@@ -72,7 +72,7 @@ void* loopFunctionPThread(void *ptr) {
 			usleep(sleepTime * 1000);
 		} else {
 			if (-sleepTime > lf->delayTime) {
-				DBG("Thread too slow %d\n", sleepTime);
+		//		DBG("Thread too slow %d\n", sleepTime);
 				nextTime = now - lf->delayTime;
 			}
 			lf->lastRunTime = nextTime;

@@ -81,7 +81,7 @@ void readSensors() {
 								lockSensor(sensor, "READ");
 								// 85 is the chips start up temp.  It reads as a valid temp so......
 								if (!hasVaildTemp(sensor) && (tempC == 85 || tempC == 0)) {
-									DBG("Sensor temp is startup temp. Ignore\n");
+									//DBG("Sensor temp is startup temp. Ignore\n");
 								} else if ((sensor->lastTemp < 84 || sensor->lastTemp > 86) && tempC == 85) {
 									// Was reading temp ouside of 85+-1 and have temp = 85.0 assume it is startup temp
 									DBG("Sensor temp is startup temp 85 and wasn't close last time. Ignore\n");

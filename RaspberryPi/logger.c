@@ -24,7 +24,7 @@
 
 unsigned long starttimeus;
 
-#ifdef __DEBUG
+#ifdef __DEBUG_FILE
 FILE* logFp = NULL;
 #endif
 
@@ -33,7 +33,7 @@ void initLogFile() {
 	gettimeofday(&tv, NULL);
 	starttimeus = tv.tv_sec * 1000000 + tv.tv_usec;
 
-#ifdef __DEBUG
+#ifdef __DEBUG_FILE
 	if (logFp == NULL) {
 		logFp = fopen(LOG_FILE, "w");
 		if (logFp == NULL) {
@@ -44,7 +44,7 @@ void initLogFile() {
 }
 void closeLogFile() {
 
-#ifdef __DEBUG
+#ifdef __DEBUG_FILE
 	if (logFp) {
 		fclose(logFp);
 	}
@@ -73,7 +73,7 @@ void logError(const char *fmt, ...) {
 	sprintf(logFmt, "%lu\t%s", microsec, fmt);
 	(void) vfprintf(stderr, logFmt, args);
 
-#ifdef __DEBUG
+#ifdef __DEBUG_FILE
 	if(logFp) {
 		(void) vfprintf(logFp, logFmt, args);
 	}
@@ -81,7 +81,7 @@ void logError(const char *fmt, ...) {
 
 	free(logFmt);
 
-#ifdef __DEBUG
+#ifdef __DEBUG_FILE
 	fflush(logFp);
 #endif
 	va_end(args);
@@ -113,13 +113,14 @@ void logMessage(const char *fmt, ...) {
 
 	(void) vfprintf(stderr, logFmt, args);
 
+#ifdef __DEBUG_FILE
 	if(logFp) {
 		va_end(args);
 		va_start(args, fmt);
 		(void) vfprintf(logFp, logFmt, args);
 		fflush(logFp);
 	}
-
+#endif
 	free(logFmt);
 
 	va_end(args);

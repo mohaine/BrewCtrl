@@ -309,11 +309,14 @@ void updateStepTimer() {
  *
  */
 void updateDuty() {
-
+//	DBG("updateDuty Start\n");
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
-		lockSteps();
 
+//DBG("updateDuty lockSteps\n");
+		lockSteps();
+//DBG("updateDuty lockSteps OK\n");
+	
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
 			int controlPointCount = step->controlPointCount;
@@ -350,7 +353,7 @@ void updateDuty() {
 		unlockSteps();
 	}
 
-
+	//DBG("updateDuty END\n");
 }
 
 /*
@@ -366,9 +369,6 @@ void updatePinsForSetDuty() {
 		lockSteps();
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
-
-			//	DBG("***********  updatePinsForSetDuty *************** \n");
-
 			int controlPointCount = step->controlPointCount;
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
@@ -376,7 +376,7 @@ void updatePinsForSetDuty() {
 
 				int duty = cp->duty;
 
-				//DBG("Pin: %d Duty: %d\n",cp->controlPin, cp->duty);
+
 
 				int maxAmps = 0;
 
@@ -389,12 +389,17 @@ void updatePinsForSetDuty() {
 					duty = 0;
 				}
 
+
+
 				if (cp->hasDuty) {
+					//DBG("  Pin: %d Duty: %d\n",cp->controlPin, cp->duty);
 					setHeatDuty(&cp->dutyController, duty);
 					updateHeatForStateAndDuty(&cp->dutyController);
 				} else {
 					updateForPinState(&cp->dutyController, duty > 0);
 				}
+
+
 				if (cp->dutyController.pinState) {
 					currentAmps += cp->fullOnAmps;
 				}
@@ -402,6 +407,7 @@ void updatePinsForSetDuty() {
 		}
 		unlockSteps();
 	}
+	//DBG("***********  updatePinsForSetDuty - END *************** \n");
 }
 
 void turnOff() {

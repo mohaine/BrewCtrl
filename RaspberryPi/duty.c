@@ -42,7 +42,7 @@ void pinMode(int pin, bool inout) {
 		fwrite(tmp, 1, strlen(tmp), f);
 		fclose(f);
 	} else {
-		fprintf(stderr, "Failed export pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
+		ERR("Failed export pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
 	}
 	sprintf(path, "%s/gpio%d/direction", GPIO_ROOT, pin);
 	f = fopen(path, "wb");
@@ -51,7 +51,7 @@ void pinMode(int pin, bool inout) {
 		fwrite(tmp, 1, strlen(tmp), f);
 		fclose(f);
 	} else {
-		fprintf(stderr, "Failed to set direction on pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
+		ERR("Failed to set direction on pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
 	}
 #endif
 }
@@ -66,7 +66,6 @@ void digitalWrite(int pin, bool hilow) {
 
 #ifdef MOCK
 //	printf("Pin %d set to %s\n", pin, hilow ? "On" : "Off");
-
 #else
 	char tmp[10];
 	char path[PATH_MAX];
@@ -77,7 +76,7 @@ void digitalWrite(int pin, bool hilow) {
 		fwrite(tmp, 1, strlen(tmp), f);
 		fclose(f);
 	} else {
-		fprintf(stderr, "Failed to set output on pin %d to %s\n", pin, hilow ? "On" : "Off");
+		ERR("Failed to set output on pin %d to %s\n", pin, hilow ? "On" : "Off");
 	}
 #endif
 
@@ -105,7 +104,6 @@ void resetDutyState(DutyController * hs) {
 }
 
 void updateForPinState(DutyController * hs, bool newHeatPinState) {
-
 	newHeatPinState = newHeatPinState & hs->on;
 	if (newHeatPinState != hs->pinState) {
 		hs->dutyOnOffLastChange = millis();
@@ -128,15 +126,20 @@ void setHeatOn(DutyController * hs, bool newState) {
 void updateHeatForStateAndDuty(DutyController * hs) {
 	unsigned long now = millis();
 	bool newHeatPinState = false;
-
-//	DBG("                 ON  : %d\n", hs->on);
-
 	if (hs->on) {
-//		DBG("                    hs->pinState  : %d\n", hs->pinState);
+
+
+
+		unsigned long timeSinceLast  = now - hs->dutyLastCheckTime;
+  if(hs->controlPin == 10){
+	DBG("  Before dutyLastCheckTime: %lu Off Time: %lu dutyLastCheckTime:  %lu timeSinceLast: %lu now: %lu\n", hs->timeOn , hs->timeOff , hs->dutyLastCheckTime,timeSinceLast,now );
+  }
+
+		
 		if (hs->pinState) {
-			hs->timeOn += (now - hs->dutyLastCheckTime);
+			hs->timeOn += (timeSinceLast);
 		} else {
-			hs->timeOff += (now - hs->dutyLastCheckTime);
+			hs->timeOff += (timeSinceLast);
 		}
 		hs->dutyLastCheckTime = now;
 
@@ -145,8 +148,17 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 		} else if (hs->duty == 0) {
 			newHeatPinState = false;
 		} else {
-			int percentOn = ((double) hs->timeOn / (hs->timeOn + hs->timeOff)) * 1000;
-			if (percentOn >= hs->duty * 10) {
+
+			unsigned long totalTime = hs->timeOn + hs->timeOff;
+			double percentOn = ((double) hs->timeOn)/totalTime;
+			int percentOnTest = (int)(percentOn * 1000);
+
+
+  if(hs->controlPin == 10){
+	DBG("     After OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n", hs->timeOn , hs->timeOff , totalTime , percentOn * 100);
+  }
+
+			if (percentOnTest >= hs->duty * 10) {
 				newHeatPinState = false;
 			} else {
 				newHeatPinState = true;

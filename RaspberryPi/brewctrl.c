@@ -36,8 +36,8 @@ long millis() {
 	if (startTime == 0) {
 		startTime = currentTime;
 	}
-
-	return (long) ((currentTime - startTime) / 1000);
+	uint64_t timeDiff = currentTime - startTime;
+	return (long) ((timeDiff) / 1000);
 }
 
 char * generateRandomId() {
