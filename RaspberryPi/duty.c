@@ -131,9 +131,11 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 
 
 		unsigned long timeSinceLast  = now - hs->dutyLastCheckTime;
+  /*
   if(hs->controlPin == 10){
 	DBG("  Before dutyLastCheckTime: %lu Off Time: %lu dutyLastCheckTime:  %lu timeSinceLast: %lu now: %lu\n", hs->timeOn , hs->timeOff , hs->dutyLastCheckTime,timeSinceLast,now );
   }
+  */
 
 		
 		if (hs->pinState) {
@@ -153,11 +155,11 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 			double percentOn = ((double) hs->timeOn)/totalTime;
 			int percentOnTest = (int)(percentOn * 1000);
 
-
+/*
   if(hs->controlPin == 10){
 	DBG("     After OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n", hs->timeOn , hs->timeOff , totalTime , percentOn * 100);
   }
-
+*/
 			if (percentOnTest >= hs->duty * 10) {
 				newHeatPinState = false;
 			} else {

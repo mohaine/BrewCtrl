@@ -48,5 +48,6 @@
 
 long millis();
 char * generateRandomId();
+void initBrewCtrl();
 #endif
 

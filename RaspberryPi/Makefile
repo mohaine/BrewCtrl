@@ -13,7 +13,8 @@ LDFLAGS += -g -rdynamic
 CFLAGS += -g -rdynamic
 
 #CFLAGSD+= -DMOCK
-CFLAGSD+= -D__DEBUG -D__DEBUG_FILE
+#CFLAGSD+= -D__DEBUG -D__DEBUG_FILE
+CFLAGSD+= -D__DEBUG
 
 
 
