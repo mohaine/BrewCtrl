@@ -1,0 +1,59 @@
+<project name="brewcontroller" default="build-jar" basedir=".">
+
+	<property file="${user.home}/home.properties" />
+	<property file="build.properties" />
+
+	<property environment="env" />
+
+	<property name="app.name" value="${ant.project.name}" />
+	<property name="app.version" value="1.0" />
+	<property name="build.home" value="build" />
+
+	<property name="common.src" value="${common.home}/src" />
+	<property name="common.lib" value="${common.home}/lib" />
+
+
+	<path id="compile.classpath">
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+
+	</path>
+	<path id="run.classpath">
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="${build.home}/classes">
+		</dirset>
+	</path>
+
+
+	<target name="clean" description="Delete old build and dist directories">
+		<delete dir="${build.home}" />
+	</target>
+
+
+	<target name="compile" depends="" description="Generate war directory">
+		<!-- Compile Java classes as necessary -->
+		<mkdir dir="${build.home}/classes" />
+		<javac srcdir="src" destdir="${build.home}/classes" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}" target="1.5">
+			<classpath refid="compile.classpath" />
+			<exclude name="**/**_UT.java" />
+		</javac>
+	</target>
+
+	<target name="build-jar" depends="compile" description="Generate war directory">
+		<jar file="${build.home}/${app.name}.war" duplicate="fail">
+			<fileset dir="${build.home}/classes">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="run" depends="" description="Generate war directory">
+		<java classpathref="run.classpath" classname="com.mohaine.brewcontroller.swing.SwingController" fork="yes">
+			
+		</java>
+	</target>
+
+</project>
