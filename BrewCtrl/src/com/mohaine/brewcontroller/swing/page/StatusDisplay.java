@@ -19,6 +19,7 @@
 package com.mohaine.brewcontroller.swing.page;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -135,6 +136,8 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 	private JPanel statusPanel;
 
+	private Color normalStatusForeground;
+
 	@Inject
 	public StatusDisplay(Hardware hardware, UnitConversion conversion, Controller controller, EventBus eventBus) {
 		super();
@@ -170,6 +173,11 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 		hltDuty = addTitledLabel(gbc, statusPanel, "HLT Duty:");
 
 		pumpState = addTitledLabel(gbc, statusPanel, "Pump:");
+
+
+		normalStatusForeground = status.getForeground();		
+
+		
 		updateState();
 		updateMode(controller.getMode());
 
@@ -268,8 +276,9 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 	}
 
 	private void updateState() {
-
 		status.setText(hardware.getStatus());
+		boolean statusOk = "Ok".equals(hardware.getStatus());
+		status.setForeground(statusOk ? normalStatusForeground : Color.red);
 
 		HardwareStatus hardwareStatus = hardware.getHardwareStatus();
 		if (hardwareStatus != null) {

@@ -24,6 +24,7 @@ package com.mohaine.brewcontroller.serial;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,6 +39,9 @@ import com.mohaine.brewcontroller.bean.HeaterMode;
 import com.mohaine.brewcontroller.bean.TempSensor;
 
 final class ReadWriteThread implements Runnable {
+
+	// TODO Add windows comm ports
+	private final String[] COMM_PORTS = { "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3" };
 
 	private final class ControlMessageWriter extends BinaryMessage implements MessageWriter {
 
@@ -167,7 +171,6 @@ final class ReadWriteThread implements Runnable {
 		status.setMode(HeaterMode.OFF);
 		status.setHltSensor(prefs.getHltSensorAddress());
 		status.setTunSensor(prefs.getTunSensorAddress());
-
 	}
 
 	public void run() {
@@ -193,7 +196,18 @@ final class ReadWriteThread implements Runnable {
 	private boolean reconnectIfNeeded() {
 		if (inputStream == null) {
 			try {
-				System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyUSB0");
+
+				if (System.getProperty("gnu.io.rxtx.SerialPorts") == null) {
+
+					StringBuffer sb = new StringBuffer();
+					for (String string : COMM_PORTS) {
+						if (sb.length() > 0) {
+							sb.append(File.pathSeparator);
+						}
+						sb.append(string);
+					}
+
+				}
 				Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
 				while (portList.hasMoreElements()) {
 					CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
