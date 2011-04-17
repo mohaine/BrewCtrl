@@ -174,10 +174,8 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 		pumpState = addTitledLabel(gbc, statusPanel, "Pump:");
 
+		normalStatusForeground = status.getForeground();
 
-		normalStatusForeground = status.getForeground();		
-
-		
 		updateState();
 		updateMode(controller.getMode());
 
@@ -276,9 +274,11 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 	}
 
 	private void updateState() {
-		status.setText(hardware.getStatus());
-		boolean statusOk = "Ok".equals(hardware.getStatus());
-		status.setForeground(statusOk ? normalStatusForeground : Color.red);
+		{
+			status.setText(hardware.getStatus());
+			boolean statusOk = "Ok".equals(hardware.getStatus());
+			status.setForeground(statusOk ? normalStatusForeground : Color.red);
+		}
 
 		HardwareStatus hardwareStatus = hardware.getHardwareStatus();
 		if (hardwareStatus != null) {
@@ -336,6 +336,9 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 		public void update() {
 			label.setText(sensor.getName() + ":");
 			value.setText(tempFormat.format(conversion.getTempDisplayConveter().convertFrom(sensor.getTempatureC())));
+
+			label.setForeground(sensor.isReading() ? normalStatusForeground : Color.red);
+
 		}
 	}
 
