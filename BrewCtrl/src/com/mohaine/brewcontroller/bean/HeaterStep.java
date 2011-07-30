@@ -103,7 +103,7 @@ public class HeaterStep {
 		this.extraCompletedTime = extraCompletedTime;
 	}
 
-	private long getTotalCompletedTime() {
+	public long getTotalCompletedTime() {
 		long total = extraCompletedTime;
 		if (lastStartTime > 0) {
 			total += (System.currentTimeMillis() - lastStartTime);
@@ -118,9 +118,9 @@ public class HeaterStep {
 		lastStartTime = 0;
 	}
 
-	public static String timeToMinutes(long time) {
+	public static String timeToMinutes(long time, String zeroDesc) {
 		if (time <= 0) {
-			return "forever";
+			return zeroDesc;
 		}
 
 		time = time / 1000;

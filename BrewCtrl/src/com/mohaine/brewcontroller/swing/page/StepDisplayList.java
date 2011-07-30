@@ -212,6 +212,8 @@ public class StepDisplayList extends JPanel {
 			case 2:
 				return "Tun Temp";
 			case 3:
+				return "Time Remaining";
+			case 4:
 				return "Time";
 			}
 
@@ -231,7 +233,9 @@ public class StepDisplayList extends JPanel {
 				case 2:
 					return nf.format(conversion.getTempDisplayConveter().convertFrom(step.getTunTemp()));
 				case 3:
-					return HeaterStep.timeToMinutes(step.getTimeRemaining());
+					return HeaterStep.timeToMinutes(step.getTimeRemaining(),"forever");
+				case 4:
+					return HeaterStep.timeToMinutes(step.getTotalCompletedTime(),"");
 				}
 
 			}
