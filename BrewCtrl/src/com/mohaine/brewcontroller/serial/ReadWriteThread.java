@@ -41,7 +41,7 @@ import com.mohaine.brewcontroller.bean.TempSensor;
 final class ReadWriteThread implements Runnable {
 
 	// TODO Add windows comm ports
-	private final String[] COMM_PORTS = { "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3" };
+	private final String[] COMM_PORTS = { "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3", "/dev/ttyACM0" };
 
 	private final class ControlMessageWriter extends BinaryMessage implements MessageWriter {
 
@@ -206,7 +206,7 @@ final class ReadWriteThread implements Runnable {
 						}
 						sb.append(string);
 					}
-
+					System.setProperty("gnu.io.rxtx.SerialPorts",sb.toString());
 				}
 				Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
 				while (portList.hasMoreElements()) {
