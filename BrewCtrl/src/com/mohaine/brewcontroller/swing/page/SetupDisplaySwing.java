@@ -44,13 +44,12 @@ import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.bean.TempSensor;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
+import com.mohaine.event.ClickHandler;
 import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.HasClickHandlers;
 import com.mohaine.event.StatusChangeHandler;
 
 public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	private static final long serialVersionUID = 1L;
-	private SwingHasClickHandlers mainMenuClickable = new SwingHasClickHandlers("Main Menu");
 	private ArrayList<SensorLabel> sensorLabels = new ArrayList<SensorLabel>();
 	private GridBagConstraints gbc = new GridBagConstraints();
 
@@ -63,6 +62,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	private List<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 
 	private JPanel inputPanel = new JPanel();
+	private JPanel controlPanel;
 
 	@Inject
 	public SetupDisplaySwing(Hardware hardware, final BrewPrefs prefs) {
@@ -122,16 +122,17 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 			}
 		});
 
-		JPanel controlPanel = new JPanel();
+		controlPanel = new JPanel();
 		add(controlPanel, BorderLayout.SOUTH);
-
-		controlPanel.add(new JButton(mainMenuClickable));
 
 	}
 
 	@Override
-	public HasClickHandlers getMainMenu() {
-		return mainMenuClickable;
+	public void addClickable(String name, ClickHandler ch) {
+		gbc.gridy++;
+		SwingHasClickHandlers setupClickable = new SwingHasClickHandlers(name);
+		setupClickable.addClickHandler(ch);
+		controlPanel.add(new JButton(setupClickable), gbc);
 	}
 
 	private void updateState(List<TempSensor> sensors) {

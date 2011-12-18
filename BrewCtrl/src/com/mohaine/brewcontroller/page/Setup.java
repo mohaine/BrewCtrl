@@ -29,13 +29,12 @@ import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.bean.TempSensor;
 import com.mohaine.event.ClickHandler;
 import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.HasClickHandlers;
 import com.mohaine.event.StatusChangeHandler;
 
 public class Setup extends BasePage implements StatusChangeHandler {
 
 	public interface SetupDisplay {
-		HasClickHandlers getMainMenu();
+		public void addClickable(String name, ClickHandler ch);
 
 		void setSensors(List<TempSensor> listSensors);
 
@@ -52,7 +51,7 @@ public class Setup extends BasePage implements StatusChangeHandler {
 		this.hardware = hardware;
 		onStateChange();
 
-		display.getMainMenu().addClickHandler(new ClickHandler() {
+		display.addClickable("Main Menu", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				controllerInterface.displayPage(providerMainMenu.get());
