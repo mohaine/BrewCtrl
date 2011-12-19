@@ -57,4 +57,9 @@ public class MainMenuDisplaySwing extends JPanel implements MainMenuDisplay {
 
 	}
 
+	@Override
+	public void init() {
+
+	}
+
 }

@@ -304,4 +304,9 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 		}
 	}
 
+	@Override
+	public void init() {
+
+	}
+
 }

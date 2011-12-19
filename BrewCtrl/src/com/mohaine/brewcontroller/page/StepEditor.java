@@ -49,6 +49,8 @@ public class StepEditor extends BasePage {
 
 		HasValue<String> getNameValue();
 
+		public void init();
+
 	}
 
 	private Object syncObject = new Object();
@@ -68,6 +70,9 @@ public class StepEditor extends BasePage {
 		this.controllerGui = ci;
 		this.mainMenu = mainMenu;
 		this.controller = controller;
+		
+		display.init();
+		
 		display.addClickable("Next Step", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

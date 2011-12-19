@@ -40,7 +40,7 @@ import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.page.StepEditor.StepEditorDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
-import com.mohaine.brewcontroller.swing.TimespanEditor;
+import com.mohaine.brewcontroller.swing.TimespanEditorSwing;
 import com.mohaine.brewcontroller.swing.ValueSlider;
 import com.mohaine.event.AbstractHasValue;
 import com.mohaine.event.ChangeEvent;
@@ -75,7 +75,7 @@ public class StepEditorDisplaySwing extends JPanel implements StepEditorDisplay 
 		}
 	};
 
-	private TimespanEditor timeValue = new TimespanEditor();
+	private TimespanEditorSwing timeValue = new TimespanEditorSwing();
 	private Hardware hardware;
 	private Converter<Double, Double> tempDisplayConveter;
 
@@ -242,6 +242,11 @@ public class StepEditorDisplaySwing extends JPanel implements StepEditorDisplay 
 		setupClickable.addClickHandler(ch);
 		controlPanel.add(new JButton(setupClickable));
 
+	}
+
+	@Override
+	public void init() {
+		
 	}
 
 }

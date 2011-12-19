@@ -38,6 +38,8 @@ public class Setup extends BasePage implements StatusChangeHandler {
 
 		void setSensors(List<TempSensor> listSensors);
 
+		void init();
+
 	}
 
 	private SetupDisplay display;
@@ -51,6 +53,8 @@ public class Setup extends BasePage implements StatusChangeHandler {
 		this.hardware = hardware;
 		onStateChange();
 
+		display.init();
+		
 		display.addClickable("Main Menu", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

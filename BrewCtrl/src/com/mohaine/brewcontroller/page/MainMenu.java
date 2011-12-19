@@ -36,6 +36,8 @@ public class MainMenu extends BasePage {
 
 	public interface MainMenuDisplay {
 		void addClickable(String name, ClickHandler ch);
+
+		void init();
 	}
 
 	private MainMenuDisplay display;
@@ -45,6 +47,9 @@ public class MainMenu extends BasePage {
 			final BrewPrefs prefs, final UnitConversion conversion) {
 		super();
 		this.display = display;
+		
+		display.init();
+		
 
 		final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
 

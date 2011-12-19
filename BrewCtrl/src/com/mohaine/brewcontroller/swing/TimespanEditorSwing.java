@@ -32,12 +32,12 @@ import com.mohaine.event.ChangeHandler;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.HasValue;
 
-public class TimespanEditor extends JPanel implements HasValue<Long>, ChangeListener {
+public class TimespanEditorSwing extends JPanel implements HasValue<Long>, ChangeListener {
 	private static final long serialVersionUID = 1L;
 	JSpinner minuteSpinner = new JSpinner();
 	JSpinner secondSpinner = new JSpinner();
 
-	public TimespanEditor() {
+	public TimespanEditorSwing() {
 		super();
 
 		setLayout(new GridBagLayout());
