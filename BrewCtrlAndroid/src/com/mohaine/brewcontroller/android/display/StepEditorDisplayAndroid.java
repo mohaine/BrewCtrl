@@ -5,12 +5,15 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.inject.Inject;
+import com.mohaine.brewcontroller.Converter;
+import com.mohaine.brewcontroller.Hardware;
+import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.android.widget.TimespanEditorAndroid;
+import com.mohaine.brewcontroller.android.widget.ValueSlider;
 import com.mohaine.brewcontroller.page.StepEditor.StepEditorDisplay;
 import com.mohaine.event.AbstractHasValue;
 import com.mohaine.event.ChangeEvent;
-import com.mohaine.event.ChangeHandler;
-import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.HasValue;
 
 public class StepEditorDisplayAndroid extends ControlPanelAndroid implements StepEditorDisplay {
@@ -34,6 +37,20 @@ public class StepEditorDisplayAndroid extends ControlPanelAndroid implements Ste
 
 	private TimespanEditorAndroid timespanEditor;
 
+	private Hardware hardware;
+
+	private Converter<Double, Double> tempDisplayConveter;
+
+	private ValueSlider tunTempSlider;
+
+	private ValueSlider hltTempSlider;
+
+	@Inject
+	public StepEditorDisplayAndroid(UnitConversion conversion, Hardware hardware) {
+		this.hardware = hardware;
+		tempDisplayConveter = conversion.getTempDisplayConveter();
+	}
+
 	@Override
 	public void init() {
 		super.init();
@@ -49,6 +66,13 @@ public class StepEditorDisplayAndroid extends ControlPanelAndroid implements Ste
 		timespanEditor.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		layout.addView(timespanEditor);
 
+		tunTempSlider = new ValueSlider(context, 120, tempDisplayConveter.convertTo(100.0), tempDisplayConveter.convertTo(212.0), tempDisplayConveter);
+		hltTempSlider = new ValueSlider(context, 120, tempDisplayConveter.convertTo(100.0), tempDisplayConveter.convertTo(212.0), tempDisplayConveter);
+
+		layout.addView(tunTempSlider);
+		layout.addView(hltTempSlider);
+
+		
 	}
 
 	private View createLabel(String string) {
@@ -59,77 +83,12 @@ public class StepEditorDisplayAndroid extends ControlPanelAndroid implements Ste
 
 	@Override
 	public HasValue<Double> getTunTemp() {
-		// TODO
-		return new HasValue<Double>() {
-
-			@Override
-			public Double getValue() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void setValue(Double value) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void setValue(Double value, boolean fireEvents) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public HandlerRegistration addChangeHandler(ChangeHandler handler) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void fireEvent(ChangeEvent event) {
-				// TODO Auto-generated method stub
-
-			}
-		};
+		return tunTempSlider;
 	}
 
 	@Override
 	public HasValue<Double> getHltTemp() {
-		// TODO
-		return new HasValue<Double>() {
-
-			@Override
-			public Double getValue() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void setValue(Double value) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void setValue(Double value, boolean fireEvents) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public HandlerRegistration addChangeHandler(ChangeHandler handler) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void fireEvent(ChangeEvent event) {
-				// TODO Auto-generated method stub
-
-			}
-		};
-
+		return hltTempSlider;
 	}
 
 	@Override
