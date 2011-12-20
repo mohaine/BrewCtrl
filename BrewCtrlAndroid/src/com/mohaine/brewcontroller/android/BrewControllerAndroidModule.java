@@ -36,8 +36,7 @@ public class BrewControllerAndroidModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(ControllerGui.class).to(ControllerInterfaceAndroid.class)
-				.asEagerSingleton();
+		bind(ControllerGui.class).to(ControllerInterfaceAndroid.class);
 		bind(Controller.class).to(ControllerImpl.class).asEagerSingleton();
 
 		bind(MainMenuDisplay.class).to(MainMenuDisplayAndroid.class);

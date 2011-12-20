@@ -29,6 +29,8 @@ public class BrewControllerStartup {
 	private final ControllerGui ci;
 	private final DisplayPage startupPage;
 
+	private boolean started = false;
+
 	@Inject
 	public BrewControllerStartup(ControllerGui ci, StepEditor startupPage, final Controller controller, final UnitConversion conversion) {
 		super();
@@ -46,8 +48,11 @@ public class BrewControllerStartup {
 
 	public void startup() {
 
-		ci.init();
-		ci.displayPage(startupPage);
+		if (!started) {
+			ci.init();
+			ci.displayPage(startupPage);
+			started = true;
+		}
 	}
 
 }
