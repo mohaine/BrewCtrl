@@ -26,8 +26,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.FontMetrics;
 import android.graphics.Path;
-import android.graphics.Rect;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.mohaine.brewcontroller.Converter;
@@ -37,7 +39,9 @@ import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.HasValue;
 
 public class ValueSlider extends View implements HasValue<Double> {
-	private static final long serialVersionUID = 1L;
+
+	private static final int FG_COLOR = Color.BLACK;
+	private static final int STROKE_WIDTH = 2;
 
 	private final class MouseDownRunnable implements Runnable {
 		private boolean up = false;
@@ -54,6 +58,7 @@ public class ValueSlider extends View implements HasValue<Double> {
 				} catch (InterruptedException e) {
 				}
 				while (holdingMouseDown) {
+					Log.v(TAG, "TOUCH DOWN THREAD");
 
 					try {
 						wait(50);
@@ -61,12 +66,12 @@ public class ValueSlider extends View implements HasValue<Double> {
 					}
 
 					if (holdingMouseDown) {
-						// SwingUtilities.invokeLater(new Runnable() {
-						// @Override
-						// public void run() {
-						// updateValue(value + (up ? step : -step));
-						// }
-						// });
+						post(new Runnable() {
+							@Override
+							public void run() {
+								updateValue(value + (up ? step : -step));
+							}
+						});
 					}
 				}
 				running = false;
@@ -74,11 +79,12 @@ public class ValueSlider extends View implements HasValue<Double> {
 		}
 	}
 
-	private static final int SLIDER_HEIGHT = 3;
-	private static final int BUTTON_HEIGHT = 20;
+	private static final int SLIDER_HEIGHT = 5;
+	private static final int BUTTON_HEIGHT = 40;
+	private static final String TAG = "ValueSlider";
 
 	private NumberFormat nf = new DecimalFormat("0.#");
-	private Paint valueColor = new Paint(Color.LTGRAY);
+	private int valueColor = Color.rgb(175, 175, 175);
 	private double value = 50;
 	private double minValue = 0;
 	private double maxValue = 100;
@@ -86,7 +92,7 @@ public class ValueSlider extends View implements HasValue<Double> {
 
 	private boolean drawOtherValue = false;
 	private double otherValue = 0;
-	private Paint otherValueColor = new Paint(Color.RED);
+	private int otherValueColor = Color.RED;
 
 	private ArrayList<ChangeHandler> changeHandlers = new ArrayList<ChangeHandler>();
 
@@ -114,74 +120,85 @@ public class ValueSlider extends View implements HasValue<Double> {
 
 	{
 
-		// setPreferredSize(new Dimension(50, 200));
-		// addMouseListener(this);
-		// addMouseMotionListener(this);
-		// addMouseWheelListener(this);
+		this.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return updateForEvent(event);
+			}
+		});
+
 	}
 
 	@Override
-	protected void onDraw(Canvas g) {
-		super.onDraw(g);
+	protected void onDraw(Canvas c) {
+		super.onDraw(c);
 
 		int width = getWidth();
 		int height = getHeight();
 
-		// g.drawColor(Color.WHITE);
-		g.drawColor(Color.BLACK);
+		c.drawColor(Color.WHITE);
+		c.drawColor(Color.LTGRAY);
 
-		Paint paint = new Paint(Color.WHITE);
+		Paint paint = new Paint(FG_COLOR);
 
-		g.drawRect(new Rect(0, 0, width - 1, BUTTON_HEIGHT - 1), paint);
-
+		// Arrows
 		int arrowTopBottom = 5;
 		int arrowLeftRight = width / 3;
 		Path p = new Path();
+		paint.setStyle(Paint.Style.FILL);
+		int center = width / 2;
 
-		p.moveTo(width / 2, arrowTopBottom);
-		p.moveTo(arrowLeftRight, BUTTON_HEIGHT - arrowTopBottom);
-		p.moveTo(width - arrowLeftRight, BUTTON_HEIGHT - arrowTopBottom);
-		g.drawPath(p, paint);
+		p.moveTo(center, arrowTopBottom);
+		p.lineTo(arrowLeftRight, BUTTON_HEIGHT - arrowTopBottom);
+		p.lineTo(width - arrowLeftRight, BUTTON_HEIGHT - arrowTopBottom);
+		c.drawPath(p, paint);
 		p.reset();
-		p.moveTo(width / 2, height - arrowTopBottom);
-		p.moveTo(arrowLeftRight, height - (BUTTON_HEIGHT - arrowTopBottom));
-		p.moveTo(width - arrowLeftRight + 1, height - (BUTTON_HEIGHT - arrowTopBottom));
-		g.drawPath(p, paint);
+		p.moveTo(center, height - arrowTopBottom);
+		p.lineTo(arrowLeftRight, height - (BUTTON_HEIGHT - arrowTopBottom));
+		p.lineTo(width - arrowLeftRight + 1, height - (BUTTON_HEIGHT - arrowTopBottom));
+		c.drawPath(p, paint);
 
-		g.drawRect(new Rect(0, height - BUTTON_HEIGHT, width - 1, BUTTON_HEIGHT - 1), paint);
-
-		// Slider Bottom Fill
 		int offset = getLocation(value, height);
-		g.drawRect(1, offset, width - 2, height - offset - BUTTON_HEIGHT, valueColor);
 
-		// Other Value Fill
+		// Area under slider
+		paint.setStyle(Paint.Style.FILL);
 		if (drawOtherValue) {
-			int otherOvalueOffset = getLocation(otherValue, height);
-			g.drawRect(new Rect(1, otherOvalueOffset, width - 2, height - otherOvalueOffset - BUTTON_HEIGHT), otherValueColor);
-			drawValue(g, width, otherValue, otherOvalueOffset);
-
+			paint.setColor(otherValueColor);
+		} else {
+			paint.setColor(valueColor);
 		}
+		c.drawRect(0, offset, width, height - BUTTON_HEIGHT, paint);
 
 		// Slider
-		g.drawRect(new Rect(0, offset - SLIDER_HEIGHT, width, SLIDER_HEIGHT), paint);
-		drawValue(g, width, value, offset);
+		paint.setColor(FG_COLOR);
+		paint.setStyle(Paint.Style.FILL_AND_STROKE);
+		c.drawRect(0, offset, width, offset - SLIDER_HEIGHT, paint);
+		drawValue(c, paint, width, value, offset);
+
+		// Borders
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setStrokeWidth(STROKE_WIDTH);
+
+		c.drawRect(0, 0, width, height, paint);
+		c.drawRect(0, BUTTON_HEIGHT, width, height - BUTTON_HEIGHT, paint);
+
 	}
 
-	private void drawValue(Canvas g, int width, double displayValue, int displayOffset) {
-		// FontMetrics fontMetrics = g.getFontMetrics();
-		// String string = nf.format(displayValue);
-		// int stringWidth = fontMetrics.stringWidth(string);
-		// int textOffset = displayOffset - fontMetrics.getDescent() - 1;
-		//
-		// if (textOffset - fontMetrics.getAscent() < BUTTON_HEIGHT) {
-		// textOffset = displayOffset + fontMetrics.getAscent() + 1;
-		// }
-		// Graphics2D g2 = (Graphics2D) g;
-		// g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		// RenderingHints.VALUE_ANTIALIAS_ON);
-		// g.drawString(string, (width - stringWidth) / 2, textOffset);
-		// g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		// RenderingHints.VALUE_ANTIALIAS_OFF);
+	private void drawValue(Canvas c, Paint paint, int width, double displayValue, int displayOffset) {
+
+		FontMetrics fontMetrics = paint.getFontMetrics();
+		String string = nf.format(displayValue);
+		float stringWidth = paint.measureText(string);
+
+		float textOffset = (int) displayOffset - fontMetrics.descent - SLIDER_HEIGHT;
+
+		float topOfText = textOffset + fontMetrics.ascent - 2;
+
+		if (topOfText <= BUTTON_HEIGHT) {
+			textOffset = displayOffset - fontMetrics.ascent + SLIDER_HEIGHT;
+		}
+		c.drawText(string, (width - stringWidth) / 2, textOffset, paint);
 	}
 
 	private int getLocation(double lValue, int height) {
@@ -206,75 +223,51 @@ public class ValueSlider extends View implements HasValue<Double> {
 		return value;
 	}
 
-	// @Override
-	// public void mouseClicked(MouseEvent event) {
-	// updateForEvent(event);
-	// }
-	//
-	// private void updateForEvent(MouseEvent event) {
-	// int y = event.getY();
-	// if (y < BUTTON_HEIGHT) {
-	// updateValue(value + step);
-	// } else if (y > getHeight() - BUTTON_HEIGHT) {
-	// updateValue(value - step);
-	// } else {
-	// updateValue(getValue(y));
-	// }
-	// }
-	//
-	//
-	// @Override
-	// public void mouseExited(MouseEvent event) {
-	// cancelThread();
-	// }
-	//
-	// private void cancelThread() {
-	// synchronized (mouseDownRunable) {
-	// mouseDownRunable.holdingMouseDown = false;
-	// mouseDownRunable.notify();
-	// }
-	// }
-	//
-	// @Override
-	// public void mousePressed(MouseEvent event) {
-	// int y = event.getY();
-	// boolean upButton = y < BUTTON_HEIGHT;
-	// boolean downButton = y > getHeight() - BUTTON_HEIGHT;
-	// if (upButton || downButton) {
-	// synchronized (mouseDownRunable) {
-	// if (!mouseDownRunable.running) {
-	// mouseDownRunable.up = upButton;
-	// mouseDownRunable.holdingMouseDown = true;
-	// mouseDownRunable.running = true;
-	// new Thread(mouseDownRunable).start();
-	// }
-	// }
-	// }
-	// }
-	//
-	// @Override
-	// public void mouseReleased(MouseEvent event) {
-	// cancelThread();
-	// }
-	//
-	// @Override
-	// public void mouseDragged(MouseEvent event) {
-	// updateForEvent(event);
-	// }
-	//
-	// @Override
-	// public void mouseMoved(MouseEvent event) {
-	// int y = event.getY();
-	// if (!(y < BUTTON_HEIGHT || y > getHeight() - BUTTON_HEIGHT)) {
-	// cancelThread();
-	// }
-	//
-	// }
-	//
-	// @Override
-	// public void mouseWheelMoved(MouseWheelEvent event) {
-	// updateValue(value + -event.getWheelRotation() * step);
-	// }
+	private boolean updateForEvent(MotionEvent event) {
+		System.out.println("e: " + event.getX() + " " + event.getY() + " " + event.getAction());
+
+		int y = (int) event.getY();
+
+		boolean upButton = y < BUTTON_HEIGHT;
+		boolean downButton = y > getHeight() - BUTTON_HEIGHT;
+		if (upButton || downButton) {
+			synchronized (mouseDownRunable) {
+				boolean down = event.getAction() != MotionEvent.ACTION_UP;
+				if (down) {
+					if (upButton) {
+						updateValue(value + step);
+					} else {
+						updateValue(value - step);
+					}
+					if (!mouseDownRunable.running) {
+						mouseDownRunable.up = upButton;
+						mouseDownRunable.holdingMouseDown = down;
+						mouseDownRunable.running = true;
+						new Thread(mouseDownRunable).start();
+					}
+				} else {
+					mouseDownRunable.holdingMouseDown = false;
+					mouseDownRunable.notify();
+				}
+			}
+		} else {
+			updateValue(getValue(y));
+		}
+		//
+		// if (y < BUTTON_HEIGHT) {
+		// if (event.getAction() == MotionEvent.ACTION_DOWN) {
+		// updateValue(value + step);
+		// }
+		// } else if (y > getHeight() - BUTTON_HEIGHT) {
+		// if (event.getAction() == MotionEvent.ACTION_DOWN) {
+		// updateValue(value - step);
+		// }
+		// } else {
+		// updateValue(getValue(y));
+		// }
+
+		return true;
+	}
 
 	@Override
 	public HandlerRegistration addChangeHandler(final ChangeHandler handler) {
@@ -330,6 +323,7 @@ public class ValueSlider extends View implements HasValue<Double> {
 				fireEvent(new ChangeEvent());
 			}
 		}
+
 	}
 
 	public double getOtherValue() {
@@ -343,8 +337,7 @@ public class ValueSlider extends View implements HasValue<Double> {
 	}
 
 	private void repaint() {
-		// TODO
-		refreshDrawableState();
+		invalidate();
 	}
 
 	public boolean isDrawOtherValue() {
@@ -355,11 +348,11 @@ public class ValueSlider extends View implements HasValue<Double> {
 		this.drawOtherValue = drawOtherValue;
 	}
 
-	public Paint getOtherValueColor() {
+	public int getOtherValueColor() {
 		return otherValueColor;
 	}
 
-	public void setOtherValueColor(Paint otherValueColor) {
+	public void setOtherValueColor(int otherValueColor) {
 		this.otherValueColor = otherValueColor;
 	}
 
