@@ -69,7 +69,13 @@ public class ValueSlider extends View implements HasValue<Double> {
 						post(new Runnable() {
 							@Override
 							public void run() {
+
+								double valueBefore = value;
 								updateValue(value + (up ? step : -step));
+
+								if (valueBefore == value) {
+									holdingMouseDown = false;
+								}
 							}
 						});
 					}
@@ -98,6 +104,7 @@ public class ValueSlider extends View implements HasValue<Double> {
 
 	private MouseDownRunnable mouseDownRunable = new MouseDownRunnable();
 	private Converter<Double, Double> displayConverter;
+	private boolean inDrag;
 
 	public ValueSlider(Context context) {
 		super(context);
@@ -224,15 +231,15 @@ public class ValueSlider extends View implements HasValue<Double> {
 	}
 
 	private boolean updateForEvent(MotionEvent event) {
-		System.out.println("e: " + event.getX() + " " + event.getY() + " " + event.getAction());
+		Log.v(TAG, "ValueSlider.updateForEvent() at: " + event.getX() + "," + event.getY() + " Action: " + event.getAction());
+		boolean down = event.getAction() != MotionEvent.ACTION_UP;
 
 		int y = (int) event.getY();
 
 		boolean upButton = y < BUTTON_HEIGHT;
 		boolean downButton = y > getHeight() - BUTTON_HEIGHT;
-		if (upButton || downButton) {
+		if (!inDrag && (upButton || downButton)) {
 			synchronized (mouseDownRunable) {
-				boolean down = event.getAction() != MotionEvent.ACTION_UP;
 				if (down) {
 					if (upButton) {
 						updateValue(value + step);
@@ -240,32 +247,24 @@ public class ValueSlider extends View implements HasValue<Double> {
 						updateValue(value - step);
 					}
 					if (!mouseDownRunable.running) {
+						Log.v(TAG, "ValueSlider.updateForEvent() Start Thread");
 						mouseDownRunable.up = upButton;
 						mouseDownRunable.holdingMouseDown = down;
 						mouseDownRunable.running = true;
 						new Thread(mouseDownRunable).start();
 					}
 				} else {
+
+					Log.v(TAG, "ValueSlider.updateForEvent() Stop Thread");
+
 					mouseDownRunable.holdingMouseDown = false;
 					mouseDownRunable.notify();
 				}
 			}
 		} else {
 			updateValue(getValue(y));
+			inDrag = down;
 		}
-		//
-		// if (y < BUTTON_HEIGHT) {
-		// if (event.getAction() == MotionEvent.ACTION_DOWN) {
-		// updateValue(value + step);
-		// }
-		// } else if (y > getHeight() - BUTTON_HEIGHT) {
-		// if (event.getAction() == MotionEvent.ACTION_DOWN) {
-		// updateValue(value - step);
-		// }
-		// } else {
-		// updateValue(getValue(y));
-		// }
-
 		return true;
 	}
 
