@@ -42,11 +42,13 @@ public class ValueSlider extends View implements HasValue<Double> {
 
 	private static final int FG_COLOR = Color.BLACK;
 	private static final int STROKE_WIDTH = 2;
+	private static final int SLIDER_HEIGHT = 5;
+	private static final int BUTTON_HEIGHT = 50;
 
 	private final class MouseDownRunnable implements Runnable {
 		private boolean up = false;
 		private boolean running = false;
-		private boolean holdingMouseDown = false;
+		private boolean run = false;
 
 		@Override
 		public void run() {
@@ -57,15 +59,18 @@ public class ValueSlider extends View implements HasValue<Double> {
 					wait(500);
 				} catch (InterruptedException e) {
 				}
-				while (holdingMouseDown) {
+				while (run) {
 					Log.v(TAG, "TOUCH DOWN THREAD");
 
 					try {
-						wait(50);
+						wait(100);
 					} catch (InterruptedException e) {
 					}
 
-					if (holdingMouseDown) {
+					if (run) {
+
+						Log.v(TAG, "ValueSlider PROCESS TICK");
+
 						post(new Runnable() {
 							@Override
 							public void run() {
@@ -74,7 +79,9 @@ public class ValueSlider extends View implements HasValue<Double> {
 								updateValue(value + (up ? step : -step));
 
 								if (valueBefore == value) {
-									holdingMouseDown = false;
+									Log.v(TAG, "ValueSlider Stop Thread VALUE");
+
+									run = false;
 								}
 							}
 						});
@@ -85,8 +92,6 @@ public class ValueSlider extends View implements HasValue<Double> {
 		}
 	}
 
-	private static final int SLIDER_HEIGHT = 5;
-	private static final int BUTTON_HEIGHT = 40;
 	private static final String TAG = "ValueSlider";
 
 	private NumberFormat nf = new DecimalFormat("0.#");
@@ -232,10 +237,18 @@ public class ValueSlider extends View implements HasValue<Double> {
 
 	private boolean updateForEvent(MotionEvent event) {
 		Log.v(TAG, "ValueSlider.updateForEvent() at: " + event.getX() + "," + event.getY() + " Action: " + event.getAction());
-		boolean down = event.getAction() != MotionEvent.ACTION_UP;
+		boolean down = event.getAction() == MotionEvent.ACTION_DOWN;
+		boolean move = event.getAction() == MotionEvent.ACTION_MOVE;
+
+		if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+			cancelTouchActions();
+			return true;
+		} else if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+			cancelTouchActions();
+			return true;
+		}
 
 		int y = (int) event.getY();
-
 		boolean upButton = y < BUTTON_HEIGHT;
 		boolean downButton = y > getHeight() - BUTTON_HEIGHT;
 		if (!inDrag && (upButton || downButton)) {
@@ -249,23 +262,39 @@ public class ValueSlider extends View implements HasValue<Double> {
 					if (!mouseDownRunable.running) {
 						Log.v(TAG, "ValueSlider.updateForEvent() Start Thread");
 						mouseDownRunable.up = upButton;
-						mouseDownRunable.holdingMouseDown = down;
+						mouseDownRunable.run = true;
 						mouseDownRunable.running = true;
 						new Thread(mouseDownRunable).start();
 					}
+				} else if (move) {
 				} else {
-
-					Log.v(TAG, "ValueSlider.updateForEvent() Stop Thread");
-
-					mouseDownRunable.holdingMouseDown = false;
-					mouseDownRunable.notify();
+					cancelTouchActions();
 				}
 			}
+		} else if (inDrag || down) {
+			if (down || move) {
+				inDrag = true;
+				updateValue(getValue(y));
+			} else {
+				cancelTouchActions();
+			}
 		} else {
-			updateValue(getValue(y));
-			inDrag = down;
+			cancelTouchActions();
 		}
 		return true;
+	}
+
+	private void cancelTouchActions() {
+		Log.v(TAG, "ValueSlider.cancelTouchActions() ");
+		inDrag = false;
+
+		synchronized (mouseDownRunable) {
+			if (mouseDownRunable.run) {
+				Log.v(TAG, "ValueSlider.cancelTouchActions() Stop Thread");
+				mouseDownRunable.run = false;
+				mouseDownRunable.notify();
+			}
+		}
 	}
 
 	@Override
