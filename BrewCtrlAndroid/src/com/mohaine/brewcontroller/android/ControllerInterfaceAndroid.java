@@ -24,23 +24,22 @@ public class ControllerInterfaceAndroid implements ControllerGui {
 	public void displayPage(DisplayPage page) {
 		Log.v(TAG, "ControllerInterfaceAndroid.displayPage(" + page.getTitle() + ")");
 
-		if (currentPage == page) {
-			return;
+		Activity activity = providerActivity.get();
+		LinearLayout layout = (LinearLayout) activity.findViewById(R.id.pageDisplay);
+		if (currentPage != null) {
+			currentPage.hidePage();
 		}
-
 		currentPage = page;
 
-		Activity activity = providerActivity.get();
 		activity.setTitle(page.getTitle());
-
-		LinearLayout layout = (LinearLayout) activity.findViewById(R.id.pageDisplay);
 
 		Object widget = page.getWidget();
 		if (widget != null) {
 			if (widget instanceof HasView) {
+				layout.removeAllViews();
 				View viewGroup = ((HasView) widget).getView();
 				layout.addView(viewGroup);
-				viewGroup.invalidate();
+				layout.invalidate();
 			}
 		}
 		page.showPage();
