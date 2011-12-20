@@ -79,9 +79,9 @@ public class StepEditorDisplayAndroid extends ControlPanelAndroid implements Ste
 
 		LinearLayout ll = new LinearLayout(context);
 
-		tunTempSlider.setLayoutParams(new LayoutParams(100, 200));
+		tunTempSlider.setLayoutParams(new LayoutParams(100, 300));
 		ll.addView(tunTempSlider);
-		hltTempSlider.setLayoutParams(new LayoutParams(100, 200));
+		hltTempSlider.setLayoutParams(new LayoutParams(100, 300));
 		ll.addView(hltTempSlider);
 
 		layout.addView(ll);
