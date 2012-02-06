@@ -44,12 +44,11 @@ public class MainMenu extends BasePage {
 
 	@Inject
 	public MainMenu(MainMenuDisplay display, final Provider<Setup> providerSetup, final Provider<StepEditor> providerStepEditor, final ControllerGui controllerGui, final Controller controller,
-			final BrewPrefs prefs, final UnitConversion conversion) {
+			final Provider<Overview> providerOverview, final BrewPrefs prefs, final UnitConversion conversion) {
 		super();
 		this.display = display;
-		
+
 		display.init();
-		
 
 		final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
 
@@ -57,6 +56,12 @@ public class MainMenu extends BasePage {
 			@Override
 			public void onClick(ClickEvent event) {
 				controllerGui.displayPage(providerSetup.get());
+			}
+		});
+		display.addClickable("Overview", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				controllerGui.displayPage(providerOverview.get());
 			}
 		});
 		display.addClickable("Run", new ClickHandler() {

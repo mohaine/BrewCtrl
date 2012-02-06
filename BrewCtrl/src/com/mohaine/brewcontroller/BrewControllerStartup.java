@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.bean.HeaterStep;
-import com.mohaine.brewcontroller.page.StepEditor;
+import com.mohaine.brewcontroller.page.Overview;
 
 public class BrewControllerStartup {
 	private final ControllerGui ci;
@@ -32,7 +32,7 @@ public class BrewControllerStartup {
 	private boolean started = false;
 
 	@Inject
-	public BrewControllerStartup(ControllerGui ci, StepEditor startupPage, final Controller controller, final UnitConversion conversion) {
+	public BrewControllerStartup(ControllerGui ci, Overview startupPage, final Controller controller, final UnitConversion conversion) {
 		super();
 		this.ci = ci;
 		this.startupPage = startupPage;

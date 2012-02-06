@@ -29,6 +29,10 @@ import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.layout.BrewLayout;
+import com.mohaine.brewcontroller.layout.Heater;
+import com.mohaine.brewcontroller.layout.Sensor;
+import com.mohaine.brewcontroller.layout.Zone;
 import com.mohaine.event.bus.EventBus;
 
 public class ControllerImpl implements Controller {
@@ -157,7 +161,7 @@ public class ControllerImpl implements Controller {
 	@Override
 	public void setMode(Mode mode) {
 		this.mode = mode;
-		
+
 		updateHardware();
 	}
 
@@ -192,5 +196,31 @@ public class ControllerImpl implements Controller {
 			hc.setMashOn(false);
 		}
 		hardware.setHardwareControl(hc);
+	}
+
+	public BrewLayout getLayout() {
+
+		BrewLayout brewLayout = new BrewLayout();
+		brewLayout.setName("Brewing");
+
+		List<Zone> zones = brewLayout.getZones();
+		Zone hlt = new Zone();
+		hlt.setName("HLT");
+		hlt.setHeater(new Heater());
+		hlt.setSensor(new Sensor());
+
+		zones.add(hlt);
+
+		Zone tun = new Zone();
+		tun.setName("TUN");
+		tun.setSensor(new Sensor());
+		zones.add(tun);
+
+		Zone kettle = new Zone();
+		kettle.setName("Kettle");
+		kettle.setHeater(new Heater());
+		zones.add(kettle);
+
+		return brewLayout;
 	}
 }

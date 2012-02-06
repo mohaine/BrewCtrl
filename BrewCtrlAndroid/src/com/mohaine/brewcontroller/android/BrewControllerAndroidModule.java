@@ -25,9 +25,11 @@ import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.HardwareMock;
 import com.mohaine.brewcontroller.android.display.MainMenuDisplayAndroid;
+import com.mohaine.brewcontroller.android.display.OverviewDisplayAndroid;
 import com.mohaine.brewcontroller.android.display.SetupDisplayAndroid;
 import com.mohaine.brewcontroller.android.display.StepEditorDisplayAndroid;
 import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
+import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
 import com.mohaine.brewcontroller.page.StepEditor.StepEditorDisplay;
 import com.mohaine.event.bus.EventBus;
@@ -42,6 +44,7 @@ public class BrewControllerAndroidModule extends AbstractModule {
 		bind(MainMenuDisplay.class).to(MainMenuDisplayAndroid.class);
 		bind(SetupDisplay.class).to(SetupDisplayAndroid.class);
 		bind(StepEditorDisplay.class).to(StepEditorDisplayAndroid.class);
+		bind(OverviewDisplay.class).to(OverviewDisplayAndroid.class);
 		// bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
 		bind(Hardware.class).to(HardwareMock.class).asEagerSingleton();
 

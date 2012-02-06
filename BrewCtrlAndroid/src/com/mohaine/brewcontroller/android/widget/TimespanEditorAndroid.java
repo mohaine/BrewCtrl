@@ -34,8 +34,8 @@ import com.mohaine.event.HasValue;
 
 public class TimespanEditorAndroid extends LinearLayout implements HasValue<Long> {
 
-	EditText minuteEdit;
-	EditText secondEdit;
+	private EditText minuteEdit;
+	private EditText secondEdit;
 
 	public TimespanEditorAndroid(Context context) {
 		super(context);

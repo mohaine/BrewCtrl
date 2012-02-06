@@ -21,6 +21,7 @@ package com.mohaine.brewcontroller;
 import java.util.List;
 
 import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.layout.BrewLayout;
 
 public interface Controller {
 
@@ -43,5 +44,7 @@ public interface Controller {
 	public void setSteps(List<HeaterStep> steps);
 
 	public void nextStep();
+
+	public BrewLayout getLayout();
 
 }
