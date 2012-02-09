@@ -11,13 +11,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mohaine.brewcontroller.android.widget.PumpView;
 import com.mohaine.brewcontroller.android.widget.ZoneView;
 import com.mohaine.brewcontroller.layout.BrewLayout;
+import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Zone;
 
 public class BreweryDisplay extends ViewGroup {
 	private static final String TAG = "BreweryDisplay";
 	private List<ZoneView> zoneViews = new ArrayList<ZoneView>();
+	private List<PumpView> pumpViews = new ArrayList<PumpView>();
 
 	public BreweryDisplay(Context context) {
 		super(context);
@@ -89,18 +92,29 @@ public class BreweryDisplay extends ViewGroup {
 		Rect rect = new Rect(5, yOffset, 5 + zoneWidth, yOffset + zoneHeight);
 		for (ZoneView zoneView : zoneViews) {
 			measureChild(zoneView, widthMeasureSpec, heightMeasureSpec);
-
 			LayoutParams lp = (LayoutParams) zoneView.getLayoutParams();
-
 			lp.x = rect.left;
 			lp.y = rect.top;
 			lp.width = zoneWidth;
 			lp.height = zoneHeight;
-			Log.v(TAG, "   set lp: " + lp.x + "," + lp.y + " => " + (lp.x + lp.width) + "," + (lp.y + lp.height));
-
 			rect.top += zoneHeight + padding;
 		}
 
+		int pumpWidth = 100;
+		int pumpHeight = 100;
+
+		rect.top = yOffset;
+		rect.left = 5 + zoneWidth + 30;
+
+		for (PumpView pumpView : pumpViews) {
+			measureChild(pumpView, widthMeasureSpec, heightMeasureSpec);
+			LayoutParams lp = (LayoutParams) pumpView.getLayoutParams();
+			lp.x = rect.left;
+			lp.y = rect.top;
+			lp.width = pumpWidth;
+			lp.height = pumpHeight;
+			rect.top += pumpHeight + padding;
+		}
 		setMeasuredDimension(resolveSize(widthSize, widthMeasureSpec), resolveSize(heightSize, heightMeasureSpec));
 	}
 
@@ -114,6 +128,15 @@ public class BreweryDisplay extends ViewGroup {
 			zoneView.layout(lp.x, lp.y, right, bottom);
 			Log.v(TAG, "onLayout: " + lp.x + "," + lp.y + "  => " + right + "," + bottom);
 		}
+
+		for (PumpView pumpView : pumpViews) {
+			LayoutParams lp = (LayoutParams) pumpView.getLayoutParams();
+			int right = lp.x + pumpView.getMeasuredWidth();
+			int bottom = lp.y + pumpView.getMeasuredHeight();
+			pumpView.layout(lp.x, lp.y, right, bottom);
+			Log.v(TAG, "onLayout: " + lp.x + "," + lp.y + "  => " + right + "," + bottom);
+		}
+
 	}
 
 	public void setBreweryLayout(BrewLayout brewLayout) {
@@ -126,6 +149,16 @@ public class BreweryDisplay extends ViewGroup {
 			zoneView.setLayoutParams(new LayoutParams(200, 200));
 			addView(zoneView);
 		}
+
+		List<Pump> pumps = brewLayout.getPumps();
+		for (Pump pump : pumps) {
+			PumpView pumpView = new PumpView(getContext());
+			pumpViews.add(pumpView);
+			pumpView.setPump(pump);
+			pumpView.setLayoutParams(new LayoutParams(100, 100));
+			addView(pumpView);
+		}
+
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.List;
 public class BrewLayout {
 	private String name;
 	private List<Zone> zones = new ArrayList<Zone>();
+	private List<Pump> pumps = new ArrayList<Pump>();
 
 	public String getName() {
 		return name;
@@ -23,5 +24,12 @@ public class BrewLayout {
 		this.zones = zone;
 	}
 
+	public List<Pump> getPumps() {
+		return pumps;
+	}
+
+	public void setPumps(List<Pump> pumps) {
+		this.pumps = pumps;
+	}
 
 }

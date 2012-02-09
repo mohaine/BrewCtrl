@@ -22,23 +22,18 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.mohaine.brewcontroller.layout.Heater;
-import com.mohaine.brewcontroller.layout.Sensor;
-import com.mohaine.brewcontroller.layout.Zone;
+import com.mohaine.brewcontroller.layout.Pump;
 
-public class ZoneView extends LinearLayout {
-	private static final String TAG = "ZoneView";
+public class PumpView extends LinearLayout {
+	private static final String TAG = "PumpView";
 	private static final int STROKE_WIDTH = 2;
 	@SuppressWarnings("unused")
-	private Zone zone;
+	private Pump pump;
 
-	public ZoneView(Context context) {
+	public PumpView(Context context) {
 		super(context);
 		setOrientation(LinearLayout.VERTICAL);
 
@@ -73,34 +68,15 @@ public class ZoneView extends LinearLayout {
 		super.onLayout(changed, l, t, r, b);
 	}
 
-	public void setZone(Zone zone) {
-		this.zone = zone;
+	public void setPump(Pump pump) {
+		this.pump = pump;
 		this.removeAllViews();
 
-		Log.v(TAG, "Set Zone: " + zone.getName());
+		Log.v(TAG, "Set Pump: " + pump.getName());
 		TextView textView = new TextView(getContext());
 		textView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		textView.setText(zone.getName());
+		textView.setText(pump.getName());
 		addView(textView);
-
-		LinearLayout controlLayout = new LinearLayout(getContext());
-		controlLayout.setOrientation(LinearLayout.HORIZONTAL);
-		controlLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		addView(controlLayout);
-
-		Heater heater = zone.getHeater();
-		if (heater != null) {
-			ValueSlider slider = new ValueSlider(getContext(), 0, 0, 100);
-			slider.setLayoutParams(new LayoutParams(100, 250));
-			controlLayout.addView(slider);
-		}
-		Sensor sensor = zone.getSensor();
-		if (sensor != null) {
-			Log.v(TAG, "  Has Sensor");
-			ValueSlider slider = new ValueSlider(getContext(), 0, 100, 210);
-			slider.setLayoutParams(new LayoutParams(100, 250));
-			controlLayout.addView(slider);
-		}
 
 	}
 }

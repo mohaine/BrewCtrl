@@ -43,7 +43,7 @@ public class ValueSlider extends View implements HasValue<Double> {
 	private static final int FG_COLOR = Color.BLACK;
 	private static final int STROKE_WIDTH = 2;
 	private static final int SLIDER_HEIGHT = 5;
-	private static final int BUTTON_HEIGHT = 50;
+	private static final int BUTTON_HEIGHT = 25;
 
 	private final class MouseDownRunnable implements Runnable {
 		private boolean up = false;

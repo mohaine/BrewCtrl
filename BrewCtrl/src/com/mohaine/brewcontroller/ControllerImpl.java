@@ -31,6 +31,7 @@ import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.layout.BrewLayout;
 import com.mohaine.brewcontroller.layout.Heater;
+import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Zone;
 import com.mohaine.event.bus.EventBus;
@@ -220,6 +221,12 @@ public class ControllerImpl implements Controller {
 		kettle.setName("Kettle");
 		kettle.setHeater(new Heater());
 		zones.add(kettle);
+
+		List<Pump> pumps = brewLayout.getPumps();
+
+		Pump pump = new Pump();
+		pump.setName("Loop");
+		pumps.add(pump);
 
 		return brewLayout;
 	}
