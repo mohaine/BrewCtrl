@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -61,6 +62,43 @@ public class PumpView extends LinearLayout {
 
 		c.drawRect(0, 0, width, height, paint);
 
+		Paint backPaint = new Paint();
+		backPaint.setAntiAlias(true);
+		// Borders
+
+		boolean on = false;
+
+		backPaint.setColor(on ? Colors.PUMP_ON : Colors.PUMP_OFF);
+		backPaint.setStyle(Paint.Style.FILL);
+
+		Paint strokePaint = new Paint();
+		strokePaint.setAntiAlias(true);
+		// Borders
+		strokePaint.setColor(Colors.PUMP_STROKE);
+		strokePaint.setStyle(Paint.Style.STROKE);
+		strokePaint.setStrokeWidth(STROKE_WIDTH);
+
+		float cirSize = Math.min(width, height) * 0.36f;
+		float cirMidY = height - cirSize;
+
+		float exitRight = cirSize + cirSize + cirSize / 2;
+		float exitBottom = cirMidY - (cirSize / 3);
+
+		float extraWidth = (width - exitRight) / 2;
+
+		float cirCenterX = cirSize + extraWidth;
+		exitRight += extraWidth;
+		c.drawRect(cirCenterX, cirMidY - cirSize, exitRight, exitBottom, backPaint);
+		c.drawRect(cirCenterX, cirMidY - cirSize, exitRight, exitBottom, strokePaint);
+		c.drawCircle(cirCenterX, cirMidY, cirSize, backPaint);
+		c.drawCircle(cirCenterX, cirMidY, cirSize, strokePaint);
+
+		if (!on) {
+			strokePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+			c.drawCircle(cirCenterX, cirMidY, cirSize / 2, strokePaint);
+
+		}
+
 	}
 
 	@Override
@@ -74,7 +112,10 @@ public class PumpView extends LinearLayout {
 
 		Log.v(TAG, "Set Pump: " + pump.getName());
 		TextView textView = new TextView(getContext());
+		textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+
 		textView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+
 		textView.setText(pump.getName());
 		addView(textView);
 

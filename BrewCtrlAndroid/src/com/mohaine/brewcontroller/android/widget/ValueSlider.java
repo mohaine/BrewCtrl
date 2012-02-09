@@ -153,6 +153,7 @@ public class ValueSlider extends View implements HasValue<Double> {
 		c.drawColor(Color.LTGRAY);
 
 		Paint paint = new Paint(FG_COLOR);
+		paint.setAntiAlias(true);
 
 		// Arrows
 		int arrowTopBottom = 5;

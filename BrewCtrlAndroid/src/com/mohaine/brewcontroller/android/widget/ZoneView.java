@@ -22,10 +22,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.ArrayAdapter;
+import android.view.Gravity;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.mohaine.brewcontroller.layout.Heater;
@@ -79,6 +77,8 @@ public class ZoneView extends LinearLayout {
 
 		Log.v(TAG, "Set Zone: " + zone.getName());
 		TextView textView = new TextView(getContext());
+		textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+
 		textView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		textView.setText(zone.getName());
 		addView(textView);
