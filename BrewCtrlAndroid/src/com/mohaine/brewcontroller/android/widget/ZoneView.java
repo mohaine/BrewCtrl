@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -82,18 +83,23 @@ public class ZoneView extends LinearLayout {
 		textView.setText(zone.getName());
 		addView(textView);
 
+		LinearLayout controlLayout = new LinearLayout(getContext());
+		controlLayout.setOrientation(LinearLayout.HORIZONTAL);
+		controlLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		addView(controlLayout);
+
 		Heater heater = zone.getHeater();
 		if (heater != null) {
 			ValueSlider slider = new ValueSlider(getContext(), 0, 0, 100);
-			addView(slider);
+			slider.setLayoutParams(new LayoutParams(100, 200));
+			controlLayout.addView(slider);
 		}
 		Sensor sensor = zone.getSensor();
 		if (sensor != null) {
 			Log.v(TAG, "  Has Sensor");
-			TextView sensorView = new TextView(getContext());
-			sensorView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-			sensorView.setText("Temp");
-			addView(sensorView);
+			ValueSlider slider = new ValueSlider(getContext(), 0, 100, 210);
+			slider.setLayoutParams(new LayoutParams(100, 200));
+			controlLayout.addView(slider);
 		}
 
 	}
