@@ -43,7 +43,6 @@ public class MessageEnvelope_UT extends TestCase {
 		byte[] copyBuffer = new byte[length];
 
 		int invalid = 0;
-		int valid = 0;
 
 		Random r = new Random();
 

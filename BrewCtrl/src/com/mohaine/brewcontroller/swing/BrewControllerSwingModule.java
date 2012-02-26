@@ -23,11 +23,13 @@ import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
+import com.mohaine.brewcontroller.HardwareMock;
 import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
+import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
 import com.mohaine.brewcontroller.page.StepEditor.StepEditorDisplay;
-import com.mohaine.brewcontroller.serial.SerialHardwareComm;
 import com.mohaine.brewcontroller.swing.page.MainMenuDisplaySwing;
+import com.mohaine.brewcontroller.swing.page.OverviewDisplaySwing;
 import com.mohaine.brewcontroller.swing.page.SetupDisplaySwing;
 import com.mohaine.brewcontroller.swing.page.StepEditorDisplaySwing;
 import com.mohaine.event.bus.EventBus;
@@ -40,10 +42,11 @@ public class BrewControllerSwingModule extends AbstractModule {
 		bind(Controller.class).to(ControllerImpl.class).asEagerSingleton();
 
 		bind(MainMenuDisplay.class).to(MainMenuDisplaySwing.class);
+		bind(OverviewDisplay.class).to(OverviewDisplaySwing.class);
 		bind(SetupDisplay.class).to(SetupDisplaySwing.class);
 		bind(StepEditorDisplay.class).to(StepEditorDisplaySwing.class);
-		bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
-		// bind(Hardware.class).to(HardwareMock.class).asEagerSingleton();
+		// bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
+		bind(Hardware.class).to(HardwareMock.class).asEagerSingleton();
 
 		bind(EventBus.class).asEagerSingleton();
 	}

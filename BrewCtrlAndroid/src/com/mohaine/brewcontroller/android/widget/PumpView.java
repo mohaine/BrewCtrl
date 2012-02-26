@@ -51,16 +51,16 @@ public class PumpView extends LinearLayout {
 
 		Log.v(TAG, "onDraw: " + width + "," + height);
 
-		// c.drawColor(Colors.BG_COLOR);
-
-		Paint paint = new Paint();
-		paint.setAntiAlias(true);
-		// Borders
-		paint.setColor(Colors.BORDER_COLOR);
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(STROKE_WIDTH);
-
-		c.drawRect(0, 0, width, height, paint);
+//		// c.drawColor(Colors.BG_COLOR);
+//
+//		Paint paint = new Paint();
+//		paint.setAntiAlias(true);
+//		// Borders
+//		paint.setColor(Colors.BORDER_COLOR);
+//		paint.setStyle(Paint.Style.STROKE);
+//		paint.setStrokeWidth(STROKE_WIDTH);
+//
+//		c.drawRect(0, 0, width, height, paint);
 
 		Paint backPaint = new Paint();
 		backPaint.setAntiAlias(true);

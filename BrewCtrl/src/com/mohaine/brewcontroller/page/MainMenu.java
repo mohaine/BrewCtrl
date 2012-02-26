@@ -70,16 +70,7 @@ public class MainMenu extends BasePage {
 				controllerGui.displayPage(providerStepEditor.get());
 			}
 		});
-		display.addClickable("Heater", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				List<HeaterStep> steps = new ArrayList<HeaterStep>();
-				steps.add(new HeaterStep("Heater", 0, 0));
-				controller.setSteps(steps);
-				controller.setSelectedStep(steps.get(0));
-				controllerGui.displayPage(providerStepEditor.get());
-			}
-		});
+
 		display.addClickable("1 Step Mash", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

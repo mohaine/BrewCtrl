@@ -20,8 +20,7 @@
 #ifndef SENSOR_H_
 #define SENSOR_H_
 
-#include "WProgram.h"
-
+#include "Arduino.h"
 
 
 
