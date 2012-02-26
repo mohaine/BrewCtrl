@@ -43,21 +43,14 @@ public class MessageEnvelope_UT extends TestCase {
 		byte[] copyBuffer = new byte[length];
 
 		int invalid = 0;
-
 		Random r = new Random();
 
 		System.arraycopy(buffer, 0, copyBuffer, 0, length);
 
 		int total = 100000;
 
-		int modulus = (int) Math.pow(10, ((int) Math.log10(total)) - 1);
-
 		for (int i = 0; i < total; i++) {
 			System.arraycopy(buffer, 0, copyBuffer, 0, length);
-			if ((i + 1) % modulus == 0) {
-				System.out.println("Count: " + (i + 1));
-			}
-
 			changeBit(length, copyBuffer, r);
 			changeBit(length, copyBuffer, r);
 			changeBit(length, copyBuffer, r);
@@ -67,9 +60,7 @@ public class MessageEnvelope_UT extends TestCase {
 			changeBit(length, copyBuffer, r);
 			changeBit(length, copyBuffer, r);
 
-			if (MessageEnvelope.validateMessage(copyBuffer, 0, sbe)) {
-				valid++;
-			} else {
+			if (!MessageEnvelope.validateMessage(copyBuffer, 0, sbe)) {
 				invalid++;
 			}
 
@@ -78,6 +69,7 @@ public class MessageEnvelope_UT extends TestCase {
 		double caughtPercent = ((double) invalid) / total * 100;
 		System.out.println("Caught " + caughtPercent + "% " + invalid + "/" + total);
 
+		assertTrue(caughtPercent > 0.99);
 	}
 
 	private void changeBit(int length, byte[] copyBuffer, Random r) {
