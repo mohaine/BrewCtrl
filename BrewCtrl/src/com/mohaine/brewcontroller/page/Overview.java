@@ -35,6 +35,8 @@ public class Overview extends BasePage {
 
 		public void setBreweryLayout(BreweryLayout layout);
 
+		public void cleanup();
+
 	}
 
 	private OverviewDisplay display;
@@ -78,4 +80,12 @@ public class Overview extends BasePage {
 	public Object getWidget() {
 		return display;
 	}
+
+	@Override
+	public void hidePage() {
+		super.hidePage();
+
+		display.cleanup();
+	}
+
 }

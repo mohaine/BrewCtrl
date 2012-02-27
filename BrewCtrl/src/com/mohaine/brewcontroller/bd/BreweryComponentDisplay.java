@@ -9,6 +9,7 @@ public class BreweryComponentDisplay {
 	private int width;
 	private int top;
 	private int left;
+	private Object displayInfo;
 
 	public BreweryComponentDisplay(BreweryComponent component) {
 		this.component = component;
@@ -57,6 +58,14 @@ public class BreweryComponentDisplay {
 
 	public void setWidth(int width) {
 		this.width = width;
+	}
+
+	public Object getDisplayInfo() {
+		return displayInfo;
+	}
+
+	public void setDisplayInfo(Object displayInfo) {
+		this.displayInfo = displayInfo;
 	}
 
 }

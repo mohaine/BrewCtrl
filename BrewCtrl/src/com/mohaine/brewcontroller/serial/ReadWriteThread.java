@@ -169,8 +169,8 @@ final class ReadWriteThread implements Runnable {
 		this.serialHardwareComm = serialHardwareComm;
 		this.prefs = prefs;
 		status.setMode(HeaterMode.OFF);
-		status.setHltSensor(prefs.getHltSensorAddress());
-		status.setTunSensor(prefs.getTunSensorAddress());
+//		status.setHltSensor(prefs.getHltSensorAddress());
+//		status.setTunSensor(prefs.getTunSensorAddress());
 	}
 
 	public void run() {

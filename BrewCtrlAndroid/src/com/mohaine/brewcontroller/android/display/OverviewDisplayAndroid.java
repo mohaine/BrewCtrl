@@ -36,4 +36,9 @@ public class OverviewDisplayAndroid extends ControlPanelAndroid implements Overv
 		return tv;
 	}
 
+	@Override
+	public void cleanup() {
+
+	}
+
 }

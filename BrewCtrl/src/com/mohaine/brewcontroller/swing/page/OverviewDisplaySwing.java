@@ -101,4 +101,11 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 		setupClickable.addClickHandler(ch);
 		controlPanel.add(new JButton(setupClickable));
 	}
+
+	@Override
+	public void cleanup() {
+		breweryDisplay.cleanup();
+
+	}
+
 }

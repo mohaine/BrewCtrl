@@ -194,10 +194,10 @@ public class ControllerImpl implements Controller {
 		if (steps.size() > 0) {
 			HeaterStep currentStep = steps.get(0);
 			hc.setMashOn(true);
-			hc.setHltTargetTemp(currentStep.getHltTemp());
-			hc.setTunTargetTemp(currentStep.getTunTemp());
-			hc.setHltSensor(prefs.getHltSensorAddress());
-			hc.setTunSensor(prefs.getTunSensorAddress());
+			// hc.setHltTargetTemp(currentStep.getHltTemp());
+			// hc.setTunTargetTemp(currentStep.getTunTemp());
+			// hc.setHltSensor(prefs.getHltSensorAddress());
+			// hc.setTunSensor(prefs.getTunSensorAddress());
 		} else {
 			hc.setMashOn(false);
 		}

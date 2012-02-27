@@ -1,12 +1,7 @@
 package com.mohaine.brewcontroller.bd;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.text.ZoneView;
-
-import org.w3c.dom.css.Rect;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -24,6 +19,8 @@ public class BreweryDisplay {
 		int getWidth();
 
 		void setDisplays(List<BreweryComponentDisplay> displays);
+
+		void cleanup();
 
 	}
 
@@ -100,6 +97,10 @@ public class BreweryDisplay {
 
 	public Object getDrawer() {
 		return drawer;
+	}
+
+	public void cleanup() {
+		drawer.cleanup();
 	}
 
 }

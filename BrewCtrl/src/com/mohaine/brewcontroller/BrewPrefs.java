@@ -24,17 +24,16 @@ import com.google.inject.Inject;
 
 public class BrewPrefs {
 
-	private static final String HLT_SENSOR_ADDRESS = "HLT_SENSOR_ADDRESS";
-	private static final String TUN_SENSOR_ADDRESS = "TUN_SENSOR_ADDRESS";
 	private static final String SENSOR_NAME = "SENSOR_NAME_";
 	private static final String SENSOR_LOCATION = "SENSOR_LOCATION_";
+	private Preferences prefs;
 
 	@Inject
 	public BrewPrefs() {
+		prefs = Preferences.userNodeForPackage(BrewPrefs.class);
 	}
 
 	public String getSensorName(String address, String defaultName) {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
 		byte[] prefValue = prefs.getByteArray(SENSOR_NAME + address, null);
 		if (prefValue != null) {
 			String value = new String(prefValue);
@@ -45,14 +44,12 @@ public class BrewPrefs {
 	}
 
 	public void setSensorName(String address, String name) {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
 		if (name != null && name.length() > 0 && address != null && address.length() > 0) {
 			prefs.putByteArray(SENSOR_NAME + address, name.getBytes());
 		}
 	}
 
 	public String getSensorLocation(String address, String defaultLocation) {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
 		byte[] prefValue = prefs.getByteArray(SENSOR_LOCATION + address, null);
 		if (prefValue != null) {
 			String value = new String(prefValue);
@@ -63,43 +60,9 @@ public class BrewPrefs {
 	}
 
 	public void setSensorLocation(String address, String location) {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
 		if (location != null && location.length() > 0 && address != null && address.length() > 0) {
 			prefs.putByteArray(SENSOR_LOCATION + address, location.getBytes());
 		}
 	}
-
-	
-	public String getTunSensorAddress() {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
-		byte[] prefValue = prefs.getByteArray(TUN_SENSOR_ADDRESS, null);
-		if (prefValue != null) {
-			String value = new String(prefValue);
-			return value;
-		}
-		return "";
-	}
-
-	public void setHltSensorAddress(String address) {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
-		prefs.putByteArray(HLT_SENSOR_ADDRESS, address.getBytes());
-	}
-
-	public String getHltSensorAddress() {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
-		byte[] prefValue = prefs.getByteArray(HLT_SENSOR_ADDRESS, null);
-		if (prefValue != null) {
-			String value = new String(prefValue);
-			return value;
-		}
-		return "";
-	}
-
-	public void setTunSensorAddress(String address) {
-		Preferences prefs = Preferences.userNodeForPackage(BrewPrefs.class);
-		prefs.putByteArray(TUN_SENSOR_ADDRESS, address.getBytes());
-	}
-
-	
 
 }

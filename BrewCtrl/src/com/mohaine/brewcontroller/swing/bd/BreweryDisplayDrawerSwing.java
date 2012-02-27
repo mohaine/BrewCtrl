@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -14,35 +15,79 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Converter;
+import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
-import com.mohaine.brewcontroller.bean.TempSensor;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Tank;
+import com.mohaine.event.HandlerRegistration;
+import com.mohaine.event.StatusChangeHandler;
 
 public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayDrawer {
+	private static final int TANK_TOP_HEIGHT = 20;
 	private static final long serialVersionUID = 1L;
 	private List<BreweryComponentDisplay> displays;
 	private int PADDING = 5;
-	private NumberFormat nf = new DecimalFormat("0.#");
+	private NumberFormat nf = new DecimalFormat("0.0");
 	private UnitConversion conversion;
 	private Controller controller;
+	private HandlerRegistration handler;
+	private boolean painted;
 
 	@Inject
-	public BreweryDisplayDrawerSwing(final UnitConversion conversion, Controller controller) {
+	public BreweryDisplayDrawerSwing(final UnitConversion conversion, Controller controller, Hardware hardware) {
 		super();
 		this.conversion = conversion;
 		this.controller = controller;
+
+		handler = hardware.addStatusChangeHandler(new StatusChangeHandler() {
+			@Override
+			public void onStateChange() {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						updateState();
+					}
+				});
+			}
+		});
+
+	}
+
+	public void cleanup() {
+		if (handler != null) {
+			handler.removeHandler();
+			handler = null;
+		}
+	}
+
+	private void updateState() {
+		if (painted) {
+			Graphics graphics = getGraphics();
+			Graphics2D g2 = (Graphics2D) graphics;
+
+			for (BreweryComponentDisplay display : displays) {
+				BreweryComponent component = display.getComponent();
+				if (Tank.TYPE.equals(component.getType())) {
+					drawTankTemp(g2, display);
+				}
+			}
+		}
 	}
 
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
+
+		painted = true;
+
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(Colors.BACKGROUND);
@@ -75,19 +120,17 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 		int textHeight = g.getFontMetrics().getAscent();
 
-		int topheight = 20;
-
-		int boxHeight = height - topheight - textHeight - 5;
+		int boxHeight = height - TANK_TOP_HEIGHT - textHeight - 5;
 
 		// bottom arc
-		Shape circleBottom = new Ellipse2D.Float(left, top + boxHeight, width, topheight);
+		Shape circleBottom = new Ellipse2D.Float(left, top + boxHeight, width, TANK_TOP_HEIGHT);
 		g.setColor(tankColor);
 		g.fill(circleBottom);
 		g.setColor(strokePaint);
 		g.draw(circleBottom);
 
 		// Center
-		int boxTopLeft = top + topheight / 2;
+		int boxTopLeft = top + TANK_TOP_HEIGHT / 2;
 		Shape square = new Rectangle2D.Double(left, boxTopLeft, width, boxHeight);
 		g.setColor(tankColor);
 		g.fill(square);
@@ -96,24 +139,38 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		g.drawLine(left + width, boxTopLeft, left + width, boxTopLeft + boxHeight);
 
 		// Inside/Top of tank
-		Shape circleTop = new Ellipse2D.Float(left, top, width, topheight);
+		Shape circleTop = new Ellipse2D.Float(left, top, width, TANK_TOP_HEIGHT);
 		g.setColor(Colors.TANK_INSIDE);
 		g.fill(circleTop);
 		g.setColor(strokePaint);
 		g.draw(circleTop);
 
-		g.setFont(Colors.TEMP_FONT);
+		drawTankTemp(g, display);
 
+	}
+
+	private void drawTankTemp(Graphics2D g, BreweryComponentDisplay display) {
 		Double temp = controller.getTankTemp(display.getComponent());
 		if (temp != null) {
+			int top = display.getTop();
+			int left = display.getLeft();
 			final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
 			String tempDisplay = nf.format(tempDisplayConveter.convertFrom(temp)) + "\u00B0";
 
+			Rectangle lastTextRect = (Rectangle) display.getDisplayInfo();
+			if (lastTextRect != null) {
+				g.setColor(Colors.TANK);
+				g.fillRect(lastTextRect.x, lastTextRect.y - lastTextRect.height, lastTextRect.width, lastTextRect.height);
+			}
+
+			g.setColor(Colors.FOREGROUND);
+			g.setFont(Colors.TEMP_FONT);
 			FontMetrics fontMetrics = g.getFontMetrics();
 			Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, g);
-			g.drawString(tempDisplay, left + 5, (int) (top + stringBounds.getHeight() + topheight));
+			Rectangle textRect = new Rectangle(left + 5, (int) (top + stringBounds.getHeight() + TANK_TOP_HEIGHT), (int) stringBounds.getWidth(), (int) -stringBounds.getMinY());
+			g.drawString(tempDisplay, textRect.x, textRect.y);
+			display.setDisplayInfo(textRect);
 		}
-
 	}
 
 	private void drawPump(Graphics2D g, BreweryComponentDisplay display) {

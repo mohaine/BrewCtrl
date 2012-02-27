@@ -59,20 +59,17 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 
 	@Override
 	public void run() {
-
 		int loopCount = 0;
 
 		while (run) {
-			double orgDuty = duty;
+			loopCount++;
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			HardwareStatus hardwareStatus = getHardwareStatus();
-
 			hardwareStatus.setMode(mode);
-
 			if (loopCount % 5 == 0) {
 				switch (mode) {
 				case OFF:
@@ -93,11 +90,8 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 					break;
 				}
 
-				if (orgDuty != duty) {
-					fireStateChangeHandlers();
-				}
+				fireStateChangeHandlers();
 			}
-			loopCount++;
 		}
 
 	}
@@ -114,7 +108,6 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 				}
 				maxDuty = hc.getHltTargetTemp();
 				mode = hc.getMode();
-				fireStateChangeHandlers();
 			}
 		}).start();
 
