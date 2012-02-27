@@ -28,13 +28,13 @@ import android.widget.TextView;
 
 import com.mohaine.brewcontroller.layout.Heater;
 import com.mohaine.brewcontroller.layout.Sensor;
-import com.mohaine.brewcontroller.layout.Zone;
+import com.mohaine.brewcontroller.layout.Tank;
 
 public class ZoneView extends LinearLayout {
 	private static final String TAG = "ZoneView";
 	private static final int STROKE_WIDTH = 2;
 	@SuppressWarnings("unused")
-	private Zone zone;
+	private Tank zone;
 
 	public ZoneView(Context context) {
 		super(context);
@@ -71,7 +71,7 @@ public class ZoneView extends LinearLayout {
 		super.onLayout(changed, l, t, r, b);
 	}
 
-	public void setZone(Zone zone) {
+	public void setZone(Tank zone) {
 		this.zone = zone;
 		this.removeAllViews();
 

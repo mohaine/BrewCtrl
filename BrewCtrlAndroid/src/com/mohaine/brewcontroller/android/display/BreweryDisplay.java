@@ -15,7 +15,7 @@ import com.mohaine.brewcontroller.android.widget.PumpView;
 import com.mohaine.brewcontroller.android.widget.ZoneView;
 import com.mohaine.brewcontroller.layout.BrewLayout;
 import com.mohaine.brewcontroller.layout.Pump;
-import com.mohaine.brewcontroller.layout.Zone;
+import com.mohaine.brewcontroller.layout.Tank;
 
 public class BreweryDisplay extends ViewGroup {
 	private static final String TAG = "BreweryDisplay";
@@ -141,8 +141,8 @@ public class BreweryDisplay extends ViewGroup {
 
 	public void setBreweryLayout(BrewLayout brewLayout) {
 		Log.v(TAG, "OverviewDisplayAndroid.setBreweryLayout()");
-		List<Zone> zones = brewLayout.getZones();
-		for (Zone zone : zones) {
+		List<Tank> zones = brewLayout.getZones();
+		for (Tank zone : zones) {
 			ZoneView zoneView = new ZoneView(getContext());
 			zoneViews.add(zoneView);
 			zoneView.setZone(zone);

@@ -24,10 +24,12 @@ import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.HardwareMock;
+import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
 import com.mohaine.brewcontroller.page.StepEditor.StepEditorDisplay;
+import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
 import com.mohaine.brewcontroller.swing.page.MainMenuDisplaySwing;
 import com.mohaine.brewcontroller.swing.page.OverviewDisplaySwing;
 import com.mohaine.brewcontroller.swing.page.SetupDisplaySwing;
@@ -47,8 +49,10 @@ public class BrewControllerSwingModule extends AbstractModule {
 		bind(StepEditorDisplay.class).to(StepEditorDisplaySwing.class);
 		// bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
 		bind(Hardware.class).to(HardwareMock.class).asEagerSingleton();
-
 		bind(EventBus.class).asEagerSingleton();
+
+		bind(BreweryDisplayDrawer.class).to(BreweryDisplayDrawerSwing.class);
+
 	}
 
 }

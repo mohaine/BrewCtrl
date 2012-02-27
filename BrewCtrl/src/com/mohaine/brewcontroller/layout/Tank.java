@@ -1,17 +1,15 @@
 package com.mohaine.brewcontroller.layout;
 
-public class Zone {
-	private String name;
+public class Tank extends BreweryComponent {
+	public static final String TYPE = "Tank";
+
+	@Override
+	public String getType() {
+		return TYPE;
+	}
+
 	private Sensor sensor;
 	private Heater heater;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public Sensor getSensor() {
 		return sensor;

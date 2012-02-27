@@ -1,15 +1,11 @@
 package com.mohaine.brewcontroller.layout;
 
-public class Pump {
+public class Pump extends BreweryComponent {
+	public static final String TYPE = "Pump";
 
-	private String name;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 
 }

@@ -19,6 +19,10 @@
 package com.mohaine.brewcontroller.swing.page;
 
 import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Component;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -26,6 +30,7 @@ import javax.swing.JPanel;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.Hardware;
+import com.mohaine.brewcontroller.bd.BreweryDisplay;
 import com.mohaine.brewcontroller.layout.BrewLayout;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
@@ -36,19 +41,47 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 	private Hardware hardware;
 	private BrewPrefs prefs;
 	private JPanel controlPanel = new JPanel();
+	private Canvas canvas;
+	private BreweryDisplay breweryDisplay;
 
 	@Inject
-	public OverviewDisplaySwing(Hardware hardware, final BrewPrefs prefs) {
+	public OverviewDisplaySwing(Hardware hardware, final BrewPrefs prefs, BreweryDisplay breweryDisplayp) {
 		super();
 		this.hardware = hardware;
 		this.prefs = prefs;
-
+		this.breweryDisplay = breweryDisplayp;
 		setLayout(new BorderLayout());
-
 		JPanel sliderPanel = new JPanel();
 		add(sliderPanel, BorderLayout.EAST);
-
 		add(controlPanel, BorderLayout.SOUTH);
+
+		Component drawer = (Component) breweryDisplay.getDrawer();
+		add(drawer, BorderLayout.CENTER);
+		drawer.addComponentListener(new ComponentListener() {
+
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+				breweryDisplay.layoutDisplays();
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 
 	}
 
@@ -59,7 +92,7 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 
 	@Override
 	public void setBreweryLayout(BrewLayout layout) {
-
+		breweryDisplay.setBreweryLayout(layout);
 	}
 
 	@Override
@@ -67,6 +100,5 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 		SwingHasClickHandlers setupClickable = new SwingHasClickHandlers(name);
 		setupClickable.addClickHandler(ch);
 		controlPanel.add(new JButton(setupClickable));
-
 	}
 }

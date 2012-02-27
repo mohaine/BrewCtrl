@@ -5,7 +5,7 @@ import java.util.List;
 
 public class BrewLayout {
 	private String name;
-	private List<Zone> zones = new ArrayList<Zone>();
+	private List<Tank> zones = new ArrayList<Tank>();
 	private List<Pump> pumps = new ArrayList<Pump>();
 
 	public String getName() {
@@ -16,11 +16,11 @@ public class BrewLayout {
 		this.name = name;
 	}
 
-	public List<Zone> getZones() {
+	public List<Tank> getZones() {
 		return zones;
 	}
 
-	public void setZones(List<Zone> zone) {
+	public void setZones(List<Tank> zone) {
 		this.zones = zone;
 	}
 

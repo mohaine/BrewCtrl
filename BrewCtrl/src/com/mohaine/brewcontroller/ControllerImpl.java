@@ -33,7 +33,7 @@ import com.mohaine.brewcontroller.layout.BrewLayout;
 import com.mohaine.brewcontroller.layout.Heater;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
-import com.mohaine.brewcontroller.layout.Zone;
+import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.event.bus.EventBus;
 
 public class ControllerImpl implements Controller {
@@ -204,20 +204,20 @@ public class ControllerImpl implements Controller {
 		BrewLayout brewLayout = new BrewLayout();
 		brewLayout.setName("Brewing");
 
-		List<Zone> zones = brewLayout.getZones();
-		Zone hlt = new Zone();
+		List<Tank> zones = brewLayout.getZones();
+		Tank hlt = new Tank();
 		hlt.setName("HLT");
 		hlt.setHeater(new Heater());
 		hlt.setSensor(new Sensor());
 
 		zones.add(hlt);
 
-		Zone tun = new Zone();
+		Tank tun = new Tank();
 		tun.setName("TUN");
 		tun.setSensor(new Sensor());
 		zones.add(tun);
 
-		Zone kettle = new Zone();
+		Tank kettle = new Tank();
 		kettle.setName("Kettle");
 		kettle.setHeater(new Heater());
 		zones.add(kettle);
@@ -227,6 +227,10 @@ public class ControllerImpl implements Controller {
 		Pump pump = new Pump();
 		pump.setName("Loop");
 		pumps.add(pump);
+
+		Pump mainPump = new Pump();
+		mainPump.setName("Main");
+		pumps.add(mainPump);
 
 		return brewLayout;
 	}
