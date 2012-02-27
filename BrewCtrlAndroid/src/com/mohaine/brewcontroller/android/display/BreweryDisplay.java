@@ -141,7 +141,7 @@ public class BreweryDisplay extends ViewGroup {
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
 		Log.v(TAG, "OverviewDisplayAndroid.setBreweryLayout()");
-		List<Tank> zones = brewLayout.getZones();
+		List<Tank> zones = brewLayout.getTanks();
 		for (Tank zone : zones) {
 			ZoneView zoneView = new ZoneView(getContext());
 			zoneViews.add(zoneView);

@@ -14,4 +14,9 @@ public abstract class BreweryComponent {
 
 	public abstract String getType();
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 }

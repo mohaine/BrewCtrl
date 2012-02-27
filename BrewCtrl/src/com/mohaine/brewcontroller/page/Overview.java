@@ -59,7 +59,6 @@ public class Overview extends BasePage {
 			public void onClick(ClickEvent event) {
 				goMainMenu();
 			}
-
 		});
 
 		display.setBreweryLayout(controller.getLayout());

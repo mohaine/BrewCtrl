@@ -21,6 +21,7 @@ package com.mohaine.brewcontroller;
 import java.util.List;
 
 import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 
 public interface Controller {
@@ -46,5 +47,7 @@ public interface Controller {
 	public void nextStep();
 
 	public BreweryLayout getLayout();
+
+	public Double getTankTemp(BreweryComponent component);
 
 }

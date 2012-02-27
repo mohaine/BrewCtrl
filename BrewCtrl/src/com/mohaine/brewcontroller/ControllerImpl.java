@@ -25,10 +25,12 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HeaterMode;
 import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.TempSensor;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.Heater;
 import com.mohaine.brewcontroller.layout.Pump;
@@ -47,9 +49,9 @@ public class ControllerImpl implements Controller {
 	private Monitor monitor = new Monitor();
 	private Hardware hardware;
 	private BrewPrefs prefs;
+	private BreweryLayout brewLayout;
 
 	private class Monitor implements Runnable {
-
 		@Override
 		public void run() {
 			while (true) {
@@ -118,6 +120,9 @@ public class ControllerImpl implements Controller {
 		this.eventBus = eventBusp;
 		this.hardware = hardware;
 		this.prefs = prefs;
+
+		initLayout();
+
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 			@Override
 			public void onStepChange(HeaterStep step) {
@@ -200,11 +205,14 @@ public class ControllerImpl implements Controller {
 	}
 
 	public BreweryLayout getLayout() {
+		return brewLayout;
+	}
 
-		BreweryLayout brewLayout = new BreweryLayout();
+	private void initLayout() {
+		brewLayout = new BreweryLayout();
 		brewLayout.setName("Brewing");
 
-		List<Tank> tanks = brewLayout.getZones();
+		List<Tank> tanks = brewLayout.getTanks();
 		Tank hlt = new Tank();
 		hlt.setName("HLT");
 		hlt.setHeater(new Heater());
@@ -229,10 +237,18 @@ public class ControllerImpl implements Controller {
 		Pump mainPump = new Pump();
 		mainPump.setName("Main");
 		pumps.add(mainPump);
-		
-		
-		
+	}
 
-		return brewLayout;
+	@Override
+	public Double getTankTemp(BreweryComponent component) {
+
+		List<TempSensor> sensors = hardware.getSensors();
+		for (TempSensor tempSensor : sensors) {
+			if (component.getName().equals(prefs.getSensorLocation(tempSensor.getAddress(), ""))) {
+				return tempSensor.getTempatureC();
+			}
+		}
+
+		return null;
 	}
 }

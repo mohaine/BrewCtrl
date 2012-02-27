@@ -16,7 +16,7 @@ public class BreweryLayout {
 		this.name = name;
 	}
 
-	public List<Tank> getZones() {
+	public List<Tank> getTanks() {
 		return zones;
 	}
 

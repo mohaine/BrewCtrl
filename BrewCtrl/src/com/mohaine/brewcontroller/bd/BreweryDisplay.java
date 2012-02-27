@@ -37,7 +37,7 @@ public class BreweryDisplay {
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
 		this.brewLayout = brewLayout;
-		List<Tank> zones = brewLayout.getZones();
+		List<Tank> zones = brewLayout.getTanks();
 
 		for (Tank zone : zones) {
 			BreweryComponentDisplay display = new BreweryComponentDisplay(zone);

@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.bean.HardwareControl;
+import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HeaterMode;
 import com.mohaine.brewcontroller.bean.TempSensor;
 
@@ -45,43 +46,58 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 		int count = 1;
 		for (TempSensor sensor : tempSensors) {
 			sensor.setName(prefs.getSensorName(sensor.getAddress(), "Sensor " + count));
+
+			sensor.setTempatureC(30);
+
 			count++;
 		}
 
 		Thread thread = new Thread(this);
 		thread.setDaemon(true);
-
 		thread.start();
 	}
 
 	@Override
 	public void run() {
+
+		int loopCount = 0;
+
 		while (run) {
-			// double orgDuty = duty;
+			double orgDuty = duty;
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			HardwareStatus hardwareStatus = getHardwareStatus();
 
-			switch (mode) {
-			case OFF:
-				duty = 0;
-				break;
-			case ON:
-				duty = maxDuty + Math.round(2 * Math.random() - 1);
-				if (duty > maxDuty) {
-					duty = maxDuty;
-				}
-				if (duty < 0) {
+			hardwareStatus.setMode(mode);
+
+			if (loopCount % 5 == 0) {
+				switch (mode) {
+				case OFF:
 					duty = 0;
-				}
-				break;
-			}
+					break;
+				case ON:
+					duty = maxDuty + Math.round(2 * Math.random() - 1);
+					if (duty > maxDuty) {
+						duty = maxDuty;
+					}
+					if (duty < 0) {
+						duty = 0;
+					}
 
-			// if (orgDuty != duty) {
-			fireStateChangeHandlers();
-			// }
+					for (TempSensor sensor : getSensors()) {
+						sensor.setTempatureC(sensor.getTempatureC() + Math.random());
+					}
+					break;
+				}
+
+				if (orgDuty != duty) {
+					fireStateChangeHandlers();
+				}
+			}
+			loopCount++;
 		}
 
 	}
@@ -89,18 +105,16 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 	@Override
 	public void setHardwareControl(final HardwareControl hc) {
 		new Thread(new Runnable() {
-
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					// ignore
 				}
 				maxDuty = hc.getHltTargetTemp();
 				mode = hc.getMode();
 				fireStateChangeHandlers();
-
 			}
 		}).start();
 
@@ -111,5 +125,4 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 		return status;
 	}
 
-	
 }

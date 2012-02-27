@@ -70,7 +70,6 @@ public abstract class HardwareBase implements Hardware {
 				return tempSensor.getTempatureC();
 			}
 		}
-
 		return null;
 	}
 }
