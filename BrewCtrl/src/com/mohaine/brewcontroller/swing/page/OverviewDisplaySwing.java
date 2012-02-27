@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.bd.BreweryDisplay;
-import com.mohaine.brewcontroller.layout.BrewLayout;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
 import com.mohaine.event.ClickHandler;
@@ -91,7 +91,7 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 	}
 
 	@Override
-	public void setBreweryLayout(BrewLayout layout) {
+	public void setBreweryLayout(BreweryLayout layout) {
 		breweryDisplay.setBreweryLayout(layout);
 	}
 

@@ -56,25 +56,20 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		Color tankColor = Colors.TANK;
 		Color strokePaint = Colors.FOREGROUND;
 
-		int cirSize = (int) (Math.min(width, height) * 0.8f);
-
-		int cirRadius = cirSize / 2;
-
 		int textHeight = g.getFontMetrics().getAscent();
-		System.out.println(textHeight);
 
 		int topheight = 20;
 
 		int boxHeight = height - topheight - textHeight - 5;
 
-		//bottom arc
+		// bottom arc
 		Shape circleBottom = new Ellipse2D.Float(left, top + boxHeight, width, topheight);
 		g.setColor(tankColor);
 		g.fill(circleBottom);
 		g.setColor(strokePaint);
 		g.draw(circleBottom);
 
-		//Center 
+		// Center
 		int boxTopLeft = top + topheight / 2;
 		Shape square = new Rectangle2D.Double(left, boxTopLeft, width, boxHeight);
 		g.setColor(tankColor);
@@ -83,8 +78,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		g.drawLine(left, boxTopLeft, left, boxTopLeft + boxHeight);
 		g.drawLine(left + width, boxTopLeft, left + width, boxTopLeft + boxHeight);
 
-		
-		//Inside/Top of tank
+		// Inside/Top of tank
 		Shape circleTop = new Ellipse2D.Float(left, top, width, topheight);
 		g.setColor(Colors.TANK_INSIDE);
 		g.fill(circleTop);

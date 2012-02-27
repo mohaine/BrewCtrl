@@ -42,6 +42,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
 import com.mohaine.event.ClickHandler;
@@ -53,9 +54,6 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	private ArrayList<SensorLabel> sensorLabels = new ArrayList<SensorLabel>();
 	private GridBagConstraints gbc = new GridBagConstraints();
 
-	private JComboBox tunSensorCombo = new JComboBox();
-	private JComboBox hltSensorCombo = new JComboBox();
-
 	private Hardware hardware;
 	private BrewPrefs prefs;
 	private Timer timer = null;
@@ -65,7 +63,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	private JPanel controlPanel;
 
 	@Inject
-	public SetupDisplaySwing(Hardware hardware, final BrewPrefs prefs) {
+	public SetupDisplaySwing(Hardware hardware, final BrewPrefs prefs, BreweryLayout layout) {
 		super();
 		this.hardware = hardware;
 		this.prefs = prefs;
@@ -79,48 +77,50 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.weightx = 0;
-		inputPanel.add(new JLabel("HLT Sensor:"), gbc);
+		// gbc.fill = GridBagConstraints.NONE;
+		// gbc.weightx = 0;
+		// inputPanel.add(new JLabel("HLT Sensor:"), gbc);
+		//
+		// gbc.gridx++;
+		// gbc.fill = GridBagConstraints.HORIZONTAL;
+		// gbc.weightx = 1;
+		// inputPanel.add(hltSensorCombo, gbc);
+		//
+		// gbc.gridy++;
+		// gbc.gridx = 0;
+		// gbc.fill = GridBagConstraints.NONE;
+		// gbc.weightx = 0;
+		// inputPanel.add(new JLabel("Tun Sensor:"), gbc);
+		// gbc.gridx++;
+		// gbc.fill = GridBagConstraints.HORIZONTAL;
+		// gbc.weightx = 1;
+		// inputPanel.add(tunSensorCombo, gbc);
+		// gbc.gridy++;
+		// gbc.gridx = 0;
 
-		gbc.gridx++;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weightx = 1;
-		inputPanel.add(hltSensorCombo, gbc);
-
-		gbc.gridy++;
-		gbc.gridx = 0;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.weightx = 0;
-		inputPanel.add(new JLabel("Tun Sensor:"), gbc);
-		gbc.gridx++;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weightx = 1;
-		inputPanel.add(tunSensorCombo, gbc);
-		gbc.gridy++;
-		gbc.gridx = 0;
-
-		tunSensorCombo.addItem(new TempSensor(""));
-		hltSensorCombo.addItem(new TempSensor(""));
-
-		hltSensorCombo.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				TempSensor selectedItem = (TempSensor) hltSensorCombo.getSelectedItem();
-				if (selectedItem != null) {
-					prefs.setHltSensorAddress(selectedItem.getAddress());
-				}
-			}
-		});
-		tunSensorCombo.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				TempSensor selectedItem = (TempSensor) tunSensorCombo.getSelectedItem();
-				if (selectedItem != null) {
-					prefs.setTunSensorAddress(selectedItem.getAddress());
-				}
-			}
-		});
+		// tunSensorCombo.addItem(new TempSensor(""));
+		// hltSensorCombo.addItem(new TempSensor(""));
+		//
+		// hltSensorCombo.addItemListener(new ItemListener() {
+		// @Override
+		// public void itemStateChanged(ItemEvent e) {
+		// TempSensor selectedItem = (TempSensor)
+		// hltSensorCombo.getSelectedItem();
+		// if (selectedItem != null) {
+		// prefs.setHltSensorAddress(selectedItem.getAddress());
+		// }
+		// }
+		// });
+		// tunSensorCombo.addItemListener(new ItemListener() {
+		// @Override
+		// public void itemStateChanged(ItemEvent e) {
+		// TempSensor selectedItem = (TempSensor)
+		// tunSensorCombo.getSelectedItem();
+		// if (selectedItem != null) {
+		// prefs.setTunSensorAddress(selectedItem.getAddress());
+		// }
+		// }
+		// });
 
 		controlPanel = new JPanel();
 		add(controlPanel, BorderLayout.SOUTH);
@@ -136,6 +136,8 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	}
 
 	private void updateState(List<TempSensor> sensors) {
+		System.out.println("SetupDisplaySwing.updateState() " + sensors);
+
 		for (TempSensor tempSensor : sensors) {
 
 			boolean found = false;
@@ -151,8 +153,8 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 				invalidate();
 			}
 		}
-		updateCombo(sensors, hltSensorCombo, prefs.getHltSensorAddress());
-		updateCombo(sensors, tunSensorCombo, prefs.getTunSensorAddress());
+		// updateCombo(sensors, hltSensorCombo, prefs.getHltSensorAddress());
+		// updateCombo(sensors, tunSensorCombo, prefs.getTunSensorAddress());
 		doLayout();
 	}
 

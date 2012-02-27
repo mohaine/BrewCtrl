@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import com.mohaine.brewcontroller.android.widget.PumpView;
 import com.mohaine.brewcontroller.android.widget.ZoneView;
-import com.mohaine.brewcontroller.layout.BrewLayout;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Tank;
 
@@ -139,7 +139,7 @@ public class BreweryDisplay extends ViewGroup {
 
 	}
 
-	public void setBreweryLayout(BrewLayout brewLayout) {
+	public void setBreweryLayout(BreweryLayout brewLayout) {
 		Log.v(TAG, "OverviewDisplayAndroid.setBreweryLayout()");
 		List<Tank> zones = brewLayout.getZones();
 		for (Tank zone : zones) {

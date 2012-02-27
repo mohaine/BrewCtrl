@@ -4,7 +4,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.layout.BrewLayout;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 
 public class OverviewDisplayAndroid extends ControlPanelAndroid implements OverviewDisplay {
@@ -26,7 +26,7 @@ public class OverviewDisplayAndroid extends ControlPanelAndroid implements Overv
 	}
 
 	@Override
-	public void setBreweryLayout(BrewLayout brewLayout) {
+	public void setBreweryLayout(BreweryLayout brewLayout) {
 		breweryDisplay.setBreweryLayout(brewLayout);
 	}
 

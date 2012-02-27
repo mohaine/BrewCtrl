@@ -9,7 +9,7 @@ import javax.swing.text.ZoneView;
 import org.w3c.dom.css.Rect;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.layout.BrewLayout;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Tank;
 
@@ -28,14 +28,14 @@ public class BreweryDisplay {
 	}
 
 	private BreweryDisplayDrawer drawer;
-	private BrewLayout brewLayout;
+	private BreweryLayout brewLayout;
 
 	@Inject
 	public BreweryDisplay(BreweryDisplayDrawer drawer) {
 		this.drawer = drawer;
 	}
 
-	public void setBreweryLayout(BrewLayout brewLayout) {
+	public void setBreweryLayout(BreweryLayout brewLayout) {
 		this.brewLayout = brewLayout;
 		List<Tank> zones = brewLayout.getZones();
 

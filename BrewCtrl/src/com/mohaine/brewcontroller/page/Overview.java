@@ -22,7 +22,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ClickEvent;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
-import com.mohaine.brewcontroller.layout.BrewLayout;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.event.ClickHandler;
 import com.mohaine.event.bus.EventBus;
 
@@ -33,7 +33,7 @@ public class Overview extends BasePage {
 
 		public void init();
 
-		public void setBreweryLayout(BrewLayout layout);
+		public void setBreweryLayout(BreweryLayout layout);
 
 	}
 
