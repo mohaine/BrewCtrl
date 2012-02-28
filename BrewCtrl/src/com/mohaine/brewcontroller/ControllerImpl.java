@@ -224,7 +224,6 @@ public class ControllerImpl implements Controller {
 
 	private void initLayout() {
 		brewLayout = new BreweryLayout();
-		brewLayout.setName("Brewing");
 
 		List<Tank> tanks = brewLayout.getTanks();
 		Tank hlt = new Tank();
@@ -254,7 +253,6 @@ public class ControllerImpl implements Controller {
 	}
 
 	private void updateLayoutState() {
-		System.out.println("ControllerImpl.updateLayoutState()");
 		List<HardwareSensor> sensors = hardware.getSensors();
 		for (HardwareSensor tempSensor : sensors) {
 			List<Tank> tanks = brewLayout.getTanks();

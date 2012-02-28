@@ -173,6 +173,11 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 		locationCombo.addItem(null);
 
 		for (Tank tank : tanks) {
+
+			if (tank.getSensor() == null) {
+				continue;
+			}
+
 			locationCombo.addItem(tank);
 			if (tank.getName().equals(prefs.getSensorLocation(tempSensor.getAddress(), null))) {
 				locationCombo.setSelectedItem(tank);
@@ -259,7 +264,6 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 			String newName = value.getText();
 			if (!sensor.getName().equals(newName)) {
 				sensor.setName(newName);
-
 				prefs.setSensorName(sensor.getAddress(), newName);
 				scheduleTimer();
 			}
@@ -270,6 +274,8 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 			Tank selectedItem = (Tank) combo.getSelectedItem();
 			if (selectedItem != null) {
 				prefs.setSensorLocation(sensor.getAddress(), selectedItem.getName());
+			} else {
+				prefs.setSensorLocation(sensor.getAddress(), "");
 			}
 		}
 	}

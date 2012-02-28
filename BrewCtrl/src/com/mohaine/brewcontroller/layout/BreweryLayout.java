@@ -4,17 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BreweryLayout {
-	private String name;
 	private List<Tank> zones = new ArrayList<Tank>();
 	private List<Pump> pumps = new ArrayList<Pump>();
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public List<Tank> getTanks() {
 		return zones;
