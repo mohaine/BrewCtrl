@@ -18,14 +18,14 @@
 
 package com.mohaine.brewcontroller.bean;
 
-public class TempSensor {
+public class HardwareSensor {
 
 	private final String address;
 	private String name;
 	private double tempatureC;
 	private boolean reading = false;
 
-	public TempSensor(String address) {
+	public HardwareSensor(String address) {
 		this.address = address;
 	}
 

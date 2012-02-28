@@ -43,7 +43,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Hardware;
-import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
@@ -100,9 +100,9 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 		controlPanel.add(new JButton(setupClickable));
 	}
 
-	private void updateState(List<TempSensor> sensors) {
+	private void updateState(List<HardwareSensor> sensors) {
 
-		for (TempSensor tempSensor : sensors) {
+		for (HardwareSensor tempSensor : sensors) {
 
 			boolean found = false;
 			for (SensorLabel sensorLabel : sensorLabels) {
@@ -144,7 +144,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 		super.removeNotify();
 	}
 
-	private SensorLabel addSensorLabel(GridBagConstraints gbc, final TempSensor tempSensor) {
+	private SensorLabel addSensorLabel(GridBagConstraints gbc, final HardwareSensor tempSensor) {
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.weightx = 0;
 		gbc.anchor = GridBagConstraints.WEST;
@@ -195,7 +195,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	}
 
 	@Override
-	public void setSensors(final List<TempSensor> listSensors) {
+	public void setSensors(final List<HardwareSensor> listSensors) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -207,7 +207,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	private class SensorLabel implements KeyListener, ItemListener {
 		public JComboBox combo;
 		JTextField value;
-		TempSensor sensor;
+		HardwareSensor sensor;
 
 		public void update() {
 			String name = sensor.getName();

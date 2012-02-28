@@ -36,7 +36,7 @@ import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HeaterMode;
-import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 
 final class ReadWriteThread implements Runnable {
 
@@ -81,11 +81,11 @@ final class ReadWriteThread implements Runnable {
 		public void readFrom(byte[] readBuffer, int offset) {
 			String address = readAddress(readBuffer, offset);
 			offset += 8;
-			TempSensor sensor = null;
+			HardwareSensor sensor = null;
 
-			List<TempSensor> tempSensors = serialHardwareComm.getSensors();
+			List<HardwareSensor> tempSensors = serialHardwareComm.getSensors();
 
-			for (TempSensor tempSensor : tempSensors) {
+			for (HardwareSensor tempSensor : tempSensors) {
 				if (tempSensor.getAddress().equals(address)) {
 					sensor = tempSensor;
 					break;
@@ -93,7 +93,7 @@ final class ReadWriteThread implements Runnable {
 			}
 			if (sensor == null) {
 				String defaultName = "Sensor " + (tempSensors.size() + 1);
-				sensor = new TempSensor(address);
+				sensor = new HardwareSensor(address);
 				sensor.setName(prefs.getSensorName(address, defaultName));
 				tempSensors.add(sensor);
 			}

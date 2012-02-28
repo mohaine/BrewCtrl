@@ -22,13 +22,13 @@ import java.util.List;
 
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
-import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.StatusChangeHandler;
 
 public interface Hardware {
 
-	public List<TempSensor> getSensors();
+	public List<HardwareSensor> getSensors();
 
 	public HardwareStatus getHardwareStatus();
 

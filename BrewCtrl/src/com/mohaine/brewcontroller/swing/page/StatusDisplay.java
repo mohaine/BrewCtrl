@@ -42,7 +42,7 @@ import com.mohaine.brewcontroller.Controller.Mode;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
-import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
 import com.mohaine.brewcontroller.swing.ValueSlider;
@@ -253,7 +253,7 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 	}
 
-	private SensorLabel addTitledSensorLabel(GridBagConstraints gbc, JPanel panel, TempSensor tempSensor) {
+	private SensorLabel addTitledSensorLabel(GridBagConstraints gbc, JPanel panel, HardwareSensor tempSensor) {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		JLabel label = new JLabel();
 		panel.add(label, gbc);
@@ -299,8 +299,8 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 			pumpState.setText(hardwareStatus.isPumpOn() ? "On" : "Off");
 		}
 
-		List<TempSensor> sensors = hardware.getSensors();
-		for (TempSensor tempSensor : sensors) {
+		List<HardwareSensor> sensors = hardware.getSensors();
+		for (HardwareSensor tempSensor : sensors) {
 
 			boolean found = false;
 			for (SensorLabel sensorLabel : sensorLabels) {
@@ -331,7 +331,7 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 	private class SensorLabel {
 		JLabel label;
 		JLabel value;
-		TempSensor sensor;
+		HardwareSensor sensor;
 
 		public void update() {
 			label.setText(sensor.getName() + ":");

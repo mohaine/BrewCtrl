@@ -9,7 +9,7 @@ import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 
 public class OverviewDisplayAndroid extends ControlPanelAndroid implements OverviewDisplay {
 	private static final String TAG = "OverviewDisplayAndroid";
-	private BreweryDisplay breweryDisplay;
+	private BreweryDisplayAndroid breweryDisplay;
 
 	@Inject
 	public OverviewDisplayAndroid() {
@@ -20,7 +20,7 @@ public class OverviewDisplayAndroid extends ControlPanelAndroid implements Overv
 	public void init() {
 		super.init();
 		layout.addView(createLabel("Name"));
-		breweryDisplay = new BreweryDisplay(getView().getContext());
+		breweryDisplay = new BreweryDisplayAndroid(getView().getContext());
 		layout.addView(breweryDisplay);
 
 	}

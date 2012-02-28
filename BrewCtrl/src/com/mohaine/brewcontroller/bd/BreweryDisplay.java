@@ -3,10 +3,16 @@ package com.mohaine.brewcontroller.bd;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Tank;
+import com.mohaine.event.BreweryComponentChangeHandler;
+import com.mohaine.event.HandlerRegistration;
 
 public class BreweryDisplay {
 
@@ -20,16 +26,31 @@ public class BreweryDisplay {
 
 		void setDisplays(List<BreweryComponentDisplay> displays);
 
-		void cleanup();
+		void redrawBreweryComponent(BreweryComponent component);
 
 	}
 
 	private BreweryDisplayDrawer drawer;
 	private BreweryLayout brewLayout;
+	private HandlerRegistration handler;
+	private Controller controller;
 
 	@Inject
-	public BreweryDisplay(BreweryDisplayDrawer drawer) {
+	public BreweryDisplay(BreweryDisplayDrawer drawer, Controller controller) {
 		this.drawer = drawer;
+		this.controller = controller;
+
+		handler = controller.addBreweryComponentChangeHandlers(new BreweryComponentChangeHandler() {
+			@Override
+			public void onStateChange(final BreweryComponent component) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						BreweryDisplay.this.drawer.redrawBreweryComponent(component);
+					}
+				});
+			}
+		});
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
@@ -61,7 +82,7 @@ public class BreweryDisplay {
 		int left = 5;
 		int top = 5;
 
-		for (BreweryComponentDisplay zoneView : getZonesForType(Tank.TYPE)) {
+		for (BreweryComponentDisplay zoneView : getComponentForType(Tank.TYPE)) {
 			zoneView.setLeft(left);
 			zoneView.setTop(top);
 			left += zoneView.getHeight();
@@ -71,7 +92,7 @@ public class BreweryDisplay {
 		left = 5;
 		top = 210;
 
-		for (BreweryComponentDisplay pump : getZonesForType(Pump.TYPE)) {
+		for (BreweryComponentDisplay pump : getComponentForType(Pump.TYPE)) {
 			pump.setLeft(left);
 			pump.setTop(top);
 			left += pump.getHeight();
@@ -80,7 +101,7 @@ public class BreweryDisplay {
 
 	}
 
-	private List<BreweryComponentDisplay> getZonesForType(String type) {
+	private List<BreweryComponentDisplay> getComponentForType(String type) {
 		List<BreweryComponentDisplay> results = new ArrayList<BreweryComponentDisplay>();
 		for (BreweryComponentDisplay display : displays) {
 			if (display.getComponent().getType().equals(type)) {
@@ -90,17 +111,14 @@ public class BreweryDisplay {
 		return results;
 	}
 
-	private List<BreweryComponentDisplay> getZonesForType(Class<Tank> class1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public Object getDrawer() {
 		return drawer;
 	}
 
 	public void cleanup() {
-		drawer.cleanup();
+		if (handler != null) {
+			handler.removeHandler();
+			handler = null;
+		}
 	}
-
 }

@@ -26,7 +26,7 @@ import com.google.inject.Provider;
 import com.mohaine.brewcontroller.ClickEvent;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.Hardware;
-import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.event.ClickHandler;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.StatusChangeHandler;
@@ -36,7 +36,7 @@ public class Setup extends BasePage implements StatusChangeHandler {
 	public interface SetupDisplay {
 		public void addClickable(String name, ClickHandler ch);
 
-		void setSensors(List<TempSensor> listSensors);
+		void setSensors(List<HardwareSensor> listSensors);
 
 		void init();
 

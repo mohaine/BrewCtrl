@@ -17,12 +17,12 @@ import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Tank;
 
-public class BreweryDisplay extends ViewGroup {
+public class BreweryDisplayAndroid extends ViewGroup {
 	private static final String TAG = "BreweryDisplay";
 	private List<ZoneView> zoneViews = new ArrayList<ZoneView>();
 	private List<PumpView> pumpViews = new ArrayList<PumpView>();
 
-	public BreweryDisplay(Context context) {
+	public BreweryDisplayAndroid(Context context) {
 		super(context);
 	}
 

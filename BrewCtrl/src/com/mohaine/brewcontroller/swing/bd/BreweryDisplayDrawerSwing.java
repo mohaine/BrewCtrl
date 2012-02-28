@@ -15,20 +15,15 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Converter;
-import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.Pump;
+import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
-import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.StatusChangeHandler;
 
 public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayDrawer {
 	private static final int TANK_TOP_HEIGHT = 20;
@@ -37,48 +32,28 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	private int PADDING = 5;
 	private NumberFormat nf = new DecimalFormat("0.0");
 	private UnitConversion conversion;
-	private Controller controller;
-	private HandlerRegistration handler;
-	private boolean painted;
 
 	@Inject
-	public BreweryDisplayDrawerSwing(final UnitConversion conversion, Controller controller, Hardware hardware) {
+	public BreweryDisplayDrawerSwing(final UnitConversion conversion) {
 		super();
 		this.conversion = conversion;
-		this.controller = controller;
+	}
 
-		handler = hardware.addStatusChangeHandler(new StatusChangeHandler() {
-			@Override
-			public void onStateChange() {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						updateState();
-					}
-				});
+	@Override
+	public void redrawBreweryComponent(BreweryComponent componentChanged) {
+		Graphics2D g2 = (Graphics2D) getGraphics();
+		for (BreweryComponentDisplay display : displays) {
+			BreweryComponent displayComponent = display.getComponent();
+			if (displayComponent == componentChanged) {
+				drawComponent(g2, display);
 			}
-		});
-
-	}
-
-	public void cleanup() {
-		if (handler != null) {
-			handler.removeHandler();
-			handler = null;
-		}
-	}
-
-	private void updateState() {
-		if (painted) {
-			Graphics graphics = getGraphics();
-			Graphics2D g2 = (Graphics2D) graphics;
-
-			for (BreweryComponentDisplay display : displays) {
-				BreweryComponent component = display.getComponent();
-				if (Tank.TYPE.equals(component.getType())) {
+			if (displayComponent instanceof Tank) {
+				Tank tank = (Tank) displayComponent;
+				if (tank.getSensor() == componentChanged) {
 					drawTankTemp(g2, display);
 				}
 			}
+
 		}
 	}
 
@@ -86,25 +61,27 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	public void paint(Graphics g) {
 		super.paint(g);
 
-		painted = true;
-
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(Colors.BACKGROUND);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 
 		for (BreweryComponentDisplay display : displays) {
-			BreweryComponent component = display.getComponent();
-			if (Tank.TYPE.equals(component.getType())) {
-				drawTank(g2, display);
-			} else if (Pump.TYPE.equals(component.getType())) {
-				drawPump(g2, display);
-			} else {
-				g.drawRect(display.getLeft(), display.getTop(), display.getWidth(), display.getHeight());
-				drawName(g2, display);
-			}
+			drawComponent(g2, display);
 		}
 
+	}
+
+	private void drawComponent(Graphics2D g2, BreweryComponentDisplay display) {
+		BreweryComponent component = display.getComponent();
+		if (Tank.TYPE.equals(component.getType())) {
+			drawTank(g2, display);
+		} else if (Pump.TYPE.equals(component.getType())) {
+			drawPump(g2, display);
+		} else {
+			g2.drawRect(display.getLeft(), display.getTop(), display.getWidth(), display.getHeight());
+			drawName(g2, display);
+		}
 	}
 
 	private void drawTank(Graphics2D g, BreweryComponentDisplay display) {
@@ -150,12 +127,14 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	private void drawTankTemp(Graphics2D g, BreweryComponentDisplay display) {
-		Double temp = controller.getTankTemp(display.getComponent());
-		if (temp != null) {
+		Tank component = (Tank) display.getComponent();
+		Sensor sensor = component.getSensor();
+		if (sensor != null) {
+
 			int top = display.getTop();
 			int left = display.getLeft();
 			final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
-			String tempDisplay = nf.format(tempDisplayConveter.convertFrom(temp)) + "\u00B0";
+			String tempDisplay = nf.format(tempDisplayConveter.convertFrom(sensor.getTempatureC())) + "\u00B0";
 
 			Rectangle lastTextRect = (Rectangle) display.getDisplayInfo();
 			if (lastTextRect != null) {
@@ -163,7 +142,11 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				g.fillRect(lastTextRect.x, lastTextRect.y - lastTextRect.height, lastTextRect.width, lastTextRect.height);
 			}
 
-			g.setColor(Colors.FOREGROUND);
+			if (sensor.isReading()) {
+				g.setColor(Colors.FOREGROUND);
+			} else {
+				g.setColor(Colors.ERROR);
+			}
 			g.setFont(Colors.TEMP_FONT);
 			FontMetrics fontMetrics = g.getFontMetrics();
 			Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, g);

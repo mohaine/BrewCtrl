@@ -23,17 +23,17 @@ import java.util.Collections;
 import java.util.List;
 
 import com.mohaine.brewcontroller.bean.HardwareStatus;
-import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.StatusChangeHandler;
 
 public abstract class HardwareBase implements Hardware {
 	private HardwareStatus hardwareStatus = new HardwareStatus();
-	private ArrayList<TempSensor> tempSensors = new ArrayList<TempSensor>();
+	private ArrayList<HardwareSensor> tempSensors = new ArrayList<HardwareSensor>();
 	private List<StatusChangeHandler> statusChangeHandlers = Collections.synchronizedList(new ArrayList<StatusChangeHandler>());
 
 	@Override
-	public List<TempSensor> getSensors() {
+	public List<HardwareSensor> getSensors() {
 		return tempSensors;
 	}
 
@@ -63,9 +63,9 @@ public abstract class HardwareBase implements Hardware {
 
 	@Override
 	public Double getSensorTemp(String sensorAddress) {
-		List<TempSensor> sensors = getSensors();
+		List<HardwareSensor> sensors = getSensors();
 		for (int i = 0; i < sensors.size(); i++) {
-			TempSensor tempSensor = sensors.get(i);
+			HardwareSensor tempSensor = sensors.get(i);
 			if (tempSensor.getAddress().equals(sensorAddress)) {
 				return tempSensor.getTempatureC();
 			}

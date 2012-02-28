@@ -24,7 +24,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HeaterMode;
-import com.mohaine.brewcontroller.bean.TempSensor;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 
 public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 
@@ -38,17 +38,15 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 	@Inject
 	public HardwareMock(BrewPrefs prefs) {
 
-		List<TempSensor> tempSensors = getSensors();
+		List<HardwareSensor> tempSensors = getSensors();
 
-		tempSensors.add(new TempSensor("ABCD"));
-		tempSensors.add(new TempSensor("EFGH"));
+		tempSensors.add(new HardwareSensor("ABCD"));
+		tempSensors.add(new HardwareSensor("EFGH"));
 
 		int count = 1;
-		for (TempSensor sensor : tempSensors) {
+		for (HardwareSensor sensor : tempSensors) {
 			sensor.setName(prefs.getSensorName(sensor.getAddress(), "Sensor " + count));
-
 			sensor.setTempatureC(30);
-
 			count++;
 		}
 
@@ -84,7 +82,8 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 						duty = 0;
 					}
 
-					for (TempSensor sensor : getSensors()) {
+					for (HardwareSensor sensor : getSensors()) {
+						sensor.setReading(true);
 						sensor.setTempatureC(sensor.getTempatureC() + Math.random());
 					}
 					break;
