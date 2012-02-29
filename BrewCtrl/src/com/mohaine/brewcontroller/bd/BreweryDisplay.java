@@ -6,13 +6,14 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
+import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Tank;
-import com.mohaine.event.BreweryComponentChangeHandler;
 import com.mohaine.event.HandlerRegistration;
+import com.mohaine.event.bus.EventBus;
 
 public class BreweryDisplay {
 
@@ -33,14 +34,12 @@ public class BreweryDisplay {
 	private BreweryDisplayDrawer drawer;
 	private BreweryLayout brewLayout;
 	private HandlerRegistration handler;
-	private Controller controller;
 
 	@Inject
-	public BreweryDisplay(BreweryDisplayDrawer drawer, Controller controller) {
+	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus) {
 		this.drawer = drawer;
-		this.controller = controller;
 
-		handler = controller.addBreweryComponentChangeHandlers(new BreweryComponentChangeHandler() {
+		eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
 			@Override
 			public void onStateChange(final BreweryComponent component) {
 				SwingUtilities.invokeLater(new Runnable() {

@@ -195,6 +195,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 	private void drawName(Graphics2D g, BreweryComponentDisplay display) {
 		g.setFont(Colors.TEXT_FONT);
+		g.setColor(Colors.FOREGROUND);
 		int left = display.getLeft();
 		int width = display.getWidth();
 		FontMetrics fontMetrics = g.getFontMetrics();

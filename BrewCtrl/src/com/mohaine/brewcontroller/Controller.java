@@ -22,8 +22,6 @@ import java.util.List;
 
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
-import com.mohaine.event.BreweryComponentChangeHandler;
-import com.mohaine.event.HandlerRegistration;
 
 public interface Controller {
 
@@ -48,7 +46,5 @@ public interface Controller {
 	public void nextStep();
 
 	public BreweryLayout getLayout();
-
-	public HandlerRegistration addBreweryComponentChangeHandlers(final BreweryComponentChangeHandler handler);
 
 }

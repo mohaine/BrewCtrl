@@ -19,7 +19,6 @@
 package com.mohaine.brewcontroller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.inject.Inject;
@@ -27,6 +26,7 @@ import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterMode;
 import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
@@ -37,8 +37,6 @@ import com.mohaine.brewcontroller.layout.Heater;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
-import com.mohaine.event.BreweryComponentChangeHandler;
-import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.StatusChangeHandler;
 import com.mohaine.event.bus.EventBus;
 
@@ -54,7 +52,6 @@ public class ControllerImpl implements Controller {
 	private Hardware hardware;
 	private BrewPrefs prefs;
 	private BreweryLayout brewLayout;
-	private List<BreweryComponentChangeHandler> componentChangeHandler = Collections.synchronizedList(new ArrayList<BreweryComponentChangeHandler>());
 
 	private class Monitor implements Runnable {
 		@Override
@@ -277,21 +274,7 @@ public class ControllerImpl implements Controller {
 	}
 
 	private void fireBreweryComponentChangeHandler(BreweryComponent component) {
-		for (BreweryComponentChangeHandler handler : componentChangeHandler) {
-			handler.onStateChange(component);
-		}
-	}
-
-	@Override
-	public HandlerRegistration addBreweryComponentChangeHandlers(final BreweryComponentChangeHandler handler) {
-		componentChangeHandler.add(handler);
-
-		return new HandlerRegistration() {
-			@Override
-			public void removeHandler() {
-				componentChangeHandler.remove(handler);
-			}
-		};
+		eventBus.fireEvent(new BreweryComponentChangeEvent(component));
 	}
 
 }

@@ -16,11 +16,12 @@
  
  */
 
-package com.mohaine.event;
+package com.mohaine.brewcontroller.event;
 
 import com.mohaine.brewcontroller.layout.BreweryComponent;
+import com.mohaine.event.bus.EventHandler;
 
-public interface BreweryComponentChangeHandler {
+public interface BreweryComponentChangeEventHandler extends EventHandler {
 
 	public void onStateChange(BreweryComponent component);
 
