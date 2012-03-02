@@ -9,7 +9,7 @@ public class Tank extends BreweryComponent {
 	}
 
 	private Sensor sensor;
-	private Heater heater;
+	private HeatElement heater;
 
 	public Sensor getSensor() {
 		return sensor;
@@ -19,11 +19,11 @@ public class Tank extends BreweryComponent {
 		this.sensor = sensor;
 	}
 
-	public Heater getHeater() {
+	public HeatElement getHeater() {
 		return heater;
 	}
 
-	public void setHeater(Heater heater) {
+	public void setHeater(HeatElement heater) {
 		this.heater = heater;
 	}
 

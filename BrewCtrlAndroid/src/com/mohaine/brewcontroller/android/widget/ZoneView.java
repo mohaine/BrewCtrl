@@ -26,7 +26,7 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.mohaine.brewcontroller.layout.Heater;
+import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
 
@@ -88,7 +88,7 @@ public class ZoneView extends LinearLayout {
 		controlLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		addView(controlLayout);
 
-		Heater heater = zone.getHeater();
+		HeatElement heater = zone.getHeater();
 		if (heater != null) {
 			ValueSlider slider = new ValueSlider(getContext(), 0, 0, 100);
 			slider.setLayoutParams(new LayoutParams(100, 250));

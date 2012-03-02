@@ -1,6 +1,6 @@
 package com.mohaine.brewcontroller.layout;
 
-public class Heater extends BreweryComponent {
+public class HeatElement extends BreweryComponent {
 
 	public static final String TYPE = "Heater";
 

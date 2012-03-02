@@ -33,7 +33,7 @@ import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
-import com.mohaine.brewcontroller.layout.Heater;
+import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
@@ -220,10 +220,19 @@ public class ControllerImpl implements Controller {
 	private void initLayout() {
 		brewLayout = new BreweryLayout();
 
+		List<Pump> pumps = brewLayout.getPumps();
+		Pump pump = new Pump();
+		pump.setName("Loop");
+		pumps.add(pump);
+
+		Pump mainPump = new Pump();
+		mainPump.setName("Main");
+		pumps.add(mainPump);
+
 		List<Tank> tanks = brewLayout.getTanks();
 		Tank hlt = new Tank();
 		hlt.setName("HLT");
-		hlt.setHeater(new Heater());
+		hlt.setHeater(new HeatElement());
 		hlt.setSensor(new Sensor());
 		tanks.add(hlt);
 
@@ -234,17 +243,9 @@ public class ControllerImpl implements Controller {
 
 		Tank kettle = new Tank();
 		kettle.setName("Kettle");
-		kettle.setHeater(new Heater());
+		kettle.setHeater(new HeatElement());
 		tanks.add(kettle);
 
-		List<Pump> pumps = brewLayout.getPumps();
-		Pump pump = new Pump();
-		pump.setName("Loop");
-		pumps.add(pump);
-
-		Pump mainPump = new Pump();
-		mainPump.setName("Main");
-		pumps.add(mainPump);
 	}
 
 	private void updateLayoutState() {
