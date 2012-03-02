@@ -3,7 +3,7 @@ package com.mohaine.brewcontroller.layout;
 public class Sensor extends BreweryComponent {
 	public static final String TYPE = "Sensor";
 	private boolean reading;
-	private double tempatureC;
+	private Double tempatureC;
 
 	@Override
 	public String getType() {
@@ -18,11 +18,11 @@ public class Sensor extends BreweryComponent {
 		this.reading = reading;
 	}
 
-	public double getTempatureC() {
+	public Double getTempatureC() {
 		return tempatureC;
 	}
 
-	public void setTempatureC(double temp) {
+	public void setTempatureC(Double temp) {
 		this.tempatureC = temp;
 	}
 

@@ -135,12 +135,10 @@ public class ControllerImpl implements Controller {
 		});
 
 		hardware.addStatusChangeHandler(new StatusChangeHandler() {
-
 			@Override
 			public void onStateChange() {
 				updateLayoutState();
 			}
-
 		});
 
 		new Thread(monitor).start();
@@ -257,7 +255,7 @@ public class ControllerImpl implements Controller {
 				Sensor sensor = tank.getSensor();
 				if (sensor != null) {
 					if (tank.getName().equals(prefs.getSensorLocation(tempSensor.getAddress(), ""))) {
-						double temp = sensor.getTempatureC();
+						Double temp = sensor.getTempatureC();
 						boolean reading = sensor.isReading();
 
 						sensor.setReading(tempSensor.isReading());

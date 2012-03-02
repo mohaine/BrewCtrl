@@ -130,29 +130,32 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		Tank component = (Tank) display.getComponent();
 		Sensor sensor = component.getSensor();
 		if (sensor != null) {
+			Double tempatureC = sensor.getTempatureC();
+			if (tempatureC != null) {
+				int top = display.getTop();
+				int left = display.getLeft();
+				final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
 
-			int top = display.getTop();
-			int left = display.getLeft();
-			final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
-			String tempDisplay = nf.format(tempDisplayConveter.convertFrom(sensor.getTempatureC())) + "\u00B0";
+				String tempDisplay = nf.format(tempDisplayConveter.convertFrom(tempatureC)) + "\u00B0";
 
-			Rectangle lastTextRect = (Rectangle) display.getDisplayInfo();
-			if (lastTextRect != null) {
-				g.setColor(Colors.TANK);
-				g.fillRect(lastTextRect.x, lastTextRect.y - lastTextRect.height, lastTextRect.width, lastTextRect.height);
+				Rectangle lastTextRect = (Rectangle) display.getDisplayInfo();
+				if (lastTextRect != null) {
+					g.setColor(Colors.TANK);
+					g.fillRect(lastTextRect.x, lastTextRect.y - lastTextRect.height, lastTextRect.width, lastTextRect.height);
+				}
+
+				if (sensor.isReading()) {
+					g.setColor(Colors.FOREGROUND);
+				} else {
+					g.setColor(Colors.ERROR);
+				}
+				g.setFont(Colors.TEMP_FONT);
+				FontMetrics fontMetrics = g.getFontMetrics();
+				Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, g);
+				Rectangle textRect = new Rectangle(left + 5, (int) (top + stringBounds.getHeight() + TANK_TOP_HEIGHT), (int) stringBounds.getWidth(), (int) -stringBounds.getMinY());
+				g.drawString(tempDisplay, textRect.x, textRect.y);
+				display.setDisplayInfo(textRect);
 			}
-
-			if (sensor.isReading()) {
-				g.setColor(Colors.FOREGROUND);
-			} else {
-				g.setColor(Colors.ERROR);
-			}
-			g.setFont(Colors.TEMP_FONT);
-			FontMetrics fontMetrics = g.getFontMetrics();
-			Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, g);
-			Rectangle textRect = new Rectangle(left + 5, (int) (top + stringBounds.getHeight() + TANK_TOP_HEIGHT), (int) stringBounds.getWidth(), (int) -stringBounds.getMinY());
-			g.drawString(tempDisplay, textRect.x, textRect.y);
-			display.setDisplayInfo(textRect);
 		}
 	}
 
