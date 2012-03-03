@@ -39,7 +39,7 @@ public class BreweryDisplay {
 	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus) {
 		this.drawer = drawer;
 
-		eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
+		handler = eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
 			@Override
 			public void onStateChange(final BreweryComponent component) {
 				SwingUtilities.invokeLater(new Runnable() {
