@@ -123,6 +123,9 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		g.draw(circleTop);
 
 		drawTankTemp(g, display);
+		
+//		if(display)
+		
 
 	}
 
