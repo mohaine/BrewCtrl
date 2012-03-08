@@ -1,6 +1,6 @@
 package com.mohaine.brewcontroller.layout;
 
-public class HeatElement extends BreweryComponent {
+public class HeatElement extends HardwareControl {
 
 	public static final String TYPE = "Heater";
 	public static final String MODE_OFF = "Off";

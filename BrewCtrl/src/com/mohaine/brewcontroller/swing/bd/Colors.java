@@ -13,7 +13,7 @@ public class Colors {
 	public static Color FOREGROUND = Color.black;
 	public static Color ERROR = Color.red;
 
-	public static final Font TEMP_FONT = new Font("Dialog", Font.PLAIN, 40);
+	public static final Font TEMP_FONT = new Font("Dialog", Font.PLAIN, 32);
 	public static final Font TEXT_FONT = new Font("Dialog", Font.PLAIN, 12);
 
 }

@@ -75,16 +75,14 @@ public class BreweryDisplay {
 	}
 
 	public void layoutDisplays() {
-		int width = drawer.getWidth();
-		int height = drawer.getHeight();
 
 		int left = 5;
 		int top = 5;
 
-		for (BreweryComponentDisplay zoneView : getComponentForType(Tank.TYPE)) {
-			zoneView.setLeft(left);
-			zoneView.setTop(top);
-			left += zoneView.getHeight();
+		for (BreweryComponentDisplay tank : getComponentForType(Tank.TYPE)) {
+			tank.setLeft(left);
+			tank.setTop(top);
+			left += tank.getHeight();
 			left += 5;
 		}
 
