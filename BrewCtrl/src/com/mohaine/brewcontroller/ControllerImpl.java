@@ -101,13 +101,17 @@ public class ControllerImpl implements Controller {
 		boolean updateSelection = false;
 		HeaterStep newSelection = null;
 		synchronized (steps) {
+
 			if (steps.size() > 0) {
 				HeaterStep remove = steps.remove(0);
 				updateSelection = remove == selectedStep;
-				if (steps.size() > 0) {
-					newSelection = steps.get(0);
-				}
 			}
+
+			if (steps.size() == 0) {
+				steps.add(createOffStep());
+			}
+
+			newSelection = steps.get(0);
 		}
 
 		if (updateSelection) {
@@ -116,12 +120,22 @@ public class ControllerImpl implements Controller {
 		eventBus.fireEvent(new StepsModifyEvent());
 	}
 
+	private HeaterStep createOffStep() {
+		HeaterStep heaterStep = new HeaterStep();
+		
+		
+		
+		return heaterStep;
+	}
+
 	@Inject
 	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs) {
 		super();
 		this.eventBus = eventBusp;
 		this.hardware = hardware;
 		this.prefs = prefs;
+
+		steps.add(createOffStep());
 
 		initLayout();
 

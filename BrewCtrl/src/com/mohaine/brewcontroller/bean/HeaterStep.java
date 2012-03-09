@@ -21,8 +21,8 @@ package com.mohaine.brewcontroller.bean;
 public class HeaterStep {
 
 	private String name;
-	private double hltTemp;
-	private double tunTemp;
+//	private double hltTemp;
+//	private double tunTemp;
 
 	private long stepTime = 0;
 	private long extraCompletedTime = 0;
@@ -35,29 +35,29 @@ public class HeaterStep {
 	public HeaterStep(String name, double tunTemp, long stepTime) {
 		super();
 		this.name = name;
-		this.hltTemp = tunTemp + 10;
-		this.tunTemp = tunTemp;
+//		this.hltTemp = tunTemp + 10;
+//		this.tunTemp = tunTemp;
 		this.stepTime = stepTime;
 	}
 
-	public double getHltTemp() {
-		return hltTemp;
-	}
-
-	public void setHltTemp(double duty) {
-		if (duty < 0) {
-			duty = 0;
-		}
-		if (duty > 100) {
-			duty = 100;
-		}
-
-		boolean dirty = duty != hltTemp;
-		hltTemp = duty;
-		if (dirty) {
-			// fireStateChangeHandlers();
-		}
-	}
+//	public double getHltTemp() {
+//		return hltTemp;
+//	}
+//
+//	public void setHltTemp(double duty) {
+//		if (duty < 0) {
+//			duty = 0;
+//		}
+//		if (duty > 100) {
+//			duty = 100;
+//		}
+//
+//		boolean dirty = duty != hltTemp;
+//		hltTemp = duty;
+//		if (dirty) {
+//			// fireStateChangeHandlers();
+//		}
+//	}
 
 	public String getName() {
 		return name;
@@ -67,13 +67,13 @@ public class HeaterStep {
 		this.name = name;
 	}
 
-	public double getTunTemp() {
-		return tunTemp;
-	}
-
-	public void setTunTemp(double targetTemp) {
-		this.tunTemp = targetTemp;
-	}
+//	public double getTunTemp() {
+//		return tunTemp;
+//	}
+//
+//	public void setTunTemp(double targetTemp) {
+//		this.tunTemp = targetTemp;
+//	}
 
 	public long getStepTime() {
 		return stepTime;

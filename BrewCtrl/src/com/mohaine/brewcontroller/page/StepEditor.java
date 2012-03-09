@@ -97,24 +97,24 @@ public class StepEditor extends BasePage {
 				}
 			}
 		});
-		display.getHltTemp().addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				synchronized (syncObject) {
-					step.setHltTemp(display.getHltTemp().getValue());
-					fireModifiedEvent();
-				}
-			}
-		});
-		display.getTunTemp().addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				synchronized (syncObject) {
-					step.setTunTemp(display.getTunTemp().getValue());
-					fireModifiedEvent();
-				}
-			}
-		});
+//		display.getHltTemp().addChangeHandler(new ChangeHandler() {
+//			@Override
+//			public void onChange(ChangeEvent event) {
+//				synchronized (syncObject) {
+//					step.setHltTemp(display.getHltTemp().getValue());
+//					fireModifiedEvent();
+//				}
+//			}
+//		});
+//		display.getTunTemp().addChangeHandler(new ChangeHandler() {
+//			@Override
+//			public void onChange(ChangeEvent event) {
+//				synchronized (syncObject) {
+//					step.setTunTemp(display.getTunTemp().getValue());
+//					fireModifiedEvent();
+//				}
+//			}
+//		});
 
 		display.getNameValue().addChangeHandler(new ChangeHandler() {
 			@Override
@@ -160,8 +160,8 @@ public class StepEditor extends BasePage {
 				goMainMenu();
 			} else {
 
-				display.getHltTemp().setValue(step.getHltTemp());
-				display.getTunTemp().setValue(step.getTunTemp());
+//				display.getHltTemp().setValue(step.getHltTemp());
+//				display.getTunTemp().setValue(step.getTunTemp());
 				display.getNameValue().setValue(step.getName());
 				display.getTimeValue().setValue(step.getStepTime());
 			}

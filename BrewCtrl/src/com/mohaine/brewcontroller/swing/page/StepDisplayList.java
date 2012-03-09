@@ -229,9 +229,9 @@ public class StepDisplayList extends JPanel {
 				case 0:
 					return step.getName();
 				case 1:
-					return nf.format(conversion.getTempDisplayConveter().convertFrom(step.getHltTemp()));
+//					return nf.format(conversion.getTempDisplayConveter().convertFrom(step.getHltTemp()));
 				case 2:
-					return nf.format(conversion.getTempDisplayConveter().convertFrom(step.getTunTemp()));
+//					return nf.format(conversion.getTempDisplayConveter().convertFrom(step.getTunTemp()));
 				case 3:
 					return HeaterStep.timeToMinutes(step.getTimeRemaining(),"forever");
 				case 4:
