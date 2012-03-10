@@ -44,6 +44,8 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	@Override
 	public void redrawBreweryComponent(BreweryComponent componentChanged) {
 		Graphics2D g2 = (Graphics2D) getGraphics();
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
 		for (BreweryComponentDisplay display : displays) {
 			BreweryComponent displayComponent = display.getComponent();
 			if (displayComponent == componentChanged) {
