@@ -56,17 +56,17 @@ final class ReadWriteThread implements Runnable {
 			offset += 2;
 
 			buffer[offset++] = (byte) (control.getMode() == HeaterMode.ON ? 1 : 0);
-			buffer[offset++] = (byte) control.getBoilDuty();
-			buffer[offset++] = (byte) (control.isMashOn() ? 1 : 0);
-
-			writeAddress(buffer, offset, control.getHltSensor());
-			offset += 8;
-			writeAddress(buffer, offset, control.getTunSensor());
-			offset += 8;
-
-			byteUtils.putFloat(buffer, offset, (float) control.getHltTargetTemp());
-			offset += 4;
-			byteUtils.putFloat(buffer, offset, (float) control.getTunTargetTemp());
+//			buffer[offset++] = (byte) control.getBoilDuty();
+//			buffer[offset++] = (byte) (control.isMashOn() ? 1 : 0);
+//
+//			writeAddress(buffer, offset, control.getHltSensor());
+//			offset += 8;
+//			writeAddress(buffer, offset, control.getTunSensor());
+//			offset += 8;
+//
+//			byteUtils.putFloat(buffer, offset, (float) control.getHltTargetTemp());
+//			offset += 4;
+//			byteUtils.putFloat(buffer, offset, (float) control.getTunTargetTemp());
 			offset += 4;
 
 		}

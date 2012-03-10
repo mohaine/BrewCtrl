@@ -35,8 +35,6 @@ public interface Controller {
 
 	public Mode getMode();
 
-	public void setBoilDuty(int duty);
-
 	public void setMode(Mode mode);
 
 	public void setSelectedStep(HeaterStep step);

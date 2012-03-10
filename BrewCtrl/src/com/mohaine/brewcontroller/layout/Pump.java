@@ -1,6 +1,6 @@
 package com.mohaine.brewcontroller.layout;
 
-public class Pump extends HardwareControl {
+public class Pump extends BrewHardwareControl {
 	public static final String TYPE = "Pump";
 
 	@Override

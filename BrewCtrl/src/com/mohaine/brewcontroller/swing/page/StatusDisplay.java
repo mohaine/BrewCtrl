@@ -41,14 +41,13 @@ import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Controller.Mode;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.UnitConversion;
-import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
+import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
 import com.mohaine.brewcontroller.swing.ValueSlider;
 import com.mohaine.event.AbstractHasValue;
 import com.mohaine.event.ChangeEvent;
-import com.mohaine.event.ChangeHandler;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.HasValue;
 import com.mohaine.event.StatusChangeHandler;
@@ -193,13 +192,6 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 		super.addNotify();
 
 		removeHandlers();
-
-		handlers.add(boilDutySlider.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				controller.setBoilDuty(boilDutySlider.getValue().intValue());
-			}
-		}));
 
 		handlers.add(hardware.addStatusChangeHandler(this));
 		handlers.add(eventBus.addHandler(ChangeModeEvent.getType(), new ChangeModeEventHandler() {

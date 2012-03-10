@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterMode;
@@ -31,6 +32,7 @@ import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.HeatElement;
@@ -42,91 +44,13 @@ import com.mohaine.event.bus.EventBus;
 
 public class ControllerImpl implements Controller {
 	private List<HeaterStep> steps = new ArrayList<HeaterStep>();
+	private List<BrewHardwareControl> brewHardwareControls = new ArrayList<BrewHardwareControl>();
 	private HeaterStep selectedStep = null;;
-
-	private int boilDuty = 0;
 	private Mode mode = Mode.OFF;
-
 	private EventBus eventBus;
-	private Monitor monitor = new Monitor();
 	private Hardware hardware;
 	private BrewPrefs prefs;
 	private BreweryLayout brewLayout;
-
-	private class Monitor implements Runnable {
-		@Override
-		public void run() {
-			while (true) {
-				HeaterStep heaterStep = null;
-				synchronized (steps) {
-					if (steps.size() > 0) {
-						heaterStep = steps.get(0);
-					}
-				}
-				if (heaterStep != null) {
-					synchronized (heaterStep) {
-						switch (mode) {
-						case ON: {
-							heaterStep.startTimer();
-							eventBus.fireEvent(new StepModifyEvent(heaterStep));
-							if (heaterStep.isComplete()) {
-								nextStep();
-							}
-							break;
-						}
-						case HOLD: {
-							heaterStep.stopTimer();
-							break;
-						}
-						case OFF: {
-							heaterStep.stopTimer();
-							updateHardware();
-							break;
-						}
-						}
-
-					}
-				}
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-
-			}
-		}
-	}
-
-	public void nextStep() {
-		boolean updateSelection = false;
-		HeaterStep newSelection = null;
-		synchronized (steps) {
-
-			if (steps.size() > 0) {
-				HeaterStep remove = steps.remove(0);
-				updateSelection = remove == selectedStep;
-			}
-
-			if (steps.size() == 0) {
-				steps.add(createOffStep());
-			}
-
-			newSelection = steps.get(0);
-		}
-
-		if (updateSelection) {
-			setSelectedStep(newSelection);
-		}
-		eventBus.fireEvent(new StepsModifyEvent());
-	}
-
-	private HeaterStep createOffStep() {
-		HeaterStep heaterStep = new HeaterStep();
-		
-		
-		
-		return heaterStep;
-	}
 
 	@Inject
 	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs) {
@@ -135,9 +59,9 @@ public class ControllerImpl implements Controller {
 		this.hardware = hardware;
 		this.prefs = prefs;
 
-		steps.add(createOffStep());
-
 		initLayout();
+		steps.add(createBlankStep());
+		updateHardware();
 
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 			@Override
@@ -155,7 +79,69 @@ public class ControllerImpl implements Controller {
 			}
 		});
 
-		new Thread(monitor).start();
+	}
+
+	public void nextStep() {
+		boolean updateSelection = false;
+		HeaterStep newSelection = null;
+		synchronized (steps) {
+
+			if (steps.size() > 0) {
+				HeaterStep remove = steps.remove(0);
+				updateSelection = remove == selectedStep;
+			}
+
+			if (steps.size() == 0) {
+				steps.add(createBlankStep());
+			}
+
+			newSelection = steps.get(0);
+		}
+
+		if (updateSelection) {
+			setSelectedStep(newSelection);
+		}
+		eventBus.fireEvent(new StepsModifyEvent());
+	}
+
+	private HeaterStep createBlankStep() {
+		HeaterStep step = new HeaterStep();
+		ArrayList<ControlPoint> controlPoints = step.getControlPoints();
+
+		List<Pump> pumps = brewLayout.getPumps();
+		for (Pump pump : pumps) {
+			ControlPoint controlPoint = new ControlPoint();
+			controlPoint.setAutomaticControl(false);
+			controlPoint.setControlPin(pump.getPin());
+			controlPoint.setHasDuty(pump.isHasDuty());
+			controlPoints.add(controlPoint);
+		}
+
+		List<Tank> tanks = brewLayout.getTanks();
+		for (Tank tank : tanks) {
+			HeatElement heater = tank.getHeater();
+			if (heater != null) {
+				ControlPoint controlPoint = new ControlPoint();
+				controlPoint.setAutomaticControl(false);
+				controlPoint.setControlPin(heater.getPin());
+				controlPoint.setHasDuty(heater.isHasDuty());
+
+				Sensor sensor = tank.getSensor();
+				if (sensor != null) {
+					List<HardwareSensor> sensors = hardware.getSensors();
+					for (HardwareSensor hardwareSensor : sensors) {
+						if (tank.getName().equals(prefs.getSensorLocation(hardwareSensor.getAddress(), ""))) {
+							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
+							break;
+						}
+					}
+				}
+
+				controlPoints.add(controlPoint);
+			}
+		}
+
+		return step;
 	}
 
 	private boolean isCurrentStep(HeaterStep step) {
@@ -173,6 +159,8 @@ public class ControllerImpl implements Controller {
 	@Override
 	public void setSteps(List<HeaterStep> steps) {
 		this.steps = steps;
+
+		Thread.dumpStack();
 		eventBus.fireEvent(new StepsModifyEvent());
 
 	}
@@ -203,26 +191,14 @@ public class ControllerImpl implements Controller {
 		updateHardware();
 	}
 
-	@Override
-	public void setBoilDuty(int duty) {
-		boilDuty = duty;
-		updateHardware();
-	}
-
 	private void updateHardware() {
 		HardwareControl hc = new HardwareControl();
-
 		hc.setMode(mode == Mode.OFF ? HeaterMode.OFF : HeaterMode.ON);
-		hc.setBoilDuty(boilDuty);
+
 		if (steps.size() > 0) {
 			HeaterStep currentStep = steps.get(0);
-			hc.setMashOn(true);
-			// hc.setHltTargetTemp(currentStep.getHltTemp());
-			// hc.setTunTargetTemp(currentStep.getTunTemp());
-			// hc.setHltSensor(prefs.getHltSensorAddress());
-			// hc.setTunSensor(prefs.getTunSensorAddress());
-		} else {
-			hc.setMashOn(false);
+			ArrayList<ControlPoint> controlPoints = currentStep.getControlPoints();
+			hc.setControlPoints(controlPoints);
 		}
 		hardware.setHardwareControl(hc);
 	}
@@ -232,37 +208,68 @@ public class ControllerImpl implements Controller {
 	}
 
 	private void initLayout() {
+
 		brewLayout = new BreweryLayout();
 
 		List<Pump> pumps = brewLayout.getPumps();
-		Pump pump = new Pump();
-		pump.setName("Loop");
-		pumps.add(pump);
+		Pump loopPump = new Pump();
+		loopPump.setPin(6);
+		loopPump.setName("Loop");
+		pumps.add(loopPump);
 
 		Pump mainPump = new Pump();
 		mainPump.setName("Main");
+		mainPump.setPin(7);
 		pumps.add(mainPump);
 
 		List<Tank> tanks = brewLayout.getTanks();
 		Tank hlt = new Tank();
 		hlt.setName("HLT");
-		hlt.setHeater(new HeatElement());
+		HeatElement htlHeater = new HeatElement();
+		htlHeater.setPin(8);
+		hlt.setHeater(htlHeater);
 		hlt.setSensor(new Sensor());
 		tanks.add(hlt);
 
 		Tank tun = new Tank();
 		tun.setName("TUN");
-		tun.setSensor(new Sensor());
+		Sensor tunSensor = new Sensor();
+		tun.setSensor(tunSensor);
 		tanks.add(tun);
 
 		Tank kettle = new Tank();
 		kettle.setName("Kettle");
-		kettle.setHeater(new HeatElement());
+		HeatElement kettleElement = new HeatElement();
+		kettleElement.setPin(9);
+		kettle.setHeater(kettleElement);
 		tanks.add(kettle);
+
+		for (Pump pump : pumps) {
+			brewHardwareControls.add(pump);
+		}
+
+		for (Tank tank : tanks) {
+			HeatElement heater = tank.getHeater();
+			if (heater != null) {
+				brewHardwareControls.add(heater);
+			}
+		}
 
 	}
 
 	private void updateLayoutState() {
+		for (BrewHardwareControl bhc : brewHardwareControls) {
+			List<ControlPoint> controlPoints = hardware.getControlPoints();
+			for (ControlPoint controlPoint : controlPoints) {
+				if (controlPoint.getControlPin() == bhc.getPin()) {
+					if (bhc.getDuty() != controlPoint.getDuty()) {
+						bhc.setDuty(controlPoint.getDuty());
+						fireBreweryComponentChangeHandler(bhc);
+					}
+				}
+			}
+		}
+
 		List<HardwareSensor> sensors = hardware.getSensors();
 		for (HardwareSensor tempSensor : sensors) {
 			List<Tank> tanks = brewLayout.getTanks();
@@ -272,10 +279,8 @@ public class ControllerImpl implements Controller {
 					if (tank.getName().equals(prefs.getSensorLocation(tempSensor.getAddress(), ""))) {
 						Double temp = sensor.getTempatureC();
 						boolean reading = sensor.isReading();
-
 						sensor.setReading(tempSensor.isReading());
 						sensor.setTempatureC(tempSensor.getTempatureC());
-
 						boolean diff = temp != sensor.getTempatureC() || reading != sensor.isReading();
 						if (diff) {
 							fireBreweryComponentChangeHandler(sensor);

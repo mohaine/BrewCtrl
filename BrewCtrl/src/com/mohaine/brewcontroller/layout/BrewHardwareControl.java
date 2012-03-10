@@ -1,6 +1,6 @@
 package com.mohaine.brewcontroller.layout;
 
-public abstract class HardwareControl extends BreweryComponent {
+public abstract class BrewHardwareControl extends BreweryComponent {
 	private int pin;
 	private int duty;
 	private boolean canPulse;

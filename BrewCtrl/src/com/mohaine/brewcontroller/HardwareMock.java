@@ -19,12 +19,14 @@
 package com.mohaine.brewcontroller;
 
 import java.util.List;
+import java.util.Random;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HeaterMode;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
 
 public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 
@@ -34,6 +36,7 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 	private String status = "Ok";
 
 	private HeaterMode mode = HeaterMode.OFF;
+	private List<ControlPoint> controlPoints;
 
 	@Inject
 	public HardwareMock(BrewPrefs prefs) {
@@ -66,6 +69,11 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+			for (HardwareSensor sensor : getSensors()) {
+				sensor.setReading(true);
+			}
+			Random r = new Random();
 			HardwareStatus hardwareStatus = getHardwareStatus();
 			hardwareStatus.setMode(mode);
 			if (loopCount % 5 == 0) {
@@ -84,8 +92,20 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 
 					for (HardwareSensor sensor : getSensors()) {
 						sensor.setReading(true);
-						sensor.setTempatureC(sensor.getTempatureC() + Math.random());
+						sensor.setTempatureC(sensor.getTempatureC() + r.nextDouble() - 0.5);
 					}
+
+					for (ControlPoint controlPoint : controlPoints) {
+						int newValue = controlPoint.getDuty() + r.nextInt(10) - 5;
+						if (newValue < 0) {
+							newValue = 0;
+						}
+						if (newValue > 100) {
+							newValue = 100;
+						}
+						controlPoint.setDuty(newValue);
+					}
+
 					break;
 				}
 
@@ -98,6 +118,7 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 	@Override
 	public void setHardwareControl(final HardwareControl hc) {
 		new Thread(new Runnable() {
+
 			@Override
 			public void run() {
 				try {
@@ -105,8 +126,9 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 				} catch (InterruptedException e) {
 					// ignore
 				}
-				maxDuty = hc.getHltTargetTemp();
+				// maxDuty = hc.getHltTargetTemp();
 				mode = hc.getMode();
+				controlPoints = hc.getControlPoints();
 			}
 		}).start();
 
@@ -115,6 +137,11 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 	@Override
 	public String getStatus() {
 		return status;
+	}
+
+	@Override
+	public List<ControlPoint> getControlPoints() {
+		return controlPoints;
 	}
 
 }

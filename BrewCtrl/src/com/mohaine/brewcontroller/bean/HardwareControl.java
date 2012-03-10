@@ -18,24 +18,12 @@
 
 package com.mohaine.brewcontroller.bean;
 
+import java.util.List;
+
 public class HardwareControl {
-
 	private HeaterMode mode;
-	private String tunSensor;
-	private String hltSensor;
-	private double hltTargetTemp;
-	private double tunTargetTemp;
 	private int controlId;
-	private int boilDuty;
-	private boolean mashOn;
-
-	public int getBoilDuty() {
-		return boilDuty;
-	}
-
-	public void setBoilDuty(int boilDuty) {
-		this.boilDuty = boilDuty;
-	}
+	private List<ControlPoint> controlPoints;
 
 	public int getControlId() {
 		return controlId;
@@ -53,44 +41,12 @@ public class HardwareControl {
 		this.mode = mode;
 	}
 
-	public String getHltSensor() {
-		return hltSensor;
+	public List<ControlPoint> getControlPoints() {
+		return controlPoints;
 	}
 
-	public void setHltSensor(String limitSensorAddress) {
-		this.hltSensor = limitSensorAddress;
-	}
-
-	public String getTunSensor() {
-		return tunSensor;
-	}
-
-	public void setTunSensor(String sensorAddress) {
-		this.tunSensor = sensorAddress;
-	}
-
-	public double getHltTargetTemp() {
-		return hltTargetTemp;
-	}
-
-	public void setHltTargetTemp(double targetTemp) {
-		this.hltTargetTemp = targetTemp;
-	}
-
-	public double getTunTargetTemp() {
-		return tunTargetTemp;
-	}
-
-	public void setTunTargetTemp(double limitTemp) {
-		this.tunTargetTemp = limitTemp;
-	}
-
-	public boolean isMashOn() {
-		return mashOn;
-	}
-
-	public void setMashOn(boolean mashOn) {
-		this.mashOn = mashOn;
+	public void setControlPoints(List<ControlPoint> controlPoints) {
+		this.controlPoints = controlPoints;
 	}
 
 }

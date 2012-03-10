@@ -53,6 +53,8 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				Tank tank = (Tank) displayComponent;
 				if (tank.getSensor() == componentChanged) {
 					drawTankTemp(g2, display);
+				} else if (tank.getHeater() == componentChanged) {
+					drawHeatElement(g2, display);
 				}
 			}
 
@@ -139,7 +141,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 			String text = Integer.toString(duty) + "%";
 
 			int top = display.getTop();
-			int left = display.getLeft() + display.getWidth() - 60;
+			int left = display.getLeft() + display.getWidth() - 80;
 			Rectangle rec = ((TankData) display.getDisplayInfo()).dutyRec;
 			drawText(rec, g, top, left, display, text, Colors.FOREGROUND);
 		}

@@ -18,11 +18,12 @@
 
 package com.mohaine.brewcontroller.bean;
 
-public class HeaterStep {
+import java.util.ArrayList;
 
+public class HeaterStep {
 	private String name;
-//	private double hltTemp;
-//	private double tunTemp;
+
+	private ArrayList<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
 
 	private long stepTime = 0;
 	private long extraCompletedTime = 0;
@@ -35,29 +36,8 @@ public class HeaterStep {
 	public HeaterStep(String name, double tunTemp, long stepTime) {
 		super();
 		this.name = name;
-//		this.hltTemp = tunTemp + 10;
-//		this.tunTemp = tunTemp;
 		this.stepTime = stepTime;
 	}
-
-//	public double getHltTemp() {
-//		return hltTemp;
-//	}
-//
-//	public void setHltTemp(double duty) {
-//		if (duty < 0) {
-//			duty = 0;
-//		}
-//		if (duty > 100) {
-//			duty = 100;
-//		}
-//
-//		boolean dirty = duty != hltTemp;
-//		hltTemp = duty;
-//		if (dirty) {
-//			// fireStateChangeHandlers();
-//		}
-//	}
 
 	public String getName() {
 		return name;
@@ -66,14 +46,6 @@ public class HeaterStep {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-//	public double getTunTemp() {
-//		return tunTemp;
-//	}
-//
-//	public void setTunTemp(double targetTemp) {
-//		this.tunTemp = targetTemp;
-//	}
 
 	public long getStepTime() {
 		return stepTime;
@@ -142,6 +114,14 @@ public class HeaterStep {
 
 	public boolean isComplete() {
 		return stepTime > 0 && getTotalCompletedTime() >= stepTime;
+	}
+
+	public ArrayList<ControlPoint> getControlPoints() {
+		return controlPoints;
+	}
+
+	public void setControlPoints(ArrayList<ControlPoint> controlPoints) {
+		this.controlPoints = controlPoints;
 	}
 
 }

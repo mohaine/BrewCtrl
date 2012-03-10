@@ -1,6 +1,7 @@
 package com.mohaine.brewcontroller.layout;
 
 public class Tank extends BreweryComponent {
+
 	public static final String TYPE = "Tank";
 
 	@Override

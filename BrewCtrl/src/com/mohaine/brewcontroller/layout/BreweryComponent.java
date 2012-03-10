@@ -19,4 +19,13 @@ public abstract class BreweryComponent {
 		return name;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj instanceof BreweryComponent) {
+			return name.equals(((BreweryComponent) obj).name);
+		}
+
+		return super.equals(obj);
+	}
 }

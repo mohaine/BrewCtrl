@@ -3,9 +3,10 @@ package com.mohaine.brewcontroller.bean;
 public class ControlPoint {
 
 	private byte controlPin;
+	private int duty;
 	private String tempSensorAddress;
 	private double targetTemp;
-	private boolean mechanical;
+	private boolean hasDuty;
 	private boolean automaticControl;
 
 	public byte getControlPin() {
@@ -32,12 +33,12 @@ public class ControlPoint {
 		this.targetTemp = targetTemp;
 	}
 
-	public boolean isMechanical() {
-		return mechanical;
+	public boolean isHasDuty() {
+		return hasDuty;
 	}
 
-	public void setMechanical(boolean mechanical) {
-		this.mechanical = mechanical;
+	public void setHasDuty(boolean hasDuty) {
+		this.hasDuty = hasDuty;
 	}
 
 	public boolean isAutomaticControl() {
@@ -50,6 +51,14 @@ public class ControlPoint {
 
 	public void setControlPin(int i) {
 		setControlPin((byte) i);
+	}
+
+	public int getDuty() {
+		return duty;
+	}
+
+	public void setDuty(int duty) {
+		this.duty = duty;
 	}
 
 	// TODO PID VALUES

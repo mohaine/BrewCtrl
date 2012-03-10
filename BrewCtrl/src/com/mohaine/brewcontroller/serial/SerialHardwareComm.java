@@ -18,10 +18,13 @@
 
 package com.mohaine.brewcontroller.serial;
 
+import java.util.List;
+
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.HardwareBase;
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HeaterMode;
@@ -90,6 +93,12 @@ public class SerialHardwareComm extends HardwareBase implements Hardware {
 			this.status = status;
 			fireStateChangeHandlers();
 		}
+	}
+
+	@Override
+	public List<ControlPoint> getControlPoints() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.mohaine.brewcontroller.layout;
 
 public class Sensor extends BreweryComponent {
+
 	public static final String TYPE = "Sensor";
 	private boolean reading;
 	private Double tempatureC;

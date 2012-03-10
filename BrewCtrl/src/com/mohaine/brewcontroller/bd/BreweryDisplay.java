@@ -50,6 +50,7 @@ public class BreweryDisplay {
 				});
 			}
 		});
+
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
