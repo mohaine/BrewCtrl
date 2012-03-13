@@ -6,11 +6,20 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.bean.ControlPoint;
+import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
+import com.mohaine.brewcontroller.event.StepModifyEvent;
+import com.mohaine.brewcontroller.event.StepModifyEventHandler;
+import com.mohaine.brewcontroller.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
+import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.bus.EventBus;
@@ -20,7 +29,6 @@ public class BreweryDisplay {
 	List<BreweryComponentDisplay> displays = new ArrayList<BreweryComponentDisplay>();
 
 	public interface BreweryDisplayDrawer {
-
 		int getHeight();
 
 		int getWidth();
@@ -28,16 +36,17 @@ public class BreweryDisplay {
 		void setDisplays(List<BreweryComponentDisplay> displays);
 
 		void redrawBreweryComponent(BreweryComponent component);
-
 	}
 
 	private BreweryDisplayDrawer drawer;
 	private BreweryLayout brewLayout;
 	private HandlerRegistration handler;
+	private Controller controller;
 
 	@Inject
-	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus) {
+	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus, Controller controller) {
 		this.drawer = drawer;
+		this.controller = controller;
 
 		handler = eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
 			@Override
@@ -51,28 +60,66 @@ public class BreweryDisplay {
 			}
 		});
 
+		eventBus.addHandler(StepsModifyEvent.getType(), new StepsModifyEventHandler() {
+			@Override
+			public void onStepsChange() {
+				System.out.println("BreweryDisplay.BreweryDisplay(...).new StepsModifyEventHandler() {...}.onStepsChange()");
+			}
+		});
+
+		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
+			@Override
+			public void onStepChange(HeaterStep step) {
+				System.out.println("BreweryDisplay.BreweryDisplay(...).new StepModifyEventHandler() {...}.onStepChange()");
+				if (step != null) {
+					ArrayList<ControlPoint> controlPoints = step.getControlPoints();
+					for (ControlPoint controlPoint : controlPoints) {
+						System.out.println("controlPoint: " + controlPoint);
+					}
+				}
+			}
+		});
+
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
 		this.brewLayout = brewLayout;
-		List<Tank> zones = brewLayout.getTanks();
+		List<Tank> tanks = brewLayout.getTanks();
 
-		for (Tank zone : zones) {
-			BreweryComponentDisplay display = new BreweryComponentDisplay(zone);
-			display.setSize(200, 200);
-			displays.add(display);
+		for (Tank tank : tanks) {
+			BreweryComponentDisplay tankBcd = createBcd(tank, 200, 200);
+
+			if (tank.getHeater() != null) {
+				BreweryComponentDisplay bcd = createBcd(tank.getHeater(), 98, 30);
+
+				bcd.setTop(25);
+				bcd.setLeft(102);
+
+				bcd.setParent(tankBcd);
+			}
+
+			if (tank.getSensor() != null) {
+				BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 98, 30);
+				bcd.setTop(25);
+				bcd.setLeft(2);
+				bcd.setParent(tankBcd);
+			}
 		}
 
 		List<Pump> pumps = brewLayout.getPumps();
 		for (Pump pump : pumps) {
-			BreweryComponentDisplay display = new BreweryComponentDisplay(pump);
-			display.setSize(100, 100);
-			displays.add(display);
+			createBcd(pump, 100, 100);
 		}
-
 		drawer.setDisplays(displays);
 
 		layoutDisplays();
+	}
+
+	private BreweryComponentDisplay createBcd(BreweryComponent comp, int width, int height) {
+		BreweryComponentDisplay display = new BreweryComponentDisplay(comp);
+		display.setSize(width, height);
+		displays.add(display);
+		return display;
 	}
 
 	public void layoutDisplays() {

@@ -61,6 +61,7 @@ public class ControllerImpl implements Controller {
 
 		initLayout();
 		steps.add(createBlankStep());
+		selectedStep = steps.get(0);
 		updateHardware();
 
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {

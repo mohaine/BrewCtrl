@@ -9,7 +9,10 @@ public class BreweryComponentDisplay {
 	private int width;
 	private int top;
 	private int left;
-	private Object displayInfo;
+	private BreweryComponentDisplay parent;
+
+	// private List<BreweryComponentDisplay> children = new
+	// ArrayList<BreweryComponentDisplay>();
 
 	public BreweryComponentDisplay(BreweryComponent component) {
 		this.component = component;
@@ -60,12 +63,28 @@ public class BreweryComponentDisplay {
 		this.width = width;
 	}
 
-	public Object getDisplayInfo() {
-		return displayInfo;
+	public BreweryComponentDisplay getParent() {
+		return parent;
 	}
 
-	public void setDisplayInfo(Object displayInfo) {
-		this.displayInfo = displayInfo;
+	public void setParent(BreweryComponentDisplay parent) {
+		this.parent = parent;
+	}
+
+	public int getAbsTop() {
+		int top = this.top;
+		if (parent != null) {
+			top += parent.getAbsTop();
+		}
+		return top;
+	}
+
+	public int getAbsLeft() {
+		int left = this.left;
+		if (parent != null) {
+			left += parent.getAbsLeft();
+		}
+		return left;
 	}
 
 }

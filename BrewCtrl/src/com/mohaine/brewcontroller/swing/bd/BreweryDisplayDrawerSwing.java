@@ -7,7 +7,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -49,22 +48,8 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		for (BreweryComponentDisplay display : displays) {
 			BreweryComponent displayComponent = display.getComponent();
 			if (displayComponent == componentChanged) {
-
-				if (displayComponent instanceof Pump) {
-					drawPumpSymbol(g2, display);
-				} else {
-					drawComponent(g2, display);
-				}
+				drawComponent(g2, display, false);
 			}
-			if (displayComponent instanceof Tank) {
-				Tank tank = (Tank) displayComponent;
-				if (tank.getSensor() == componentChanged) {
-					drawTankTemp(g2, display);
-				} else if (tank.getHeater() == componentChanged) {
-					drawHeatElement(g2, display);
-				}
-			}
-
 		}
 	}
 
@@ -78,19 +63,26 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 
 		for (BreweryComponentDisplay display : displays) {
-			drawComponent(g2, display);
+			drawComponent(g2, display, true);
 		}
 
 	}
 
-	private void drawComponent(Graphics2D g2, BreweryComponentDisplay display) {
+	private void drawComponent(Graphics2D g2, BreweryComponentDisplay display, boolean full) {
 		BreweryComponent component = display.getComponent();
 		if (Tank.TYPE.equals(component.getType())) {
 			drawTank(g2, display);
 		} else if (Pump.TYPE.equals(component.getType())) {
 			drawPump(g2, display);
+			if (full) {
+				drawName(g2, display);
+			}
+		} else if (Sensor.TYPE.equals(component.getType())) {
+			drawTankTemp(g2, display);
+		} else if (HeatElement.TYPE.equals(component.getType())) {
+			drawHeatElement(g2, display);
 		} else {
-			g2.drawRect(display.getLeft(), display.getTop(), display.getWidth(), display.getHeight());
+			g2.drawRect(display.getAbsLeft(), display.getAbsTop(), display.getWidth(), display.getHeight());
 			drawName(g2, display);
 		}
 	}
@@ -133,106 +125,59 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		g.setColor(strokePaint);
 		g.draw(circleTop);
 
-		drawTankTemp(g, display);
-		drawHeatElement(g, display);
-
 		// if(display)
 
 	}
 
 	private void drawHeatElement(Graphics2D g, BreweryComponentDisplay display) {
-		Tank component = (Tank) display.getComponent();
-		HeatElement heater = component.getHeater();
-		if (heater != null) {
-			int duty = heater.getDuty();
-			String text = Integer.toString(duty) + "%";
+		HeatElement heater = (HeatElement) display.getComponent();
+		int duty = heater.getDuty();
+		String text = Integer.toString(duty) + "%";
+		drawText(g, display, text, Colors.FOREGROUND, true);
 
-			int top = display.getTop();
-			int left = display.getLeft() + display.getWidth() - 80;
-			Rectangle rec = ((TankData) display.getDisplayInfo()).dutyRec;
-			drawText(rec, g, top, left, display, text, Colors.FOREGROUND);
-		}
 	}
 
 	private void drawTankTemp(Graphics2D g, BreweryComponentDisplay display) {
-		Tank component = (Tank) display.getComponent();
-		Sensor sensor = component.getSensor();
-		if (sensor != null) {
-			Double tempatureC = sensor.getTempatureC();
-			if (tempatureC != null) {
+		Sensor sensor = (Sensor) display.getComponent();
+		Double tempatureC = sensor.getTempatureC();
+		if (tempatureC != null) {
 
-				int top = display.getTop();
-				int left = display.getLeft();
-
-				final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
-				String tempDisplay = nf.format(tempDisplayConveter.convertFrom(tempatureC)) + "\u00B0";
-				Color textColor;
-				if (sensor.isReading()) {
-					textColor = Colors.FOREGROUND;
-				} else {
-					textColor = Colors.ERROR;
-				}
-
-				Rectangle rec = ((TankData) display.getDisplayInfo()).tempRec;
-
-				drawText(rec, g, top, left, display, tempDisplay, textColor);
+			final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
+			String tempDisplay = nf.format(tempDisplayConveter.convertFrom(tempatureC)) + "\u00B0";
+			Color textColor;
+			if (sensor.isReading()) {
+				textColor = Colors.FOREGROUND;
+			} else {
+				textColor = Colors.ERROR;
 			}
+			drawText(g, display, tempDisplay, textColor, false);
 		}
+
 	}
 
-	private void drawText(Rectangle rect, Graphics2D g, int top, int left, BreweryComponentDisplay display, String tempDisplay, Color textColor) {
+	private void drawText(Graphics2D g, BreweryComponentDisplay display, String tempDisplay, Color textColor, boolean alignRight) {
+		Image image = createImage(display.getWidth(), display.getHeight());
+		Graphics2D drawG = (Graphics2D) image.getGraphics();
+		drawG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		drawG.setColor(Colors.TANK);
+		drawG.fillRect(0, 0, display.getWidth(), display.getHeight());
 
-		g.setFont(Colors.TEMP_FONT);
-		FontMetrics fontMetrics = g.getFontMetrics();
-		Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, g);
-
-		Graphics2D drawG;
-		Image image = null;
-		if (rect.width > 0) {
-
-			rect.width = Math.max(rect.width, (int) stringBounds.getWidth());
-
-			image = createImage(rect.width, rect.height);
-			drawG = (Graphics2D) image.getGraphics();
-			drawG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			drawG.setColor(Colors.TANK);
-			drawG.fillRect(0, 0, rect.width, rect.height);
-		} else {
-			drawG = g;
-		}
-
-		int oldX = rect.x;
-		int oldY = rect.y;
-		int oldHeight = rect.height;
-
-		drawG.setFont(Colors.TEMP_FONT);
 		drawG.setColor(textColor);
+		drawG.setFont(Colors.TEMP_FONT);
 
-		rect.x = left + 5;
-		rect.y = (int) (top + stringBounds.getHeight() + TANK_TOP_HEIGHT);
-		rect.width = (int) stringBounds.getWidth();
-		rect.height = (int) -stringBounds.getMinY();
+		FontMetrics fontMetrics = drawG.getFontMetrics();
+		Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, drawG);
 
-		if (image != null) {
-			int drawX = rect.x - oldX;
-			int drawY = rect.y - oldY + rect.height;
-			drawG.drawString(tempDisplay, drawX, drawY);
+		int x = alignRight ? (int) (display.getWidth() - stringBounds.getWidth()) : 0;
+		int y = (int) (-stringBounds.getCenterY()) + display.getHeight() / 2;
 
-			g.drawImage(image, oldX, oldY - oldHeight, null);
-			drawG.dispose();
-		} else {
-			drawG.drawString(tempDisplay, rect.x, rect.y);
-		}
+		drawG.drawString(tempDisplay, x, y);
 
+		g.drawImage(image, display.getAbsLeft(), display.getAbsTop(), null);
+		drawG.dispose();
 	}
 
 	private void drawPump(Graphics2D g, BreweryComponentDisplay display) {
-		drawPumpSymbol(g, display);
-		drawName(g, display);
-	}
-
-	private void drawPumpSymbol(Graphics2D g, BreweryComponentDisplay display) {
-
 		g.setFont(Colors.TEXT_FONT);
 		FontMetrics fontMetrics = g.getFontMetrics();
 
@@ -254,7 +199,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		Color backPaint = (on ? Colors.PUMP_ON : Colors.PUMP_OFF);
 		Color strokePaint = Colors.FOREGROUND;
 
-		int cirSize = (int) (Math.min(width, height) -1);
+		int cirSize = (int) (Math.min(width, height) - 1);
 
 		int cirRadius = cirSize / 2;
 
@@ -282,28 +227,22 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	private void drawName(Graphics2D g, BreweryComponentDisplay display) {
-		g.setFont(Colors.TEXT_FONT);
-		g.setColor(Colors.FOREGROUND);
-		int left = display.getLeft();
-		int width = display.getWidth();
-		FontMetrics fontMetrics = g.getFontMetrics();
 		String name = display.getComponent().getName();
-		Rectangle2D stringBounds = fontMetrics.getStringBounds(name, g);
-		g.drawString(name, (int) (left + (width / 2) - stringBounds.getCenterX()), (int) (display.getTop() + display.getHeight() - 3));
+		if (name != null && name.length() > 0) {
+			g.setFont(Colors.TEXT_FONT);
+			g.setColor(Colors.FOREGROUND);
+			int left = display.getLeft();
+			int width = display.getWidth();
+			FontMetrics fontMetrics = g.getFontMetrics();
+			Rectangle2D stringBounds = fontMetrics.getStringBounds(name, g);
+			g.drawString(name, (int) (left + (width / 2) - stringBounds.getCenterX()), (int) (display.getTop() + display.getHeight() - 3));
+		}
 	}
 
 	@Override
 	public void setDisplays(List<BreweryComponentDisplay> displays) {
 		invalidate();
 		this.displays = displays;
-
-		for (BreweryComponentDisplay display : displays) {
-			if (display.getDisplayInfo() == null) {
-				if (Tank.TYPE.equals(display.getComponent().getType())) {
-					display.setDisplayInfo(new TankData());
-				}
-			}
-		}
 	}
 
 	@Override
@@ -319,13 +258,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		preferredSize.setSize(maxX + PADDING, maxY + PADDING);
 
 		return preferredSize;
-	}
-
-	private static class TankData {
-
-		public Rectangle dutyRec = new Rectangle(0, 0, 0, 0);
-		public Rectangle tempRec = new Rectangle(0, 0, 0, 0);
-
 	}
 
 }
