@@ -18,6 +18,7 @@
 
 package com.mohaine.brewcontroller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -128,7 +129,16 @@ public class HardwareMock extends HardwareBase implements Hardware, Runnable {
 				}
 				// maxDuty = hc.getHltTargetTemp();
 				mode = hc.getMode();
-				controlPoints = hc.getControlPoints();
+
+				List<ControlPoint> controlPointsNew = new ArrayList<ControlPoint>();
+
+				List<ControlPoint> controlPoints = hc.getControlPoints();
+				for (ControlPoint controlPoint : controlPoints) {
+					controlPointsNew.add(controlPoint.getClone());
+				}
+
+				HardwareMock.this.controlPoints = controlPoints;
+
 			}
 		}).start();
 

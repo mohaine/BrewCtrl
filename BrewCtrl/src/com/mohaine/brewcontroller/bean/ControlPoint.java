@@ -1,6 +1,6 @@
 package com.mohaine.brewcontroller.bean;
 
-public class ControlPoint {
+public class ControlPoint implements Cloneable {
 
 	private byte controlPin;
 	private int duty;
@@ -61,6 +61,11 @@ public class ControlPoint {
 		this.duty = duty;
 	}
 
-	// TODO PID VALUES
-
+	public ControlPoint getClone() {
+		try {
+			return (ControlPoint) clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

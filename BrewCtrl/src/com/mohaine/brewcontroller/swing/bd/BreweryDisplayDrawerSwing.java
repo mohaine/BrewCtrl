@@ -177,9 +177,16 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 	private void drawText(Rectangle rect, Graphics2D g, int top, int left, BreweryComponentDisplay display, String tempDisplay, Color textColor) {
 
+		g.setFont(Colors.TEMP_FONT);
+		FontMetrics fontMetrics = g.getFontMetrics();
+		Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, g);
+
 		Graphics2D drawG;
 		Image image = null;
 		if (rect.width > 0) {
+
+			rect.width = Math.max(rect.width, (int) stringBounds.getWidth());
+
 			image = createImage(rect.width, rect.height);
 			drawG = (Graphics2D) image.getGraphics();
 			drawG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -196,8 +203,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		drawG.setFont(Colors.TEMP_FONT);
 		drawG.setColor(textColor);
 
-		FontMetrics fontMetrics = drawG.getFontMetrics();
-		Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, drawG);
 		rect.x = left + 5;
 		rect.y = (int) (top + stringBounds.getHeight() + TANK_TOP_HEIGHT);
 		rect.width = (int) stringBounds.getWidth();
@@ -223,6 +228,13 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		int width = display.getWidth();
 		int height = display.getHeight();
 
+		Image image = createImage(width, height);
+		Graphics2D drawG = (Graphics2D) image.getGraphics();
+		drawG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+//		drawG.setColor(Colors.BACKGROUND);
+//		drawG.fillRect(0, 0, width, height);
+
 		Pump pump = (Pump) display.getComponent();
 		boolean on = pump.isOn();
 
@@ -233,25 +245,29 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 		int cirRadius = cirSize / 2;
 
-		Shape square = new Rectangle2D.Double(left + cirRadius, top, width - cirRadius, cirRadius * 0.67);
-		g.setColor(backPaint);
-		g.fill(square);
-		g.setColor(strokePaint);
-		g.draw(square);
+		Shape square = new Rectangle2D.Double(cirRadius, 0, width - cirRadius, cirRadius * 0.65);
+		drawG.setColor(backPaint);
+		drawG.fill(square);
+		drawG.setColor(strokePaint);
+		drawG.draw(square);
 
-		Shape circle = new Ellipse2D.Float(left, top, cirSize, cirSize);
-		g.setColor(backPaint);
-		g.fill(circle);
-		g.setColor(strokePaint);
-		g.draw(circle);
+		Shape circle = new Ellipse2D.Float(0, 0, cirSize, cirSize);
+		drawG.setColor(backPaint);
+		drawG.fill(circle);
+		drawG.setColor(strokePaint);
+		drawG.draw(circle);
 
 		if (!on) {
 			int subSize = (int) (cirRadius * 0.7f);
-			Shape circle2 = new Ellipse2D.Float(left + cirRadius - subSize / 2, top + cirRadius - subSize / 2, subSize, subSize);
-			g.fill(circle2);
+			Shape circle2 = new Ellipse2D.Float(cirRadius - subSize / 2, cirRadius - subSize / 2, subSize, subSize);
+			drawG.fill(circle2);
 			// c.drawCircle(cirCenterX, cirMidY, cirSize / 2, strokePaint);
 		}
+
+		g.drawImage(image, left, top, null);
 		drawName(g, display);
+		drawG.dispose();
+
 	}
 
 	private void drawName(Graphics2D g, BreweryComponentDisplay display) {
