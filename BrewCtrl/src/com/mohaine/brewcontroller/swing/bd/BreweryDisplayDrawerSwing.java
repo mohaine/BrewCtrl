@@ -49,7 +49,12 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		for (BreweryComponentDisplay display : displays) {
 			BreweryComponent displayComponent = display.getComponent();
 			if (displayComponent == componentChanged) {
-				drawComponent(g2, display);
+
+				if (displayComponent instanceof Pump) {
+					drawPumpSymbol(g2, display);
+				} else {
+					drawComponent(g2, display);
+				}
 			}
 			if (displayComponent instanceof Tank) {
 				Tank tank = (Tank) displayComponent;
@@ -222,18 +227,26 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	private void drawPump(Graphics2D g, BreweryComponentDisplay display) {
+		drawPumpSymbol(g, display);
+		drawName(g, display);
+	}
+
+	private void drawPumpSymbol(Graphics2D g, BreweryComponentDisplay display) {
+
+		g.setFont(Colors.TEXT_FONT);
+		FontMetrics fontMetrics = g.getFontMetrics();
 
 		int top = display.getTop();
 		int left = display.getLeft();
 		int width = display.getWidth();
-		int height = display.getHeight();
+		int height = display.getHeight() - fontMetrics.getHeight();
 
 		Image image = createImage(width, height);
 		Graphics2D drawG = (Graphics2D) image.getGraphics();
 		drawG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-//		drawG.setColor(Colors.BACKGROUND);
-//		drawG.fillRect(0, 0, width, height);
+		// drawG.setColor(Colors.BACKGROUND);
+		// drawG.fillRect(0, 0, width, height);
 
 		Pump pump = (Pump) display.getComponent();
 		boolean on = pump.isOn();
@@ -241,11 +254,11 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		Color backPaint = (on ? Colors.PUMP_ON : Colors.PUMP_OFF);
 		Color strokePaint = Colors.FOREGROUND;
 
-		int cirSize = (int) (Math.min(width, height) * 0.8f);
+		int cirSize = (int) (Math.min(width, height) -1);
 
 		int cirRadius = cirSize / 2;
 
-		Shape square = new Rectangle2D.Double(cirRadius, 0, width - cirRadius, cirRadius * 0.65);
+		Shape square = new Rectangle2D.Double(cirRadius, 0, width - cirRadius - 1, cirRadius * 0.67);
 		drawG.setColor(backPaint);
 		drawG.fill(square);
 		drawG.setColor(strokePaint);
@@ -265,9 +278,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		}
 
 		g.drawImage(image, left, top, null);
-		drawName(g, display);
 		drawG.dispose();
-
 	}
 
 	private void drawName(Graphics2D g, BreweryComponentDisplay display) {
