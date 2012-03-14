@@ -22,7 +22,6 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Converter;
-import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
@@ -211,11 +210,11 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 			if (selectedStep != null) {
 				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
 				if (cp != null) {
-//					if (selectedStep.isActive()) {
-//						if (cp.getTargetTemp() != sensor.getTargetTemp()) {
-//							textColor = Colors.PENDING;
-//						}
-//					}
+					// if (selectedStep.isActive()) {
+					// if (cp.getTargetTemp() != sensor.getTargetTemp()) {
+					// textColor = Colors.PENDING;
+					// }
+					// }
 					tempDisplay = numberFormatWhole.format(tempDisplayConveter.convertFrom(cp.getTargetTemp())) + "\u00B0";
 					drawText(g, "(" + tempDisplay + ")", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
 				}

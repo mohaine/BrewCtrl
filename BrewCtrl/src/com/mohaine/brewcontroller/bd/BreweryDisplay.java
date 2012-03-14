@@ -44,7 +44,7 @@ public class BreweryDisplay {
 
 	private BreweryDisplayDrawer drawer;
 	// private BreweryLayout brewLayout;
-	private HandlerRegistration handler;
+	private List<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 	private Controller controller;
 
 	private DragState dragState;
@@ -97,7 +97,7 @@ public class BreweryDisplay {
 			}
 		});
 
-		handler = eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
+		handlers.add(eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
 			@Override
 			public void onStateChange(final BreweryComponent component) {
 				SwingUtilities.invokeLater(new Runnable() {
@@ -107,14 +107,14 @@ public class BreweryDisplay {
 					}
 				});
 			}
-		});
-		eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
+		}));
+		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
 
 			@Override
 			public void onStepChange(HeaterStep step) {
 				BreweryDisplay.this.drawer.redrawAll();
 			}
-		});
+		}));
 
 		// eventBus.addHandler(StepsModifyEvent.getType(), new
 		// StepsModifyEventHandler() {
@@ -304,9 +304,11 @@ public class BreweryDisplay {
 	}
 
 	public void cleanup() {
-		if (handler != null) {
-			handler.removeHandler();
-			handler = null;
+		if (handlers != null) {
+			for (HandlerRegistration handler : handlers) {
+				handler.removeHandler();
+			}
+			handlers.clear();
 		}
 	}
 
