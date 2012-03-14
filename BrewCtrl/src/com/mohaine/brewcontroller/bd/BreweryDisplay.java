@@ -96,7 +96,7 @@ public class BreweryDisplay {
 					int deltaX = dragState.x - e.getX();
 					int deltaY = dragState.y - e.getY();
 
-					if (time < 300 && deltaX < 15 && deltaY < 15) {
+					if (time < 300 && Math.abs(deltaX) < 15 && Math.abs(deltaY) < 15) {
 						// System.out.println("   Ignore: " + time + "  " +
 						// deltaX + "," + deltaY);
 						return;
@@ -186,8 +186,10 @@ public class BreweryDisplay {
 			double delta = dragState.lastY - dragState.y;
 
 			long time = System.currentTimeMillis() - dragState.lastTime;
-			if (time > 200 && delta < 30) {
+			if (time > 200 && Math.abs(delta) < 30) {
 				delta = delta < 0 ? -1 : 1;
+			} else if (time < 200 && Math.abs(delta) > 15) {
+				delta = delta * 2;
 			}
 
 			BreweryComponent component = dragState.display.getComponent();
