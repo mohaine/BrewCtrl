@@ -162,10 +162,7 @@ public class ControllerImpl implements Controller {
 	@Override
 	public void setSteps(List<HeaterStep> steps) {
 		this.steps = steps;
-
-		Thread.dumpStack();
 		eventBus.fireEvent(new StepsModifyEvent());
-
 	}
 
 	@Override

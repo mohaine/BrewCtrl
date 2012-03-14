@@ -64,6 +64,15 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	@Override
+	public void redrawAll() {
+		Graphics2D g2 = (Graphics2D) getGraphics();
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		for (BreweryComponentDisplay display : displays) {
+			drawComponent(g2, display, false);
+		}
+	}
+
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 
@@ -80,7 +89,9 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	private void drawComponent(Graphics2D g2, BreweryComponentDisplay display, boolean full) {
 		BreweryComponent component = display.getComponent();
 		if (Tank.TYPE.equals(component.getType())) {
-			drawTank(g2, display);
+			if (full) {
+				drawTank(g2, display);
+			}
 		} else if (Pump.TYPE.equals(component.getType())) {
 			drawPump(g2, display);
 			if (full) {
@@ -237,7 +248,33 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		Pump pump = (Pump) display.getComponent();
 		boolean on = pump.isOn();
 
-		Color backPaint = (on ? Colors.PUMP_ON : Colors.PUMP_OFF);
+		Color backPaint = null;
+
+		HeaterStep selectedStep = controller.getSelectedStep();
+		if (selectedStep != null) {
+			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(pump.getPin());
+			if (controlPointForPin != null) {
+				int cpDuty = controlPointForPin.getDuty();
+
+				if (controlPointForPin.isAutomaticControl()) {
+					backPaint = Colors.INACTIVE;
+				}
+
+				if (selectedStep.isActive()) {
+					if (on != cpDuty > 0) {
+						on = cpDuty > 0;
+						backPaint = Colors.PENDING;
+					}
+				} else {
+					on = cpDuty > 0;
+				}
+			}
+		}
+
+		if (backPaint == null) {
+			backPaint = (on ? Colors.PUMP_ON : Colors.PUMP_OFF);
+		}
+
 		Color strokePaint = Colors.FOREGROUND;
 
 		int cirSize = (int) (Math.min(width, height) - 1);

@@ -11,7 +11,12 @@ import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
+import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
+import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
+import com.mohaine.brewcontroller.event.StepModifyEventHandler;
+import com.mohaine.brewcontroller.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -35,6 +40,8 @@ public class BreweryDisplay {
 		void redrawBreweryComponent(BreweryComponent component);
 
 		void addMouseListener(DrawerMouseListener drawerMouseListener);
+
+		void redrawAll();
 	}
 
 	private BreweryDisplayDrawer drawer;
@@ -104,6 +111,13 @@ public class BreweryDisplay {
 						BreweryDisplay.this.drawer.redrawBreweryComponent(component);
 					}
 				});
+			}
+		});
+		eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
+
+			@Override
+			public void onStepChange(HeaterStep step) {
+				BreweryDisplay.this.drawer.redrawAll();
 			}
 		});
 
