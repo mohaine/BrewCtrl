@@ -14,9 +14,6 @@ import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
-import com.mohaine.brewcontroller.event.StepModifyEventHandler;
-import com.mohaine.brewcontroller.event.StepsModifyEvent;
-import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -45,7 +42,7 @@ public class BreweryDisplay {
 	}
 
 	private BreweryDisplayDrawer drawer;
-	private BreweryLayout brewLayout;
+	// private BreweryLayout brewLayout;
 	private HandlerRegistration handler;
 	private Controller controller;
 
@@ -184,7 +181,7 @@ public class BreweryDisplay {
 								dragState.startDuty = 0;
 							} else if (newDuty > 100) {
 								newDuty = 100;
-								dragState.startY = dragState.y - 100;
+								dragState.startY = dragState.y;
 								dragState.startDuty = 100;
 							}
 
@@ -201,7 +198,7 @@ public class BreweryDisplay {
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
-		this.brewLayout = brewLayout;
+//		this.brewLayout = brewLayout;
 		List<Tank> tanks = brewLayout.getTanks();
 
 		for (Tank tank : tanks) {
