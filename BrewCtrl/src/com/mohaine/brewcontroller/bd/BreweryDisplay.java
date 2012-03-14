@@ -12,11 +12,10 @@ import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
-import com.mohaine.brewcontroller.event.StepModifyEventHandler;
-import com.mohaine.brewcontroller.event.StepsModifyEvent;
-import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
+import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.event.HandlerRegistration;
@@ -65,27 +64,34 @@ public class BreweryDisplay {
 			@Override
 			public void mouseDown(DrawerMouseEvent e) {
 				dragState = new DragState();
-				dragState.startX = e.getX();
-				dragState.startY = e.getY();
+				dragState.x = e.getX();
+				dragState.y = e.getY();
+				dragState.startX = dragState.x;
+				dragState.startY = dragState.y;
 
-				for (BreweryComponentDisplay component : displays) {
-					int absLeft = component.getAbsLeft();
-					int absTop = component.getAbsTop();
-					if (dragState.startX >= absLeft && dragState.startX < absLeft + component.getWidth()) {
-						if (dragState.startY >= absTop && dragState.startY < absTop + component.getHeight()) {
-							dragState.displayComponent = component;
+				for (int i = displays.size() - 1; i > -1; i--) {
+					BreweryComponentDisplay display = displays.get(i);
+
+					int absLeft = display.getAbsLeft();
+					int absTop = display.getAbsTop();
+					if (dragState.startX >= absLeft && dragState.startX < absLeft + display.getWidth()) {
+						if (dragState.startY >= absTop && dragState.startY < absTop + display.getHeight()) {
+							dragState.display = display;
+
 							break;
 						}
 					}
 				}
-
 				handleDragDown();
-
 			}
 
 			@Override
 			public void mouseDragged(DrawerMouseEvent e) {
-
+				if (dragState != null && dragState.display != null) {
+					dragState.x = e.getX();
+					dragState.y = e.getY();
+					handleDrag();
+				}
 			}
 		});
 
@@ -126,18 +132,54 @@ public class BreweryDisplay {
 	}
 
 	private void handleDragDown() {
-		if (dragState.displayComponent != null) {
-			BreweryComponent component = dragState.displayComponent.getComponent();
+		if (dragState.display != null) {
+			BreweryComponent component = dragState.display.getComponent();
+			HeaterStep selectedStep = controller.getSelectedStep();
+			if (selectedStep != null) {
+				if (component instanceof BrewHardwareControl) {
+					ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+						if (component instanceof Pump) {
+							controlPoint.setDuty(controlPoint.getDuty() > 0 ? 0 : 100);
+							BreweryDisplay.this.drawer.redrawBreweryComponent(component);
+							eventBus.fireEvent(new StepModifyEvent(selectedStep));
+						} else if (component instanceof HeatElement) {
+							dragState.startDuty = controlPoint.getDuty();
+						}
+					}
+				}
+			}
+		}
+	}
 
-			if (component instanceof Pump) {
-				Pump pump = (Pump) component;
-				HeaterStep selectedStep = controller.getSelectedStep();
-				if (selectedStep != null) {
-					ControlPoint controlPoint = selectedStep.getControlPointForPin(pump.getPin());
+	private void handleDrag() {
+		if (dragState.display != null) {
+			BreweryComponent component = dragState.display.getComponent();
+			HeaterStep selectedStep = controller.getSelectedStep();
+			if (selectedStep != null) {
+				if (component instanceof BrewHardwareControl) {
+					ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+						if (component instanceof HeatElement) {
+							int delta = dragState.startY - dragState.y;
 
-					if (!controlPoint.isAutomaticControl()) {
-						controlPoint.setDuty(controlPoint.getDuty() > 0 ? 0 : 100);
-						eventBus.fireEvent(new StepModifyEvent(selectedStep));
+							int newDuty = dragState.startDuty + delta;
+							if (newDuty < 0) {
+								newDuty = 0;
+								dragState.startY = dragState.y;
+								dragState.startDuty = 0;
+							} else if (newDuty > 100) {
+								newDuty = 100;
+								dragState.startY = dragState.y - 100;
+								dragState.startDuty = 100;
+							}
+
+							if (newDuty != controlPoint.getDuty()) {
+								controlPoint.setDuty(newDuty);
+								BreweryDisplay.this.drawer.redrawBreweryComponent(component);
+								eventBus.fireEvent(new StepModifyEvent(selectedStep));
+							}
+						}
 					}
 				}
 			}
@@ -229,9 +271,12 @@ public class BreweryDisplay {
 
 	private static class DragState {
 
-		protected BreweryComponentDisplay displayComponent;
+		public int startDuty;
+		protected BreweryComponentDisplay display;
 		protected int startY;
 		protected int startX;
+		protected int y;
+		protected int x;
 
 	}
 

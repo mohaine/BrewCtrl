@@ -19,12 +19,15 @@ import java.text.NumberFormat;
 import java.util.List;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.bd.DrawerMouseListener;
 import com.mohaine.brewcontroller.bd.DrawerMouseListener.DrawerMouseEvent;
+import com.mohaine.brewcontroller.bean.ControlPoint;
+import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
@@ -38,11 +41,13 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	private int PADDING = 5;
 	private NumberFormat nf = new DecimalFormat("0.0");
 	private UnitConversion conversion;
+	private Controller controller;
 
 	@Inject
-	public BreweryDisplayDrawerSwing(final UnitConversion conversion) {
+	public BreweryDisplayDrawerSwing(final UnitConversion conversion, Controller controller) {
 		super();
 		this.conversion = conversion;
+		this.controller = controller;
 	}
 
 	@Override
@@ -134,10 +139,42 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	private void drawHeatElement(Graphics2D g, BreweryComponentDisplay display) {
+
 		HeatElement heater = (HeatElement) display.getComponent();
 		int duty = heater.getDuty();
-		String text = Integer.toString(duty) + "%";
-		drawText(g, display, text, Colors.FOREGROUND, true);
+		String text = null;
+		Color color = Colors.FOREGROUND;
+
+		HeaterStep selectedStep = controller.getSelectedStep();
+		if (selectedStep != null) {
+			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getPin());
+			if (controlPointForPin != null) {
+				int cpDuty = controlPointForPin.getDuty();
+
+				if (controlPointForPin.isAutomaticControl()) {
+					color = Colors.INACTIVE;
+				}
+
+				if (selectedStep.isActive()) {
+					text = Integer.toString(cpDuty) + "%";
+					if (duty != cpDuty) {
+						color = Colors.PENDING;
+					}
+				} else {
+					if (controlPointForPin.isAutomaticControl()) {
+						text = "Auto";
+					} else {
+						text = Integer.toString(cpDuty) + "%";
+					}
+				}
+			}
+		}
+
+		if (text == null) {
+			text = Integer.toString(duty) + "%";
+		}
+
+		drawText(g, display, text, color, true);
 
 	}
 

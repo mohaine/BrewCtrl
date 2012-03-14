@@ -25,6 +25,8 @@ public class HeaterStep {
 
 	private ArrayList<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
 
+	private boolean active;
+
 	private long stepTime = 0;
 	private long extraCompletedTime = 0;
 	private long lastStartTime = 0;
@@ -131,6 +133,14 @@ public class HeaterStep {
 			}
 		}
 		return null;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

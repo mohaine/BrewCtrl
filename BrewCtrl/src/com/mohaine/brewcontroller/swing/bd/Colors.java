@@ -11,6 +11,8 @@ public class Colors {
 	public static final Color TANK_INSIDE = Color.lightGray;
 	public static Color BACKGROUND = Color.gray;
 	public static Color FOREGROUND = Color.black;
+	public static final Color INACTIVE = Color.gray;
+	public static final Color PENDING = Color.pink;
 	public static Color ERROR = Color.red;
 
 	public static final Font TEMP_FONT = new Font("Dialog", Font.PLAIN, 32);

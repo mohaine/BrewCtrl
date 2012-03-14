@@ -61,6 +61,8 @@ public class ControllerImpl implements Controller {
 
 		initLayout();
 		steps.add(createBlankStep());
+		steps.add(createBlankStep());
+		steps.add(createBlankStep());
 		selectedStep = steps.get(0);
 		updateHardware();
 
@@ -198,6 +200,7 @@ public class ControllerImpl implements Controller {
 
 		if (steps.size() > 0) {
 			HeaterStep currentStep = steps.get(0);
+			currentStep.setActive(true);
 			ArrayList<ControlPoint> controlPoints = currentStep.getControlPoints();
 			hc.setControlPoints(controlPoints);
 		}
