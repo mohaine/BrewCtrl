@@ -5,6 +5,7 @@ public class Sensor extends BreweryComponent {
 	public static final String TYPE = "Sensor";
 	private boolean reading;
 	private Double tempatureC;
+	private String address;
 
 	@Override
 	public String getType() {
@@ -25,6 +26,14 @@ public class Sensor extends BreweryComponent {
 
 	public void setTempatureC(Double temp) {
 		this.tempatureC = temp;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 }

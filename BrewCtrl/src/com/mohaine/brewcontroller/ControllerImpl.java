@@ -280,6 +280,7 @@ public class ControllerImpl implements Controller {
 					if (tank.getName().equals(prefs.getSensorLocation(tempSensor.getAddress(), ""))) {
 						Double temp = sensor.getTempatureC();
 						boolean reading = sensor.isReading();
+						sensor.setAddress(tempSensor.getAddress());
 						sensor.setReading(tempSensor.isReading());
 						sensor.setTempatureC(tempSensor.getTempatureC());
 						boolean diff = temp != sensor.getTempatureC() || reading != sensor.isReading();

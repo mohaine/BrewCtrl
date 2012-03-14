@@ -3,6 +3,7 @@ package com.mohaine.brewcontroller.swing.bd;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -21,6 +22,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Converter;
+import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
@@ -39,7 +41,8 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	private static final long serialVersionUID = 1L;
 	private List<BreweryComponentDisplay> displays;
 	private int PADDING = 5;
-	private NumberFormat nf = new DecimalFormat("0.0");
+	private NumberFormat numberFormat = new DecimalFormat("0.0");
+	private NumberFormat numberFormatWhole = new DecimalFormat("0");
 	private UnitConversion conversion;
 	private Controller controller;
 
@@ -98,7 +101,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				drawName(g2, display);
 			}
 		} else if (Sensor.TYPE.equals(component.getType())) {
-			drawTankTemp(g2, display);
+			drawSensor(g2, display);
 		} else if (HeatElement.TYPE.equals(component.getType())) {
 			drawHeatElement(g2, display);
 		} else {
@@ -189,43 +192,62 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 	}
 
-	private void drawTankTemp(Graphics2D g, BreweryComponentDisplay display) {
+	private void drawSensor(Graphics2D g, BreweryComponentDisplay display) {
 		Sensor sensor = (Sensor) display.getComponent();
 		Double tempatureC = sensor.getTempatureC();
 		if (tempatureC != null) {
-
 			final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
-			String tempDisplay = nf.format(tempDisplayConveter.convertFrom(tempatureC)) + "\u00B0";
+			String tempDisplay = numberFormat.format(tempDisplayConveter.convertFrom(tempatureC)) + "\u00B0";
+
 			Color textColor;
 			if (sensor.isReading()) {
 				textColor = Colors.FOREGROUND;
 			} else {
 				textColor = Colors.ERROR;
 			}
-			drawText(g, display, tempDisplay, textColor, false);
+			drawText(g, tempDisplay, textColor, false, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, Colors.TEMP_FONT);
+
+			HeaterStep selectedStep = controller.getSelectedStep();
+			if (selectedStep != null) {
+				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
+				if (cp != null) {
+//					if (selectedStep.isActive()) {
+//						if (cp.getTargetTemp() != sensor.getTargetTemp()) {
+//							textColor = Colors.PENDING;
+//						}
+//					}
+					tempDisplay = numberFormatWhole.format(tempDisplayConveter.convertFrom(cp.getTargetTemp())) + "\u00B0";
+					drawText(g, "(" + tempDisplay + ")", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
+				}
+			}
+
 		}
 
 	}
 
 	private void drawText(Graphics2D g, BreweryComponentDisplay display, String tempDisplay, Color textColor, boolean alignRight) {
-		Image image = createImage(display.getWidth(), display.getHeight());
+		drawText(g, tempDisplay, textColor, alignRight, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), display.getHeight(), Colors.TEMP_FONT);
+	}
+
+	private void drawText(Graphics2D g, String text, Color textColor, boolean alignRight, int left, int top, int width, int height, Font font) {
+		Image image = createImage(width, height);
 		Graphics2D drawG = (Graphics2D) image.getGraphics();
 		drawG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		drawG.setColor(Colors.TANK);
-		drawG.fillRect(0, 0, display.getWidth(), display.getHeight());
+		drawG.fillRect(0, 0, width, height);
 
 		drawG.setColor(textColor);
-		drawG.setFont(Colors.TEMP_FONT);
+		drawG.setFont(font);
 
 		FontMetrics fontMetrics = drawG.getFontMetrics();
-		Rectangle2D stringBounds = fontMetrics.getStringBounds(tempDisplay, drawG);
+		Rectangle2D stringBounds = fontMetrics.getStringBounds(text, drawG);
 
-		int x = alignRight ? (int) (display.getWidth() - stringBounds.getWidth()) : 0;
-		int y = (int) (-stringBounds.getCenterY()) + display.getHeight() / 2;
+		int x = alignRight ? (int) (width - stringBounds.getWidth()) : 0;
+		int y = (int) (-stringBounds.getCenterY()) + height / 2;
 
-		drawG.drawString(tempDisplay, x, y);
+		drawG.drawString(text, x, y);
 
-		g.drawImage(image, display.getAbsLeft(), display.getAbsTop(), null);
+		g.drawImage(image, left, top, null);
 		drawG.dispose();
 	}
 

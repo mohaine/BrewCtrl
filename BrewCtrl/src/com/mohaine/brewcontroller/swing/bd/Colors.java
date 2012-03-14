@@ -17,5 +17,6 @@ public class Colors {
 
 	public static final Font TEMP_FONT = new Font("Dialog", Font.PLAIN, 32);
 	public static final Font TEXT_FONT = new Font("Dialog", Font.PLAIN, 12);
+	public static final Font TEMP_TARGET_FONT = new Font("Dialog", Font.PLAIN, 20);
 
 }

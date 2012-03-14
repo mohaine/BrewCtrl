@@ -143,4 +143,14 @@ public class HeaterStep {
 		this.active = active;
 	}
 
+	public ControlPoint getControlPointForAddress(String address) {
+		if (address != null) {
+			for (ControlPoint cp : controlPoints) {
+				if (address.equals(cp.getTempSensorAddress())) {
+					return cp;
+				}
+			}
+		}
+		return null;
+	}
 }

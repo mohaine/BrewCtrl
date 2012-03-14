@@ -19,6 +19,7 @@ import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
+import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.bus.EventBus;
@@ -59,9 +60,6 @@ public class BreweryDisplay {
 
 			@Override
 			public void mouseUp(DrawerMouseEvent e) {
-				if (dragState != null) {
-
-				}
 				dragState = null;
 			}
 
@@ -155,8 +153,14 @@ public class BreweryDisplay {
 							BreweryDisplay.this.drawer.redrawBreweryComponent(component);
 							eventBus.fireEvent(new StepModifyEvent(selectedStep));
 						} else if (component instanceof HeatElement) {
-							dragState.startDuty = controlPoint.getDuty();
+							dragState.startValue = controlPoint.getDuty();
 						}
+					}
+				} else if (component instanceof Sensor) {
+					Sensor sensor = (Sensor) component;
+					ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
+					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+						dragState.startValue = controlPoint.getTargetTemp();
 					}
 				}
 			}
@@ -165,6 +169,8 @@ public class BreweryDisplay {
 
 	private void handleDrag() {
 		if (dragState.display != null) {
+			double delta = dragState.startY - dragState.y;
+
 			BreweryComponent component = dragState.display.getComponent();
 			HeaterStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
@@ -172,17 +178,15 @@ public class BreweryDisplay {
 					ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
 					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 						if (component instanceof HeatElement) {
-							int delta = dragState.startY - dragState.y;
-
-							int newDuty = dragState.startDuty + delta;
+							int newDuty = (int) (dragState.startValue + delta);
 							if (newDuty < 0) {
 								newDuty = 0;
 								dragState.startY = dragState.y;
-								dragState.startDuty = 0;
+								dragState.startValue = 0;
 							} else if (newDuty > 100) {
 								newDuty = 100;
 								dragState.startY = dragState.y;
-								dragState.startDuty = 100;
+								dragState.startValue = 100;
 							}
 
 							if (newDuty != controlPoint.getDuty()) {
@@ -192,13 +196,39 @@ public class BreweryDisplay {
 							}
 						}
 					}
+				} else if (component instanceof Sensor) {
+					Sensor sensor = (Sensor) component;
+					ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
+					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+
+						delta = delta * (5.0 / 9.0);
+
+						double newTemp = dragState.startValue + delta;
+
+						if (newTemp < 0) {
+							newTemp = 0;
+							dragState.startY = dragState.y;
+							dragState.startValue = 0;
+						} else if (newTemp > 110) {
+							newTemp = 110;
+							dragState.startY = dragState.y;
+							dragState.startValue = 110;
+						}
+
+						if (newTemp != controlPoint.getTargetTemp()) {
+							controlPoint.setTargetTemp(newTemp);
+							BreweryDisplay.this.drawer.redrawBreweryComponent(component);
+							eventBus.fireEvent(new StepModifyEvent(selectedStep));
+						}
+					}
 				}
+
 			}
 		}
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
-//		this.brewLayout = brewLayout;
+		// this.brewLayout = brewLayout;
 		List<Tank> tanks = brewLayout.getTanks();
 
 		for (Tank tank : tanks) {
@@ -212,7 +242,7 @@ public class BreweryDisplay {
 			}
 
 			if (tank.getSensor() != null) {
-				BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 98, 30);
+				BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 98, 60);
 				bcd.setTop(25);
 				bcd.setLeft(2);
 				bcd.setParent(tankBcd);
@@ -282,7 +312,7 @@ public class BreweryDisplay {
 
 	private static class DragState {
 
-		public int startDuty;
+		public double startValue;
 		protected BreweryComponentDisplay display;
 		protected int startY;
 		protected int startX;
