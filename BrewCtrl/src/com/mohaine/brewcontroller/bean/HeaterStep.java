@@ -124,4 +124,13 @@ public class HeaterStep {
 		this.controlPoints = controlPoints;
 	}
 
+	public ControlPoint getControlPointForPin(int pin) {
+		for (ControlPoint cp : controlPoints) {
+			if (cp.getControlPin() == pin) {
+				return cp;
+			}
+		}
+		return null;
+	}
+
 }

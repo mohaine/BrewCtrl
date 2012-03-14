@@ -9,6 +9,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -20,6 +23,8 @@ import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
+import com.mohaine.brewcontroller.bd.DrawerMouseListener;
+import com.mohaine.brewcontroller.bd.DrawerMouseListener.DrawerMouseEvent;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
@@ -65,7 +70,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		for (BreweryComponentDisplay display : displays) {
 			drawComponent(g2, display, true);
 		}
-
 	}
 
 	private void drawComponent(Graphics2D g2, BreweryComponentDisplay display, boolean full) {
@@ -260,4 +264,54 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		return preferredSize;
 	}
 
+	@Override
+	public void addMouseListener(final DrawerMouseListener drawerMouseListener) {
+
+		addMouseMotionListener(new MouseMotionListener() {
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				drawerMouseListener.mouseDragged(createEvent(e));
+
+			}
+		});
+
+		addMouseListener(new MouseListener() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				drawerMouseListener.mouseUp(createEvent(e));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				drawerMouseListener.mouseDown(createEvent(e));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+			}
+		});
+	}
+
+	private DrawerMouseEvent createEvent(MouseEvent e) {
+		DrawerMouseEvent event = new DrawerMouseEvent();
+		event.setX(e.getX());
+		event.setY(e.getY());
+		return event;
+	}
 }

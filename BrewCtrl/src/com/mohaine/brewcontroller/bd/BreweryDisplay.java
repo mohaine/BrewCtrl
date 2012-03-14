@@ -17,9 +17,7 @@ import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
-import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
-import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.bus.EventBus;
@@ -36,6 +34,8 @@ public class BreweryDisplay {
 		void setDisplays(List<BreweryComponentDisplay> displays);
 
 		void redrawBreweryComponent(BreweryComponent component);
+
+		void addMouseListener(DrawerMouseListener drawerMouseListener);
 	}
 
 	private BreweryDisplayDrawer drawer;
@@ -43,10 +43,51 @@ public class BreweryDisplay {
 	private HandlerRegistration handler;
 	private Controller controller;
 
+	private DragState dragState;
+	private EventBus eventBus;
+
 	@Inject
 	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus, Controller controller) {
 		this.drawer = drawer;
 		this.controller = controller;
+		this.eventBus = eventBus;
+
+		drawer.addMouseListener(new DrawerMouseListener() {
+
+			@Override
+			public void mouseUp(DrawerMouseEvent e) {
+				if (dragState != null) {
+
+				}
+				dragState = null;
+			}
+
+			@Override
+			public void mouseDown(DrawerMouseEvent e) {
+				dragState = new DragState();
+				dragState.startX = e.getX();
+				dragState.startY = e.getY();
+
+				for (BreweryComponentDisplay component : displays) {
+					int absLeft = component.getAbsLeft();
+					int absTop = component.getAbsTop();
+					if (dragState.startX >= absLeft && dragState.startX < absLeft + component.getWidth()) {
+						if (dragState.startY >= absTop && dragState.startY < absTop + component.getHeight()) {
+							dragState.displayComponent = component;
+							break;
+						}
+					}
+				}
+
+				handleDragDown();
+
+			}
+
+			@Override
+			public void mouseDragged(DrawerMouseEvent e) {
+
+			}
+		});
 
 		handler = eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
 			@Override
@@ -60,26 +101,47 @@ public class BreweryDisplay {
 			}
 		});
 
-		eventBus.addHandler(StepsModifyEvent.getType(), new StepsModifyEventHandler() {
-			@Override
-			public void onStepsChange() {
-				System.out.println("BreweryDisplay.BreweryDisplay(...).new StepsModifyEventHandler() {...}.onStepsChange()");
-			}
-		});
+		// eventBus.addHandler(StepsModifyEvent.getType(), new
+		// StepsModifyEventHandler() {
+		// @Override
+		// public void onStepsChange() {
+		// System.out.println("BreweryDisplay.BreweryDisplay(...).new StepsModifyEventHandler() {...}.onStepsChange()");
+		// }
+		// });
+		//
+		// eventBus.addHandler(StepModifyEvent.getType(), new
+		// StepModifyEventHandler() {
+		// @Override
+		// public void onStepChange(HeaterStep step) {
+		// System.out.println("BreweryDisplay.BreweryDisplay(...).new StepModifyEventHandler() {...}.onStepChange()");
+		// if (step != null) {
+		// ArrayList<ControlPoint> controlPoints = step.getControlPoints();
+		// for (ControlPoint controlPoint : controlPoints) {
+		// System.out.println("controlPoint: " + controlPoint);
+		// }
+		// }
+		// }
+		// });
 
-		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
-			@Override
-			public void onStepChange(HeaterStep step) {
-				System.out.println("BreweryDisplay.BreweryDisplay(...).new StepModifyEventHandler() {...}.onStepChange()");
-				if (step != null) {
-					ArrayList<ControlPoint> controlPoints = step.getControlPoints();
-					for (ControlPoint controlPoint : controlPoints) {
-						System.out.println("controlPoint: " + controlPoint);
+	}
+
+	private void handleDragDown() {
+		if (dragState.displayComponent != null) {
+			BreweryComponent component = dragState.displayComponent.getComponent();
+
+			if (component instanceof Pump) {
+				Pump pump = (Pump) component;
+				HeaterStep selectedStep = controller.getSelectedStep();
+				if (selectedStep != null) {
+					ControlPoint controlPoint = selectedStep.getControlPointForPin(pump.getPin());
+
+					if (!controlPoint.isAutomaticControl()) {
+						controlPoint.setDuty(controlPoint.getDuty() > 0 ? 0 : 100);
+						eventBus.fireEvent(new StepModifyEvent(selectedStep));
 					}
 				}
 			}
-		});
-
+		}
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
@@ -91,10 +153,8 @@ public class BreweryDisplay {
 
 			if (tank.getHeater() != null) {
 				BreweryComponentDisplay bcd = createBcd(tank.getHeater(), 98, 30);
-
 				bcd.setTop(25);
 				bcd.setLeft(102);
-
 				bcd.setParent(tankBcd);
 			}
 
@@ -166,4 +226,13 @@ public class BreweryDisplay {
 			handler = null;
 		}
 	}
+
+	private static class DragState {
+
+		protected BreweryComponentDisplay displayComponent;
+		protected int startY;
+		protected int startX;
+
+	}
+
 }
