@@ -66,14 +66,11 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 
 	private GridBagConstraints gbc;
 
-	private Controller controller;
-
 	@Inject
 	public SetupDisplaySwing(Hardware hardware, final BrewPrefs prefs, Controller controller) {
 		super();
 		this.hardware = hardware;
 		this.prefs = prefs;
-		this.controller = controller;
 		this.tanks = controller.getLayout().getTanks();
 
 		setLayout(new BorderLayout());
@@ -168,7 +165,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 		sensorPanel.add(new JLabel("Sensor Location:"), gbc);
 		gbc.gridx++;
 
-		JComboBox locationCombo = new JComboBox();
+		JComboBox<Tank> locationCombo = new JComboBox<Tank>();
 		sensorPanel.add(locationCombo, gbc);
 		locationCombo.addItem(null);
 
@@ -210,7 +207,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	}
 
 	private class SensorLabel implements KeyListener, ItemListener {
-		public JComboBox combo;
+		public JComboBox<Tank> combo;
 		JTextField value;
 		HardwareSensor sensor;
 

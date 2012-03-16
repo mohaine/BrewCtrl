@@ -19,10 +19,7 @@
 package com.mohaine.brewcontroller.swing.page;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Component;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -38,51 +35,17 @@ import com.mohaine.event.ClickHandler;
 
 public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 	private static final long serialVersionUID = 1L;
-	private Hardware hardware;
-	private BrewPrefs prefs;
 	private JPanel controlPanel = new JPanel();
-	private Canvas canvas;
 	private BreweryDisplay breweryDisplay;
 
 	@Inject
 	public OverviewDisplaySwing(Hardware hardware, final BrewPrefs prefs, BreweryDisplay breweryDisplayp) {
 		super();
-		this.hardware = hardware;
-		this.prefs = prefs;
 		this.breweryDisplay = breweryDisplayp;
 		setLayout(new BorderLayout());
-		JPanel sliderPanel = new JPanel();
-		add(sliderPanel, BorderLayout.EAST);
-		add(controlPanel, BorderLayout.SOUTH);
 
 		Component drawer = (Component) breweryDisplay.getDrawer();
 		add(drawer, BorderLayout.CENTER);
-		drawer.addComponentListener(new ComponentListener() {
-
-			@Override
-			public void componentShown(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void componentResized(ComponentEvent arg0) {
-				breweryDisplay.layoutDisplays();
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void componentHidden(ComponentEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
 	}
 
 	@Override

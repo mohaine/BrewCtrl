@@ -60,9 +60,9 @@ public class ControllerImpl implements Controller {
 		this.prefs = prefs;
 
 		initLayout();
-		steps.add(createBlankStep());
-		steps.add(createBlankStep());
-		steps.add(createBlankStep());
+		steps.add(createBlankStep("Step 1"));
+		steps.add(createBlankStep("Step 2"));
+		steps.add(createBlankStep("Step 3"));
 		selectedStep = steps.get(0);
 		updateHardware();
 
@@ -95,7 +95,7 @@ public class ControllerImpl implements Controller {
 			}
 
 			if (steps.size() == 0) {
-				steps.add(createBlankStep());
+				steps.add(createBlankStep("Default"));
 			}
 
 			newSelection = steps.get(0);
@@ -107,8 +107,9 @@ public class ControllerImpl implements Controller {
 		eventBus.fireEvent(new StepsModifyEvent());
 	}
 
-	private HeaterStep createBlankStep() {
+	private HeaterStep createBlankStep(String name) {
 		HeaterStep step = new HeaterStep();
+		step.setName(name);
 		ArrayList<ControlPoint> controlPoints = step.getControlPoints();
 
 		List<Pump> pumps = brewLayout.getPumps();

@@ -16,7 +16,7 @@
  
  */
 
-package com.mohaine.brewcontroller.swing.page;
+package com.mohaine.brewcontroller.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,7 +45,6 @@ import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
-import com.mohaine.brewcontroller.swing.ValueSlider;
 import com.mohaine.event.AbstractHasValue;
 import com.mohaine.event.ChangeEvent;
 import com.mohaine.event.HandlerRegistration;
@@ -67,7 +66,6 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 	});
 	private JToggleButton modeHoldButton = new JToggleButton(new AbstractAction("Hold") {
-
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -115,13 +113,9 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 		}
 	};
 
-	private JLabel boilDuty;
-	private JLabel hltDuty;
-	private JLabel pumpState;
 	private JLabel mode;
 	private JLabel status;
 	private Controller controller;
-	private ValueSlider boilDutySlider;
 
 	private Hardware hardware;
 	private ArrayList<SensorLabel> sensorLabels = new ArrayList<SensorLabel>();
@@ -138,7 +132,7 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 	private Color normalStatusForeground;
 
 	@Inject
-	public StatusDisplay(Hardware hardware, UnitConversion conversion, Controller controller, EventBus eventBus) {
+	public StatusDisplay(Hardware hardware, UnitConversion conversion, Controller controller, EventBus eventBus, StepDisplayList stepDisplay) {
 		super();
 		this.hardware = hardware;
 		this.conversion = conversion;
@@ -154,11 +148,8 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 		modePanel.add(modeOffButton);
 		add(modePanel, BorderLayout.NORTH);
 
-		boilDutySlider = new ValueSlider(0, 0, 100);
-		add(boilDutySlider, BorderLayout.EAST);
-
 		statusPanel = new JPanel();
-		add(statusPanel, BorderLayout.CENTER);
+		add(statusPanel, BorderLayout.SOUTH);
 		statusPanel.setLayout(new GridBagLayout());
 
 		gbc.gridx = 0;
@@ -168,15 +159,13 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 		status = addTitledLabel(gbc, statusPanel, "Status:");
 		mode = addTitledLabel(gbc, statusPanel, "Mode:");
-		boilDuty = addTitledLabel(gbc, statusPanel, "Boil Duty:");
-		hltDuty = addTitledLabel(gbc, statusPanel, "HLT Duty:");
-
-		pumpState = addTitledLabel(gbc, statusPanel, "Pump:");
 
 		normalStatusForeground = status.getForeground();
 
 		updateState();
 		updateMode(controller.getMode());
+
+		add(stepDisplay, BorderLayout.CENTER);
 
 	}
 
@@ -285,10 +274,6 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 				mode.setText("???????");
 				break;
 			}
-			NumberFormat nf = NumberFormat.getInstance();
-			hltDuty.setText(nf.format(hardwareStatus.getHltDuty()));
-			boilDuty.setText(nf.format(hardwareStatus.getBoilDuty()));
-			pumpState.setText(hardwareStatus.isPumpOn() ? "On" : "Off");
 		}
 
 		List<HardwareSensor> sensors = hardware.getSensors();

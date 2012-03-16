@@ -29,8 +29,6 @@ import javax.swing.SwingUtilities;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.DisplayPage;
-import com.mohaine.brewcontroller.swing.page.StatusDisplay;
-import com.mohaine.brewcontroller.swing.page.StepDisplayList;
 
 public class SwingControllerInterface implements ControllerGui {
 	private JFrame frame = new JFrame();
@@ -38,16 +36,12 @@ public class SwingControllerInterface implements ControllerGui {
 
 	DisplayPage currentPage;
 	private StatusDisplay statusDisplay;
-	private StepDisplayList stepDisplay;
 
 	@Inject
-	public SwingControllerInterface(StatusDisplay statusDisplay, StepDisplayList stepDisplay) {
+	public SwingControllerInterface(StatusDisplay statusDisplay) {
 		super();
-		this.stepDisplay = stepDisplay;
 		this.statusDisplay = statusDisplay;
-
 		mainPanel.setLayout(new BorderLayout());
-
 	}
 
 	@Override
@@ -79,7 +73,6 @@ public class SwingControllerInterface implements ControllerGui {
 		cp.setLayout(new BorderLayout());
 		cp.add(mainPanel, BorderLayout.CENTER);
 		cp.add(statusDisplay, BorderLayout.EAST);
-		cp.add(stepDisplay, BorderLayout.SOUTH);
 
 		// mainPanel.setPreferredSize(new Dimension(800, 600));
 		frame.pack();

@@ -45,15 +45,12 @@ public class Overview extends BasePage {
 
 	private MainMenu mainMenu;
 
-	private Controller controller;
-
 	@Inject
 	public Overview(OverviewDisplay displayp, EventBus eventBusp, Controller controller, final ControllerGui ci, final MainMenu mainMenu) {
 		super();
 		this.display = displayp;
 		this.mainMenu = mainMenu;
 		this.controllerGui = ci;
-		this.controller = controller;
 		display.init();
 
 		display.addClickable("Main Menu", new ClickHandler() {

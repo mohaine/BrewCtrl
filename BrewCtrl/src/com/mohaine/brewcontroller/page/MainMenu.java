@@ -43,8 +43,8 @@ public class MainMenu extends BasePage {
 	private MainMenuDisplay display;
 
 	@Inject
-	public MainMenu(MainMenuDisplay display, final Provider<Setup> providerSetup, final Provider<StepEditor> providerStepEditor, final ControllerGui controllerGui, final Controller controller,
-			final Provider<Overview> providerOverview, final BrewPrefs prefs, final UnitConversion conversion) {
+	public MainMenu(MainMenuDisplay display, final Provider<Setup> providerSetup, final ControllerGui controllerGui, final Controller controller, final Provider<Overview> providerOverview,
+			final BrewPrefs prefs, final UnitConversion conversion) {
 		super();
 		this.display = display;
 
@@ -64,12 +64,6 @@ public class MainMenu extends BasePage {
 				controllerGui.displayPage(providerOverview.get());
 			}
 		});
-		display.addClickable("Run", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				controllerGui.displayPage(providerStepEditor.get());
-			}
-		});
 
 		display.addClickable("1 Step Mash", new ClickHandler() {
 			@Override
@@ -80,7 +74,7 @@ public class MainMenu extends BasePage {
 				steps.add(new HeaterStep("Mash Out", tempDisplayConveter.convertTo(170.0), 0));
 				controller.setSteps(steps);
 				controller.setSelectedStep(steps.get(0));
-				controllerGui.displayPage(providerStepEditor.get());
+				controllerGui.displayPage(providerOverview.get());
 			}
 		});
 		display.addClickable("3 Step Mash", new ClickHandler() {
@@ -94,7 +88,7 @@ public class MainMenu extends BasePage {
 				steps.add(new HeaterStep("Mash Out", tempDisplayConveter.convertTo(170.0), 0));
 				controller.setSteps(steps);
 				controller.setSelectedStep(steps.get(0));
-				controllerGui.displayPage(providerStepEditor.get());
+				controllerGui.displayPage(providerOverview.get());
 			}
 		});
 	}
