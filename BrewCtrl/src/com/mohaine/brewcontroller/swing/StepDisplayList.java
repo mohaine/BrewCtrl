@@ -29,12 +29,11 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
-import com.mohaine.brewcontroller.event.StepModifyEvent;
-import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.event.HandlerRegistration;
@@ -51,9 +50,12 @@ public class StepDisplayList extends JPanel {
 
 	private JPanel contentPanel;
 
+	private Provider<StepEditorSwing> providerStepEditorSwing;
+
 	@Inject
-	public StepDisplayList(Controller controllerp, EventBus eventBusp) {
+	public StepDisplayList(Controller controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing) {
 		super();
+		this.providerStepEditorSwing = providerStepEditorSwing;
 		this.eventBus = eventBusp;
 		this.controller = controllerp;
 
@@ -85,17 +87,6 @@ public class StepDisplayList extends JPanel {
 			}
 		}));
 
-		handlers.add(eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
-			@Override
-			public void onStepChange(final HeaterStep step) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						modifedStep(step);
-					}
-				});
-			}
-		}));
 		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
 			@Override
 			public void onStepChange(final HeaterStep step) {
@@ -122,10 +113,6 @@ public class StepDisplayList extends JPanel {
 		handlers.clear();
 	}
 
-	private void modifedStep(HeaterStep modifedStep) {
-		// TODO
-	}
-
 	private void updateSteps() {
 
 		List<HeaterStep> steps = controller.getSteps();
@@ -136,7 +123,7 @@ public class StepDisplayList extends JPanel {
 			if (index < editors.size()) {
 				stepEditor = editors.get(index);
 			} else {
-				stepEditor = new StepEditorSwing();
+				stepEditor = providerStepEditorSwing.get();
 				editors.add(stepEditor);
 				contentPanel.add(stepEditor);
 			}
