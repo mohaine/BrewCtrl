@@ -19,18 +19,25 @@
 package com.mohaine.brewcontroller.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
+import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.event.ChangeEvent;
@@ -52,10 +59,13 @@ public class StepEditorSwing extends JPanel {
 
 	private ArrayList<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 
+	private Controller controller;
+
 	@Inject
-	public StepEditorSwing(EventBus eventBus) {
+	public StepEditorSwing(EventBus eventBus, Controller controller) {
 		super();
 		this.eventBus = eventBus;
+		this.controller = controller;
 		JPanel mainPanel = this;
 
 		mainPanel.setLayout(new GridBagLayout());
@@ -72,7 +82,6 @@ public class StepEditorSwing extends JPanel {
 		mainPanel.add(namePanel, gbc);
 
 		gbc.gridx++;
-		gbc.gridheight = 1;
 
 		JPanel timePanel = new JPanel();
 		timePanel.setLayout(new BorderLayout());
@@ -102,11 +111,7 @@ public class StepEditorSwing extends JPanel {
 			public void onChange(ChangeEvent event) {
 				if (heaterStep != null) {
 					long stepTime = timeValue.getValue();
-					System.out.println("Step Time: " + stepTime + " " + heaterStep.getStepTime());
-
 					if (stepTime != heaterStep.getStepTime()) {
-						System.out.println("  CHANGE Step Time: " + stepTime);
-
 						heaterStep.setStepTime(stepTime);
 						fireChange();
 					}
@@ -114,6 +119,24 @@ public class StepEditorSwing extends JPanel {
 
 			}
 		});
+
+		gbc.gridx++;
+
+		JPanel controlPanel = new JPanel();
+		controlPanel.setLayout(new GridLayout(1, 0));
+		mainPanel.add(controlPanel, gbc);
+
+		JLabel edit = new JLabel("Edit");
+		edit.addMouseListener(new MouseListenerAbstract() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				selectStep();
+			}
+
+		});
+
+		controlPanel.add(edit);
+		controlPanel.add(new JLabel("Delete"));
 
 	}
 
@@ -128,6 +151,15 @@ public class StepEditorSwing extends JPanel {
 					setStep(step);
 				}
 			}
+		}));
+
+		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
+
+			@Override
+			public void onStepChange(HeaterStep step) {
+				updateSelected(step == heaterStep);
+			}
+
 		}));
 	}
 
@@ -150,25 +182,33 @@ public class StepEditorSwing extends JPanel {
 		}
 	}
 
-	private JPanel createTitledPanel(String name) {
-		JPanel namePanel = new JPanel();
-		namePanel.setLayout(new BorderLayout());
-		namePanel.setBorder(BorderFactory.createTitledBorder(name));
-		return namePanel;
-	}
-
 	public void setStep(HeaterStep heaterStep) {
 		this.heaterStep = heaterStep;
 		nameField.setText(heaterStep.getName());
 		timeValue.setValue(heaterStep.getStepTime(), false);
+		updateSelected(heaterStep == controller.getSelectedStep());
 	}
 
 	private void updateName() {
-		String newName = nameField.getName();
+		String newName = nameField.getText();
+		System.out.println("Heater Step : " + heaterStep + " => " + newName);
+
 		if (!newName.equals(heaterStep.getName())) {
 			heaterStep.setName(newName);
 			fireChange();
 		}
+	}
 
+	private void updateSelected(boolean selected) {
+		if (selected) {
+			setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, Color.red));
+		} else {
+			setBorder(null);
+		}
+
+	}
+
+	private void selectStep() {
+		controller.setSelectedStep(heaterStep);
 	}
 }

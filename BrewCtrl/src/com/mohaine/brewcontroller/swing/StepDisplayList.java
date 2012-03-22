@@ -18,22 +18,20 @@
 
 package com.mohaine.brewcontroller.swing;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.bean.HeaterStep;
-import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
-import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.event.HandlerRegistration;
@@ -60,10 +58,27 @@ public class StepDisplayList extends JPanel {
 		this.controller = controllerp;
 
 		setPreferredSize(new Dimension(200, 200));
-		setLayout(new BorderLayout());
+		setLayout(new GridBagLayout());
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1;
+		gbc.weighty = 0;
+
 		contentPanel = new JPanel();
 		contentPanel.setLayout(new GridLayout(0, 1));
-		add(new JScrollPane(contentPanel), BorderLayout.CENTER);
+		add(contentPanel, gbc);
+
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+
+		JPanel extraPanel = new JPanel();
+		add(extraPanel, gbc);
 
 		updateSteps();
 	}
@@ -87,17 +102,6 @@ public class StepDisplayList extends JPanel {
 			}
 		}));
 
-		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
-			@Override
-			public void onStepChange(final HeaterStep step) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						changeSelectedStep(step);
-					}
-				});
-			}
-		}));
 	}
 
 	@Override
@@ -132,14 +136,6 @@ public class StepDisplayList extends JPanel {
 
 			index++;
 		}
-
-		HeaterStep selectedStep = controller.getSelectedStep();
-		changeSelectedStep(selectedStep);
-		// TODO
-	}
-
-	private void changeSelectedStep(HeaterStep selectedStep) {
-		// TODO
 	}
 
 }

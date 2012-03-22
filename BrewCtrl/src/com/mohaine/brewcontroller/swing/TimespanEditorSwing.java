@@ -23,6 +23,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.event.ChangeListener;
@@ -35,7 +36,6 @@ import com.mohaine.event.HasValue;
 public class TimespanEditorSwing extends JPanel implements HasValue<Long>, ChangeListener {
 	private static final long serialVersionUID = 1L;
 	JSpinner minuteSpinner = new JSpinner();
-	JSpinner secondSpinner = new JSpinner();
 
 	public TimespanEditorSwing() {
 		super();
@@ -51,12 +51,8 @@ public class TimespanEditorSwing extends JPanel implements HasValue<Long>, Chang
 		add(minuteSpinner, gbc);
 		gbc.gridx++;
 		gbc.weightx = 0;
-		add(secondSpinner, gbc);
+		add(new JLabel("Min"), gbc);
 
-		Dimension preferredSize = secondSpinner.getPreferredSize();
-		preferredSize.width = 50;
-		secondSpinner.setPreferredSize(preferredSize);
-		secondSpinner.addChangeListener(this);
 		minuteSpinner.addChangeListener(this);
 
 	}
@@ -116,11 +112,9 @@ public class TimespanEditorSwing extends JPanel implements HasValue<Long>, Chang
 		}
 
 		long minutes = value / 60000;
-		long seconds = (value - minutes * 60000) / 1000;
 		ignoreEvents = true;
 		try {
 			minuteSpinner.setValue(minutes);
-			secondSpinner.setValue(seconds);
 		} finally {
 			ignoreEvents = false;
 		}
@@ -135,7 +129,7 @@ public class TimespanEditorSwing extends JPanel implements HasValue<Long>, Chang
 		}
 
 		long minutes = getSpinnerLong(minuteSpinner);
-		long seconds = getSpinnerLong(secondSpinner);
+		long seconds = 0;
 
 		if (seconds < 0) {
 			if (minutes > 0) {
