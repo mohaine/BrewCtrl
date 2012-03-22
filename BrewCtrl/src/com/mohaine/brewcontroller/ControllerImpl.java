@@ -97,7 +97,6 @@ public class ControllerImpl implements Controller {
 			if (steps.size() == 0) {
 				steps.add(createBlankStep("Default"));
 			}
-
 			newSelection = steps.get(0);
 		}
 
@@ -163,7 +162,19 @@ public class ControllerImpl implements Controller {
 	@Override
 	public void setSteps(List<HeaterStep> steps) {
 		this.steps = steps;
+		boolean updateSelection;
+		synchronized (steps) {
+			if (steps.size() == 0) {
+				steps.add(createBlankStep("Default"));
+			}
+			updateSelection = selectedStep == null || !steps.contains(selectedStep);
+		}
+
 		eventBus.fireEvent(new StepsModifyEvent());
+
+		if (updateSelection) {
+			setSelectedStep(steps.get(0));
+		}
 	}
 
 	@Override

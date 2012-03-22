@@ -46,7 +46,7 @@ public class StepDisplayList extends JPanel {
 
 	private ArrayList<StepEditorSwing> editors = new ArrayList<StepEditorSwing>();
 
-	private JPanel contentPanel;
+	private JPanel editorsPanel;
 
 	private Provider<StepEditorSwing> providerStepEditorSwing;
 
@@ -67,9 +67,9 @@ public class StepDisplayList extends JPanel {
 		gbc.weightx = 1;
 		gbc.weighty = 0;
 
-		contentPanel = new JPanel();
-		contentPanel.setLayout(new GridLayout(0, 1));
-		add(contentPanel, gbc);
+		editorsPanel = new JPanel();
+		editorsPanel.setLayout(new GridLayout(0, 1));
+		add(editorsPanel, gbc);
 
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
@@ -120,7 +120,6 @@ public class StepDisplayList extends JPanel {
 	private void updateSteps() {
 
 		List<HeaterStep> steps = controller.getSteps();
-
 		int index = 0;
 		for (HeaterStep heaterStep : steps) {
 			StepEditorSwing stepEditor;
@@ -129,13 +128,17 @@ public class StepDisplayList extends JPanel {
 			} else {
 				stepEditor = providerStepEditorSwing.get();
 				editors.add(stepEditor);
-				contentPanel.add(stepEditor);
+				editorsPanel.add(stepEditor);
 			}
-
 			stepEditor.setStep(heaterStep);
-
 			index++;
 		}
+		while (editors.size() > steps.size()) {
+			StepEditorSwing extra = editors.remove(steps.size());
+			editorsPanel.remove(extra);
+		}
+
+		editorsPanel.repaint();
 	}
 
 }

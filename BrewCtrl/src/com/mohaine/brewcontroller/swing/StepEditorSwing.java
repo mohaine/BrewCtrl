@@ -20,16 +20,18 @@ package com.mohaine.brewcontroller.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -123,7 +125,7 @@ public class StepEditorSwing extends JPanel {
 		gbc.gridx++;
 
 		JPanel controlPanel = new JPanel();
-		controlPanel.setLayout(new GridLayout(1, 0));
+		controlPanel.setLayout(new FlowLayout());
 		mainPanel.add(controlPanel, gbc);
 
 		JLabel edit = new JLabel("Edit");
@@ -132,11 +134,19 @@ public class StepEditorSwing extends JPanel {
 			public void mouseClicked(MouseEvent arg0) {
 				selectStep();
 			}
-
 		});
 
 		controlPanel.add(edit);
-		controlPanel.add(new JLabel("Delete"));
+		JLabel delete = new JLabel("Delete");
+
+		delete.addMouseListener(new MouseListenerAbstract() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				deleteStep();
+			}
+		});
+
+		controlPanel.add(delete);
 
 	}
 
@@ -191,8 +201,6 @@ public class StepEditorSwing extends JPanel {
 
 	private void updateName() {
 		String newName = nameField.getText();
-		System.out.println("Heater Step : " + heaterStep + " => " + newName);
-
 		if (!newName.equals(heaterStep.getName())) {
 			heaterStep.setName(newName);
 			fireChange();
@@ -201,14 +209,22 @@ public class StepEditorSwing extends JPanel {
 
 	private void updateSelected(boolean selected) {
 		if (selected) {
-			setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, Color.red));
+			setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, Color.black));
 		} else {
-			setBorder(null);
+			setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, getBackground()));
 		}
 
 	}
 
 	private void selectStep() {
 		controller.setSelectedStep(heaterStep);
+	}
+
+	private void deleteStep() {
+		if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this, "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete", JOptionPane.OK_CANCEL_OPTION)) {
+			List<HeaterStep> steps = new ArrayList<HeaterStep>(controller.getSteps());
+			steps.remove(heaterStep);
+			controller.setSteps(steps);
+		}
 	}
 }
