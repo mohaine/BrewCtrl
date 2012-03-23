@@ -222,7 +222,7 @@ public class BreweryDisplay {
 				} else if (component instanceof Sensor) {
 					Sensor sensor = (Sensor) component;
 					ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
-					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+					if (controlPoint != null && controlPoint.isAutomaticControl()) {
 
 						delta = delta * (5.0 / 9.0);
 
@@ -336,6 +336,7 @@ public class BreweryDisplay {
 		protected long lastTime;
 		protected BreweryComponentDisplay display;
 		protected int lastY;
+		@SuppressWarnings("unused")
 		protected int lastX;
 		protected int y;
 		protected int x;

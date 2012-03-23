@@ -206,20 +206,25 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 			}
 			drawText(g, tempDisplay, textColor, false, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, Colors.TEMP_FONT);
 
+			boolean clearText = true;
 			HeaterStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
 				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
-				if (cp != null) {
+				if (cp != null && cp.isAutomaticControl()) {
 					// if (selectedStep.isActive()) {
 					// if (cp.getTargetTemp() != sensor.getTargetTemp()) {
 					// textColor = Colors.PENDING;
 					// }
 					// }
+					clearText = false;
 					tempDisplay = numberFormatWhole.format(tempDisplayConveter.convertFrom(cp.getTargetTemp())) + "\u00B0";
 					drawText(g, "(" + tempDisplay + ")", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
 				}
 			}
 
+			if (clearText) {
+				drawText(g, "", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
+			}
 		}
 
 	}

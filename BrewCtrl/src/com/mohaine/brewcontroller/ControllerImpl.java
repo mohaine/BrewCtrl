@@ -136,6 +136,7 @@ public class ControllerImpl implements Controller {
 					List<HardwareSensor> sensors = hardware.getSensors();
 					for (HardwareSensor hardwareSensor : sensors) {
 						if (tank.getName().equals(prefs.getSensorLocation(hardwareSensor.getAddress(), ""))) {
+							controlPoint.setAutomaticControl(true);
 							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
 							break;
 						}
