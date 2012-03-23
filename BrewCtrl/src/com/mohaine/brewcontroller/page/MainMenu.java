@@ -23,13 +23,18 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.ClickEvent;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.UnitConversion;
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.layout.HeatElement;
+import com.mohaine.brewcontroller.layout.Pump;
+import com.mohaine.brewcontroller.layout.Sensor;
+import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.event.ClickHandler;
 
 public class MainMenu extends BasePage {
@@ -41,16 +46,19 @@ public class MainMenu extends BasePage {
 	}
 
 	private MainMenuDisplay display;
+	private Controller controller;
+	private Converter<Double, Double> tempDisplayConveter;
 
 	@Inject
 	public MainMenu(MainMenuDisplay display, final Provider<Setup> providerSetup, final ControllerGui controllerGui, final Controller controller, final Provider<Overview> providerOverview,
-			final BrewPrefs prefs, final UnitConversion conversion) {
+			final UnitConversion conversion) {
 		super();
 		this.display = display;
+		this.controller = controller;
 
 		display.init();
 
-		final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
+		tempDisplayConveter = conversion.getTempDisplayConveter();
 
 		display.addClickable("Setup", new ClickHandler() {
 			@Override
@@ -69,28 +77,74 @@ public class MainMenu extends BasePage {
 			@Override
 			public void onClick(ClickEvent event) {
 				List<HeaterStep> steps = new ArrayList<HeaterStep>();
-				steps.add(new HeaterStep("Mash In", tempDisplayConveter.convertTo(165.0), 0));
-				steps.add(new HeaterStep("Mash", tempDisplayConveter.convertTo(153.0), 60 * 60 * 1000));
-				steps.add(new HeaterStep("Mash Out", tempDisplayConveter.convertTo(170.0), 0));
+
+				steps.add(createMashStep("Mash In", tempDisplayConveter.convertTo(165.0), 0));
+				steps.add(createMashStep("Mash", tempDisplayConveter.convertTo(153.0), 60 * 60 * 1000));
+				steps.add(createMashStep("Mash Out", tempDisplayConveter.convertTo(170.0), 0));
 				controller.setSteps(steps);
 				controller.setSelectedStep(steps.get(0));
 				controllerGui.displayPage(providerOverview.get());
 			}
+
 		});
 		display.addClickable("3 Step Mash", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				List<HeaterStep> steps = new ArrayList<HeaterStep>();
-				steps.add(new HeaterStep("Mash In", tempDisplayConveter.convertTo(165.0), 0));
-				steps.add(new HeaterStep("Mash", 40, 30 * 60 * 1000));
-				steps.add(new HeaterStep("Mash", 60, 30 * 60 * 1000));
-				steps.add(new HeaterStep("Mash", 70, 30 * 60 * 1000));
-				steps.add(new HeaterStep("Mash Out", tempDisplayConveter.convertTo(170.0), 0));
+				steps.add(createMashStep("Mash In", tempDisplayConveter.convertTo(165.0), 0));
+				steps.add(createMashStep("Mash", 40, 30 * 60 * 1000));
+				steps.add(createMashStep("Mash", 60, 30 * 60 * 1000));
+				steps.add(createMashStep("Mash", 70, 30 * 60 * 1000));
+				steps.add(createMashStep("Mash Out", tempDisplayConveter.convertTo(170.0), 0));
 				controller.setSteps(steps);
 				controller.setSelectedStep(steps.get(0));
 				controllerGui.displayPage(providerOverview.get());
 			}
 		});
+	}
+
+	private HeaterStep createMashStep(String name, double targetTunTempC, long msAtStep) {
+		HeaterStep step = controller.createManualStep(name);
+		step.setStepTime(msAtStep);
+		BreweryLayout brewLayout = controller.getLayout();
+
+		// Map HLT Loop pump to HTL Sensor
+		List<Pump> pumps = brewLayout.getPumps();
+		for (Pump pump : pumps) {
+			if (Pump.HLT_LOOP.equals(pump.getName())) {
+				ControlPoint controlPointForPin = step.getControlPointForPin(pump.getPin());
+				if (controlPointForPin != null) {
+
+					Tank tun = brewLayout.getTank(Tank.TUN_NAME);
+					if (tun != null) {
+						Sensor sensor = tun.getSensor();
+						if (sensor != null) {
+							controlPointForPin.setAutomaticControl(true);
+							controlPointForPin.setTempSensorAddress(sensor.getAddress());
+							controlPointForPin.setTargetTemp(targetTunTempC);
+						}
+					}
+
+				}
+			}
+		}
+
+		Tank htl = brewLayout.getTank(Tank.HLT_NAME);
+		if (htl != null) {
+			HeatElement heater = htl.getHeater();
+			ControlPoint controlPointForPin = step.getControlPointForPin(heater.getPin());
+
+			if (heater != null) {
+				Sensor sensor = htl.getSensor();
+				if (sensor != null) {
+					controlPointForPin.setAutomaticControl(true);
+					controlPointForPin.setTempSensorAddress(sensor.getAddress());
+					controlPointForPin.setTargetTemp(targetTunTempC + tempDisplayConveter.convertTo(37.0));
+				}
+			}
+		}
+
+		return step;
 	}
 
 	@Override

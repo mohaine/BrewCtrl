@@ -4,15 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BreweryLayout {
-	private List<Tank> zones = new ArrayList<Tank>();
-	private List<Pump> pumps = new ArrayList<Pump>();
+	private final List<Tank> tanks = new ArrayList<Tank>();
+	private final List<Pump> pumps = new ArrayList<Pump>();
 
 	public List<Tank> getTanks() {
-		return zones;
+		return tanks;
 	}
 
 	public List<Pump> getPumps() {
 		return pumps;
+	}
+
+	public Tank getTank(String name) {
+		for (Tank tank : tanks) {
+			if (tank.getName().equals(name)) {
+				return tank;
+			}
+		}
+		return null;
+
 	}
 
 }

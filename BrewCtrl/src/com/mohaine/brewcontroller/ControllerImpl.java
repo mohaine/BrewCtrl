@@ -43,6 +43,7 @@ import com.mohaine.event.StatusChangeHandler;
 import com.mohaine.event.bus.EventBus;
 
 public class ControllerImpl implements Controller {
+
 	private List<HeaterStep> steps = new ArrayList<HeaterStep>();
 	private List<BrewHardwareControl> brewHardwareControls = new ArrayList<BrewHardwareControl>();
 	private HeaterStep selectedStep = null;;
@@ -60,9 +61,9 @@ public class ControllerImpl implements Controller {
 		this.prefs = prefs;
 
 		initLayout();
-		steps.add(createBlankStep("Step 1"));
-		steps.add(createBlankStep("Step 2"));
-		steps.add(createBlankStep("Step 3"));
+		steps.add(createManualStep("Step 1"));
+		steps.add(createManualStep("Step 2"));
+		steps.add(createManualStep("Step 3"));
 		selectedStep = steps.get(0);
 		updateHardware();
 
@@ -95,7 +96,7 @@ public class ControllerImpl implements Controller {
 			}
 
 			if (steps.size() == 0) {
-				steps.add(createBlankStep("Default"));
+				steps.add(createManualStep("Default"));
 			}
 			newSelection = steps.get(0);
 		}
@@ -106,7 +107,8 @@ public class ControllerImpl implements Controller {
 		eventBus.fireEvent(new StepsModifyEvent());
 	}
 
-	private HeaterStep createBlankStep(String name) {
+	@Override
+	public HeaterStep createManualStep(String name) {
 		HeaterStep step = new HeaterStep();
 		step.setName(name);
 		ArrayList<ControlPoint> controlPoints = step.getControlPoints();
@@ -165,7 +167,7 @@ public class ControllerImpl implements Controller {
 		boolean updateSelection;
 		synchronized (steps) {
 			if (steps.size() == 0) {
-				steps.add(createBlankStep("Default"));
+				steps.add(createManualStep("Default"));
 			}
 			updateSelection = selectedStep == null || !steps.contains(selectedStep);
 		}
@@ -221,13 +223,13 @@ public class ControllerImpl implements Controller {
 	}
 
 	private void initLayout() {
-
+		// TODO move to config
 		brewLayout = new BreweryLayout();
 
 		List<Pump> pumps = brewLayout.getPumps();
 		Pump loopPump = new Pump();
 		loopPump.setPin(6);
-		loopPump.setName("Loop");
+		loopPump.setName(Pump.HLT_LOOP);
 		pumps.add(loopPump);
 
 		Pump mainPump = new Pump();
@@ -237,7 +239,7 @@ public class ControllerImpl implements Controller {
 
 		List<Tank> tanks = brewLayout.getTanks();
 		Tank hlt = new Tank();
-		hlt.setName("HLT");
+		hlt.setName(Tank.HLT_NAME);
 		HeatElement htlHeater = new HeatElement();
 		htlHeater.setPin(8);
 		hlt.setHeater(htlHeater);
@@ -245,13 +247,13 @@ public class ControllerImpl implements Controller {
 		tanks.add(hlt);
 
 		Tank tun = new Tank();
-		tun.setName("TUN");
+		tun.setName(Tank.TUN_NAME);
 		Sensor tunSensor = new Sensor();
 		tun.setSensor(tunSensor);
 		tanks.add(tun);
 
 		Tank kettle = new Tank();
-		kettle.setName("Kettle");
+		kettle.setName(Tank.KETTLE_NAME);
 		HeatElement kettleElement = new HeatElement();
 		kettleElement.setPin(9);
 		kettle.setHeater(kettleElement);

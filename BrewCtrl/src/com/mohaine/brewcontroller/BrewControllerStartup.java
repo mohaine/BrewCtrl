@@ -19,7 +19,7 @@
 package com.mohaine.brewcontroller;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.page.Overview;
+import com.mohaine.brewcontroller.page.MainMenu;
 
 public class BrewControllerStartup {
 	private final ControllerGui ci;
@@ -28,7 +28,7 @@ public class BrewControllerStartup {
 	private boolean started = false;
 
 	@Inject
-	public BrewControllerStartup(ControllerGui ci, Overview startupPage, final Controller controller, final UnitConversion conversion) {
+	public BrewControllerStartup(ControllerGui ci, MainMenu startupPage, final Controller controller, final UnitConversion conversion) {
 		super();
 		this.ci = ci;
 		this.startupPage = startupPage;

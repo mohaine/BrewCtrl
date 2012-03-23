@@ -45,4 +45,6 @@ public interface Controller {
 
 	public BreweryLayout getLayout();
 
+	public HeaterStep createManualStep(String name);
+
 }

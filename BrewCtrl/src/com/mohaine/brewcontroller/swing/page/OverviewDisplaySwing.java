@@ -46,6 +46,7 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 
 		Component drawer = (Component) breweryDisplay.getDrawer();
 		add(drawer, BorderLayout.CENTER);
+		add(controlPanel, BorderLayout.SOUTH);
 	}
 
 	@Override
