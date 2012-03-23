@@ -21,27 +21,16 @@
  */
 package com.mohaine.brewcontroller.serial;
 
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.bean.HardwareControl;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HeaterMode;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
 
 final class ReadWriteThread implements Runnable {
-
-	// TODO Add windows comm ports
-	private final String[] COMM_PORTS = { "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3", "/dev/ttyACM0" };
 
 	private final class ControlMessageWriter extends BinaryMessage implements MessageWriter {
 
@@ -56,18 +45,40 @@ final class ReadWriteThread implements Runnable {
 			offset += 2;
 
 			buffer[offset++] = (byte) (control.getMode() == HeaterMode.ON ? 1 : 0);
-//			buffer[offset++] = (byte) control.getBoilDuty();
-//			buffer[offset++] = (byte) (control.isMashOn() ? 1 : 0);
-//
-//			writeAddress(buffer, offset, control.getHltSensor());
-//			offset += 8;
-//			writeAddress(buffer, offset, control.getTunSensor());
-//			offset += 8;
-//
-//			byteUtils.putFloat(buffer, offset, (float) control.getHltTargetTemp());
-//			offset += 4;
-//			byteUtils.putFloat(buffer, offset, (float) control.getTunTargetTemp());
-			offset += 4;
+
+			// TODO NEW
+			// List<ControlPoint> controlPoints = control.getControlPoints();
+			// for (ControlPoint controlPoint : controlPoints) {
+			//
+			//
+			// controlPoint.get
+			// boolean automaticControl = controlPoint.isAutomaticControl();
+			//
+			//
+			// }
+			//
+			// boolean mashOn = control.isMashOn();
+			// byte boilDuty = control.getBoilDuty();
+			// String hltSensor = control.getHltSensor();
+			// String tunSensor = control.getTunSensor();
+			// float hltTargetTemp = (float) control.getHltTargetTemp();
+			// float tunTargetTemp = (float) control.getTunTargetTemp();
+			//
+			//
+			//
+			//
+			// buffer[offset++] = (byte) boilDuty;
+			// buffer[offset++] = (byte) (mashOn ? 1 : 0);
+			//
+			// writeAddress(buffer, offset, hltSensor);
+			// offset += 8;
+			// writeAddress(buffer, offset, tunSensor);
+			// offset += 8;
+			//
+			// byteUtils.putFloat(buffer, offset, hltTargetTemp);
+			// offset += 4;
+			// byteUtils.putFloat(buffer, offset, tunTargetTemp);
+			// offset += 4;
 
 		}
 	}
@@ -140,14 +151,13 @@ final class ReadWriteThread implements Runnable {
 
 	private ControlMessageWriter writer = new ControlMessageWriter();
 	private final SerialHardwareComm serialHardwareComm;
-	private InputStream inputStream;
+
+	private final RxTxComm conn;
 
 	private int controlId;
-	private OutputStream outputStream;
+
 	private int lastWriteControlId = -1;
 	private long lastWriteTime = System.currentTimeMillis() - 10000;
-
-	private SerialPort serialPort;
 
 	private HardwareStatus status = new HardwareStatus();
 
@@ -158,29 +168,31 @@ final class ReadWriteThread implements Runnable {
 	private final MessageProcessor processor;
 
 	{
-
 		ArrayList<MessageReader> readers = new ArrayList<MessageReader>();
 		readers.add(new ControlMessageReader());
 		readers.add(new SensorMessageReader());
 		processor = new MessageProcessor(readers);
 	}
 
-	public ReadWriteThread(SerialHardwareComm serialHardwareComm, BrewPrefs prefs) {
+	public ReadWriteThread(SerialHardwareComm serialHardwareComm, BrewPrefs prefs, RxTxComm conn) {
 		this.serialHardwareComm = serialHardwareComm;
+		this.conn = conn;
 		this.prefs = prefs;
 		status.setMode(HeaterMode.OFF);
-//		status.setHltSensor(prefs.getHltSensorAddress());
-//		status.setTunSensor(prefs.getTunSensorAddress());
 	}
 
 	public void run() {
 		try {
 			while (this.serialHardwareComm.run) {
 
-				if (reconnectIfNeeded()) {
+				String connectError = conn.reconnectIfNeeded();
+
+				if (connectError == null) {
 					processRead();
 					processWrite();
 					processControlId();
+				} else {
+					serialHardwareComm.changeStatus(connectError);
 				}
 				try {
 					Thread.sleep(100);
@@ -189,50 +201,8 @@ final class ReadWriteThread implements Runnable {
 				}
 			}
 		} finally {
-			disconnect();
+			conn.disconnect();
 		}
-	}
-
-	private boolean reconnectIfNeeded() {
-		if (inputStream == null) {
-			try {
-
-				if (System.getProperty("gnu.io.rxtx.SerialPorts") == null) {
-
-					StringBuffer sb = new StringBuffer();
-					for (String string : COMM_PORTS) {
-						if (sb.length() > 0) {
-							sb.append(File.pathSeparator);
-						}
-						sb.append(string);
-					}
-					System.setProperty("gnu.io.rxtx.SerialPorts",sb.toString());
-				}
-				Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
-				while (portList.hasMoreElements()) {
-					CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
-					if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-						SerialPort serialPort = (SerialPort) portId.open("SimpleReadApp", 2000);
-
-						inputStream = serialPort.getInputStream();
-						outputStream = serialPort.getOutputStream();
-						this.serialPort = serialPort;
-						serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-
-						this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_NO_COMM_READ);
-						break;
-					}
-				}
-
-				if (inputStream == null) {
-					this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_CONNECT_NO_PORT);
-				}
-
-			} catch (Exception e) {
-				this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_CONNECT_ERROR);
-			}
-		}
-		return inputStream != null;
 	}
 
 	private void processControlId() {
@@ -242,9 +212,7 @@ final class ReadWriteThread implements Runnable {
 				long now = System.currentTimeMillis();
 
 				if (now - lastReadTime > 5000) {
-
 					this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_NO_COMM_READ);
-
 				}
 			}
 
@@ -291,8 +259,8 @@ final class ReadWriteThread implements Runnable {
 					// System.out.println(i + " " + ((byte) buffer[i]));
 					// }
 
-					outputStream.write(buffer, 0, offset);
-					outputStream.flush();
+					conn.getOutputStream().write(buffer, 0, offset);
+					conn.getOutputStream().flush();
 
 				}
 
@@ -301,36 +269,13 @@ final class ReadWriteThread implements Runnable {
 			e.printStackTrace();
 
 			this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_NO_COMM_WRITE);
-			disconnect();
-		}
-	}
-
-	private void disconnect() {
-
-		if (inputStream != null) {
-			try {
-				inputStream.close();
-			} catch (IOException e) {
-				// ignore
-			}
-			inputStream = null;
-		}
-		if (outputStream != null) {
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-				// ignore
-			}
-			outputStream = null;
-		}
-		if (serialPort != null) {
-			serialPort.close();
+			conn.disconnect();
 		}
 	}
 
 	private void processRead() {
 		try {
-			boolean changes = processor.readStream(inputStream);
+			boolean changes = processor.readStream(conn.getInputStream());
 			if (changes) {
 				// TODO Check for changes first
 				this.serialHardwareComm.fireStateChangeHandlers();
@@ -338,7 +283,7 @@ final class ReadWriteThread implements Runnable {
 
 		} catch (Exception e) {
 			this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_NO_COMM_READ);
-			disconnect();
+			conn.disconnect();
 		}
 	}
 

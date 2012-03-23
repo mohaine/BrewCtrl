@@ -31,17 +31,6 @@ import com.mohaine.brewcontroller.bean.HeaterMode;
 
 public class SerialHardwareComm extends HardwareBase implements Hardware {
 
-	/**
-	 * This should be cleaned up. The Arduino has no hardware flow control and
-	 * only a 126 byte buffer Keeping the write size < 126 with current code is
-	 * VERY important
-	 * 
-	 * Should really have some flow control in the read write code. i.e. Join
-	 * the read/write threads into one thread that only writes after a read
-	 * shows that the buffer has room for the write.
-	 * 
-	 */
-
 	static final String STATUS_CONNECT_NO_PORT = "NO TTY";
 	static final String STATUS_CONNECT_ERROR = "NO CONNECT";
 	static final String STATUS_NO_COMM_WRITE = "NO WRITE";
@@ -61,7 +50,7 @@ public class SerialHardwareComm extends HardwareBase implements Hardware {
 	@Inject
 	public SerialHardwareComm(BrewPrefs prefs) {
 		hardareControl.setMode(HeaterMode.OFF);
-		readWriteThread = new ReadWriteThread(this, prefs);
+		readWriteThread = new ReadWriteThread(this, prefs, new RxTxComm());
 		new Thread(readWriteThread).start();
 	}
 
