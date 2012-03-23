@@ -61,9 +61,7 @@ public class ControllerImpl implements Controller {
 		this.prefs = prefs;
 
 		initLayout();
-		steps.add(createManualStep("Step 1"));
-		steps.add(createManualStep("Step 2"));
-		steps.add(createManualStep("Step 3"));
+		steps.add(createManualStep("Default"));
 		selectedStep = steps.get(0);
 		updateHardware();
 

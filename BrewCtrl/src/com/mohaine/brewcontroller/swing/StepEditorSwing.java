@@ -20,6 +20,7 @@ package com.mohaine.brewcontroller.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -62,6 +63,8 @@ public class StepEditorSwing extends JPanel {
 	private ArrayList<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 
 	private Controller controller;
+
+	private JPanel edit;
 
 	@Inject
 	public StepEditorSwing(EventBus eventBus, Controller controller) {
@@ -126,27 +129,28 @@ public class StepEditorSwing extends JPanel {
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new FlowLayout());
+		gbc.weightx = 0;
 		mainPanel.add(controlPanel, gbc);
 
-		JLabel edit = new JLabel("Edit");
-		edit.addMouseListener(new MouseListenerAbstract() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				selectStep();
-			}
-		});
-
-		controlPanel.add(edit);
 		JLabel delete = new JLabel("Delete");
-
 		delete.addMouseListener(new MouseListenerAbstract() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				deleteStep();
 			}
 		});
-
 		controlPanel.add(delete);
+
+		edit = new JPanel();
+		edit.setPreferredSize(new Dimension(20, 20));
+		edit.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black));
+		edit.addMouseListener(new MouseListenerAbstract() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				selectStep();
+			}
+		});
+		controlPanel.add(edit);
 
 	}
 
@@ -209,9 +213,9 @@ public class StepEditorSwing extends JPanel {
 
 	private void updateSelected(boolean selected) {
 		if (selected) {
-			setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, Color.black));
+			edit.setBackground(Color.black);
 		} else {
-			setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, getBackground()));
+			edit.setBackground(getBackground());
 		}
 
 	}
