@@ -23,13 +23,15 @@ import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
-import com.mohaine.brewcontroller.HardwareMock;
 import com.mohaine.brewcontroller.android.display.MainMenuDisplayAndroid;
 import com.mohaine.brewcontroller.android.display.OverviewDisplayAndroid;
 import com.mohaine.brewcontroller.android.display.SetupDisplayAndroid;
 import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
+import com.mohaine.brewcontroller.serial.RxTxComm;
+import com.mohaine.brewcontroller.serial.SerialConnection;
+import com.mohaine.brewcontroller.serial.SerialHardwareComm;
 import com.mohaine.event.bus.EventBus;
 
 public class BrewControllerAndroidModule extends AbstractModule {
@@ -42,9 +44,8 @@ public class BrewControllerAndroidModule extends AbstractModule {
 		bind(MainMenuDisplay.class).to(MainMenuDisplayAndroid.class);
 		bind(SetupDisplay.class).to(SetupDisplayAndroid.class);
 		bind(OverviewDisplay.class).to(OverviewDisplayAndroid.class);
-		// bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
-		bind(Hardware.class).to(HardwareMock.class).asEagerSingleton();
-
+		bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
+		bind(SerialConnection.class).to(RxTxComm.class).asEagerSingleton();
 		bind(EventBus.class).asEagerSingleton();
 	}
 

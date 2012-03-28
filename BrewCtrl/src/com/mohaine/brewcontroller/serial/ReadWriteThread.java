@@ -152,7 +152,7 @@ final class ReadWriteThread implements Runnable {
 	private ControlMessageWriter writer = new ControlMessageWriter();
 	private final SerialHardwareComm serialHardwareComm;
 
-	private final RxTxComm conn;
+	private final SerialConnection conn;
 
 	private int controlId;
 
@@ -174,7 +174,7 @@ final class ReadWriteThread implements Runnable {
 		processor = new MessageProcessor(readers);
 	}
 
-	public ReadWriteThread(SerialHardwareComm serialHardwareComm, BrewPrefs prefs, RxTxComm conn) {
+	public ReadWriteThread(SerialHardwareComm serialHardwareComm, BrewPrefs prefs, SerialConnection conn) {
 		this.serialHardwareComm = serialHardwareComm;
 		this.conn = conn;
 		this.prefs = prefs;

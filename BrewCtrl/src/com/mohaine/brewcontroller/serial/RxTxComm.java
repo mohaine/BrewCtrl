@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
-public class RxTxComm {
+public class RxTxComm implements SerialConnection  {
 
 	private final String[] COMM_PORTS = { "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3", "/dev/ttyACM0" };
 
@@ -18,10 +18,10 @@ public class RxTxComm {
 
 	private SerialPort serialPort;
 
-	/**
-	 * 
-	 * @return Error message - null is success
+	/* (non-Javadoc)
+	 * @see com.mohaine.brewcontroller.serial.SerialConnection#reconnectIfNeeded()
 	 */
+	@Override
 	public String reconnectIfNeeded() {
 		if (inputStream == null) {
 			try {
@@ -63,6 +63,10 @@ public class RxTxComm {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mohaine.brewcontroller.serial.SerialConnection#disconnect()
+	 */
+	@Override
 	public void disconnect() {
 
 		if (inputStream != null) {
@@ -86,10 +90,18 @@ public class RxTxComm {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mohaine.brewcontroller.serial.SerialConnection#getOutputStream()
+	 */
+	@Override
 	public OutputStream getOutputStream() {
 		return outputStream;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.mohaine.brewcontroller.serial.SerialConnection#getInputStream()
+	 */
+	@Override
 	public InputStream getInputStream() {
 		return inputStream;
 	}
