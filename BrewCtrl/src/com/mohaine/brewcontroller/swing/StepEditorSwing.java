@@ -50,6 +50,8 @@ import com.mohaine.event.bus.EventBus;
 
 public class StepEditorSwing extends JPanel {
 
+	private static final int HEIGHT = 20;
+
 	private static final long serialVersionUID = 1L;
 
 	private JTextField nameField = new JTextField();
@@ -79,19 +81,19 @@ public class StepEditorSwing extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridheight = 1;
 		gbc.weightx = 1;
+		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 
-		JPanel namePanel = new JPanel();
-		namePanel.setLayout(new BorderLayout());
-		namePanel.add(nameField, BorderLayout.CENTER);
-		mainPanel.add(namePanel, gbc);
+		mainPanel.add(nameField, gbc);
+		nameField.setPreferredSize(new Dimension(200, HEIGHT));
+		nameField.setMinimumSize(new Dimension(200, HEIGHT));
 
 		gbc.gridx++;
+		gbc.weightx = 0;
 
-		JPanel timePanel = new JPanel();
-		timePanel.setLayout(new BorderLayout());
-		timePanel.add(timeValue, BorderLayout.CENTER);
-		mainPanel.add(timePanel, gbc);
+		mainPanel.add(timeValue, gbc);
+		timeValue.setPreferredSize(new Dimension(70, HEIGHT));
+		timeValue.setMinimumSize(new Dimension(70, HEIGHT));
 
 		nameField.addKeyListener(new KeyListener() {
 
@@ -132,7 +134,7 @@ public class StepEditorSwing extends JPanel {
 		gbc.weightx = 0;
 		mainPanel.add(controlPanel, gbc);
 
-		JLabel delete = new JLabel("Delete");
+		JLabel delete = new JLabel("X");
 		delete.addMouseListener(new MouseListenerAbstract() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -142,7 +144,8 @@ public class StepEditorSwing extends JPanel {
 		controlPanel.add(delete);
 
 		edit = new JPanel();
-		edit.setPreferredSize(new Dimension(20, 20));
+		edit.setMinimumSize(new Dimension(20, HEIGHT));
+		edit.setPreferredSize(new Dimension(20, HEIGHT));
 		edit.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black));
 		edit.addMouseListener(new MouseListenerAbstract() {
 			@Override
