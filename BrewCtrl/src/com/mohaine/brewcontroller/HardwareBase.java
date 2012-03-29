@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
+import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.StatusChangeHandler;
 

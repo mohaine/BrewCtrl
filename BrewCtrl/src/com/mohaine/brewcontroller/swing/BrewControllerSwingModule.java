@@ -28,7 +28,6 @@ import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
 import com.mohaine.brewcontroller.serial.MockComm;
-import com.mohaine.brewcontroller.serial.RxTxComm;
 import com.mohaine.brewcontroller.serial.SerialConnection;
 import com.mohaine.brewcontroller.serial.SerialHardwareComm;
 import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
