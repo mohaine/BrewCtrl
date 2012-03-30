@@ -69,6 +69,10 @@ public class HeaterStep {
 		return stepTime - getTotalCompletedTime();
 	}
 
+	public void setTimeRemaining(long time) {
+		stepTime = getTotalCompletedTime() + time;
+	}
+
 	public long getExtraCompletedTime() {
 		return extraCompletedTime;
 	}
@@ -90,19 +94,6 @@ public class HeaterStep {
 			extraCompletedTime += (System.currentTimeMillis() - lastStartTime);
 		}
 		lastStartTime = 0;
-	}
-
-	public static String timeToMinutes(long time, String zeroDesc) {
-		if (time <= 0) {
-			return zeroDesc;
-		}
-
-		time = time / 1000;
-
-		int minutes = (int) (time / 60);
-		int seconds = (int) time - (minutes * 60);
-
-		return String.format("%d:%02d", minutes, seconds);
 	}
 
 	public void startTimer() {
@@ -153,4 +144,5 @@ public class HeaterStep {
 		}
 		return null;
 	}
+
 }

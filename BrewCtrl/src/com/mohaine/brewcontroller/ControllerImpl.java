@@ -61,6 +61,7 @@ public class ControllerImpl implements Controller {
 						case ON: {
 							heaterStep.startTimer();
 
+//							System.out.println("heaterStep.getStepTime(): " + heaterStep.getStepTime());
 							if (heaterStep.getStepTime() > 0) {
 								eventBus.fireEvent(new StepModifyEvent(heaterStep));
 							}

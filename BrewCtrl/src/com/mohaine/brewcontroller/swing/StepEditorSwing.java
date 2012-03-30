@@ -23,8 +23,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +31,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.Converter;
+import com.mohaine.brewcontroller.TimeParser;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
@@ -53,9 +52,36 @@ public class StepEditorSwing extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JTextField nameField = new JTextField();
+	private ClickEditor<String> nameValue = new ClickEditor<String>(new Converter<String, String>() {
 
-	private TimespanEditorSwing timeValue = new TimespanEditorSwing();
+		@Override
+		public String convertFrom(String value) {
+			return value;
+		}
+
+		@Override
+		public String convertTo(String value) {
+			return value;
+		}
+
+	});
+	private ClickEditor<Long> timeValue = new ClickEditor<Long>(new Converter<Long, String>() {
+		TimeParser tp = new TimeParser();
+
+		{
+			tp.setZeroDescription("Forever");
+		}
+
+		@Override
+		public String convertFrom(Long value) {
+			return tp.format(value);
+		}
+
+		@Override
+		public Long convertTo(String value) {
+			return tp.parse(value);
+		}
+	});
 
 	private HeaterStep heaterStep;
 
@@ -83,9 +109,9 @@ public class StepEditorSwing extends JPanel {
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 
-		mainPanel.add(nameField, gbc);
-		nameField.setPreferredSize(new Dimension(200, HEIGHT));
-		nameField.setMinimumSize(new Dimension(200, HEIGHT));
+		mainPanel.add(nameValue, gbc);
+		nameValue.setPreferredSize(new Dimension(200, HEIGHT));
+		nameValue.setMinimumSize(new Dimension(200, HEIGHT));
 
 		gbc.gridx++;
 		gbc.weightx = 0;
@@ -94,21 +120,10 @@ public class StepEditorSwing extends JPanel {
 		timeValue.setPreferredSize(new Dimension(70, HEIGHT));
 		timeValue.setMinimumSize(new Dimension(70, HEIGHT));
 
-		nameField.addKeyListener(new KeyListener() {
-
+		nameValue.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void keyTyped(KeyEvent e) {
-
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
+			public void onChange(ChangeEvent event) {
 				updateName();
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-
 			}
 		});
 
@@ -117,12 +132,11 @@ public class StepEditorSwing extends JPanel {
 			public void onChange(ChangeEvent event) {
 				if (heaterStep != null) {
 					long stepTime = timeValue.getValue();
-					if (stepTime != heaterStep.getStepTime()) {
-						heaterStep.setStepTime(stepTime);
+					if (stepTime != heaterStep.getTimeRemaining()) {
+						heaterStep.setTimeRemaining(stepTime);
 						fireChange();
 					}
 				}
-
 			}
 		});
 
@@ -200,13 +214,13 @@ public class StepEditorSwing extends JPanel {
 
 	public void setStep(HeaterStep heaterStep) {
 		this.heaterStep = heaterStep;
-		nameField.setText(heaterStep.getName());
-		timeValue.setValue(heaterStep.getStepTime(), false);
+		nameValue.setValue(heaterStep.getName());
+		timeValue.setValue(heaterStep.getTimeRemaining(), false);
 		updateSelected(heaterStep == controller.getSelectedStep());
 	}
 
 	private void updateName() {
-		String newName = nameField.getText();
+		String newName = nameValue.getValue();
 		if (!newName.equals(heaterStep.getName())) {
 			heaterStep.setName(newName);
 			fireChange();
