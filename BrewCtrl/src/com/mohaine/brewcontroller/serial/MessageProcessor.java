@@ -40,6 +40,7 @@ public class MessageProcessor {
 		while (inputStream.available() > 0 && serialBufferOffset < serialBuffer.length) {
 
 			int readValue = inputStream.read();
+
 			if (readValue < 0) {
 				throw new RuntimeException("Read Smaller Then Zero");
 			}
@@ -54,14 +55,6 @@ public class MessageProcessor {
 					// On stop bit
 					int messageStart = bufferOffset - (mr.getLength() + MessageEnvelope.SIZE - 1);
 					if (messageStart >= 0) {
-
-						// System.out.println("Check: " + ((int)
-						// mr.getMessageId() + " from " + messageStart + " => "
-						// + bufferOffset));
-						// for (int i = messageStart; i < bufferOffset; i++) {
-						// System.out.println(i + " " + ((byte)
-						// serialBuffer[i]));
-						// }
 
 						if (MessageEnvelope.validateMessage(serialBuffer, messageStart, mr)) {
 							mr.readFrom(serialBuffer, messageStart + MessageEnvelope.START_SIZE);

@@ -25,65 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mohaine.brewcontroller.BrewPrefs;
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.HardwareStatus;
-import com.mohaine.brewcontroller.bean.HeaterMode;
 
 final class ReadWriteThread implements Runnable {
 
-	private final class ControlMessageWriter extends BinaryMessage implements MessageWriter {
-
-		private ControlMessageWriter() {
-			super(SerialConstants.HARDWARE_CONTROL, 29);
-		}
-
-		@Override
-		public void writeTo(byte[] buffer, int offset) {
-			HardwareControl control = serialHardwareComm.getHardareControl();
-			byteUtils.putShort(buffer, offset, (short) controlId);
-			offset += 2;
-
-			buffer[offset++] = (byte) (control.getMode() == HeaterMode.ON ? 1 : 0);
-
-			// TODO NEW
-			// List<ControlPoint> controlPoints = control.getControlPoints();
-			// for (ControlPoint controlPoint : controlPoints) {
-			//
-			//
-			// controlPoint.get
-			// boolean automaticControl = controlPoint.isAutomaticControl();
-			//
-			//
-			// }
-			//
-			// boolean mashOn = control.isMashOn();
-			// byte boilDuty = control.getBoilDuty();
-			// String hltSensor = control.getHltSensor();
-			// String tunSensor = control.getTunSensor();
-			// float hltTargetTemp = (float) control.getHltTargetTemp();
-			// float tunTargetTemp = (float) control.getTunTargetTemp();
-			//
-			//
-			//
-			//
-			// buffer[offset++] = (byte) boilDuty;
-			// buffer[offset++] = (byte) (mashOn ? 1 : 0);
-			//
-			// writeAddress(buffer, offset, hltSensor);
-			// offset += 8;
-			// writeAddress(buffer, offset, tunSensor);
-			// offset += 8;
-			//
-			// byteUtils.putFloat(buffer, offset, hltTargetTemp);
-			// offset += 4;
-			// byteUtils.putFloat(buffer, offset, tunTargetTemp);
-			// offset += 4;
-
-		}
-	}
-
 	private final class SensorMessageReader extends BinaryMessage implements MessageReader {
+		private ByteUtils byteUtils = new ByteUtils();
+
 		private SensorMessageReader() {
 			super(SerialConstants.SENSOR_CONTROL, 13);
 		}
@@ -116,61 +66,28 @@ final class ReadWriteThread implements Runnable {
 		}
 	}
 
-	private final class ControlMessageReader extends BinaryMessage implements MessageReader {
-		private ControlMessageReader() {
-			super(SerialConstants.STATUS_CONTROL, 31);
-		}
-
-		@Override
-		public void readFrom(byte[] readBuffer, int offset) {
-			lastReadTime = System.currentTimeMillis();
-			if (serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_NO_COMM_READ)) {
-				serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_COMM);
-			}
-
-			status.setControlId(byteUtils.getShort(readBuffer, offset));
-			offset += 2;
-
-			status.setMode(readBuffer[offset++] == SerialConstants.TRUE ? HeaterMode.ON : HeaterMode.OFF);
-			status.setHltDuty(readBuffer[offset++]);
-			status.setBoilDuty(readBuffer[offset++]);
-			status.setPumpOn(readBuffer[offset++] == SerialConstants.TRUE);
-			status.setMashOn(readBuffer[offset++] == SerialConstants.TRUE);
-
-			status.setHltSensor(readAddress(readBuffer, offset));
-			offset += 8;
-			status.setTunSensor(readAddress(readBuffer, offset));
-			offset += 8;
-
-			status.setHltTargetTemp(byteUtils.getFloat(readBuffer, offset));
-			offset += 4;
-			status.setTunTargetTemp(byteUtils.getFloat(readBuffer, offset));
-			offset += 4;
-		}
-	}
-
-	private ControlMessageWriter writer = new ControlMessageWriter();
 	private final SerialHardwareComm serialHardwareComm;
 
 	private final SerialConnection conn;
 
 	private int controlId;
-
 	private int lastWriteControlId = -1;
 	private long lastWriteTime = System.currentTimeMillis() - 10000;
 
-	private HardwareStatus status = new HardwareStatus();
-
 	private long lastReadTime;
 
-	private ByteUtils byteUtils = new ByteUtils();
 	private BrewPrefs prefs;
 	private final MessageProcessor processor;
+	private ControlMessageReaderWriter controlMsgWriter = new ControlMessageReaderWriter();
+	private ControlMessageReaderWriter controlMsgReader = new ControlMessageReaderWriter();
 
 	{
+		HardwareControl control = new HardwareControl();
+		control.setControlPoints(new ArrayList<ControlPoint>());
+		controlMsgReader.setControl(control);
+
 		ArrayList<MessageReader> readers = new ArrayList<MessageReader>();
-		readers.add(new ControlMessageReader());
-		readers.add(new SensorMessageReader());
+		readers.add(controlMsgReader);
 		processor = new MessageProcessor(readers);
 	}
 
@@ -178,7 +95,6 @@ final class ReadWriteThread implements Runnable {
 		this.serialHardwareComm = serialHardwareComm;
 		this.conn = conn;
 		this.prefs = prefs;
-		status.setMode(HeaterMode.OFF);
 	}
 
 	public void run() {
@@ -217,7 +133,8 @@ final class ReadWriteThread implements Runnable {
 			}
 
 			if (this.serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_COMM) || serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_CONTROL_ID)) {
-				int lastReadControlId = status.getControlId();
+				int lastReadControlId = controlMsgReader.getControl().getControlId();
+
 				boolean invalid = lastWriteControlId - lastReadControlId > 5;
 
 				if (lastWriteControlId < lastReadControlId && lastWriteControlId != 0) {
@@ -252,12 +169,11 @@ final class ReadWriteThread implements Runnable {
 					}
 					lastWriteControlId = controlId;
 					byte[] buffer = new byte[126];
-					int offset = MessageEnvelope.writeMessage(buffer, 0, writer);
 
-					// System.out.println("Write: " );
-					// for (int i = 0; i < offset; i++) {
-					// System.out.println(i + " " + ((byte) buffer[i]));
-					// }
+					control.setControlId(controlId);
+
+					controlMsgWriter.setControl(control);
+					int offset = MessageEnvelope.writeMessage(buffer, 0, controlMsgWriter);
 
 					conn.getOutputStream().write(buffer, 0, offset);
 					conn.getOutputStream().flush();
@@ -277,7 +193,12 @@ final class ReadWriteThread implements Runnable {
 		try {
 			boolean changes = processor.readStream(conn.getInputStream());
 			if (changes) {
-				// TODO Check for changes first
+
+				lastReadTime = System.currentTimeMillis();
+				if (serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_NO_COMM_READ)) {
+					serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_COMM);
+				}
+
 				this.serialHardwareComm.fireStateChangeHandlers();
 			}
 
@@ -301,6 +222,7 @@ final class ReadWriteThread implements Runnable {
 		return string;
 	}
 
+	@SuppressWarnings("unused")
 	private void writeAddress(byte[] buffer, int offset, String value) {
 		for (int j = 0; j < 8; j++) {
 			int parseInt;
@@ -315,7 +237,8 @@ final class ReadWriteThread implements Runnable {
 		}
 	}
 
-	public HardwareStatus getStatus() {
-		return status;
+	public HardwareControl getHardwareStatus() {
+		return controlMsgReader.getControl();
 	}
+
 }

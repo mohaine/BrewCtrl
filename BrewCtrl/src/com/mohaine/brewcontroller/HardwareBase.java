@@ -23,23 +23,16 @@ import java.util.Collections;
 import java.util.List;
 
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.StatusChangeHandler;
 
 public abstract class HardwareBase implements Hardware {
-	private HardwareStatus hardwareStatus = new HardwareStatus();
 	private ArrayList<HardwareSensor> tempSensors = new ArrayList<HardwareSensor>();
 	private List<StatusChangeHandler> statusChangeHandlers = Collections.synchronizedList(new ArrayList<StatusChangeHandler>());
 
 	@Override
 	public List<HardwareSensor> getSensors() {
 		return tempSensors;
-	}
-
-	@Override
-	public HardwareStatus getHardwareStatus() {
-		return hardwareStatus;
 	}
 
 	@Override

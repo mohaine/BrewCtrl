@@ -1,8 +1,10 @@
 package com.mohaine.brewcontroller.serial;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-class Buffer {
+public class Buffer {
 	private byte[] serialBuffer;
 	private int readOffset;
 	private int writeOffset;
@@ -15,7 +17,7 @@ class Buffer {
 		this.writeOffset = 0;
 	}
 
-	public synchronized void write(int b) throws IOException {
+	public synchronized void write(byte b) throws IOException {
 
 		if (hasData && readOffset == writeOffset) {
 			throw new IOException("Overflow");
@@ -29,13 +31,13 @@ class Buffer {
 		}
 	}
 
-	public synchronized int read() throws IOException {
+	public synchronized byte read() throws IOException {
 
 		if (!hasData && readOffset == writeOffset) {
 			throw new IOException("Read past data");
 		}
 
-		int read = serialBuffer[readOffset++];
+		byte read = serialBuffer[readOffset++];
 
 		if (readOffset == serialBuffer.length) {
 			readOffset = 0;
@@ -60,4 +62,29 @@ class Buffer {
 
 		return avil;
 	}
+
+	public InputStream getInputStream() {
+		return new InputStream() {
+			@Override
+			public int read() throws IOException {
+				return (int) Buffer.this.read() & 0xff;
+			}
+
+			@Override
+			public int available() throws IOException {
+				return Buffer.this.available();
+			}
+
+		};
+	}
+
+	public OutputStream getOuputStream() {
+		return new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				Buffer.this.write((byte) b);
+			}
+		};
+	}
+
 }

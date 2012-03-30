@@ -20,7 +20,7 @@ package com.mohaine.brewcontroller.serial;
 
 public class ByteUtils {
 
-	boolean bigEndian = false;
+	private final boolean bigEndian;
 
 	public static void print(byte[] b) {
 		for (int i = 0; i < b.length; i++) {
@@ -210,7 +210,7 @@ public class ByteUtils {
 	}
 
 	public ByteUtils() {
-
+		bigEndian = false;
 	}
 
 }

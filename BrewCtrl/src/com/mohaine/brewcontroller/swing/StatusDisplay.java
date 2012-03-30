@@ -41,8 +41,8 @@ import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Controller.Mode;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.UnitConversion;
+import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.HardwareStatus;
 import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
 import com.mohaine.event.AbstractHasValue;
@@ -261,7 +261,7 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 			status.setForeground(statusOk ? normalStatusForeground : Color.red);
 		}
 
-		HardwareStatus hardwareStatus = hardware.getHardwareStatus();
+		HardwareControl hardwareStatus = hardware.getHardwareStatus();
 		if (hardwareStatus != null) {
 			switch (hardwareStatus.getMode()) {
 			case OFF:

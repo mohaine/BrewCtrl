@@ -44,6 +44,51 @@ import com.mohaine.event.bus.EventBus;
 
 public class ControllerImpl implements Controller {
 
+	private class Monitor implements Runnable {
+
+		@Override
+		public void run() {
+			while (true) {
+				HeaterStep heaterStep = null;
+				synchronized (steps) {
+					if (steps.size() > 0) {
+						heaterStep = steps.get(0);
+					}
+				}
+				if (heaterStep != null) {
+					synchronized (heaterStep) {
+						switch (mode) {
+						case ON: {
+							heaterStep.startTimer();
+							eventBus.fireEvent(new StepModifyEvent(heaterStep));
+							if (heaterStep.isComplete()) {
+								nextStep();
+							}
+							break;
+						}
+						case HOLD: {
+							heaterStep.stopTimer();
+							break;
+						}
+						case OFF: {
+							heaterStep.stopTimer();
+							updateHardware();
+							break;
+						}
+						}
+
+					}
+				}
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// ignore
+				}
+
+			}
+		}
+	}
+
 	private List<HeaterStep> steps = new ArrayList<HeaterStep>();
 	private List<BrewHardwareControl> brewHardwareControls = new ArrayList<BrewHardwareControl>();
 	private HeaterStep selectedStep = null;;
@@ -52,6 +97,7 @@ public class ControllerImpl implements Controller {
 	private Hardware hardware;
 	private BrewPrefs prefs;
 	private BreweryLayout brewLayout;
+	private Monitor monitor = new Monitor();
 
 	@Inject
 	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs) {
@@ -80,6 +126,8 @@ public class ControllerImpl implements Controller {
 				updateLayoutState();
 			}
 		});
+
+		new Thread(monitor).start();
 
 	}
 
@@ -273,7 +321,8 @@ public class ControllerImpl implements Controller {
 
 	private void updateLayoutState() {
 		for (BrewHardwareControl bhc : brewHardwareControls) {
-			List<ControlPoint> controlPoints = hardware.getControlPoints();
+			HardwareControl hardwareStatus = hardware.getHardwareStatus();
+			List<ControlPoint> controlPoints = hardwareStatus.getControlPoints();
 			for (ControlPoint controlPoint : controlPoints) {
 				if (controlPoint.getControlPin() == bhc.getPin()) {
 					if (bhc.getDuty() != controlPoint.getDuty()) {
