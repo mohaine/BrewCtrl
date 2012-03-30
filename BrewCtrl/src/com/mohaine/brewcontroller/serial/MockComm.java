@@ -9,6 +9,8 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
+import com.mohaine.brewcontroller.serial.msg.ControlMessageReaderWriter;
+import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
 
 public class MockComm implements SerialConnection, Runnable {
 

@@ -57,6 +57,10 @@ public class ControlPoint implements Cloneable {
 		return duty;
 	}
 
+	public void setDuty(byte duty) {
+		this.duty = (int) duty & 0xff;
+	}
+
 	public void setDuty(int duty) {
 		this.duty = duty;
 	}
@@ -68,4 +72,5 @@ public class ControlPoint implements Cloneable {
 			throw new RuntimeException(e);
 		}
 	}
+
 }

@@ -28,6 +28,8 @@ import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
+import com.mohaine.brewcontroller.serial.msg.ControlMessageReaderWriter;
+import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
 
 final class ReadWriteThread implements Runnable {
 

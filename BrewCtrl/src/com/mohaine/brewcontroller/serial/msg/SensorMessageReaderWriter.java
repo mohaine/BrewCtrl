@@ -1,6 +1,12 @@
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.serial.msg;
 
 import com.mohaine.brewcontroller.bean.HardwareSensor;
+import com.mohaine.brewcontroller.serial.BinaryMessage;
+import com.mohaine.brewcontroller.serial.ByteUtils;
+import com.mohaine.brewcontroller.serial.MessageReader;
+import com.mohaine.brewcontroller.serial.MessageWriter;
+import com.mohaine.brewcontroller.serial.ReadListener;
+import com.mohaine.brewcontroller.serial.SerialConstants;
 
 public class SensorMessageReaderWriter extends BinaryMessage implements MessageReader, MessageWriter {
 	private ByteUtils byteUtils = new ByteUtils();
@@ -12,27 +18,27 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 	}
 
 	@Override
-	public void writeTo(byte[] readBuffer, int offset) {
-		writeAddress(readBuffer, offset, sensor.getAddress());
-		offset += 8;
-		readBuffer[offset++] = sensor.isReading() ? SerialConstants.TRUE : SerialConstants.FALSE;
-		byteUtils.putFloat(readBuffer, offset, (float) sensor.getTempatureC());
-		offset += 4;
-
-	}
-
-	@Override
-	public void readFrom(byte[] readBuffer, int offset) {
-		sensor.setAddress(readAddress(readBuffer, offset));
+	public void readFrom(byte[] buffer, int offset) {
+		sensor.setAddress(readAddress(buffer, offset));
 		offset += 8;
 
-		sensor.setReading(readBuffer[offset++] == SerialConstants.TRUE);
-		sensor.setTempatureC(byteUtils.getFloat(readBuffer, offset));
+		sensor.setReading(buffer[offset++] == SerialConstants.TRUE);
+		sensor.setTempatureC(byteUtils.getFloat(buffer, offset));
 		offset += 4;
 
 		if (listener != null) {
 			listener.onRead();
 		}
+	}
+
+	@Override
+	public void writeTo(byte[] buffer, int offset) {
+		writeAddress(buffer, offset, sensor.getAddress());
+		offset += 8;
+		buffer[offset++] = sensor.isReading() ? SerialConstants.TRUE : SerialConstants.FALSE;
+		byteUtils.putFloat(buffer, offset, (float) sensor.getTempatureC());
+		offset += 4;
+
 	}
 
 	public void setListener(ReadListener listener) {
@@ -41,7 +47,7 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 
 	private static final String HEXES = "0123456789abcdef";
 
-	private String readAddress(byte[] buffer, int offset) {
+	public static String readAddress(byte[] buffer, int offset) {
 		StringBuffer sb = new StringBuffer();
 		for (int j = 0; j < 8; j++) {
 
@@ -53,7 +59,7 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 		return string;
 	}
 
-	private void writeAddress(byte[] buffer, int offset, String value) {
+	public static void writeAddress(byte[] buffer, int offset, String value) {
 		for (int j = 0; j < 8; j++) {
 			int parseInt;
 			if (value != null && value.length() > j + 1) {
