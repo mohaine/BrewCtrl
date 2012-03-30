@@ -118,9 +118,17 @@ public class MockComm implements SerialConnection, Runnable {
 					}
 
 				}
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+
 		}
 
 	}

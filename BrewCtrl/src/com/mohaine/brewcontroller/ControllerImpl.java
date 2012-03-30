@@ -60,7 +60,11 @@ public class ControllerImpl implements Controller {
 						switch (mode) {
 						case ON: {
 							heaterStep.startTimer();
-							eventBus.fireEvent(new StepModifyEvent(heaterStep));
+
+							if (heaterStep.getStepTime() > 0) {
+								eventBus.fireEvent(new StepModifyEvent(heaterStep));
+							}
+
 							if (heaterStep.isComplete()) {
 								nextStep();
 							}
