@@ -20,15 +20,14 @@ package com.mohaine.brewcontroller.bean;
 
 public class HardwareSensor {
 
-	private final String address;
+	private String address;
 	private String name;
 	private double tempatureC;
 	private boolean reading = false;
 
-	public HardwareSensor(String address) {
+	public void setAddress(String address) {
 		this.address = address;
 	}
-
 
 	public String getAddress() {
 		return address;
