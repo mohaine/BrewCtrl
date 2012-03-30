@@ -7,14 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.serial.msg.ControlMessageReaderWriter;
+import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
 import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
 
 public class MockComm implements SerialConnection, Runnable {
 
-	private Buffer fromJava = new Buffer(250);
+	private Buffer fromJava = new Buffer(126);
 	private Buffer toJava = new Buffer(2500);
 	private MessageProcessor processor;
 	private ControlMessageReaderWriter controlMsgWriter = new ControlMessageReaderWriter();
@@ -37,7 +39,19 @@ public class MockComm implements SerialConnection, Runnable {
 
 		ArrayList<MessageReader> readers = new ArrayList<MessageReader>();
 		readers.add(controlMsgWriter);
-		controlMsgWriter.setControl(new HardwareControl());
+		ControlPointReaderWriter controlPointReaderWriter = new ControlPointReaderWriter();
+		controlPointReaderWriter.setControlPoint(new ControlPoint());
+
+		final HardwareControl control = new HardwareControl();
+		controlPointReaderWriter.setListener(new ReadListener<ControlPointReaderWriter>() {
+			@Override
+			public void onRead(ControlPointReaderWriter w) {
+				System.out.println("Read from Java");
+			}
+		});
+		readers.add(controlPointReaderWriter);
+
+		controlMsgWriter.setControl(control);
 
 		processor = new MessageProcessor(readers);
 

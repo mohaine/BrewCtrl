@@ -18,6 +18,8 @@
 
 package com.mohaine.brewcontroller.serial;
 
+import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
+
 public class MessageEnvelope {
 
 	public static final int START_SIZE = 2;
@@ -48,7 +50,6 @@ public class MessageEnvelope {
 		boolean valid = true;
 		int startOffset = offset;
 
-
 		valid = valid && buffer[offset++] == SerialConstants.DATA_START;
 		valid = valid && buffer[offset++] == reader.getMessageId();
 
@@ -64,5 +65,13 @@ public class MessageEnvelope {
 
 	private static byte computeCrc8(byte[] buffer, int offset, int crcLength) {
 		return (byte) CRC8.compute(buffer, offset, crcLength);
+	}
+
+	public static int getMessageSize(MessageWriter writer) {
+		return writer.getLength() + 4;
+	}
+
+	public static boolean canFit(ControlPointReaderWriter writer, int offset, byte[] buffer) {
+		return offset + MessageEnvelope.getMessageSize(writer) <= buffer.length;
 	}
 }

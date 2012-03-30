@@ -12,7 +12,7 @@ import com.mohaine.brewcontroller.serial.SerialConstants;
 public class ControlMessageReaderWriter extends BinaryMessage implements MessageWriter, MessageReader {
 	private HardwareControl control;
 	private ByteUtils byteUtils = new ByteUtils();
-	private ReadListener listener;
+	private ReadListener<ControlMessageReaderWriter> listener;
 
 	public ControlMessageReaderWriter() {
 		super(SerialConstants.HARDWARE_CONTROL, 3);
@@ -25,7 +25,7 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 		control.setMode(buffer[offset++] == 1 ? HeaterMode.ON : HeaterMode.OFF);
 
 		if (listener != null) {
-			listener.onRead();
+			listener.onRead(this);
 		}
 	}
 
@@ -39,7 +39,7 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 
 	}
 
-	public void setListener(ReadListener listener) {
+	public void setListener(ReadListener<ControlMessageReaderWriter> listener) {
 		this.listener = listener;
 	}
 

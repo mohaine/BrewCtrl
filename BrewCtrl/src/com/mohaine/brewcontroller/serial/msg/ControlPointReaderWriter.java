@@ -16,7 +16,7 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 	private static final int AUTO_MASK = 0x01;
 	private ControlPoint controlPoint;
 	private ByteUtils byteUtils = new ByteUtils();
-	private ReadListener listener;
+	private ReadListener<ControlPointReaderWriter> listener;
 
 	public ControlPointReaderWriter() {
 		super(SerialConstants.HARDWARE_CONTROL, 15);
@@ -38,7 +38,7 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 		offset += 8;
 
 		if (listener != null) {
-			listener.onRead();
+			listener.onRead(this);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 
 	}
 
-	public void setListener(ReadListener listener) {
+	public void setListener(ReadListener<ControlPointReaderWriter> listener) {
 		this.listener = listener;
 	}
 

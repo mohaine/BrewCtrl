@@ -29,6 +29,7 @@ import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.serial.msg.ControlMessageReaderWriter;
+import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
 import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
 
 final class ReadWriteThread implements Runnable {
@@ -47,6 +48,8 @@ final class ReadWriteThread implements Runnable {
 	private ControlMessageReaderWriter controlMsgWriter = new ControlMessageReaderWriter();
 	private ControlMessageReaderWriter controlMsgReader = new ControlMessageReaderWriter();
 	private SensorMessageReaderWriter sensorMessageReader = new SensorMessageReaderWriter();
+	private ControlPointReaderWriter controlPointReader = new ControlPointReaderWriter();
+	private ControlPointReaderWriter controlPointWriter = new ControlPointReaderWriter();
 
 	{
 		HardwareControl control = new HardwareControl();
@@ -58,17 +61,28 @@ final class ReadWriteThread implements Runnable {
 		ArrayList<MessageReader> readers = new ArrayList<MessageReader>();
 		readers.add(controlMsgReader);
 		readers.add(sensorMessageReader);
+		readers.add(controlPointReader);
 		processor = new MessageProcessor(readers);
+
+		controlPointReader.setListener(new ReadListener<ControlPointReaderWriter>() {
+
+			@Override
+			public void onRead(ControlPointReaderWriter w) {
+				System.out.println("Read CP from HW");
+
+			}
+		});
+
 	}
 
 	public ReadWriteThread(SerialHardwareComm serialHardwareComm, final BrewPrefs prefs, SerialConnection conn) {
 		this.serialHardwareComm = serialHardwareComm;
 		this.conn = conn;
 
-		sensorMessageReader.setListener(new ReadListener() {
+		sensorMessageReader.setListener(new ReadListener<SensorMessageReaderWriter>() {
 			@Override
-			public void onRead() {
-				HardwareSensor readSensor = sensorMessageReader.getSensor();
+			public void onRead(SensorMessageReaderWriter r) {
+				HardwareSensor readSensor = r.getSensor();
 
 				HardwareSensor sensor = null;
 
@@ -171,6 +185,41 @@ final class ReadWriteThread implements Runnable {
 					controlMsgWriter.setControl(control);
 					int offset = MessageEnvelope.writeMessage(buffer, 0, controlMsgWriter);
 
+					if (MessageEnvelope.canFit(controlPointWriter, offset, buffer)) {
+						List<ControlPoint> controlPointsWriter = controlMsgWriter.getControl().getControlPoints();
+						if (controlPointsWriter != null) {
+							synchronized (controlPointsWriter) {
+								for (ControlPoint controlPointToWrite : controlPointsWriter) {
+
+									List<ControlPoint> controlPointsReader = controlMsgReader.getControl().getControlPoints();
+									if (controlPointsReader != null) {
+										synchronized (controlPointsReader) {
+											boolean writeCp = true;
+											for (ControlPoint controlPointReader : controlPointsReader) {
+
+												if (controlPointToWrite.getControlPin() == controlPointReader.getControlPin()) {
+													if (!controlPointToWrite.equals(controlPointReader)) {
+														writeCp = false;
+													}
+												}
+											}
+
+											if (writeCp) {
+												System.out.println("Write: " + controlPointToWrite.getControlPin() + " at " + offset);
+												controlPointWriter.setControlPoint(controlPointToWrite);
+												offset = MessageEnvelope.writeMessage(buffer, offset, controlPointWriter);
+
+												if (!MessageEnvelope.canFit(controlPointWriter, offset, buffer)) {
+													break;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+
+					}
 					conn.getOutputStream().write(buffer, 0, offset);
 					conn.getOutputStream().flush();
 

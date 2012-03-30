@@ -11,7 +11,7 @@ import com.mohaine.brewcontroller.serial.SerialConstants;
 public class SensorMessageReaderWriter extends BinaryMessage implements MessageReader, MessageWriter {
 	private ByteUtils byteUtils = new ByteUtils();
 	private HardwareSensor sensor;
-	private ReadListener listener;
+	private ReadListener<SensorMessageReaderWriter> listener;
 
 	public SensorMessageReaderWriter() {
 		super(SerialConstants.SENSOR_CONTROL, 13);
@@ -27,7 +27,7 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 		offset += 4;
 
 		if (listener != null) {
-			listener.onRead();
+			listener.onRead(this);
 		}
 	}
 
@@ -41,7 +41,7 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 
 	}
 
-	public void setListener(ReadListener listener) {
+	public void setListener(ReadListener<SensorMessageReaderWriter> listener) {
 		this.listener = listener;
 	}
 
