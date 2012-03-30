@@ -34,5 +34,14 @@ public enum HeaterMode {
 			return "OFF";
 		}
 
+	},
+	UNKNOWN {
+
+		@Override
+		public String toString() {
+			return "UNKNOWN";
+		}
+
 	}
+
 }

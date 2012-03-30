@@ -15,6 +15,7 @@ import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
 import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
 
 public class MockComm implements SerialConnection, Runnable {
+	private final HardwareControl control = new HardwareControl();
 
 	private Buffer fromJava = new Buffer(126);
 	private Buffer toJava = new Buffer(2500);
@@ -22,9 +23,11 @@ public class MockComm implements SerialConnection, Runnable {
 	private ControlMessageReaderWriter controlMsgWriter = new ControlMessageReaderWriter();
 	private SensorMessageReaderWriter sensorMessageWriter = new SensorMessageReaderWriter();
 	private List<HardwareSensor> sensors = new ArrayList<HardwareSensor>();
+	ControlPointReaderWriter controlPointWriter = new ControlPointReaderWriter();
 
 	@Inject
 	public MockComm() {
+		control.setControlPoints(new ArrayList<ControlPoint>());
 
 		HardwareSensor sensor1 = new HardwareSensor();
 		sensor1.setAddress("0000000000000001");
@@ -39,18 +42,7 @@ public class MockComm implements SerialConnection, Runnable {
 
 		ArrayList<MessageReader> readers = new ArrayList<MessageReader>();
 		readers.add(controlMsgWriter);
-		ControlPointReaderWriter controlPointReaderWriter = new ControlPointReaderWriter();
-		controlPointReaderWriter.setControlPoint(new ControlPoint());
-
-		final HardwareControl control = new HardwareControl();
-		controlPointReaderWriter.setListener(new ReadListener<ControlPointReaderWriter>() {
-			@Override
-			public void onRead(ControlPointReaderWriter w) {
-				System.out.println("Read from Java");
-			}
-		});
-		readers.add(controlPointReaderWriter);
-
+		readers.add(createCpReader());
 		controlMsgWriter.setControl(control);
 
 		processor = new MessageProcessor(readers);
@@ -59,6 +51,13 @@ public class MockComm implements SerialConnection, Runnable {
 		thread.setDaemon(true);
 		thread.start();
 
+	}
+
+	private ControlPointReaderWriter createCpReader() {
+		ControlPointReaderWriter controlPointReader = new ControlPointReaderWriter();
+		controlPointReader.setControlPoint(new ControlPoint());
+		controlPointReader.setListener(new ControlPointReaderListUpdater(control.getControlPoints()));
+		return controlPointReader;
 	}
 
 	@Override
@@ -96,6 +95,16 @@ public class MockComm implements SerialConnection, Runnable {
 						for (HardwareSensor sensor : sensors) {
 							sensorMessageWriter.setSensor(sensor);
 							offset = MessageEnvelope.writeMessage(buffer, offset, sensorMessageWriter);
+						}
+
+						List<ControlPoint> controlPoints = control.getControlPoints();
+						synchronized (controlPoints) {
+							for (ControlPoint controlPoint : controlPoints) {
+								synchronized (controlPoint) {
+									controlPointWriter.setControlPoint(controlPoint);
+									offset = MessageEnvelope.writeMessage(buffer, offset, controlPointWriter);
+								}
+							}
 						}
 						ouputStream.write(buffer, 0, offset);
 						ouputStream.flush();

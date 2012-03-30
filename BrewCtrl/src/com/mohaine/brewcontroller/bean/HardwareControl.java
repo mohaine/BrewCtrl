@@ -21,7 +21,7 @@ package com.mohaine.brewcontroller.bean;
 import java.util.List;
 
 public class HardwareControl {
-	private HeaterMode mode;
+	private HeaterMode mode = HeaterMode.UNKNOWN;
 	private int controlId;
 	private List<ControlPoint> controlPoints;
 

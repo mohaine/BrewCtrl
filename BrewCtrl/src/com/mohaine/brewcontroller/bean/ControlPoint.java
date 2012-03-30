@@ -4,7 +4,7 @@ public class ControlPoint implements Cloneable {
 
 	private byte controlPin;
 	private int duty;
-	private String tempSensorAddress;
+	private String tempSensorAddress = "0000000000000000";
 	private double targetTemp;
 	private boolean hasDuty;
 	private boolean automaticControl;
@@ -71,6 +71,54 @@ public class ControlPoint implements Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (automaticControl ? 1231 : 1237);
+		result = prime * result + controlPin;
+		result = prime * result + duty;
+		result = prime * result + (hasDuty ? 1231 : 1237);
+		long temp;
+		temp = Double.doubleToLongBits(targetTemp);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((tempSensorAddress == null) ? 0 : tempSensorAddress.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ControlPoint other = (ControlPoint) obj;
+		if (automaticControl != other.automaticControl)
+			return false;
+		if (controlPin != other.controlPin)
+			return false;
+		if (duty != other.duty)
+			return false;
+		if (hasDuty != other.hasDuty)
+			return false;
+		if (Double.doubleToLongBits(targetTemp) != Double.doubleToLongBits(other.targetTemp))
+			return false;
+		if (tempSensorAddress == null) {
+			if (other.tempSensorAddress != null)
+				return false;
+		} else if (!tempSensorAddress.equals(other.tempSensorAddress))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ControlPoint [controlPin=" + controlPin + ", duty=" + duty + ", tempSensorAddress=" + tempSensorAddress + ", targetTemp=" + targetTemp + ", hasDuty=" + hasDuty + ", automaticControl="
+				+ automaticControl + "]";
 	}
 
 }
