@@ -21,29 +21,17 @@
 #define PUMP_CONTROL_PIN 8
 #define BOIL_HEAT_CONTROL_PIN 7 
 
-
 #define ONE_WIRE_PIN 3
 
 #include <OneWire.h>
 
-
 #define MODE_OFF 0
 #define MODE_ON 1
-
-struct Control {
-  bool pumpOn;
-  bool mode;
-  bool mashOn;
-  int controlId;
-  double hltTargetTemp;
-  double tunTargetTemp;
-};
-Control control;
-
 
 
 #include <avr/pgmspace.h>
 
+#include "step.h"
 #include "sensor.h"
 #include "duty.h"
 #include "pid.h"
@@ -58,15 +46,14 @@ DutyController boilDutyController;
 void turnOff(void);
 unsigned long lastControlIdTime = 0;   
 
-
 #include "comm.h"
+
+
 
 
 #define HEAT_DELAY 100
 #define DUTY_DELAY 1000
 #define SEARCH_DELAY 10000
-
-
 
 
 unsigned long lastHeatUpdate = 0; 
@@ -75,12 +62,7 @@ unsigned long lastPumpOnChangeTime = 0;
 unsigned long lastSearchTime = 0;  
 
 
-
 DutyAdjuster dutyAdjuster;
-
-
-
-
 
 void turnOff(void) {
   control.mode = MODE_OFF;  
@@ -97,9 +79,6 @@ void turnOff(void) {
 void setup(void) {
   // start serial port
   Serial.begin(9600);
-
-  // initialie inputs/outputs
-  //  pinMode(ledPin, OUTPUT); 
 
   pinMode(PUMP_CONTROL_PIN, OUTPUT);
   control.controlId = 0;

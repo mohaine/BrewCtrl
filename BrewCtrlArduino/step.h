@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2011 Michael Graessle
+    Copyright 2009-2012 Michael Graessle
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,32 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
 
-public class SerialConstants {
-	public static final byte DATA_START = 0x1;
-	public static final byte SENSOR_CONTROL = 0x12;
-	public static final byte HARDWARE_CONTROL = 0x13;
-	public static final byte CONTROL_POINT_MSG = 0x14;
-	public static final byte TRUE = 0x1;
-	public static final byte FALSE = 0x0;
-	public static final byte DATA_END = '\r';
-}
+#ifndef STEP_H_
+#define STEP_H_
+
+#include "sensor.h"
+
+struct Control {
+  bool mode;
+  int controlId;
+  bool mashOn;
+  bool pumpOn;
+  double hltTargetTemp;
+  double tunTargetTemp;
+};
+Control control;
+
+struct ControlPoint {
+  byte controlPin;
+  byte duty;
+  byte tempSensorAddress[8];
+  double targetTemp;
+  bool hasDuty;
+  bool automaticControl;
+};
+ControlPoint controlPoints[8];
+byte controlPointCount = 0;
+
+
+#endif

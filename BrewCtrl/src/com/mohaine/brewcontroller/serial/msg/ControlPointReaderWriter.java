@@ -19,7 +19,7 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 	private ReadListener<ControlPointReaderWriter> listener;
 
 	public ControlPointReaderWriter() {
-		super(SerialConstants.HARDWARE_CONTROL, 15);
+		super(SerialConstants.CONTROL_POINT_MSG, 15);
 	}
 
 	@Override

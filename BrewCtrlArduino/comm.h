@@ -15,16 +15,20 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
  */
- 
+
 #ifndef COMM_H_
 #define COMM_H_
 
 #define DATA_START 0x01
 #define SENSOR_CONTROL 0x12
 #define HARDWARE_CONTROL  0x13
+#define CONTROL_POINT  0x14
 #define DATA_END '\r'
 #define MESSAGE_ENEVELOP_SIZE 4
 #define MESSAGE_ENEVELOP_START_SIZE 2
+
+#define AUTO_MASK  0x01
+#define HAS_DUTY_MASK  0x02
 
 byte serialBuffer[250];
 int serialBufferOffset = 0;
@@ -65,7 +69,6 @@ void writeFloat(byte *buffer, int offset,float value) {
   buffer[offset+1] = data[1];
   buffer[offset+2] = data[2];
   buffer[offset+3] = data[3];
-
 }
 
 
@@ -91,8 +94,41 @@ void serialWriteStatus(){
   int crcLength = offset - crcStart;
   buffer[offset++] = computeCrc8(buffer, crcStart, crcLength);
   buffer[offset++] = DATA_END;
-  
-  
+
+  for (byte cpIndex=0;cpIndex<controlPointCount;cpIndex++){
+    ControlPoint *controlPoint = &controlPoints[cpIndex];
+
+    int crcStart = offset;
+    buffer[offset++] = DATA_START;
+    buffer[offset++] = CONTROL_POINT;
+
+
+    buffer[offset++] = controlPoint->controlPin;
+    buffer[offset++] = (byte) controlPoint->duty;
+
+    byte booleanValues = 0x00;
+
+    if (controlPoint->automaticControl) {
+      booleanValues = booleanValues | AUTO_MASK;
+    }
+    if (controlPoint-> hasDuty) {
+      booleanValues = booleanValues | HAS_DUTY_MASK;
+    }
+
+    buffer[offset++] = booleanValues;
+
+    writeFloat(buffer, offset, controlPoint->targetTemp);
+    offset += 4;
+
+    for(byte i=0;i<8;i++){
+      buffer[offset++] = controlPoint->tempSensorAddress[i];
+    }
+
+    crcLength = offset - crcStart;    
+    buffer[offset++] = computeCrc8(buffer, crcStart++, crcLength);
+    buffer[offset++] = DATA_END;
+  }
+
   for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
     TempSensor *sensor = &sensors[sensorIndex];
 
@@ -147,44 +183,44 @@ void readControlMessage(byte * serialBuffer,int offset){
     turnOff();   
   }
 
-/*
+  /*
   int boilDuty = serialBuffer[offset++];
-  if(boilDuty >= 0 && boilDuty <= 100){
-    setHeatDuty(&boilDutyController,boilDuty);
-  }
-
-  control.mashOn = serialBuffer[offset++];
-
-  for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
-    TempSensor *sensor = &sensors[sensorIndex];
-    boolean same = true;
-    for(byte i=0;i<8 && same;i++){             
-      same = sensor->address[i] == serialBuffer[offset+ i] ;
-    }
-    if(same){
-      hltSensor = sensor;
-      break;
-    }
-  } 
-  offset+=8;
-  for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
-    TempSensor *sensor = &sensors[sensorIndex];
-    boolean same = true;
-    for(byte i=0;i<8 && same;i++){             
-      same = sensor->address[i] == serialBuffer[offset+ i] ;
-    }
-    if(same){
-      tunSensor = sensor;
-      break;
-    }
-  } 
-  offset+=8;    
-
-  control.hltTargetTemp = readFloat(serialBuffer,offset);
-  offset+=4;
-  control.tunTargetTemp = readFloat(serialBuffer,offset);
-  offset+=4;  
-*/  
+   if(boilDuty >= 0 && boilDuty <= 100){
+   setHeatDuty(&boilDutyController,boilDuty);
+   }
+   
+   control.mashOn = serialBuffer[offset++];
+   
+   for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
+   TempSensor *sensor = &sensors[sensorIndex];
+   boolean same = true;
+   for(byte i=0;i<8 && same;i++){             
+   same = sensor->address[i] == serialBuffer[offset+ i] ;
+   }
+   if(same){
+   hltSensor = sensor;
+   break;
+   }
+   } 
+   offset+=8;
+   for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
+   TempSensor *sensor = &sensors[sensorIndex];
+   boolean same = true;
+   for(byte i=0;i<8 && same;i++){             
+   same = sensor->address[i] == serialBuffer[offset+ i] ;
+   }
+   if(same){
+   tunSensor = sensor;
+   break;
+   }
+   } 
+   offset+=8;    
+   
+   control.hltTargetTemp = readFloat(serialBuffer,offset);
+   offset+=4;
+   control.tunTargetTemp = readFloat(serialBuffer,offset);
+   offset+=4;  
+   */
 }
 
 void handleExtra(byte* data, int offset, int length) {
@@ -223,7 +259,7 @@ bool  readSerial() {
   }
 
   if(readMessage){
-        serialWriteStatus();
+    serialWriteStatus();
   }
 
   return readMessage;
@@ -231,6 +267,8 @@ bool  readSerial() {
 
 
 #endif
+
+
 
 
 
