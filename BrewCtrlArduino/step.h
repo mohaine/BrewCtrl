@@ -20,6 +20,8 @@
 #ifndef STEP_H_
 #define STEP_H_
 
+#define MAX_CP_COUNT 8
+
 #include "sensor.h"
 
 struct Control {
@@ -40,7 +42,7 @@ struct ControlPoint {
   bool hasDuty;
   bool automaticControl;
 };
-ControlPoint controlPoints[8];
+ControlPoint controlPoints[MAX_CP_COUNT];
 byte controlPointCount = 0;
 
 

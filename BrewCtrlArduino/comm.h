@@ -30,8 +30,20 @@
 #define AUTO_MASK  0x01
 #define HAS_DUTY_MASK  0x02
 
+typedef struct {
+  byte msgId;  
+  byte length;  
+  void (*processFunction)(byte * serialBuffer,int offset) ;
+} 
+ReadMessage;
+
+ReadMessage readMessages[2];
+byte readMessagesCount = 2;
+
 byte serialBuffer[250];
 int serialBufferOffset = 0;
+
+
 
 
 int readInt( byte *buffer, int offset) {
@@ -167,7 +179,40 @@ bool validateMessage(byte* buffer, int offset, byte messageId,int messageLength)
   }
   return valid;
 }
+void readControlPoint(byte * serialBuffer,int offset){
 
+  byte pin = serialBuffer[offset++];
+
+
+  ControlPoint* cp = NULL;
+
+  for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+    if(controlPoints[cpIndex].controlPin == pin){
+      cp = &controlPoints[cpIndex];
+      break;
+    }    
+  }
+
+  if(cp == NULL && controlPointCount<MAX_CP_COUNT){
+    cp = &controlPoints[controlPointCount++];
+    cp->controlPin = pin;
+  } 
+
+  if(cp != NULL){
+    cp->duty = serialBuffer[offset++];
+    byte booleanValues = serialBuffer[offset++];
+    cp->automaticControl =  booleanValues & AUTO_MASK == 0;
+    cp->hasDuty=  booleanValues & HAS_DUTY_MASK== 0;
+
+    cp->targetTemp = readFloat(serialBuffer,offset);
+    offset+=4;    
+
+    for(byte i=0;i<8;i++){             
+      cp->tempSensorAddress[i] == serialBuffer[offset+ i] ;
+    }
+
+  }
+}
 
 void readControlMessage(byte * serialBuffer,int offset){
   lastControlIdTime = millis();
@@ -225,7 +270,21 @@ void readControlMessage(byte * serialBuffer,int offset){
 
 void handleExtra(byte* data, int offset, int length) {
 
+
+
 }
+
+void setupComm(){
+  readMessages[0].msgId = HARDWARE_CONTROL; 
+  readMessages[0].length = 3; 
+  readMessages[0].processFunction = readControlMessage;
+  readMessages[1].msgId = CONTROL_POINT; 
+  readMessages[1].length = 15; 
+  readMessages[1].processFunction = readControlPoint;
+
+
+}
+
 
 bool  readSerial() {
   bool readMessage = false;
@@ -236,20 +295,22 @@ bool  readSerial() {
     int bufferOffset = serialBufferOffset - 1;
     if (serialBuffer[bufferOffset] == DATA_END) {
       // On stop bit
-      int messageStart = bufferOffset - (3 + MESSAGE_ENEVELOP_SIZE - 1);
-      if (messageStart >= 0) {
-        if (validateMessage(serialBuffer, messageStart, HARDWARE_CONTROL, 3)) {
-          readControlMessage(serialBuffer, messageStart + MESSAGE_ENEVELOP_START_SIZE);
-          readMessage = true;
-          if (messageStart > 0) {
-            int extraLength = messageStart - 1;
-            if (extraLength > 0) {
-              handleExtra(serialBuffer, 0, extraLength);
+      for(int messageIndex=0;messageIndex<readMessagesCount;messageIndex++){
+        int messageStart = bufferOffset - (readMessages[messageIndex].length + MESSAGE_ENEVELOP_SIZE - 1);
+        if (messageStart >= 0) {
+          if (validateMessage(serialBuffer, messageStart, readMessages[messageIndex].msgId, readMessages[messageIndex].length)) {
+            readMessages[messageIndex].processFunction(serialBuffer, messageStart + MESSAGE_ENEVELOP_START_SIZE);
+            readMessage = true;
+            if (messageStart > 0) {
+              int extraLength = messageStart - 1;
+              if (extraLength > 0) {
+                handleExtra(serialBuffer, 0, extraLength);
+              }
             }
+            serialBufferOffset = 0;
           }
-          serialBufferOffset = 0;
         }
-      }
+      }     
     }
   }
 
@@ -267,6 +328,11 @@ bool  readSerial() {
 
 
 #endif
+
+
+
+
+
 
 
 

@@ -84,7 +84,8 @@ void setup(void) {
   control.controlId = 0;
 
   turnOff();
-
+  setupComm();
+  
   setupDutyController(&hltDutyController,HLT_HEAT_CONTROL_PIN );
   setupDutyController(&boilDutyController,BOIL_HEAT_CONTROL_PIN );
   setupDutyAdjuster(&dutyAdjuster); 

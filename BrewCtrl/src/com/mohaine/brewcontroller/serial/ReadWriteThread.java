@@ -202,7 +202,7 @@ final class ReadWriteThread implements Runnable {
 
 											for (ControlPoint controlPointReader : controlPointsReader) {
 												if (controlPointToWrite.getControlPin() == controlPointReader.getControlPin()) {
-													controlPointDirty = !controlPointToWrite.equals(controlPointReader);
+													controlPointDirty = needToSendControlPoint(controlPointToWrite, controlPointReader);
 													break;
 												}
 											}
@@ -234,6 +234,31 @@ final class ReadWriteThread implements Runnable {
 			this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_NO_COMM_WRITE);
 			conn.disconnect();
 		}
+	}
+
+	private boolean needToSendControlPoint(ControlPoint newState, ControlPoint currentState) {
+
+		if (newState.isAutomaticControl() != currentState.isAutomaticControl()) {
+			return true;
+		}
+		if (newState.isHasDuty() != currentState.isHasDuty()) {
+			return true;
+		}
+
+		if (newState.isAutomaticControl()) {
+			if (newState.getTempSensorAddress() != null && !newState.getTempSensorAddress().equals(currentState.getTempSensorAddress())) {
+				return true;
+			}
+			if (newState.getTargetTemp() != currentState.getTargetTemp()) {
+				return true;
+			}
+		} else {
+			if (newState.getDuty() != currentState.getDuty()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private void processRead() {
