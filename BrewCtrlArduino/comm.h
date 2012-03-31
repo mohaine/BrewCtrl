@@ -20,7 +20,6 @@
 #define COMM_H_
 
 #define DATA_START 0x01
-#define STATUS_CONTROL 0x11
 #define SENSOR_CONTROL 0x12
 #define HARDWARE_CONTROL  0x13
 #define DATA_END '\r'
@@ -83,36 +82,17 @@ void serialWriteStatus(){
   buffer[offset++] = '\r';
   int crcStart = offset;
   buffer[offset++] = DATA_START;
-  buffer[offset++] = STATUS_CONTROL;
+  buffer[offset++] = HARDWARE_CONTROL;
 
   writeInt(buffer,offset, control.controlId);
   offset+=2;
 
   buffer[offset++] = (control.mode);
-  buffer[offset++] = (hltDutyController.on? hltDutyController.duty : 0);  
-  buffer[offset++] = (boilDutyController.on? boilDutyController.duty : 0);  
-  buffer[offset++] = (control.pumpOn);  
-  buffer[offset++] = (control.mashOn);
-
-
-  for(byte i=0;i<8;i++){
-    buffer[offset++] = hltSensor!=NULL ? hltSensor->address[i] : 0;
-  }
-
-  for(byte i=0;i<8;i++){
-    buffer[offset++] = tunSensor!=NULL ? tunSensor->address[i] : 0;
-  }
-
-  writeFloat(buffer,offset,control.hltTargetTemp);
-  offset+=4;
-  writeFloat(buffer,offset,control.tunTargetTemp);
-  offset+=4;
-
-  // skip newline
   int crcLength = offset - crcStart;
-  // This is only 8 bits so double calculate
   buffer[offset++] = computeCrc8(buffer, crcStart, crcLength);
   buffer[offset++] = DATA_END;
+  
+  
   for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
     TempSensor *sensor = &sensors[sensorIndex];
 
@@ -167,6 +147,7 @@ void readControlMessage(byte * serialBuffer,int offset){
     turnOff();   
   }
 
+/*
   int boilDuty = serialBuffer[offset++];
   if(boilDuty >= 0 && boilDuty <= 100){
     setHeatDuty(&boilDutyController,boilDuty);
@@ -203,6 +184,7 @@ void readControlMessage(byte * serialBuffer,int offset){
   offset+=4;
   control.tunTargetTemp = readFloat(serialBuffer,offset);
   offset+=4;  
+*/  
 }
 
 void handleExtra(byte* data, int offset, int length) {
@@ -218,9 +200,9 @@ bool  readSerial() {
     int bufferOffset = serialBufferOffset - 1;
     if (serialBuffer[bufferOffset] == DATA_END) {
       // On stop bit
-      int messageStart = bufferOffset - (29 + MESSAGE_ENEVELOP_SIZE - 1);
+      int messageStart = bufferOffset - (3 + MESSAGE_ENEVELOP_SIZE - 1);
       if (messageStart >= 0) {
-        if (validateMessage(serialBuffer, messageStart, HARDWARE_CONTROL, 29)) {
+        if (validateMessage(serialBuffer, messageStart, HARDWARE_CONTROL, 3)) {
           readControlMessage(serialBuffer, messageStart + MESSAGE_ENEVELOP_START_SIZE);
           readMessage = true;
           if (messageStart > 0) {

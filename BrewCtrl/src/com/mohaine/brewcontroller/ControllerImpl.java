@@ -280,20 +280,20 @@ public class ControllerImpl implements Controller {
 
 		List<Pump> pumps = brewLayout.getPumps();
 		Pump loopPump = new Pump();
-		loopPump.setPin(6);
+		loopPump.setPin(8);
 		loopPump.setName(Pump.HLT_LOOP);
 		pumps.add(loopPump);
 
-		Pump mainPump = new Pump();
-		mainPump.setName("Main");
-		mainPump.setPin(7);
-		pumps.add(mainPump);
+//		Pump mainPump = new Pump();
+//		mainPump.setName("Main");
+//		mainPump.setPin(7);
+//		pumps.add(mainPump);
 
 		List<Tank> tanks = brewLayout.getTanks();
 		Tank hlt = new Tank();
 		hlt.setName(Tank.HLT_NAME);
 		HeatElement htlHeater = new HeatElement();
-		htlHeater.setPin(8);
+		htlHeater.setPin(9);
 		hlt.setHeater(htlHeater);
 		hlt.setSensor(new Sensor());
 		tanks.add(hlt);
@@ -307,7 +307,7 @@ public class ControllerImpl implements Controller {
 		Tank kettle = new Tank();
 		kettle.setName(Tank.KETTLE_NAME);
 		HeatElement kettleElement = new HeatElement();
-		kettleElement.setPin(9);
+		kettleElement.setPin(7);
 		kettle.setHeater(kettleElement);
 		tanks.add(kettle);
 

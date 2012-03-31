@@ -20,7 +20,6 @@ package com.mohaine.brewcontroller.serial;
 
 public class SerialConstants {
 	public static final byte DATA_START = 0x1;
-	public static final byte STATUS_CONTROL = 0x11;
 	public static final byte SENSOR_CONTROL = 0x12;
 	public static final byte HARDWARE_CONTROL = 0x13;
 	public static final byte TRUE = 0x1;

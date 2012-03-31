@@ -74,6 +74,7 @@ final class ReadWriteThread implements Runnable {
 		sensorMessageReader.setListener(new ReadListener<SensorMessageReaderWriter>() {
 			@Override
 			public void onRead(SensorMessageReaderWriter r) {
+
 				HardwareSensor readSensor = r.getSensor();
 
 				HardwareSensor sensor = null;
@@ -85,15 +86,16 @@ final class ReadWriteThread implements Runnable {
 						break;
 					}
 				}
+
 				if (sensor == null) {
 					String defaultName = "Sensor " + (sensors.size() + 1);
 					sensor = new HardwareSensor();
 					sensor.setAddress(readSensor.getAddress());
 					sensor.setName(prefs.getSensorName(readSensor.getAddress(), defaultName));
-					sensor.setReading(readSensor.isReading());
-					sensor.setTempatureC(readSensor.getTempatureC());
 					sensors.add(sensor);
 				}
+				sensor.setReading(readSensor.isReading());
+				sensor.setTempatureC(readSensor.getTempatureC());
 			}
 		});
 
