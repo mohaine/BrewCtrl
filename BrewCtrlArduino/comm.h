@@ -182,7 +182,7 @@ bool validateMessage(byte* buffer, int offset, byte messageId,int messageLength)
 void readControlPoint(byte * serialBuffer,int offset){
 
   byte pin = serialBuffer[offset++];
-
+  byte duty = serialBuffer[offset++];
 
   ControlPoint* cp = NULL;
 
@@ -193,16 +193,38 @@ void readControlPoint(byte * serialBuffer,int offset){
     }    
   }
 
-  if(cp == NULL && controlPointCount<MAX_CP_COUNT){
+  byte booleanValues = serialBuffer[offset++];
+  bool automaticControl =  booleanValues & AUTO_MASK == 0;
+  bool hasDuty = booleanValues & HAS_DUTY_MASK== 0;
+
+  if(cp == NULL && controlPointCount<MAX_CP_COUNT && pin != ONE_WIRE_PIN){
     cp = &controlPoints[controlPointCount++];
     cp->controlPin = pin;
+    //Toogle so we init below
+    cp->hasDuty = !hasDuty;
+    cp->automaticControl = !automaticControl;
   } 
 
   if(cp != NULL){
-    cp->duty = serialBuffer[offset++];
-    byte booleanValues = serialBuffer[offset++];
-    cp->automaticControl =  booleanValues & AUTO_MASK == 0;
-    cp->hasDuty=  booleanValues & HAS_DUTY_MASK== 0;
+    if(automaticControl!= cp->automaticControl){
+      cp->automaticControl = automaticControl;
+      if(automaticControl){
+        cp->duty = 0;
+        setupPid(&cp->pid);
+      }
+    } 
+
+    if(!automaticControl){    
+      cp->duty = duty;
+    }
+
+
+    if(hasDuty!= cp->hasDuty){
+      cp->hasDuty = hasDuty;
+      if(hasDuty){
+        setupDutyController(&cp->dutyController,cp->controlPin);    
+      }
+    }
 
     cp->targetTemp = readFloat(serialBuffer,offset);
     offset+=4;    
@@ -221,8 +243,11 @@ void readControlMessage(byte * serialBuffer,int offset){
 
   control.mode = serialBuffer[offset++];
   if(control.mode ==  MODE_ON){
-    setHeatOn(&hltDutyController,true);            
-    setHeatOn(&boilDutyController,true);            
+    for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+      if(controlPoints[cpIndex].hasDuty){
+        setHeatOn(&controlPoints[cpIndex].dutyController,true);            
+      }
+    }
   }
   else {
     turnOff();   
@@ -328,6 +353,14 @@ bool  readSerial() {
 
 
 #endif
+
+
+
+
+
+
+
+
 
 
 

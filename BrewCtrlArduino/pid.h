@@ -1,7 +1,5 @@
 /*
-    Copyright 2009-2011 Michael Graessle
-
- 
+    Copyright 2009-2012
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -30,19 +28,26 @@ typedef struct
   double minOutput;
   double previousError;
   double integral;
-
-
+  unsigned long second;
+  byte output;
+  byte updateInt;
 } 
-DutyAdjuster;
+Pid;
 
 
-void setupDutyAdjuster(DutyAdjuster * da){
-//Kp: 1745.8436 Kd: 1.0440 Ki: 0.0025 Time: 56:24  overShoot: 0.1028 finalError: 0.0888
+void setupPid(Pid * da){
+  // Old Tune
+  // Kp: 10.5715 Kd: 299.8764 Ki: 0.0020 Time: 07:01 overShoot: 0.4032 finalError: 0.0005
+  // Tune with random read errors and 30 point history
+  // double kp = 5.9279, kd = 156.6051, ki = 0.0015;
+  // Tune with random read errors and 10 point history, Random target/abiemt
+  //  kp=4.5904, kd= 102.3394, ki=  0.0025 
+  //  kp=3.3242, kd= 5.9397, ki=  0.0026   
 
-  da->Kp = 1745.8436;
-  da->Kd = 1.0440;
-  da->Ki = 0.0025;
-
+  da->Kp = 21.1263;
+  da->Kd = 1521.1382;
+  da->Ki = 0.2772;
+  da->updateInt = 8;
 
   da->minOutput = 0;
   da->maxOutput = 100;
@@ -51,34 +56,53 @@ void setupDutyAdjuster(DutyAdjuster * da){
 }
 
 
-void setMaxDuty(DutyAdjuster * da, int maxDuty) {
+void setMaxDuty(Pid * da, int maxDuty) {
   da->maxOutput = maxDuty;
 }
 
 
 
-int getDutyFromAdjuster(DutyAdjuster * pid, double targetTemp, double currentTemp) {
+int getDutyFromAdjuster(Pid * pid, double targetTemp, double currentTemp) {
 
-  double dt = 1;
+  if (pid->second % pid->updateInt == 0) {
 
-  double error = targetTemp - currentTemp;
-  pid->integral = pid->integral + (error * dt);
-  double derivative = (error - pid->previousError) / dt;
-  double output = (pid->Kp * error) + (pid->Ki * pid->integral) + (pid->Kd * derivative);
-  pid->previousError = error;
+    float dt = pid->updateInt;
 
-  if (output >= pid->maxOutput) {
-    output = pid->maxOutput;
-  } 
-  else if (output <= pid->minOutput) {
-    output = pid->minOutput;
+    float error = targetTemp - currentTemp;
+    pid->integral = pid->integral + (error * dt * pid->Ki);
+
+    if (pid->integral > pid->maxOutput) {
+      pid->integral = pid->maxOutput;
+    } 
+    else if (pid->integral < pid->minOutput) {
+      pid->integral = pid->minOutput;
+    }
+
+    float derivative = (error - pid->previousError) / dt;
+    float newOutput = (pid->Kp * error) + (pid->integral) + (pid->Kd * derivative);
+    pid->previousError = error;
+
+    if (newOutput >= pid->maxOutput) {
+      newOutput = pid->maxOutput;
+    } 
+    else if (newOutput <= pid->minOutput) {
+      newOutput = pid->minOutput;
+    }
+    pid->output = (int) newOutput;
   }
 
-  return (int) output;
+  pid->second++;
+  return pid->output;
 
 } 
 
 
 
 #endif
+
+
+
+
+
+
 

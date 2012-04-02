@@ -23,15 +23,14 @@
 #define MAX_CP_COUNT 8
 
 #include "sensor.h"
+#include "duty.h"
+#include "pid.h"
+
 
 struct Control {
   bool mode;
   int controlId;
-  bool mashOn;
-  bool pumpOn;
-  double hltTargetTemp;
-  double tunTargetTemp;
-};
+}; 
 Control control;
 
 struct ControlPoint {
@@ -41,6 +40,9 @@ struct ControlPoint {
   double targetTemp;
   bool hasDuty;
   bool automaticControl;
+  long lastChangeTime;
+  DutyController dutyController;
+    Pid pid;
 };
 ControlPoint controlPoints[MAX_CP_COUNT];
 byte controlPointCount = 0;

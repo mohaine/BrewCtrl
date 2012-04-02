@@ -1,6 +1,6 @@
 /*
     Copyright 2009-2011 Michael Graessle
-
+ 
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,11 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
  */
-
-#define HLT_HEAT_CONTROL_PIN 9
-#define PUMP_CONTROL_PIN 8
-#define BOIL_HEAT_CONTROL_PIN 7 
+/*  OLD
+ #define HLT_HEAT_CONTROL_PIN 9
+ #define PUMP_CONTROL_PIN 8
+ #define BOIL_HEAT_CONTROL_PIN 7 
+ */
 
 #define ONE_WIRE_PIN 3
 
@@ -37,11 +38,13 @@
 #include "pid.h"
 
 
-TempSensor *hltSensor = NULL;
-TempSensor *tunSensor = NULL;
-DutyController hltDutyController;
-DutyController boilDutyController;
-
+/*  OLD
+ 
+ TempSensor *hltSensor = NULL;
+ TempSensor *tunSensor = NULL;
+ DutyController hltDutyController;
+ DutyController boilDutyController;
+ */
 
 void turnOff(void);
 unsigned long lastControlIdTime = 0;   
@@ -62,16 +65,18 @@ unsigned long lastPumpOnChangeTime = 0;
 unsigned long lastSearchTime = 0;  
 
 
-DutyAdjuster dutyAdjuster;
+Pid pid;
 
 void turnOff(void) {
   control.mode = MODE_OFF;  
-  control.mashOn = MODE_OFF;  
-  control.pumpOn = false;
-  digitalWrite(PUMP_CONTROL_PIN, LOW);
-  setHeatOn(&hltDutyController, false);
-  setHeatOn(&boilDutyController,false);
-  lastPumpOnChangeTime = millis();
+  for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+    digitalWrite(controlPoints[cpIndex].controlPin, LOW);
+    controlPoints[cpIndex].duty = 0; 
+    controlPoints[cpIndex].lastChangeTime = millis();
+    if(controlPoints[cpIndex].hasDuty){
+      setHeatOn(&controlPoints[cpIndex].dutyController , false);    
+    }
+  }
 }
 
 
@@ -80,15 +85,17 @@ void setup(void) {
   // start serial port
   Serial.begin(9600);
 
-  pinMode(PUMP_CONTROL_PIN, OUTPUT);
+
   control.controlId = 0;
 
   turnOff();
   setupComm();
-  
-  setupDutyController(&hltDutyController,HLT_HEAT_CONTROL_PIN );
-  setupDutyController(&boilDutyController,BOIL_HEAT_CONTROL_PIN );
-  setupDutyAdjuster(&dutyAdjuster); 
+
+  /* OLD
+   setupDutyController(&hltDutyController,HLT_HEAT_CONTROL_PIN );
+   setupDutyController(&boilDutyController,BOIL_HEAT_CONTROL_PIN );
+   setupPid(&pid); 
+   */
   searchForTempSensors();
 }
 
@@ -98,62 +105,51 @@ void setup(void) {
 void loop(void) {
 
   //  Serial.println("LOOP");
-
-
   unsigned long now = millis();  
 
-  // Now will roll over after so long, just reset if it does
-  if(lastHeatUpdate > now){
-    lastHeatUpdate = 0;
-  }
-  if(lastDutyUpdate > now){
-    lastDutyUpdate = 0;
-  }
+
+  // If loose comm, turn off
   if(lastControlIdTime > now){
     lastControlIdTime = 0;
-  }    
-  if(lastPumpOnChangeTime > now){
-    lastPumpOnChangeTime = 0;
   }
-  if(lastSearchTime > now){
-    lastSearchTime = 0;
-  }  
-
   if(now - lastControlIdTime > 10000){
-    //Serial.println("TURN OFF");
     turnOff();    
   }
 
+  // Update duty/on/off states 
+  if(lastDutyUpdate > now){
+    lastDutyUpdate = 0;
+  }
   if(now - lastDutyUpdate > DUTY_DELAY){
-
-    //Serial.println("DUTY");
-
     lastDutyUpdate = lastDutyUpdate + DUTY_DELAY;
     readSensors();
-    updateHtlTunDutyPump();
+    updateControlPointState();
   }
 
+
+  // Update pin so we acheive the correct on/off ratio for our selected duty
+  if(lastHeatUpdate > now){
+    lastHeatUpdate = 0;
+  }
   if(now - lastHeatUpdate > HEAT_DELAY){
-
-    //Serial.println("HEAT");
-
-
     lastHeatUpdate = lastHeatUpdate + HEAT_DELAY;
-    updateHeatForStateAndDuty(&hltDutyController);
+    for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+      if(controlPoints[cpIndex].hasDuty){
+        updateHeatForStateAndDuty(&controlPoints[cpIndex].dutyController);
+      } 
+      else {
 
-    bool boilOn = control.mode == MODE_ON && !hltDutyController.pinState;
-
-    setHeatOn(&boilDutyController,boilOn);
-    updateHeatForStateAndDuty(&boilDutyController);
+      }
+    }
   }
-
-  //Serial.println("READ");
 
   readSerial();
 
+  // Search for new sensors
+  if(lastSearchTime > now){
+    lastSearchTime = 0;
+  } 
   if(now - lastSearchTime > SEARCH_DELAY){
-    //Serial.println("SEARCH");
-
     lastSearchTime = lastSearchTime + SEARCH_DELAY;
     searchForTempSensors();
   }
@@ -175,13 +171,30 @@ byte getHexValue(char iValue){
 }
 
 
-void updateHtlTunDutyPump(){
+void updateControlPointState(){
   int duty = 0;
+
+  //TODO
+  if(control.mode == MODE_ON){
+    for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+      ControlPoint* cp = &controlPoints[cpIndex];
+      if(cp->automaticControl){
+      } else {
+        if(cp->hasDuty){
+            setHeatDuty(&cp->dutyController, cp->duty);
+        }
+      }
+
+
+
+
+    }
+  }
+  
+  /*
   bool newPumpOn = false;
-
-
   if(control.mode == MODE_ON && control.mashOn == MODE_ON && hltSensor != NULL && hltSensor->reading ){
-    duty = getDutyFromAdjuster(&dutyAdjuster,control.hltTargetTemp,hltSensor->lastTemp);
+    duty = getDutyFromAdjuster(&pid,control.hltTargetTemp,hltSensor->lastTemp);
     if(tunSensor != NULL){
       if(tunSensor->reading){
         if(tunSensor->lastTemp < control.tunTargetTemp) {
@@ -202,9 +215,16 @@ void updateHtlTunDutyPump(){
       digitalWrite(PUMP_CONTROL_PIN, control.pumpOn ? HIGH:LOW);
     }
   }
-
+*/
 
 }
+
+
+
+
+
+
+
 
 
 
