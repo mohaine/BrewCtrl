@@ -55,7 +55,18 @@ byte sensorCount = 0;
 OneWire  ds(ONE_WIRE_PIN); 
 bool passivePowerMode = false;
 
-
+TempSensor* getSensor(byte* address){
+    for(int i=0;i<sensorCount;i++) {
+      boolean same = true;
+      for(int j=0;same && j<8;j++){        
+        same = sensors[sensorCount].address[j] == address[j];        
+      }
+      if(same){
+        return &sensors[sensorCount];
+      }
+    }
+    return NULL;
+}
 void  searchForTempSensors(){
   int loopCount = 0;
   //Serial.println("SEARCH RESET" );
@@ -81,7 +92,6 @@ void  searchForTempSensors(){
     }
     boolean existingSensor = false;
     for(int i=0;i<sensorCount;i++) {
-
       boolean same = true;
       for(int j=0;same && j<8;j++){        
         same = sensors[sensorCount].address[j] == sensors[i].address[j];        

@@ -40,9 +40,8 @@ struct ControlPoint {
   double targetTemp;
   bool hasDuty;
   bool automaticControl;
-  long lastChangeTime;
   DutyController dutyController;
-    Pid pid;
+  Pid pid;
 };
 ControlPoint controlPoints[MAX_CP_COUNT];
 byte controlPointCount = 0;

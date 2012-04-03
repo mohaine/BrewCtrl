@@ -118,6 +118,10 @@ void serialWriteStatus(){
     buffer[offset++] = controlPoint->controlPin;
     buffer[offset++] = (byte) controlPoint->duty;
 
+  Serial.print("Write Duty? ");
+  Serial.print(controlPoint->duty);
+
+
     byte booleanValues = 0x00;
 
     if (controlPoint->automaticControl) {
@@ -203,6 +207,9 @@ void readControlPoint(byte * serialBuffer,int offset){
     //Toogle so we init below
     cp->hasDuty = !hasDuty;
     cp->automaticControl = !automaticControl;
+
+    setHeatOn(&cp->dutyController,control.mode ==  MODE_ON);            
+    resetDutyState(&cp->dutyController);
   } 
 
   if(cp != NULL){
@@ -219,12 +226,18 @@ void readControlPoint(byte * serialBuffer,int offset){
     }
 
 
+
     if(hasDuty!= cp->hasDuty){
       cp->hasDuty = hasDuty;
-      if(hasDuty){
-        setupDutyController(&cp->dutyController,cp->controlPin);    
-      }
+      setupDutyController(&cp->dutyController,cp->controlPin);    
     }
+
+    Serial.print("SET DUTY ");
+    Serial.print(cp->duty);
+    Serial.print(" HAS DUTY ");
+    Serial.print(cp->hasDuty);
+    Serial.print(" AC");
+    Serial.println(cp->automaticControl);
 
     cp->targetTemp = readFloat(serialBuffer,offset);
     offset+=4;    
@@ -244,9 +257,7 @@ void readControlMessage(byte * serialBuffer,int offset){
   control.mode = serialBuffer[offset++];
   if(control.mode ==  MODE_ON){
     for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
-      if(controlPoints[cpIndex].hasDuty){
-        setHeatOn(&controlPoints[cpIndex].dutyController,true);            
-      }
+      setHeatOn(&controlPoints[cpIndex].dutyController,true);            
     }
   }
   else {
@@ -353,6 +364,8 @@ bool  readSerial() {
 
 
 #endif
+
+
 
 
 

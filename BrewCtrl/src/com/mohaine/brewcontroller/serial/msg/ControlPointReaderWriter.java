@@ -40,6 +40,8 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 		if (listener != null) {
 			listener.onRead(this);
 		}
+		
+//		System.out.println(controlPoint.getControlPin() + " Duty: " + controlPoint.getDuty());
 	}
 
 	@Override

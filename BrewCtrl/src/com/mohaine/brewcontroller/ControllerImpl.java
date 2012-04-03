@@ -289,38 +289,38 @@ public class ControllerImpl implements Controller {
 //		mainPump.setPin(7);
 //		pumps.add(mainPump);
 
-		List<Tank> tanks = brewLayout.getTanks();
-		Tank hlt = new Tank();
-		hlt.setName(Tank.HLT_NAME);
-		HeatElement htlHeater = new HeatElement();
-		htlHeater.setPin(9);
-		hlt.setHeater(htlHeater);
-		hlt.setSensor(new Sensor());
-		tanks.add(hlt);
-
-		Tank tun = new Tank();
-		tun.setName(Tank.TUN_NAME);
-		Sensor tunSensor = new Sensor();
-		tun.setSensor(tunSensor);
-		tanks.add(tun);
-
-		Tank kettle = new Tank();
-		kettle.setName(Tank.KETTLE_NAME);
-		HeatElement kettleElement = new HeatElement();
-		kettleElement.setPin(7);
-		kettle.setHeater(kettleElement);
-		tanks.add(kettle);
-
-		for (Pump pump : pumps) {
-			brewHardwareControls.add(pump);
-		}
-
-		for (Tank tank : tanks) {
-			HeatElement heater = tank.getHeater();
-			if (heater != null) {
-				brewHardwareControls.add(heater);
-			}
-		}
+//		List<Tank> tanks = brewLayout.getTanks();
+//		Tank hlt = new Tank();
+//		hlt.setName(Tank.HLT_NAME);
+//		HeatElement htlHeater = new HeatElement();
+//		htlHeater.setPin(9);
+//		hlt.setHeater(htlHeater);
+//		hlt.setSensor(new Sensor());
+//		tanks.add(hlt);
+//
+//		Tank tun = new Tank();
+//		tun.setName(Tank.TUN_NAME);
+//		Sensor tunSensor = new Sensor();
+//		tun.setSensor(tunSensor);
+//		tanks.add(tun);
+//
+//		Tank kettle = new Tank();
+//		kettle.setName(Tank.KETTLE_NAME);
+//		HeatElement kettleElement = new HeatElement();
+//		kettleElement.setPin(7);
+//		kettle.setHeater(kettleElement);
+//		tanks.add(kettle);
+//
+//		for (Pump pump : pumps) {
+//			brewHardwareControls.add(pump);
+//		}
+//
+//		for (Tank tank : tanks) {
+//			HeatElement heater = tank.getHeater();
+//			if (heater != null) {
+//				brewHardwareControls.add(heater);
+//			}
+//		}
 
 	}
 
