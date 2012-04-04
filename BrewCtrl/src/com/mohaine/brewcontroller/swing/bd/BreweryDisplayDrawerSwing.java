@@ -169,10 +169,15 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				}
 
 				if (selectedStep.isActive()) {
-					text = Integer.toString(cpDuty) + "%";
-					if (duty != cpDuty) {
-						color = Colors.PENDING;
+					if (controlPointForPin.isAutomaticControl()) {
+						text = Integer.toString(duty) + "%";
+					} else {
+						if (duty != cpDuty) {
+							color = Colors.PENDING;
+						}
+						text = Integer.toString(cpDuty) + "%";
 					}
+
 				} else {
 					if (controlPointForPin.isAutomaticControl()) {
 						text = "Auto";
@@ -287,9 +292,14 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				}
 
 				if (selectedStep.isActive()) {
-					if (on != cpDuty > 0) {
-						on = cpDuty > 0;
-						backPaint = Colors.PENDING;
+
+					if (controlPointForPin.isAutomaticControl()) {
+
+					} else {
+						if (on != cpDuty > 0) {
+							on = cpDuty > 0;
+							backPaint = Colors.PENDING;
+						}
 					}
 				} else {
 					on = cpDuty > 0;

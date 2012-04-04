@@ -61,7 +61,8 @@ public class ControllerImpl implements Controller {
 						case ON: {
 							heaterStep.startTimer();
 
-//							System.out.println("heaterStep.getStepTime(): " + heaterStep.getStepTime());
+							// System.out.println("heaterStep.getStepTime(): " +
+							// heaterStep.getStepTime());
 							if (heaterStep.getStepTime() > 0) {
 								eventBus.fireEvent(new StepModifyEvent(heaterStep));
 							}
@@ -115,7 +116,6 @@ public class ControllerImpl implements Controller {
 		steps.add(createManualStep("Default"));
 		selectedStep = steps.get(0);
 		updateHardware();
-
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 			@Override
 			public void onStepChange(HeaterStep step) {
@@ -284,47 +284,50 @@ public class ControllerImpl implements Controller {
 		loopPump.setName(Pump.HLT_LOOP);
 		pumps.add(loopPump);
 
-//		Pump mainPump = new Pump();
-//		mainPump.setName("Main");
-//		mainPump.setPin(7);
-//		pumps.add(mainPump);
+		// Pump mainPump = new Pump();
+		// mainPump.setName("Main");
+		// mainPump.setPin(7);
+		// pumps.add(mainPump);
 
-//		List<Tank> tanks = brewLayout.getTanks();
-//		Tank hlt = new Tank();
-//		hlt.setName(Tank.HLT_NAME);
-//		HeatElement htlHeater = new HeatElement();
-//		htlHeater.setPin(9);
-//		hlt.setHeater(htlHeater);
-//		hlt.setSensor(new Sensor());
-//		tanks.add(hlt);
-//
-//		Tank tun = new Tank();
-//		tun.setName(Tank.TUN_NAME);
-//		Sensor tunSensor = new Sensor();
-//		tun.setSensor(tunSensor);
-//		tanks.add(tun);
-//
-//		Tank kettle = new Tank();
-//		kettle.setName(Tank.KETTLE_NAME);
-//		HeatElement kettleElement = new HeatElement();
-//		kettleElement.setPin(7);
-//		kettle.setHeater(kettleElement);
-//		tanks.add(kettle);
-//
-//		for (Pump pump : pumps) {
-//			brewHardwareControls.add(pump);
-//		}
-//
-//		for (Tank tank : tanks) {
-//			HeatElement heater = tank.getHeater();
-//			if (heater != null) {
-//				brewHardwareControls.add(heater);
-//			}
-//		}
+		List<Tank> tanks = brewLayout.getTanks();
+		Tank hlt = new Tank();
+		hlt.setName(Tank.HLT_NAME);
+		HeatElement htlHeater = new HeatElement();
+		htlHeater.setHasDuty(true);
+		htlHeater.setPin(9);
+		hlt.setHeater(htlHeater);
+		hlt.setSensor(new Sensor());
+		tanks.add(hlt);
+
+		Tank tun = new Tank();
+		tun.setName(Tank.TUN_NAME);
+		Sensor tunSensor = new Sensor();
+		tun.setSensor(tunSensor);
+		tanks.add(tun);
+
+		Tank kettle = new Tank();
+		kettle.setName(Tank.KETTLE_NAME);
+		HeatElement kettleElement = new HeatElement();
+		kettleElement.setHasDuty(true);
+		kettleElement.setPin(7);
+		kettle.setHeater(kettleElement);
+		tanks.add(kettle);
+
+		for (Pump pump : pumps) {
+			brewHardwareControls.add(pump);
+		}
+
+		for (Tank tank : tanks) {
+			HeatElement heater = tank.getHeater();
+			if (heater != null) {
+				brewHardwareControls.add(heater);
+			}
+		}
 
 	}
 
 	private void updateLayoutState() {
+
 		for (BrewHardwareControl bhc : brewHardwareControls) {
 			HardwareControl hardwareStatus = hardware.getHardwareStatus();
 			List<ControlPoint> controlPoints = hardwareStatus.getControlPoints();

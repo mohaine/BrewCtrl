@@ -40,12 +40,15 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 		if (listener != null) {
 			listener.onRead(this);
 		}
-		
-//		System.out.println(controlPoint.getControlPin() + " Duty: " + controlPoint.getDuty());
+
+		// System.out.println(controlPoint.getControlPin() + " Duty: " +
+		// controlPoint.getDuty());
 	}
 
 	@Override
 	public void writeTo(byte[] buffer, int offset) {
+		// System.out.println("Write: " + controlPoint.getControlPin());
+
 		buffer[offset++] = controlPoint.getControlPin();
 		buffer[offset++] = (byte) controlPoint.getDuty();
 
@@ -57,9 +60,7 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 		if (controlPoint.isHasDuty()) {
 			booleanValues = booleanValues | HAS_DUTY_MASK;
 		}
-
 		buffer[offset++] = (byte) booleanValues;
-
 		byteUtils.putFloat(buffer, offset, (float) controlPoint.getTargetTemp());
 		offset += 4;
 		writeAddress(buffer, offset, controlPoint.getTempSensorAddress());

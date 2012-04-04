@@ -28,6 +28,7 @@ import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
+import com.mohaine.brewcontroller.bean.HeaterMode;
 import com.mohaine.brewcontroller.serial.msg.ControlMessageReaderWriter;
 import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
 import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
@@ -189,38 +190,39 @@ final class ReadWriteThread implements Runnable {
 					controlMsgWriter.setControl(control);
 					int offset = MessageEnvelope.writeMessage(buffer, 0, controlMsgWriter);
 
-					if (MessageEnvelope.canFit(controlPointWriter, offset, buffer)) {
-						List<ControlPoint> controlPointsWriter = control.getControlPoints();
-						if (controlPointsWriter != null) {
-							synchronized (controlPointsWriter) {
-								for (ControlPoint controlPointToWrite : controlPointsWriter) {
-									boolean controlPointDirty = true;
+					if (control.getMode() == HeaterMode.ON) {
+						if (MessageEnvelope.canFit(controlPointWriter, offset, buffer)) {
+							List<ControlPoint> controlPointsWriter = control.getControlPoints();
+							if (controlPointsWriter != null) {
+								synchronized (controlPointsWriter) {
+									for (ControlPoint controlPointToWrite : controlPointsWriter) {
+										boolean controlPointDirty = true;
 
-									List<ControlPoint> controlPointsReader = controlMsgReader.getControl().getControlPoints();
-									if (controlPointsReader != null) {
-										synchronized (controlPointsReader) {
+										List<ControlPoint> controlPointsReader = controlMsgReader.getControl().getControlPoints();
+										if (controlPointsReader != null) {
+											synchronized (controlPointsReader) {
 
-											for (ControlPoint controlPointReader : controlPointsReader) {
-												if (controlPointToWrite.getControlPin() == controlPointReader.getControlPin()) {
-													controlPointDirty = needToSendControlPoint(controlPointToWrite, controlPointReader);
-													break;
+												for (ControlPoint controlPointReader : controlPointsReader) {
+													if (controlPointToWrite.getControlPin() == controlPointReader.getControlPin()) {
+														controlPointDirty = needToSendControlPoint(controlPointToWrite, controlPointReader);
+														break;
+													}
 												}
 											}
 										}
-									}
 
-									if (controlPointDirty) {
-										controlPointWriter.setControlPoint(controlPointToWrite);
-										offset = MessageEnvelope.writeMessage(buffer, offset, controlPointWriter);
-										if (!MessageEnvelope.canFit(controlPointWriter, offset, buffer)) {
-											break;
+										if (controlPointDirty) {
+											controlPointWriter.setControlPoint(controlPointToWrite);
+											offset = MessageEnvelope.writeMessage(buffer, offset, controlPointWriter);
+											if (!MessageEnvelope.canFit(controlPointWriter, offset, buffer)) {
+												break;
+											}
 										}
-									}
 
+									}
 								}
 							}
 						}
-
 					}
 					conn.getOutputStream().write(buffer, 0, offset);
 					conn.getOutputStream().flush();
