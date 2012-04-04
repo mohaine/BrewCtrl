@@ -118,8 +118,6 @@ void serialWriteStatus(){
     buffer[offset++] = controlPoint->controlPin;
     buffer[offset++] = (byte) controlPoint->duty;
 
-  Serial.print("Write Duty? ");
-  Serial.print(controlPoint->duty);
 
 
     byte booleanValues = 0x00;
@@ -207,12 +205,17 @@ void readControlPoint(byte * serialBuffer,int offset){
     //Toogle so we init below
     cp->hasDuty = !hasDuty;
     cp->automaticControl = !automaticControl;
-
     setHeatOn(&cp->dutyController,control.mode ==  MODE_ON);            
     resetDutyState(&cp->dutyController);
   } 
 
   if(cp != NULL){
+    
+    if(control.mode !=  MODE_ON){
+      duty = 0;
+      automaticControl  = false;
+    }
+    
     if(automaticControl!= cp->automaticControl){
       cp->automaticControl = automaticControl;
       if(automaticControl){
@@ -221,23 +224,15 @@ void readControlPoint(byte * serialBuffer,int offset){
       }
     } 
 
-    if(!automaticControl){    
+    if(!automaticControl){   
       cp->duty = duty;
     }
-
-
 
     if(hasDuty!= cp->hasDuty){
       cp->hasDuty = hasDuty;
       setupDutyController(&cp->dutyController,cp->controlPin);    
     }
 
-    Serial.print("SET DUTY ");
-    Serial.print(cp->duty);
-    Serial.print(" HAS DUTY ");
-    Serial.print(cp->hasDuty);
-    Serial.print(" AC");
-    Serial.println(cp->automaticControl);
 
     cp->targetTemp = readFloat(serialBuffer,offset);
     offset+=4;    
@@ -250,6 +245,7 @@ void readControlPoint(byte * serialBuffer,int offset){
 }
 
 void readControlMessage(byte * serialBuffer,int offset){
+  
   lastControlIdTime = millis();
   control.controlId = readInt(serialBuffer,offset);
   offset+=2;
@@ -364,6 +360,7 @@ bool  readSerial() {
 
 
 #endif
+
 
 
 

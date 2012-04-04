@@ -112,7 +112,7 @@ void loop(void) {
     turnOff();    
   }
 
-  // Update duty/on/off states 
+  // Update automaticly controlled duty/on/off states 
   if(lastDutyUpdate > now){
     lastDutyUpdate = 0;
   }
@@ -129,13 +129,16 @@ void loop(void) {
   }
   if(now - lastHeatUpdate > HEAT_DELAY){
     lastHeatUpdate = lastHeatUpdate + HEAT_DELAY;
-    for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
-      ControlPoint* cp = &controlPoints[cpIndex];
-      if(cp->hasDuty){
-        updateHeatForStateAndDuty(&cp->dutyController);
-      }  
-      else {
-        updateForPinState(&cp->dutyController,cp->duty > 0);
+
+    if(control.mode ==  MODE_ON){
+      for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+        ControlPoint* cp = &controlPoints[cpIndex];
+        if(cp->hasDuty){
+          updateHeatForStateAndDuty(&cp->dutyController);
+        }  
+        else {
+          updateForPinState(&cp->dutyController,cp->duty > 0);
+        }
       }
     }
   }
@@ -169,45 +172,45 @@ byte getHexValue(char iValue){
 
 
 void updateControlPointState(){
-  int duty = 0;
+  /*
 
-
-  if(control.mode == MODE_ON){
-    for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
-      ControlPoint* cp = &controlPoints[cpIndex];
-      if(cp->automaticControl){
-        TempSensor* sensor = getSensor(cp->tempSensorAddress);
-
-        if(sensor!=NULL){
-          if(sensor->reading){
-            if(cp->hasDuty){
-              cp->duty = getDutyFromAdjuster(&cp->pid,cp->targetTemp,sensor->lastTemp);
-            } 
-            else {
-              //TODO MIN TOGGLE TIME!!!!
-              if(sensor->lastTemp < cp->targetTemp) {               
-                cp->duty = 100;
-              } 
-              else {
-                cp->duty = 0;
-              }
-            }
-          } 
-          else {
-            cp->duty  = 0;
-          }
-        }
-
-
-      } 
-      else {
-        if(cp->hasDuty){
-          setHeatDuty(&cp->dutyController, cp->duty);
-        }
-      }
-    }
-  }
-
+   
+   if(control.mode == MODE_ON){
+   for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+   ControlPoint* cp = &controlPoints[cpIndex];
+   if(cp->automaticControl){
+   TempSensor* sensor = getSensor(cp->tempSensorAddress);
+   
+   if(sensor!=NULL){
+   if(sensor->reading){
+   if(cp->hasDuty){
+   cp->duty = getDutyFromAdjuster(&cp->pid,cp->targetTemp,sensor->lastTemp);
+   } 
+   else {
+   //TODO MIN TOGGLE TIME!!!!
+   if(sensor->lastTemp < cp->targetTemp) {               
+   cp->duty = 100;
+   } 
+   else {
+   cp->duty = 0;
+   }
+   }
+   } 
+   else {
+   cp->duty  = 0;
+   }
+   }
+   
+   
+   } 
+   else {
+   if(cp->hasDuty){
+   setHeatDuty(&cp->dutyController, cp->duty);
+   }
+   }
+   }
+   }
+   */
   /*
   bool newPumpOn = false;
    if(control.mode == MODE_ON && control.mashOn == MODE_ON && hltSensor != NULL && hltSensor->reading ){
@@ -235,6 +238,7 @@ void updateControlPointState(){
    */
 
 }
+
 
 
 

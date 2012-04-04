@@ -63,24 +63,28 @@ void resetDutyState(DutyController * hs){
 }
 
 
+
+
+void updateForPinState(DutyController * hs, boolean newHeatPinState){
+  newHeatPinState = newHeatPinState & hs->on;
+  if(newHeatPinState != hs->pinState){
+    hs->dutyOnOffLastChange = millis();
+    hs->pinState = newHeatPinState;
+    digitalWrite(hs->controlPin, hs->pinState ?  HIGH : LOW);
+  }  
+}
+
 void setHeatOn(DutyController * hs, boolean newState){
   if(hs->on != newState){
     hs->on = newState;
     if(newState){
       resetDutyState(hs);
+    } else {
+        updateForPinState(hs,false);
     }
   }
 }
 
-void updateForPinState(DutyController * hs, boolean newHeatPinState){
-  if(hs->on){
-    if(newHeatPinState != hs->pinState){
-      hs->dutyOnOffLastChange = millis();
-      hs->pinState = newHeatPinState;
-      digitalWrite(hs->controlPin, hs->pinState ?  HIGH : LOW);
-    }  
-  }
-}
 void updateHeatForStateAndDuty(DutyController * hs){
   unsigned long now = millis();  
   boolean newHeatPinState = false;
@@ -134,6 +138,8 @@ void setHeatDuty(DutyController * hs, int duty){
 
 
 #endif
+
+
 
 
 
