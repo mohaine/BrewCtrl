@@ -201,12 +201,12 @@ void updateControlPointState(){
             }
           } 
           else {
-            Serial.println("sensor not reading");
+            //Serial.println("Sensor not reading");
             cp->duty  = 0;
           }
         } 
         else {
-          Serial.println("Failed to find sensor");
+          //Serial.println("Failed to find sensor");
         }
       }      
     }
