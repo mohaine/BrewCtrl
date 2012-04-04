@@ -124,7 +124,6 @@ public class BreweryDisplay {
 			}
 		}));
 		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
-
 			@Override
 			public void onStepChange(HeaterStep step) {
 				BreweryDisplay.this.drawer.redrawAll();

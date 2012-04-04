@@ -3,9 +3,13 @@ package com.mohaine.brewcontroller.layout;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mohaine.brewcontroller.json.ListType;
+
 public class BreweryLayout {
-	private final List<Tank> tanks = new ArrayList<Tank>();
-	private final List<Pump> pumps = new ArrayList<Pump>();
+	@ListType(Tank.class)
+	private List<Tank> tanks = new ArrayList<Tank>();
+	@ListType(Pump.class)
+	private List<Pump> pumps = new ArrayList<Pump>();
 
 	public List<Tank> getTanks() {
 		return tanks;

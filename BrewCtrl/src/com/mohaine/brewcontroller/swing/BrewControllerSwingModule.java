@@ -27,7 +27,7 @@ import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
-import com.mohaine.brewcontroller.serial.RxTxComm;
+import com.mohaine.brewcontroller.serial.MockComm;
 import com.mohaine.brewcontroller.serial.SerialConnection;
 import com.mohaine.brewcontroller.serial.SerialHardwareComm;
 import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
@@ -48,8 +48,8 @@ public class BrewControllerSwingModule extends AbstractModule {
 		bind(SetupDisplay.class).to(SetupDisplaySwing.class);
 		bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
 
-		bind(SerialConnection.class).to(RxTxComm.class).asEagerSingleton();
-		// bind(SerialConnection.class).to(MockComm.class).asEagerSingleton();
+		// bind(SerialConnection.class).to(RxTxComm.class).asEagerSingleton();
+		bind(SerialConnection.class).to(MockComm.class).asEagerSingleton();
 
 		bind(EventBus.class).asEagerSingleton();
 

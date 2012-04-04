@@ -1,0 +1,37 @@
+{
+   "tanks":[
+      {
+         "name":"HLT",
+         "sensor":{
+            "reading":false
+         },
+         "heater":{
+            "pin":9,
+            "duty":0,
+            "canPulse":true
+         }
+      },
+      {
+         "name":"TUN",
+         "sensor":{
+            "reading":false
+         }
+      },
+      {
+         "name":"Kettle",
+         "heater":{
+            "pin":7,
+            "duty":0,
+            "canPulse":true
+         }
+      }
+   ],
+   "pumps":[
+      {
+         "name":"HLT Loop",
+         "pin":8,
+         "duty":0,
+         "canPulse":false
+      }
+   ]
+}

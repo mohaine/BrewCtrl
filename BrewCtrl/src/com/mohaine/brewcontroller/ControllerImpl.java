@@ -18,6 +18,7 @@
 
 package com.mohaine.brewcontroller;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,8 @@ import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.json.ReflectionJsonHandler;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -39,6 +42,7 @@ import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
+import com.mohaine.brewcontroller.util.StreamUtils;
 import com.mohaine.event.StatusChangeHandler;
 import com.mohaine.event.bus.EventBus;
 
@@ -61,14 +65,12 @@ public class ControllerImpl implements Controller {
 						case ON: {
 							heaterStep.startTimer();
 
-							// System.out.println("heaterStep.getStepTime(): " +
-							// heaterStep.getStepTime());
-							if (heaterStep.getStepTime() > 0) {
-								eventBus.fireEvent(new StepModifyEvent(heaterStep));
-							}
-
 							if (heaterStep.isComplete()) {
 								nextStep();
+							} else {
+								if (heaterStep.getStepTime() > 0) {
+									eventBus.fireEvent(new StepModifyEvent(heaterStep));
+								}
 							}
 							break;
 						}
@@ -106,7 +108,7 @@ public class ControllerImpl implements Controller {
 	private Monitor monitor = new Monitor();
 
 	@Inject
-	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs) {
+	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs) throws Exception {
 		super();
 		this.eventBus = eventBusp;
 		this.hardware = hardware;
@@ -251,10 +253,10 @@ public class ControllerImpl implements Controller {
 	@Override
 	public void setSelectedStep(HeaterStep step) {
 		this.selectedStep = step;
+		updateHardware();
 		if (eventBus != null) {
 			eventBus.fireEvent(new ChangeSelectedStepEvent(selectedStep));
 		}
-		updateHardware();
 	}
 
 	private void updateHardware() {
@@ -274,49 +276,35 @@ public class ControllerImpl implements Controller {
 		return brewLayout;
 	}
 
-	private void initLayout() {
-		// TODO move to config
-		brewLayout = new BreweryLayout();
+	private void initLayout() throws Exception {
+
+		JsonObjectConverter jc = getJsonConverter();
+
+		InputStream resourceAsStream = getClass().getResourceAsStream("/BreweryLayout.json");
+		try {
+			if (resourceAsStream != null) {
+				String json = new String(StreamUtils.readStream(resourceAsStream));
+				brewLayout = jc.decode(json, BreweryLayout.class);
+			}
+		} finally {
+			StreamUtils.close(resourceAsStream);
+		}
+
+		if (brewLayout == null) {
+			brewLayout = new BreweryLayout();
+		}
+
+		// String json = jc.encode(brewLayout);
+		// JsonPrettyPrint jpp = new JsonPrettyPrint();
+		// jpp.setStripNullAttributes(true);
+		// System.out.println(jpp.prettyPrint(json));
 
 		List<Pump> pumps = brewLayout.getPumps();
-		Pump loopPump = new Pump();
-		loopPump.setPin(8);
-		loopPump.setName(Pump.HLT_LOOP);
-		pumps.add(loopPump);
-
-		// Pump mainPump = new Pump();
-		// mainPump.setName("Main");
-		// mainPump.setPin(7);
-		// pumps.add(mainPump);
-
-		List<Tank> tanks = brewLayout.getTanks();
-		Tank hlt = new Tank();
-		hlt.setName(Tank.HLT_NAME);
-		HeatElement htlHeater = new HeatElement();
-		htlHeater.setHasDuty(true);
-		htlHeater.setPin(9);
-		hlt.setHeater(htlHeater);
-		hlt.setSensor(new Sensor());
-		tanks.add(hlt);
-
-		Tank tun = new Tank();
-		tun.setName(Tank.TUN_NAME);
-		Sensor tunSensor = new Sensor();
-		tun.setSensor(tunSensor);
-		tanks.add(tun);
-
-		Tank kettle = new Tank();
-		kettle.setName(Tank.KETTLE_NAME);
-		HeatElement kettleElement = new HeatElement();
-		kettleElement.setHasDuty(true);
-		kettleElement.setPin(7);
-		kettle.setHeater(kettleElement);
-		tanks.add(kettle);
-
 		for (Pump pump : pumps) {
 			brewHardwareControls.add(pump);
 		}
 
+		List<Tank> tanks = brewLayout.getTanks();
 		for (Tank tank : tanks) {
 			HeatElement heater = tank.getHeater();
 			if (heater != null) {
@@ -324,6 +312,16 @@ public class ControllerImpl implements Controller {
 			}
 		}
 
+	}
+
+	private JsonObjectConverter getJsonConverter() throws Exception {
+		JsonObjectConverter jc = new JsonObjectConverter(false);
+		jc.addHandler(ReflectionJsonHandler.build(BreweryLayout.class));
+		jc.addHandler(ReflectionJsonHandler.build(Tank.class));
+		jc.addHandler(ReflectionJsonHandler.build(Sensor.class));
+		jc.addHandler(ReflectionJsonHandler.build(HeatElement.class));
+		jc.addHandler(ReflectionJsonHandler.build(Pump.class));
+		return jc;
 	}
 
 	private void updateLayoutState() {
