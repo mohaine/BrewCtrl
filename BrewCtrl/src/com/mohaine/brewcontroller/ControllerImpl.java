@@ -130,7 +130,7 @@ public class ControllerImpl implements Controller {
 		hardware.addStatusChangeHandler(new StatusChangeHandler() {
 			@Override
 			public void onStateChange() {
-				updateLayoutState();
+				updateLayoutState(false);
 			}
 		});
 
@@ -153,10 +153,12 @@ public class ControllerImpl implements Controller {
 			}
 			newSelection = steps.get(0);
 		}
+		updateHardware();
 
 		if (updateSelection) {
 			setSelectedStep(newSelection);
 		}
+		updateLayoutState(true);
 		eventBus.fireEvent(new StepsModifyEvent());
 	}
 
@@ -253,7 +255,6 @@ public class ControllerImpl implements Controller {
 	@Override
 	public void setSelectedStep(HeaterStep step) {
 		this.selectedStep = step;
-		updateHardware();
 		if (eventBus != null) {
 			eventBus.fireEvent(new ChangeSelectedStepEvent(selectedStep));
 		}
@@ -261,11 +262,21 @@ public class ControllerImpl implements Controller {
 
 	private void updateHardware() {
 		HardwareControl hc = new HardwareControl();
-		hc.setMode(mode == Mode.OFF ? HeaterMode.OFF : HeaterMode.ON);
+		HeaterMode heaterMode = mode == Mode.OFF ? HeaterMode.OFF : HeaterMode.ON;
+
+		hc.setMode(heaterMode);
 
 		if (steps.size() > 0) {
 			HeaterStep currentStep = steps.get(0);
-			currentStep.setActive(true);
+
+			boolean active = heaterMode == HeaterMode.ON;
+			if (active != currentStep.isActive()) {
+				currentStep.setActive(active);
+				eventBus.fireEvent(new StepModifyEvent(currentStep));
+				updateLayoutState(true);
+
+			}
+
 			ArrayList<ControlPoint> controlPoints = currentStep.getControlPoints();
 			hc.setControlPoints(controlPoints);
 		}
@@ -324,14 +335,14 @@ public class ControllerImpl implements Controller {
 		return jc;
 	}
 
-	private void updateLayoutState() {
+	private void updateLayoutState(boolean forceDirty) {
 
 		for (BrewHardwareControl bhc : brewHardwareControls) {
 			HardwareControl hardwareStatus = hardware.getHardwareStatus();
 			List<ControlPoint> controlPoints = hardwareStatus.getControlPoints();
 			for (ControlPoint controlPoint : controlPoints) {
 				if (controlPoint.getControlPin() == bhc.getPin()) {
-					if (bhc.getDuty() != controlPoint.getDuty()) {
+					if (forceDirty || bhc.getDuty() != controlPoint.getDuty()) {
 						bhc.setDuty(controlPoint.getDuty());
 						fireBreweryComponentChangeHandler(bhc);
 					}
@@ -351,7 +362,8 @@ public class ControllerImpl implements Controller {
 						sensor.setAddress(tempSensor.getAddress());
 						sensor.setReading(tempSensor.isReading());
 						sensor.setTempatureC(tempSensor.getTempatureC());
-						boolean diff = temp != sensor.getTempatureC() || reading != sensor.isReading();
+
+						boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
 						if (diff) {
 							fireBreweryComponentChangeHandler(sensor);
 						}
@@ -359,6 +371,16 @@ public class ControllerImpl implements Controller {
 				}
 			}
 		}
+	}
+
+	private boolean equals(Double temp, Double tempatureC) {
+		if (temp == tempatureC) {
+			return true;
+		} else if (temp == null || tempatureC == null) {
+			return false;
+		}
+
+		return Math.abs(temp - tempatureC) < 0.001;
 	}
 
 	private void fireBreweryComponentChangeHandler(BreweryComponent component) {

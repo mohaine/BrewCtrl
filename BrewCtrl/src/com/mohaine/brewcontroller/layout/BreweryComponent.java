@@ -16,14 +16,18 @@ public abstract class BreweryComponent {
 
 	@Override
 	public String toString() {
-		return name;
+		if (name != null) {
+			return name;
+		}
+		return super.toString();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 
 		if (obj instanceof BreweryComponent) {
-			return name.equals(((BreweryComponent) obj).name);
+			BreweryComponent breweryComponent = (BreweryComponent) obj;
+			return name.equals(breweryComponent.name);
 		}
 
 		return super.equals(obj);

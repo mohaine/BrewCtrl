@@ -6,6 +6,7 @@
             "reading":false
          },
          "heater":{
+            "name":"HTL Element",
             "pin":9,
             "duty":0,
             "canPulse":true
@@ -20,6 +21,7 @@
       {
          "name":"Kettle",
          "heater":{
+            "name":"Kettle Element",
             "pin":7,
             "duty":0,
             "canPulse":true

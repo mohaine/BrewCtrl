@@ -192,7 +192,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		if (text == null) {
 			text = Integer.toString(duty) + "%";
 		}
-
+		// System.out.println("Draw element: " + text);
 		drawText(g, display, text, color, true);
 
 	}

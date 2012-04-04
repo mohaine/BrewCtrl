@@ -11,9 +11,10 @@ import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
-import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
-import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
+import com.mohaine.brewcontroller.event.StepModifyEventHandler;
+import com.mohaine.brewcontroller.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -118,37 +119,26 @@ public class BreweryDisplay {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
+						// System.out.println("Redraw " + component);
 						BreweryDisplay.this.drawer.redrawBreweryComponent(component);
 					}
 				});
 			}
 		}));
-		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
-			@Override
-			public void onStepChange(HeaterStep step) {
-				BreweryDisplay.this.drawer.redrawAll();
-			}
-		}));
 
-		// eventBus.addHandler(StepsModifyEvent.getType(), new
+		// handlers.add(eventBus.addHandler(StepsModifyEvent.getType(), new
 		// StepsModifyEventHandler() {
 		// @Override
 		// public void onStepsChange() {
-		// System.out.println("BreweryDisplay.BreweryDisplay(...).new StepsModifyEventHandler() {...}.onStepsChange()");
+		// BreweryDisplay.this.drawer.redrawAll();
 		// }
-		// });
-		//
+		// }));
+
 		// eventBus.addHandler(StepModifyEvent.getType(), new
 		// StepModifyEventHandler() {
 		// @Override
 		// public void onStepChange(HeaterStep step) {
-		// System.out.println("BreweryDisplay.BreweryDisplay(...).new StepModifyEventHandler() {...}.onStepChange()");
-		// if (step != null) {
-		// ArrayList<ControlPoint> controlPoints = step.getControlPoints();
-		// for (ControlPoint controlPoint : controlPoints) {
-		// System.out.println("controlPoint: " + controlPoint);
-		// }
-		// }
+		// System.out.println("StepModifyEvent " + step.getName());
 		// }
 		// });
 
