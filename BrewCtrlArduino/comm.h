@@ -196,8 +196,8 @@ void readControlPoint(byte * serialBuffer,int offset){
   }
 
   byte booleanValues = serialBuffer[offset++];
-  bool automaticControl =  booleanValues & AUTO_MASK == 0;
-  bool hasDuty = booleanValues & HAS_DUTY_MASK== 0;
+  bool automaticControl =  (booleanValues & AUTO_MASK) != 0;
+  bool hasDuty = (booleanValues & HAS_DUTY_MASK)  != 0;
 
   if(cp == NULL && controlPointCount<MAX_CP_COUNT && pin != ONE_WIRE_PIN){
     cp = &controlPoints[controlPointCount++];
@@ -260,44 +260,6 @@ void readControlMessage(byte * serialBuffer,int offset){
     turnOff();   
   }
 
-  /*
-  int boilDuty = serialBuffer[offset++];
-   if(boilDuty >= 0 && boilDuty <= 100){
-   setHeatDuty(&boilDutyController,boilDuty);
-   }
-   
-   control.mashOn = serialBuffer[offset++];
-   
-   for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
-   TempSensor *sensor = &sensors[sensorIndex];
-   boolean same = true;
-   for(byte i=0;i<8 && same;i++){             
-   same = sensor->address[i] == serialBuffer[offset+ i] ;
-   }
-   if(same){
-   hltSensor = sensor;
-   break;
-   }
-   } 
-   offset+=8;
-   for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
-   TempSensor *sensor = &sensors[sensorIndex];
-   boolean same = true;
-   for(byte i=0;i<8 && same;i++){             
-   same = sensor->address[i] == serialBuffer[offset+ i] ;
-   }
-   if(same){
-   tunSensor = sensor;
-   break;
-   }
-   } 
-   offset+=8;    
-   
-   control.hltTargetTemp = readFloat(serialBuffer,offset);
-   offset+=4;
-   control.tunTargetTemp = readFloat(serialBuffer,offset);
-   offset+=4;  
-   */
 }
 
 void handleExtra(byte* data, int offset, int length) {
@@ -360,47 +322,6 @@ bool  readSerial() {
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

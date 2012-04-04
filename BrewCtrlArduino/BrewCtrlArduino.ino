@@ -133,7 +133,14 @@ void loop(void) {
     if(control.mode ==  MODE_ON){
       for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
         ControlPoint* cp = &controlPoints[cpIndex];
+        /*
+        Serial.print(cp->controlPin);
+         Serial.print(" has duty: ");
+         Serial.print(cp->hasDuty? "true":"false");
+         Serial.println();
+         */
         if(cp->hasDuty){
+          setHeatDuty(&cp->dutyController,cp->duty);
           updateHeatForStateAndDuty(&cp->dutyController);
         }  
         else {
@@ -172,45 +179,45 @@ byte getHexValue(char iValue){
 
 
 void updateControlPointState(){
-  /*
 
-   
-   if(control.mode == MODE_ON){
-   for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
-   ControlPoint* cp = &controlPoints[cpIndex];
-   if(cp->automaticControl){
-   TempSensor* sensor = getSensor(cp->tempSensorAddress);
-   
-   if(sensor!=NULL){
-   if(sensor->reading){
-   if(cp->hasDuty){
-   cp->duty = getDutyFromAdjuster(&cp->pid,cp->targetTemp,sensor->lastTemp);
-   } 
-   else {
-   //TODO MIN TOGGLE TIME!!!!
-   if(sensor->lastTemp < cp->targetTemp) {               
-   cp->duty = 100;
-   } 
-   else {
-   cp->duty = 0;
-   }
-   }
-   } 
-   else {
-   cp->duty  = 0;
-   }
-   }
-   
-   
-   } 
-   else {
-   if(cp->hasDuty){
-   setHeatDuty(&cp->dutyController, cp->duty);
-   }
-   }
-   }
-   }
-   */
+
+
+  if(control.mode == MODE_ON){
+    for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
+      ControlPoint* cp = &controlPoints[cpIndex];
+      if(cp->automaticControl){
+        TempSensor* sensor = getSensor(cp->tempSensorAddress);
+
+        if(sensor!=NULL){
+          if(sensor->reading){
+            if(cp->hasDuty){
+              cp->duty = getDutyFromAdjuster(&cp->pid,cp->targetTemp,sensor->lastTemp);
+            } 
+            else {
+              //TODO MIN TOGGLE TIME!!!!
+              if(sensor->lastTemp < cp->targetTemp) {               
+                cp->duty = 100;
+              } 
+              else {
+                cp->duty = 0;
+              }
+            }
+          } 
+          else {
+            cp->duty  = 0;
+          }
+        }
+
+
+      } 
+      else {
+        if(cp->hasDuty){
+          setHeatDuty(&cp->dutyController, cp->duty);
+        }
+      }
+    }
+  }
+
   /*
   bool newPumpOn = false;
    if(control.mode == MODE_ON && control.mashOn == MODE_ON && hltSensor != NULL && hltSensor->reading ){
@@ -238,6 +245,7 @@ void updateControlPointState(){
    */
 
 }
+
 
 
 

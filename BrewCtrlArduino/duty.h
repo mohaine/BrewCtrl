@@ -79,8 +79,9 @@ void setHeatOn(DutyController * hs, boolean newState){
     hs->on = newState;
     if(newState){
       resetDutyState(hs);
-    } else {
-        updateForPinState(hs,false);
+    } 
+    else {
+      updateForPinState(hs,false);
     }
   }
 }
@@ -105,7 +106,7 @@ void updateHeatForStateAndDuty(DutyController * hs){
     } 
     else {
       int percentOn =  ((double) hs->timeOn / (hs->timeOn + hs->timeOff)) * 1000;
-      if(percentOn >= hs->duty * 10){
+        if(percentOn >= hs->duty * 10){
         newHeatPinState = false;
       } 
       else {
@@ -116,6 +117,7 @@ void updateHeatForStateAndDuty(DutyController * hs){
   else {
     newHeatPinState = false; 
   }
+ 
   updateForPinState(hs,newHeatPinState);
 
 }  
@@ -138,6 +140,8 @@ void setHeatDuty(DutyController * hs, int duty){
 
 
 #endif
+
+
 
 
 
