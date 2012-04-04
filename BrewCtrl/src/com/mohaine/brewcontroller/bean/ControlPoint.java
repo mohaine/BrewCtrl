@@ -4,6 +4,7 @@ public class ControlPoint implements Cloneable {
 
 	private byte controlPin;
 	private int duty;
+	private int fullOnAmps;
 	private String tempSensorAddress = "0000000000000000";
 	private double targetTemp;
 	private boolean hasDuty;
@@ -73,6 +74,19 @@ public class ControlPoint implements Cloneable {
 		}
 	}
 
+	public int getFullOnAmps() {
+		return fullOnAmps;
+	}
+
+	public void setFullOnAmps(int fullOnAmps) {
+		this.fullOnAmps = fullOnAmps;
+	}
+	
+	public void setFullOnAmps(byte fullOnAmps) {
+		this.fullOnAmps = (int) fullOnAmps & 0xff;
+	}
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -80,6 +94,7 @@ public class ControlPoint implements Cloneable {
 		result = prime * result + (automaticControl ? 1231 : 1237);
 		result = prime * result + controlPin;
 		result = prime * result + duty;
+		result = prime * result + fullOnAmps;
 		result = prime * result + (hasDuty ? 1231 : 1237);
 		long temp;
 		temp = Double.doubleToLongBits(targetTemp);
@@ -102,6 +117,8 @@ public class ControlPoint implements Cloneable {
 		if (controlPin != other.controlPin)
 			return false;
 		if (duty != other.duty)
+			return false;
+		if (fullOnAmps != other.fullOnAmps)
 			return false;
 		if (hasDuty != other.hasDuty)
 			return false;

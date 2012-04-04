@@ -23,6 +23,7 @@ import java.util.List;
 public class HardwareControl {
 	private HeaterMode mode = HeaterMode.UNKNOWN;
 	private int controlId;
+	private int maxAmps;
 	private List<ControlPoint> controlPoints;
 
 	public int getControlId() {
@@ -31,6 +32,18 @@ public class HardwareControl {
 
 	public void setControlId(int controlId) {
 		this.controlId = controlId;
+	}
+
+	public int getMaxAmps() {
+		return maxAmps;
+	}
+
+	public void setMaxAmps(int maxAmps) {
+		this.maxAmps = maxAmps;
+	}
+
+	public void setMaxAmps(byte maxAmps) {
+		this.maxAmps = (int) maxAmps & 0xff;
 	}
 
 	public HeaterMode getMode() {

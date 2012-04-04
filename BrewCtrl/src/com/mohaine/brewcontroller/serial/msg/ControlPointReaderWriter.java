@@ -19,13 +19,14 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 	private ReadListener<ControlPointReaderWriter> listener;
 
 	public ControlPointReaderWriter() {
-		super(SerialConstants.CONTROL_POINT_MSG, 15);
+		super(SerialConstants.CONTROL_POINT_MSG, 16);
 	}
 
 	@Override
 	public void readFrom(byte[] buffer, int offset) {
 		controlPoint.setControlPin(buffer[offset++]);
 		controlPoint.setDuty(buffer[offset++]);
+		controlPoint.setFullOnAmps(buffer[offset++]);
 
 		int booleanValues = buffer[offset++];
 		controlPoint.setAutomaticControl((booleanValues & AUTO_MASK) != 0);
@@ -51,6 +52,7 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 
 		buffer[offset++] = controlPoint.getControlPin();
 		buffer[offset++] = (byte) controlPoint.getDuty();
+		buffer[offset++] = (byte) controlPoint.getFullOnAmps();
 
 		int booleanValues = 0x00;
 

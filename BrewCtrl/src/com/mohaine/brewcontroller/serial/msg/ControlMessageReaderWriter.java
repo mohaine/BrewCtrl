@@ -15,7 +15,7 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 	private ReadListener<ControlMessageReaderWriter> listener;
 
 	public ControlMessageReaderWriter() {
-		super(SerialConstants.HARDWARE_CONTROL, 3);
+		super(SerialConstants.HARDWARE_CONTROL, 4);
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 		control.setControlId(byteUtils.getShort(buffer, offset));
 		offset += 2;
 		control.setMode(buffer[offset++] == 1 ? HeaterMode.ON : HeaterMode.OFF);
-
+		control.setMaxAmps( buffer[offset++]   );
 		if (listener != null) {
 			listener.onRead(this);
 		}
@@ -37,6 +37,7 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 
 		buffer[offset++] = (byte) (control.getMode() == HeaterMode.ON ? 1 : 0);
 
+		buffer[offset++] = (byte) control.getMaxAmps();
 	}
 
 	public void setListener(ReadListener<ControlMessageReaderWriter> listener) {

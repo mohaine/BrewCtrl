@@ -103,6 +103,8 @@ void serialWriteStatus(){
   offset+=2;
 
   buffer[offset++] = (control.mode);
+  buffer[offset++] = (control.maxAmps);
+  
   int crcLength = offset - crcStart;
   buffer[offset++] = computeCrc8(buffer, crcStart, crcLength);
   buffer[offset++] = DATA_END;
@@ -117,7 +119,8 @@ void serialWriteStatus(){
 
     buffer[offset++] = controlPoint->controlPin;
     buffer[offset++] = (byte) controlPoint->duty;
-
+    buffer[offset++] = (controlPoint->fullOnAmps);
+  
 
 
     byte booleanValues = 0x00;
@@ -185,7 +188,8 @@ void readControlPoint(byte * serialBuffer,int offset){
 
   byte pin = serialBuffer[offset++];
   byte duty = serialBuffer[offset++];
-
+  byte fullOnAmps = serialBuffer[offset++];
+  
   ControlPoint* cp = NULL;
 
   for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
@@ -210,7 +214,8 @@ void readControlPoint(byte * serialBuffer,int offset){
   } 
 
   if(cp != NULL){
-
+    cp->fullOnAmps = fullOnAmps;
+    
     if(control.mode !=  MODE_ON){
       duty = 0;
       automaticControl  = false;
@@ -251,6 +256,9 @@ void readControlMessage(byte * serialBuffer,int offset){
   offset+=2;
 
   control.mode = serialBuffer[offset++];
+  control.maxAmps = serialBuffer[offset++];
+  
+  
   if(control.mode ==  MODE_ON){
     for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
       setHeatOn(&controlPoints[cpIndex].dutyController,true);            
@@ -270,10 +278,10 @@ void handleExtra(byte* data, int offset, int length) {
 
 void setupComm(){
   readMessages[0].msgId = HARDWARE_CONTROL; 
-  readMessages[0].length = 3; 
+  readMessages[0].length = 4; 
   readMessages[0].processFunction = readControlMessage;
   readMessages[1].msgId = CONTROL_POINT; 
-  readMessages[1].length = 15; 
+  readMessages[1].length = 16; 
   readMessages[1].processFunction = readControlPoint;
 
 

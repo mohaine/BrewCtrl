@@ -48,6 +48,7 @@ public class ControlPointReaderWriter_UT {
 			controlPoint.setDuty(getRandomByte(random));
 			controlPoint.setHasDuty(random.nextBoolean());
 			controlPoint.setTargetTemp(random.nextFloat());
+			controlPoint.setFullOnAmps(random.nextInt(200));
 
 			random.nextBytes(adddress);
 			controlPoint.setTempSensorAddress(SensorMessageReaderWriter.readAddress(adddress, 0));

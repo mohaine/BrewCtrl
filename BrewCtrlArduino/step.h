@@ -30,12 +30,14 @@
 struct Control {
   bool mode;
   int controlId;
+  byte maxAmps;
 }; 
 Control control;
 
 struct ControlPoint {
   byte controlPin;
   byte duty;
+  byte fullOnAmps;
   byte tempSensorAddress[8];
   double targetTemp;
   bool hasDuty;
