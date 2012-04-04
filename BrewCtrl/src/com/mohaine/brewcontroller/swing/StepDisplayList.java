@@ -18,13 +18,19 @@
 
 package com.mohaine.brewcontroller.swing;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -71,9 +77,46 @@ public class StepDisplayList extends JPanel {
 		editorsPanel.setLayout(new GridLayout(0, 1));
 		add(editorsPanel, gbc);
 
+		gbc.gridx = 0;
+		gbc.gridy++;
+		JPanel addNew = new JPanel();
+		addNew.setLayout(new BorderLayout());
+
+		add(addNew, gbc);
+		JLabel addNewLabel = new JLabel("+ Add New Step");
+		addNewLabel.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				addNewStep();
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+			}
+		});
+
+		addNew.add(addNewLabel, BorderLayout.WEST);
+
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy++;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 
@@ -139,6 +182,12 @@ public class StepDisplayList extends JPanel {
 		}
 
 		editorsPanel.repaint();
+	}
+
+	private void addNewStep() {
+		List<HeaterStep> steps = new ArrayList<HeaterStep>(controller.getSteps());
+		steps.add(controller.createManualStep("New Step"));
+		controller.setSteps(steps);
 	}
 
 }

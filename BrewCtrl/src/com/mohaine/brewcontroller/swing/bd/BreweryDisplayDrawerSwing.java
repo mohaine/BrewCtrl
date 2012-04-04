@@ -161,7 +161,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		HeaterStep selectedStep = controller.getSelectedStep();
 
 		if (selectedStep != null) {
-			System.out.println("selectedStep: " + selectedStep.getName());
 			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getPin());
 			if (controlPointForPin != null) {
 				int cpDuty = controlPointForPin.getDuty();
