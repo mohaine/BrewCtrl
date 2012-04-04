@@ -143,9 +143,9 @@ void serialWriteStatus(){
     buffer[offset++] = DATA_END;
   }
 
+
   for (byte sensorIndex=0;sensorIndex<sensorCount;sensorIndex++){
     TempSensor *sensor = &sensors[sensorIndex];
-
     int crcStart = offset;
     buffer[offset++] = DATA_START;
     buffer[offset++] = SENSOR_CONTROL;
@@ -210,12 +210,12 @@ void readControlPoint(byte * serialBuffer,int offset){
   } 
 
   if(cp != NULL){
-    
+
     if(control.mode !=  MODE_ON){
       duty = 0;
       automaticControl  = false;
     }
-    
+
     if(automaticControl!= cp->automaticControl){
       cp->automaticControl = automaticControl;
       if(automaticControl){
@@ -238,14 +238,14 @@ void readControlPoint(byte * serialBuffer,int offset){
     offset+=4;    
 
     for(byte i=0;i<8;i++){             
-      cp->tempSensorAddress[i] == serialBuffer[offset+ i] ;
+      cp->tempSensorAddress[i] = serialBuffer[offset+i] ;
     }
 
   }
 }
 
 void readControlMessage(byte * serialBuffer,int offset){
-  
+
   lastControlIdTime = millis();
   control.controlId = readInt(serialBuffer,offset);
   offset+=2;
@@ -322,6 +322,7 @@ bool  readSerial() {
 
 
 #endif
+
 
 
 

@@ -179,15 +179,12 @@ byte getHexValue(char iValue){
 
 
 void updateControlPointState(){
-
-
-
+  //TODO Total Duty for elements
   if(control.mode == MODE_ON){
     for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
       ControlPoint* cp = &controlPoints[cpIndex];
       if(cp->automaticControl){
         TempSensor* sensor = getSensor(cp->tempSensorAddress);
-
         if(sensor!=NULL){
           if(sensor->reading){
             if(cp->hasDuty){
@@ -204,17 +201,14 @@ void updateControlPointState(){
             }
           } 
           else {
+            Serial.println("sensor not reading");
             cp->duty  = 0;
           }
+        } 
+        else {
+          Serial.println("Failed to find sensor");
         }
-
-
-      } 
-      else {
-        if(cp->hasDuty){
-          setHeatDuty(&cp->dutyController, cp->duty);
-        }
-      }
+      }      
     }
   }
 
@@ -245,6 +239,8 @@ void updateControlPointState(){
    */
 
 }
+
+
 
 
 
