@@ -104,12 +104,15 @@ void loop(void) {
   unsigned long now = millis();  
 
 
-  // If loose comm, turn off
-  if(lastControlIdTime > now){
-    lastControlIdTime = 0;
-  }
-  if(now - lastControlIdTime > 10000){
-    turnOff();    
+
+  if(control.turnOffOnCommLoss){
+    // If loose comm, turn off
+    if(lastControlIdTime > now){
+      lastControlIdTime = 0;
+    }
+    if(now - lastControlIdTime > 10000){
+      turnOff();    
+    }
   }
 
   // Update automaticly controlled duty/on/off states 
@@ -131,7 +134,6 @@ void loop(void) {
     lastHeatUpdate = lastHeatUpdate + HEAT_DELAY;
 
     if(control.mode ==  MODE_ON){
-      Serial.println();
       int currentAmps = 0;
       for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
         ControlPoint* cp = &controlPoints[cpIndex];
@@ -139,10 +141,10 @@ void loop(void) {
 
         /*
         Serial.print(cp->controlPin);
-        Serial.print(" has duty: ");
-        Serial.print(cp->hasDuty? "true":"false");
-        Serial.println();
-        */
+         Serial.print(" has duty: ");
+         Serial.print(cp->hasDuty? "true":"false");
+         Serial.println();
+         */
 
         int duty = cp->duty;
         if(currentAmps + cp->fullOnAmps > control.maxAmps){
@@ -162,11 +164,11 @@ void loop(void) {
 
         /*
         Serial.print(" Full On: " );
-        Serial.print(cp->fullOnAmps);
-        Serial.print(" currentAmps: " );
-        Serial.print(currentAmps);
-        Serial.println();
-        */
+         Serial.print(cp->fullOnAmps);
+         Serial.print(" currentAmps: " );
+         Serial.print(currentAmps);
+         Serial.println();
+         */
       }
     }
   }
@@ -260,6 +262,7 @@ void updateControlPointState(){
    */
 
 }
+
 
 
 

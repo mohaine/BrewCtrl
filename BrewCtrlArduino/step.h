@@ -31,6 +31,7 @@ struct Control {
   bool mode;
   int controlId;
   byte maxAmps;
+  bool turnOffOnCommLoss;
 }; 
 Control control;
 

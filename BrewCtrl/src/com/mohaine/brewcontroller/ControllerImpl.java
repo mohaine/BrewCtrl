@@ -264,6 +264,7 @@ public class ControllerImpl implements Controller {
 	private void updateHardware() {
 		HardwareControl hc = new HardwareControl();
 		hc.setMaxAmps(brewLayout.getMaxAmps());
+		hc.setTurnOffOnCommLoss(brewLayout.isTurnOffOnCommLoss());
 
 		HeaterMode heaterMode = mode == Mode.OFF ? HeaterMode.OFF : HeaterMode.ON;
 

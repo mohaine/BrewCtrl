@@ -19,13 +19,16 @@
 #ifndef COMM_H_
 #define COMM_H_
 
-#define DATA_START 0x01
+
+#define DATA_START 0x11
 #define SENSOR_CONTROL 0x12
 #define HARDWARE_CONTROL  0x13
 #define CONTROL_POINT  0x14
 #define DATA_END '\r'
 #define MESSAGE_ENEVELOP_SIZE 4
 #define MESSAGE_ENEVELOP_START_SIZE 2
+
+#define COMM_LOSS_MASK 0x01
 
 #define AUTO_MASK  0x01
 #define HAS_DUTY_MASK  0x02
@@ -104,7 +107,15 @@ void serialWriteStatus(){
 
   buffer[offset++] = (control.mode);
   buffer[offset++] = (control.maxAmps);
-  
+
+  {
+    byte booleanValues = 0x00;
+    if (control.turnOffOnCommLoss) {
+      booleanValues = booleanValues | COMM_LOSS_MASK;
+    }
+    buffer[offset++] = booleanValues;
+  }
+
   int crcLength = offset - crcStart;
   buffer[offset++] = computeCrc8(buffer, crcStart, crcLength);
   buffer[offset++] = DATA_END;
@@ -120,18 +131,16 @@ void serialWriteStatus(){
     buffer[offset++] = controlPoint->controlPin;
     buffer[offset++] = (byte) controlPoint->duty;
     buffer[offset++] = (controlPoint->fullOnAmps);
-  
+
 
 
     byte booleanValues = 0x00;
-
     if (controlPoint->automaticControl) {
       booleanValues = booleanValues | AUTO_MASK;
     }
     if (controlPoint-> hasDuty) {
       booleanValues = booleanValues | HAS_DUTY_MASK;
     }
-
     buffer[offset++] = booleanValues;
 
     writeFloat(buffer, offset, controlPoint->targetTemp);
@@ -189,7 +198,7 @@ void readControlPoint(byte * serialBuffer,int offset){
   byte pin = serialBuffer[offset++];
   byte duty = serialBuffer[offset++];
   byte fullOnAmps = serialBuffer[offset++];
-  
+
   ControlPoint* cp = NULL;
 
   for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
@@ -215,7 +224,7 @@ void readControlPoint(byte * serialBuffer,int offset){
 
   if(cp != NULL){
     cp->fullOnAmps = fullOnAmps;
-    
+
     if(control.mode !=  MODE_ON){
       duty = 0;
       automaticControl  = false;
@@ -257,8 +266,9 @@ void readControlMessage(byte * serialBuffer,int offset){
 
   control.mode = serialBuffer[offset++];
   control.maxAmps = serialBuffer[offset++];
-  
-  
+  byte booleanValues = serialBuffer[offset++];
+  control.turnOffOnCommLoss =  (booleanValues & COMM_LOSS_MASK) != 0;
+
   if(control.mode ==  MODE_ON){
     for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
       setHeatOn(&controlPoints[cpIndex].dutyController,true);            
@@ -278,7 +288,7 @@ void handleExtra(byte* data, int offset, int length) {
 
 void setupComm(){
   readMessages[0].msgId = HARDWARE_CONTROL; 
-  readMessages[0].length = 4; 
+  readMessages[0].length = 5; 
   readMessages[0].processFunction = readControlMessage;
   readMessages[1].msgId = CONTROL_POINT; 
   readMessages[1].length = 16; 
@@ -330,6 +340,7 @@ bool  readSerial() {
 
 
 #endif
+
 
 
 

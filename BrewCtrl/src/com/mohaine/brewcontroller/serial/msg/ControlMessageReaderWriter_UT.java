@@ -41,10 +41,11 @@ public class ControlMessageReaderWriter_UT {
 		for (int i = 0; i < 10000; i++) {
 			int offset = random.nextInt(20);
 
-			HardwareControl controlPoint = w.getControl();
-			controlPoint.setControlId(getRandomByte(random));
-			controlPoint.setMode(random.nextBoolean() ? HeaterMode.ON : HeaterMode.OFF);
-			controlPoint.setMaxAmps(random.nextInt(200));
+			HardwareControl control = w.getControl();
+			control.setControlId(getRandomByte(random));
+			control.setMode(random.nextBoolean() ? HeaterMode.ON : HeaterMode.OFF);
+			control.setMaxAmps(random.nextInt(200));
+			control.setTurnOffOnCommLoss(random.nextBoolean());
 
 			w.writeTo(buffer, offset);
 			r.readFrom(buffer, offset);

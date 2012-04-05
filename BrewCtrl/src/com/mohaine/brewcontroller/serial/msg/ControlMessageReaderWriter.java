@@ -10,12 +10,13 @@ import com.mohaine.brewcontroller.serial.ReadListener;
 import com.mohaine.brewcontroller.serial.SerialConstants;
 
 public class ControlMessageReaderWriter extends BinaryMessage implements MessageWriter, MessageReader {
+	private static final int COMM_LOSS_MASK = 0x01;
 	private HardwareControl control;
 	private ByteUtils byteUtils = new ByteUtils();
 	private ReadListener<ControlMessageReaderWriter> listener;
 
 	public ControlMessageReaderWriter() {
-		super(SerialConstants.HARDWARE_CONTROL, 4);
+		super(SerialConstants.HARDWARE_CONTROL, 5);
 	}
 
 	@Override
@@ -23,7 +24,11 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 		control.setControlId(byteUtils.getShort(buffer, offset));
 		offset += 2;
 		control.setMode(buffer[offset++] == 1 ? HeaterMode.ON : HeaterMode.OFF);
-		control.setMaxAmps( buffer[offset++]   );
+		control.setMaxAmps(buffer[offset++]);
+
+		int booleanValues = buffer[offset++];
+		control.setTurnOffOnCommLoss((booleanValues & COMM_LOSS_MASK) != 0);
+
 		if (listener != null) {
 			listener.onRead(this);
 		}
@@ -34,10 +39,16 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 
 		byteUtils.putShort(buffer, offset, (short) control.getControlId());
 		offset += 2;
-
 		buffer[offset++] = (byte) (control.getMode() == HeaterMode.ON ? 1 : 0);
-
 		buffer[offset++] = (byte) control.getMaxAmps();
+		int booleanValues = 0x00;
+
+		if (control.isTurnOffOnCommLoss()) {
+			booleanValues = booleanValues | COMM_LOSS_MASK;
+		}
+
+		buffer[offset++] = (byte) booleanValues;
+
 	}
 
 	public void setListener(ReadListener<ControlMessageReaderWriter> listener) {

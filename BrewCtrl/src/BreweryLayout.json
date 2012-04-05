@@ -1,4 +1,5 @@
 {
+   "turnOffOnCommLoss":true,
    "maxAmps":25,
    "tanks":[
       {

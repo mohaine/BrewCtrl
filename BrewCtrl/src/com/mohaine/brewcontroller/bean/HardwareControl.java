@@ -24,6 +24,8 @@ public class HardwareControl {
 	private HeaterMode mode = HeaterMode.UNKNOWN;
 	private int controlId;
 	private int maxAmps;
+	private boolean turnOffOnCommLoss;
+
 	private List<ControlPoint> controlPoints;
 
 	public int getControlId() {
@@ -44,6 +46,14 @@ public class HardwareControl {
 
 	public void setMaxAmps(byte maxAmps) {
 		this.maxAmps = (int) maxAmps & 0xff;
+	}
+
+	public boolean isTurnOffOnCommLoss() {
+		return turnOffOnCommLoss;
+	}
+
+	public void setTurnOffOnCommLoss(boolean turnOffOnCommLoss) {
+		this.turnOffOnCommLoss = turnOffOnCommLoss;
 	}
 
 	public HeaterMode getMode() {
