@@ -177,8 +177,8 @@ public class BreweryDisplay {
 			long time = System.currentTimeMillis() - dragState.lastTime;
 			if (time > 200 && Math.abs(delta) < 30) {
 				delta = delta < 0 ? -1 : 1;
-			} else if (time < 200 && Math.abs(delta) > 15) {
-				delta = delta * 2;
+			} else if (time > 100 && Math.abs(delta) > 15) {
+				delta = delta * 0.5;
 			}
 
 			BreweryComponent component = dragState.display.getComponent();
