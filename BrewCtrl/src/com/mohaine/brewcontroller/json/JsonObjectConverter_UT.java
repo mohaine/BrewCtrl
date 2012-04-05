@@ -40,6 +40,9 @@ public class JsonObjectConverter_UT {
 		TestObject reconstituedTo = (TestObject) jc.decode(js);
 		assertEquals(to, reconstituedTo);
 
+		TestObject nullId = (TestObject) jc.decode("{\"__type__\":\"TestObject\",\"enumValue\":\"ONE\"}");
+		assertNotNull(nullId);
+
 		for (int i = 0; i < 10; i++) {
 			to = new TestObject();
 			js = jc.encode(to);

@@ -11,6 +11,16 @@ public class BreweryLayout {
 	@ListType(Pump.class)
 	private List<Pump> pumps = new ArrayList<Pump>();
 
+	private int maxAmps = 25;
+
+	public int getMaxAmps() {
+		return maxAmps;
+	}
+
+	public void setMaxAmps(int maxAmps) {
+		this.maxAmps = maxAmps;
+	}
+
 	public List<Tank> getTanks() {
 		return tanks;
 	}

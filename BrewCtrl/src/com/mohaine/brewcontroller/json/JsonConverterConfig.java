@@ -57,7 +57,7 @@ public class JsonConverterConfig {
 				for (JsonObjectHandler<?> handler : objectHandlers) {
 					if (typeString.equals(handler.getType())) {
 						return convertToObject(unknownObject, handler);
-					}
+		 			}
 				}
 			}
 		}
@@ -72,6 +72,8 @@ public class JsonConverterConfig {
 			handler.processFromUnknown((T) obj, unknownObject, this);
 			return (T) obj;
 		} catch (Exception e) {
+			e.printStackTrace();
+			
 			throw new RuntimeException(e);
 		}
 	}

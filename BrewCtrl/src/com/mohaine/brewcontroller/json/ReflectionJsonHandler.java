@@ -76,6 +76,16 @@ public class ReflectionJsonHandler {
 				} else {
 					if (Boolean.TYPE.equals(field.getType())) {
 						value = (F) Boolean.FALSE;
+					} else if (Integer.TYPE.equals(field.getType())) {
+						value = (F) new Integer(0);
+					} else if (Long.TYPE.equals(field.getType())) {
+						value = (F) new Long(0);
+					} else if (Double.TYPE.equals(field.getType())) {
+						value = (F) new Double(0);
+					} else if (Float.TYPE.equals(field.getType())) {
+						value = (F) new Float(0);
+					} else if (Byte.TYPE.equals(field.getType())) {
+						value = (F) new Byte((byte) 0);
 					}
 				}
 

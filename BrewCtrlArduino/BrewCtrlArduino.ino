@@ -131,21 +131,42 @@ void loop(void) {
     lastHeatUpdate = lastHeatUpdate + HEAT_DELAY;
 
     if(control.mode ==  MODE_ON){
+      Serial.println();
+      int currentAmps = 0;
       for(int cpIndex=0;cpIndex<controlPointCount && cpIndex<MAX_CP_COUNT;cpIndex++){    
         ControlPoint* cp = &controlPoints[cpIndex];
+
+
         /*
         Serial.print(cp->controlPin);
-         Serial.print(" has duty: ");
-         Serial.print(cp->hasDuty? "true":"false");
-         Serial.println();
-         */
+        Serial.print(" has duty: ");
+        Serial.print(cp->hasDuty? "true":"false");
+        Serial.println();
+        */
+
+        int duty = cp->duty;
+        if(currentAmps + cp->fullOnAmps > control.maxAmps){
+          duty  = 0;
+        }
+
         if(cp->hasDuty){
-          setHeatDuty(&cp->dutyController,cp->duty);
+          setHeatDuty(&cp->dutyController,duty);
           updateHeatForStateAndDuty(&cp->dutyController);
         }  
         else {
-          updateForPinState(&cp->dutyController,cp->duty > 0);
+          updateForPinState(&cp->dutyController,duty > 0);
         }
+        if(cp->dutyController.pinState){
+          currentAmps +=  cp->fullOnAmps;
+        }
+
+        /*
+        Serial.print(" Full On: " );
+        Serial.print(cp->fullOnAmps);
+        Serial.print(" currentAmps: " );
+        Serial.print(currentAmps);
+        Serial.println();
+        */
       }
     }
   }
@@ -239,6 +260,11 @@ void updateControlPointState(){
    */
 
 }
+
+
+
+
+
 
 
 

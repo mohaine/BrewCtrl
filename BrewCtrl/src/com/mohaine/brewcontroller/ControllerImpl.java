@@ -185,6 +185,7 @@ public class ControllerImpl implements Controller {
 				controlPoint.setAutomaticControl(false);
 				controlPoint.setControlPin(heater.getPin());
 				controlPoint.setHasDuty(heater.isHasDuty());
+				controlPoint.setFullOnAmps(heater.getFullOnAmps());
 
 				Sensor sensor = tank.getSensor();
 				if (sensor != null) {
@@ -262,19 +263,19 @@ public class ControllerImpl implements Controller {
 
 	private void updateHardware() {
 		HardwareControl hc = new HardwareControl();
+		hc.setMaxAmps(brewLayout.getMaxAmps());
+
 		HeaterMode heaterMode = mode == Mode.OFF ? HeaterMode.OFF : HeaterMode.ON;
 
 		hc.setMode(heaterMode);
 
 		if (steps.size() > 0) {
 			HeaterStep currentStep = steps.get(0);
-
 			boolean active = heaterMode == HeaterMode.ON;
 			if (active != currentStep.isActive()) {
 				currentStep.setActive(active);
 				eventBus.fireEvent(new StepModifyEvent(currentStep));
 				updateLayoutState(true);
-
 			}
 
 			ArrayList<ControlPoint> controlPoints = currentStep.getControlPoints();
