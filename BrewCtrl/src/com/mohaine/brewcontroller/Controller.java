@@ -43,8 +43,8 @@ public interface Controller {
 
 	public void nextStep();
 
-	public BreweryLayout getLayout();
-
 	public HeaterStep createManualStep(String name);
+
+	public BreweryLayout getLayout();
 
 }

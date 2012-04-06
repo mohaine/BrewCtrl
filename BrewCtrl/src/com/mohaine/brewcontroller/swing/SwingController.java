@@ -18,13 +18,20 @@
 
 package com.mohaine.brewcontroller.swing;
 
+import java.io.File;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mohaine.brewcontroller.BrewControllerStartup;
+import com.mohaine.brewcontroller.Configuration;
 
 public class SwingController {
 	public static void main(String[] args) {
-		Injector injector = Guice.createInjector(new BrewControllerSwingModule());
+
+		File configFile = new File("BreweryLayout.json");
+
+		Injector injector = Guice.createInjector(new BrewControllerSwingModule(configFile));
+
 		BrewControllerStartup bc = injector.getInstance(BrewControllerStartup.class);
 		bc.startup();
 	}

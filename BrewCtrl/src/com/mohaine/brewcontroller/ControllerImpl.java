@@ -106,15 +106,18 @@ public class ControllerImpl implements Controller {
 	private BrewPrefs prefs;
 	private BreweryLayout brewLayout;
 	private Monitor monitor = new Monitor();
+	private Configuration configuration;
 
 	@Inject
-	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs) throws Exception {
+	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs, Configuration configuration) throws Exception {
 		super();
 		this.eventBus = eventBusp;
 		this.hardware = hardware;
 		this.prefs = prefs;
+		this.configuration = configuration;
 
 		initLayout();
+
 		steps.add(createManualStep("Default"));
 		selectedStep = steps.get(0);
 		updateHardware();
@@ -290,22 +293,7 @@ public class ControllerImpl implements Controller {
 	}
 
 	private void initLayout() throws Exception {
-
-		JsonObjectConverter jc = getJsonConverter();
-
-		InputStream resourceAsStream = getClass().getResourceAsStream("/BreweryLayout.json");
-		try {
-			if (resourceAsStream != null) {
-				String json = new String(StreamUtils.readStream(resourceAsStream));
-				brewLayout = jc.decode(json, BreweryLayout.class);
-			}
-		} finally {
-			StreamUtils.close(resourceAsStream);
-		}
-
-		if (brewLayout == null) {
-			brewLayout = new BreweryLayout();
-		}
+		brewLayout = configuration.getBrewLayout();
 
 		// String json = jc.encode(brewLayout);
 		// JsonPrettyPrint jpp = new JsonPrettyPrint();
@@ -325,16 +313,6 @@ public class ControllerImpl implements Controller {
 			}
 		}
 
-	}
-
-	private JsonObjectConverter getJsonConverter() throws Exception {
-		JsonObjectConverter jc = new JsonObjectConverter(false);
-		jc.addHandler(ReflectionJsonHandler.build(BreweryLayout.class));
-		jc.addHandler(ReflectionJsonHandler.build(Tank.class));
-		jc.addHandler(ReflectionJsonHandler.build(Sensor.class));
-		jc.addHandler(ReflectionJsonHandler.build(HeatElement.class));
-		jc.addHandler(ReflectionJsonHandler.build(Pump.class));
-		return jc;
 	}
 
 	private void updateLayoutState(boolean forceDirty) {

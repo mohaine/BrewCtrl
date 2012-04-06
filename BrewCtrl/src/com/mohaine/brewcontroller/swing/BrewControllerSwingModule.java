@@ -18,12 +18,26 @@
 
 package com.mohaine.brewcontroller.swing;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.google.inject.AbstractModule;
+import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
+import com.mohaine.brewcontroller.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.json.ReflectionJsonHandler;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.layout.HeatElement;
+import com.mohaine.brewcontroller.layout.Pump;
+import com.mohaine.brewcontroller.layout.Sensor;
+import com.mohaine.brewcontroller.layout.Tank;
 import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.page.Setup.SetupDisplay;
@@ -34,12 +48,53 @@ import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
 import com.mohaine.brewcontroller.swing.page.MainMenuDisplaySwing;
 import com.mohaine.brewcontroller.swing.page.OverviewDisplaySwing;
 import com.mohaine.brewcontroller.swing.page.SetupDisplaySwing;
+import com.mohaine.brewcontroller.util.StreamUtils;
 import com.mohaine.event.bus.EventBus;
 
 public class BrewControllerSwingModule extends AbstractModule {
 
+	private File configFile;
+
+	public BrewControllerSwingModule(File configFile) {
+		this.configFile = configFile;
+	}
+
+	public Configuration initFromFile(File file) throws Exception, FileNotFoundException, IOException {
+		JsonObjectConverter jc = getJsonConverter();
+
+		InputStream fis = new FileInputStream(file);
+		try {
+			String json = new String(StreamUtils.readStream(fis));
+			return jc.decode(json, Configuration.class);
+		} finally {
+			StreamUtils.close(fis);
+		}
+
+	}
+
+	private static JsonObjectConverter getJsonConverter() throws Exception {
+		JsonObjectConverter jc = new JsonObjectConverter(false);
+		jc.addHandler(ReflectionJsonHandler.build(Configuration.class));
+		jc.addHandler(ReflectionJsonHandler.build(BreweryLayout.class));
+		jc.addHandler(ReflectionJsonHandler.build(Tank.class));
+		jc.addHandler(ReflectionJsonHandler.build(Sensor.class));
+		jc.addHandler(ReflectionJsonHandler.build(HeatElement.class));
+		jc.addHandler(ReflectionJsonHandler.build(Pump.class));
+		return jc;
+	}
+
 	@Override
 	protected void configure() {
+
+		Configuration cfg = null;
+		try {
+			cfg = initFromFile(configFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			cfg = new Configuration();
+		}
+		bind(Configuration.class).toInstance(cfg);
+
 		bind(ControllerGui.class).to(SwingControllerInterface.class).asEagerSingleton();
 		bind(Controller.class).to(ControllerImpl.class).asEagerSingleton();
 

@@ -1,0 +1,45 @@
+{"brewLayout":
+	{
+	   "turnOffOnCommLoss":true,
+	   "maxAmps":25,
+	   "tanks":[
+	      {
+	         "name":"HLT",
+	         "sensor":{
+	            "reading":false
+	         },
+	         "heater":{
+	            "name":"HTL Element",
+	            "pin":9,
+	            "duty":0,
+	            "canPulse":true,
+	            "fullOnAmps":18
+	         }
+	      },
+	      {
+	         "name":"TUN",
+	         "sensor":{
+	            "reading":false
+	         }
+	      },
+	      {
+	         "name":"Kettle",
+	         "heater":{
+	            "name":"Kettle Element",
+	            "pin":7,
+	            "duty":0,
+	            "canPulse":true,
+	            "fullOnAmps":23
+	         }
+	      }
+	   ],
+	   "pumps":[
+	      {
+	         "name":"HLT Loop",
+	         "pin":8,
+	         "duty":0,
+	         "canPulse":false
+	      }
+	   ]
+	}
+}
