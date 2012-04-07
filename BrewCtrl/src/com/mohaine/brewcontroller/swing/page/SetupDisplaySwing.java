@@ -165,7 +165,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 		sensorPanel.add(new JLabel("Sensor Location:"), gbc);
 		gbc.gridx++;
 
-		JComboBox<Tank> locationCombo = new JComboBox<Tank>();
+		JComboBox locationCombo = new JComboBox();
 		sensorPanel.add(locationCombo, gbc);
 		locationCombo.addItem(null);
 
@@ -207,7 +207,7 @@ public class SetupDisplaySwing extends JPanel implements SetupDisplay {
 	}
 
 	private class SensorLabel implements KeyListener, ItemListener {
-		public JComboBox<Tank> combo;
+		public JComboBox combo;
 		JTextField value;
 		HardwareSensor sensor;
 
