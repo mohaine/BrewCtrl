@@ -136,21 +136,19 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 
 		StringBuffer sb = new StringBuffer();
 
-		String locationName = null;
-		SensorConfiguration sConfig = config.findSensor(value.getAddress());
-		if (sConfig != null) {
-			locationName = sConfig.getLocation();
-		}
+		SensorConfiguration sConfig = getSensorConfig(value);
+
+		String locationName = sConfig.getLocation();
 
 		if (StringUtils.hasLength(locationName)) {
 			sb.append(locationName);
 		}
-		if (StringUtils.hasLength(value.getName())) {
-			if (!value.getName().equals(locationName)) {
+		if (StringUtils.hasLength(sConfig.getName())) {
+			if (!sConfig.getName().equals(locationName)) {
 				if (sb.length() > 0) {
 					sb.append(" - ");
 				}
-				sb.append(value.getName());
+				sb.append(sConfig.getName());
 			}
 		}
 		sb.append(":");
@@ -158,10 +156,21 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 		label.setText(sb.toString());
 	}
 
+	private SensorConfiguration getSensorConfig(HardwareSensor value) {
+		SensorConfiguration sConfig = config.findSensor(value.getAddress());
+		if (sConfig == null) {
+			sConfig = new SensorConfiguration();
+			sConfig.setName(value.getAddress());
+		}
+		return sConfig;
+	}
+
 	private void stopEditing() {
 		if (editing) {
 			editing = false;
 			removeAll();
+			setValue(value);
+			
 			add(label);
 			this.doLayout();
 			repaint();
@@ -182,7 +191,7 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 			editor.locationCombo.doLayout();
 			repaint();
 			editor.panel.repaint();
-			editor.editField.requestFocus();
+			editor.locationCombo.requestFocus();
 		}
 
 	}
@@ -195,9 +204,15 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 
 		public Editor() {
 			super();
+			SensorConfiguration sConfig = getSensorConfig(value);
 
 			editField = new JTextField();
-			editField.setText(value.getName());
+			String editName = sConfig.getName();
+			if (editName != null && editName.equals(value.getAddress())) {
+				editName = "";
+			}
+
+			editField.setText(editName);
 			editField.addKeyListener(new KeyListener() {
 
 				@Override
@@ -220,7 +235,6 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 
 			List<Tank> tanks = config.getBrewLayout().getTanks();
 
-			SensorConfiguration sConfig = config.findSensor(value.getAddress());
 			locationCombo = new JComboBox();
 			locationCombo.addItem(null);
 			for (Tank tank : tanks) {
@@ -278,10 +292,10 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 
 				@Override
 				public void focusLost(FocusEvent paramFocusEvent) {
-					timeout.start(500, new Runnable() {
+					timeout.start(250, new Runnable() {
 						@Override
 						public void run() {
-							stopEditing();
+							stopEditingSave();
 						}
 					});
 				}
@@ -302,9 +316,8 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 			if (tank != null) {
 				locationName = tank.getName();
 			}
-			config.updateSensor(value.getAddress(), editField.getText(), locationName);
-
-			value.setName(editField.getText());
+			String name = editField.getText();
+			config.updateSensor(value.getAddress(), name, locationName);
 			stopEditing();
 		}
 	}

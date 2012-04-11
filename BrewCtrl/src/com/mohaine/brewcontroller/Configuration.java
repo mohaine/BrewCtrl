@@ -33,7 +33,7 @@ public class Configuration {
 		this.sensors = sensors;
 	}
 
-	public void updateSensor(String address, String name, String locationName) {
+	public SensorConfiguration updateSensor(String address, String name, String locationName) {
 
 		SensorConfiguration sensor = findSensor(address);
 
@@ -48,6 +48,8 @@ public class Configuration {
 
 		sensor.setName(name);
 		sensor.setLocation(locationName);
+
+		return sensor;
 
 	}
 

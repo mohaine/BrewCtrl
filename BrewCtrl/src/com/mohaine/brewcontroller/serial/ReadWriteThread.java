@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mohaine.brewcontroller.Configuration;
-import com.mohaine.brewcontroller.SensorConfiguration;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
@@ -90,14 +89,8 @@ final class ReadWriteThread implements Runnable {
 				}
 
 				if (sensor == null) {
-					String name = "Sensor " + (sensors.size() + 1);
 					sensor = new HardwareSensor();
 					sensor.setAddress(readSensor.getAddress());
-					SensorConfiguration sConfig = config.findSensor(readSensor.getAddress());
-					if (sConfig != null) {
-						name = sConfig.getName();
-					}
-					sensor.setName(name);
 					sensors.add(sensor);
 				}
 				sensor.setReading(readSensor.isReading());

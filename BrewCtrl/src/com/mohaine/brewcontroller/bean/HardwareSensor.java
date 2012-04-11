@@ -21,7 +21,6 @@ package com.mohaine.brewcontroller.bean;
 public class HardwareSensor {
 
 	private String address;
-	private String name;
 	private double tempatureC;
 	private boolean reading = false;
 
@@ -41,14 +40,6 @@ public class HardwareSensor {
 		this.tempatureC = tempatureC;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public boolean isReading() {
 		return reading;
 	}
@@ -59,7 +50,7 @@ public class HardwareSensor {
 
 	@Override
 	public String toString() {
-		return name;
+		return address;
 	}
 
 }

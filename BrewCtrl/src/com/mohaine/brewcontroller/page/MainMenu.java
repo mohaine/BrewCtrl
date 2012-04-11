@@ -117,7 +117,6 @@ public class MainMenu extends BasePage {
 							controlPointForPin.setTargetTemp(targetTunTempC);
 						}
 					}
-
 				}
 			}
 		}
