@@ -28,7 +28,7 @@ import com.mohaine.brewcontroller.Configuration;
 public class SwingController {
 	public static void main(String[] args) {
 
-		File configFile = new File("BreweryLayout.json");
+		File configFile = new File("BrewControllerConfig.json");
 
 		Injector injector = Guice.createInjector(new BrewControllerSwingModule(configFile));
 

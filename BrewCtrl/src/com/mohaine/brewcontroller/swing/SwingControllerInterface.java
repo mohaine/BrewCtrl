@@ -21,12 +21,15 @@ package com.mohaine.brewcontroller.swing;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.CloseAction;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.DisplayPage;
 
@@ -36,12 +39,15 @@ public class SwingControllerInterface implements ControllerGui {
 
 	DisplayPage currentPage;
 	private StatusDisplay statusDisplay;
+	private CloseAction closeAction;
 
 	@Inject
-	public SwingControllerInterface(StatusDisplay statusDisplay) {
+	public SwingControllerInterface(StatusDisplay statusDisplay, CloseAction closeAction) {
 		super();
+		this.closeAction = closeAction;
 		this.statusDisplay = statusDisplay;
 		mainPanel.setLayout(new BorderLayout());
+
 	}
 
 	@Override
@@ -69,6 +75,38 @@ public class SwingControllerInterface implements ControllerGui {
 	@Override
 	public void init() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+			}
+
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+			}
+
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				closeAction.run();
+			}
+
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+			}
+
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+			}
+		});
+
 		Container cp = frame.getContentPane();
 		cp.setLayout(new BorderLayout());
 		cp.add(mainPanel, BorderLayout.CENTER);

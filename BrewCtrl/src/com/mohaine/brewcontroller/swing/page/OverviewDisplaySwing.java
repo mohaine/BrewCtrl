@@ -25,7 +25,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.BrewPrefs;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.bd.BreweryDisplay;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -39,7 +38,7 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 	private BreweryDisplay breweryDisplay;
 
 	@Inject
-	public OverviewDisplaySwing(Hardware hardware, final BrewPrefs prefs, BreweryDisplay breweryDisplayp) {
+	public OverviewDisplaySwing(Hardware hardware, BreweryDisplay breweryDisplayp) {
 		super();
 		this.breweryDisplay = breweryDisplayp;
 		setLayout(new BorderLayout());

@@ -19,7 +19,7 @@
 package com.mohaine.brewcontroller.serial;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.BrewPrefs;
+import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.HardwareBase;
 import com.mohaine.brewcontroller.bean.HardwareControl;
@@ -44,9 +44,9 @@ public class SerialHardwareComm extends HardwareBase implements Hardware {
 	private ReadWriteThread readWriteThread;
 
 	@Inject
-	public SerialHardwareComm(BrewPrefs prefs, SerialConnection serialConn) {
+	public SerialHardwareComm(Configuration config, SerialConnection serialConn) {
 		hardareControl.setMode(HeaterMode.OFF);
-		readWriteThread = new ReadWriteThread(this, prefs, serialConn);
+		readWriteThread = new ReadWriteThread(this, config, serialConn);
 		new Thread(readWriteThread).start();
 	}
 

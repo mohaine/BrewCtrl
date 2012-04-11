@@ -37,6 +37,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Controller.Mode;
 import com.mohaine.brewcontroller.Hardware;
@@ -131,14 +132,16 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 	private Color normalStatusForeground;
 
+	private Provider<SensorEditor> providerSensorEditor;
+
 	@Inject
-	public StatusDisplay(Hardware hardware, UnitConversion conversion, Controller controller, EventBus eventBus, StepDisplayList stepDisplay) {
+	public StatusDisplay(Hardware hardware, UnitConversion conversion, Controller controller, EventBus eventBus, StepDisplayList stepDisplay, Provider<SensorEditor> providerSensorEditor) {
 		super();
 		this.hardware = hardware;
 		this.conversion = conversion;
 		this.controller = controller;
 		this.eventBus = eventBus;
-
+		this.providerSensorEditor = providerSensorEditor;
 		setLayout(new BorderLayout());
 
 		JPanel modePanel = createTitledPanel("Mode");
@@ -222,29 +225,37 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 	}
 
 	private JLabel addTitledLabel(GridBagConstraints gbc, JPanel panel, String title) {
+
+		gbc.gridx = 0;
+		gbc.weightx = 2;
+		gbc.gridy++;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
+
 		panel.add(new JLabel(title), gbc);
+
 		gbc.gridx++;
+		gbc.weightx = 1;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		JLabel value = new JLabel();
 		panel.add(value, gbc);
-		gbc.gridx = 0;
-		gbc.gridy++;
 		return value;
 
 	}
 
 	private SensorLabel addTitledSensorLabel(GridBagConstraints gbc, JPanel panel, HardwareSensor tempSensor) {
+
+		gbc.gridx = 0;
+		gbc.gridy++;
+		gbc.weightx = 2;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		JLabel label = new JLabel();
+		SensorEditor label = providerSensorEditor.get();
 		panel.add(label, gbc);
+		
+		gbc.weightx = 1;
 		gbc.gridx++;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 		JLabel value = new JLabel();
 		panel.add(value, gbc);
-
-		gbc.gridx = 0;
-		gbc.gridy++;
 
 		SensorLabel sensorLabel = new SensorLabel();
 		sensorLabel.value = value;
@@ -306,16 +317,14 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 	}
 
 	private class SensorLabel {
-		JLabel label;
+		SensorEditor label;
 		JLabel value;
 		HardwareSensor sensor;
 
 		public void update() {
-			label.setText(sensor.getName() + ":");
+			label.setValue(sensor);
 			value.setText(tempFormat.format(conversion.getTempDisplayConveter().convertFrom(sensor.getTempatureC())));
-
 			label.setForeground(sensor.isReading() ? normalStatusForeground : Color.red);
-
 		}
 	}
 

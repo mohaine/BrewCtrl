@@ -35,7 +35,6 @@ public class BrewControllerStartup {
 	}
 
 	public void startup() {
-
 		if (!started) {
 			ci.init();
 			ci.displayPage(startupPage);

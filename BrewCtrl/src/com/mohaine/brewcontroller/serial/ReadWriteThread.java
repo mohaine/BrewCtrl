@@ -24,7 +24,8 @@ package com.mohaine.brewcontroller.serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mohaine.brewcontroller.BrewPrefs;
+import com.mohaine.brewcontroller.Configuration;
+import com.mohaine.brewcontroller.SensorConfiguration;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
@@ -68,7 +69,7 @@ final class ReadWriteThread implements Runnable {
 
 	}
 
-	public ReadWriteThread(SerialHardwareComm serialHardwareComm, final BrewPrefs prefs, SerialConnection conn) {
+	public ReadWriteThread(SerialHardwareComm serialHardwareComm, final Configuration config, SerialConnection conn) {
 		this.serialHardwareComm = serialHardwareComm;
 		this.conn = conn;
 
@@ -89,10 +90,14 @@ final class ReadWriteThread implements Runnable {
 				}
 
 				if (sensor == null) {
-					String defaultName = "Sensor " + (sensors.size() + 1);
+					String name = "Sensor " + (sensors.size() + 1);
 					sensor = new HardwareSensor();
 					sensor.setAddress(readSensor.getAddress());
-					sensor.setName(prefs.getSensorName(readSensor.getAddress(), defaultName));
+					SensorConfiguration sConfig = config.findSensor(readSensor.getAddress());
+					if (sConfig != null) {
+						name = sConfig.getName();
+					}
+					sensor.setName(name);
 					sensors.add(sensor);
 				}
 				sensor.setReading(readSensor.isReading());

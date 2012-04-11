@@ -100,17 +100,15 @@ public class ControllerImpl implements Controller {
 	private Mode mode = Mode.OFF;
 	private EventBus eventBus;
 	private Hardware hardware;
-	private BrewPrefs prefs;
 	private BreweryLayout brewLayout;
 	private Monitor monitor = new Monitor();
 	private Configuration configuration;
 
 	@Inject
-	public ControllerImpl(EventBus eventBusp, Hardware hardware, BrewPrefs prefs, Configuration configuration) throws Exception {
+	public ControllerImpl(EventBus eventBusp, Hardware hardware, Configuration configuration) throws Exception {
 		super();
 		this.eventBus = eventBusp;
 		this.hardware = hardware;
-		this.prefs = prefs;
 		this.configuration = configuration;
 
 		initLayout();
@@ -191,7 +189,9 @@ public class ControllerImpl implements Controller {
 				if (sensor != null) {
 					List<HardwareSensor> sensors = hardware.getSensors();
 					for (HardwareSensor hardwareSensor : sensors) {
-						if (tank.getName().equals(prefs.getSensorLocation(hardwareSensor.getAddress(), ""))) {
+						SensorConfiguration findSensorByLocation = configuration.findSensor(hardwareSensor.getAddress());
+
+						if (findSensorByLocation != null && tank.getName().equals(findSensorByLocation.getLocation())) {
 							controlPoint.setAutomaticControl(false);
 							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
 							break;
@@ -331,26 +331,38 @@ public class ControllerImpl implements Controller {
 			}
 		}
 
-		List<HardwareSensor> sensors = hardware.getSensors();
-		for (HardwareSensor tempSensor : sensors) {
-			List<Tank> tanks = brewLayout.getTanks();
-			for (Tank tank : tanks) {
-				Sensor sensor = tank.getSensor();
-				if (sensor != null) {
-					if (tank.getName().equals(prefs.getSensorLocation(tempSensor.getAddress(), ""))) {
-						Double temp = sensor.getTempatureC();
-						boolean reading = sensor.isReading();
-						sensor.setAddress(tempSensor.getAddress());
-						sensor.setReading(tempSensor.isReading());
-						sensor.setTempatureC(tempSensor.getTempatureC());
+		List<Tank> tanks = brewLayout.getTanks();
+		for (Tank tank : tanks) {
+			Sensor sensor = tank.getSensor();
+			if (sensor != null) {
 
-						boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
-						if (diff) {
-							fireBreweryComponentChangeHandler(sensor);
-						}
+				HardwareSensor tankTs = null;
+				List<HardwareSensor> sensors = hardware.getSensors();
+				for (HardwareSensor tempSensor : sensors) {
+					SensorConfiguration findSensor = configuration.findSensor(tempSensor.getAddress());
+					if (findSensor != null && tank.getName().equals(findSensor.getLocation())) {
+						tankTs = tempSensor;
+						break;
 					}
 				}
+				
+				if (tankTs == null) {
+					tankTs = new HardwareSensor();
+				}
+
+				Double temp = sensor.getTempatureC();
+				boolean reading = sensor.isReading();
+				sensor.setAddress(tankTs.getAddress());
+				sensor.setReading(tankTs.isReading());
+				sensor.setTempatureC(tankTs.getTempatureC());
+
+				boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
+				if (diff) {
+					fireBreweryComponentChangeHandler(sensor);
+				}
+
 			}
+
 		}
 	}
 

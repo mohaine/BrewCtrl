@@ -50,8 +50,7 @@ public class MainMenu extends BasePage {
 	private Converter<Double, Double> tempDisplayConveter;
 
 	@Inject
-	public MainMenu(MainMenuDisplay display, final Provider<Setup> providerSetup, final ControllerGui controllerGui, final Controller controller, final Provider<Overview> providerOverview,
-			final UnitConversion conversion) {
+	public MainMenu(MainMenuDisplay display, final ControllerGui controllerGui, final Controller controller, final Provider<Overview> providerOverview, final UnitConversion conversion) {
 		super();
 		this.display = display;
 		this.controller = controller;
@@ -60,12 +59,6 @@ public class MainMenu extends BasePage {
 
 		tempDisplayConveter = conversion.getTempDisplayConveter();
 
-		display.addClickable("Setup", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				controllerGui.displayPage(providerSetup.get());
-			}
-		});
 		display.addClickable("Overview", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
