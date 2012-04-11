@@ -133,7 +133,6 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 		if (fireEvents) {
 			fireEvent(new ChangeEvent());
 		}
-		String displayName = value.getName();
 
 		StringBuffer sb = new StringBuffer();
 
@@ -157,18 +156,6 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 		sb.append(":");
 
 		label.setText(sb.toString());
-	}
-
-	private void stopEditing(String newValue) {
-		if (editing) {
-			try {
-				value.setName(newValue);
-				setValue(value, true);
-				stopEditing();
-			} catch (Exception e) {
-				// TODO Show error msg
-			}
-		}
 	}
 
 	private void stopEditing() {
@@ -200,12 +187,12 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private class Editor {
 		private JPanel panel;
 		private JTextField editField;
 		private JComboBox locationCombo;
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public Editor() {
 			super();
 
