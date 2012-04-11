@@ -18,7 +18,6 @@
 
 package com.mohaine.brewcontroller;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +28,11 @@ import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterMode;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
+import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
-import com.mohaine.brewcontroller.json.JsonObjectConverter;
-import com.mohaine.brewcontroller.json.ReflectionJsonHandler;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -42,7 +40,6 @@ import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
-import com.mohaine.brewcontroller.util.StreamUtils;
 import com.mohaine.event.StatusChangeHandler;
 import com.mohaine.event.bus.EventBus;
 
@@ -251,15 +248,19 @@ public class ControllerImpl implements Controller {
 
 	@Override
 	public void setMode(Mode mode) {
+		boolean dirty = this.mode != mode;
 		this.mode = mode;
-
 		updateHardware();
+		if (dirty && eventBus != null) {
+			eventBus.fireEvent(new ChangeModeEvent(mode));
+		}
 	}
 
 	@Override
 	public void setSelectedStep(HeaterStep step) {
+		boolean dirty = this.selectedStep != step;
 		this.selectedStep = step;
-		if (eventBus != null) {
+		if (dirty && eventBus != null) {
 			eventBus.fireEvent(new ChangeSelectedStepEvent(selectedStep));
 		}
 	}

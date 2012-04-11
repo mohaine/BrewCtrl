@@ -19,6 +19,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.Converter;
@@ -53,24 +55,56 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	@Override
-	public void redrawBreweryComponent(BreweryComponent componentChanged) {
-		Graphics2D g2 = (Graphics2D) getGraphics();
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	public void redrawBreweryComponent(final BreweryComponent componentChanged) {
+		if (SwingUtilities.isEventDispatchThread()) {
 
-		for (BreweryComponentDisplay display : displays) {
-			BreweryComponent displayComponent = display.getComponent();
-			if (displayComponent == componentChanged) {
-				drawComponent(g2, display, false);
+			redrawBreweryComponentSwing(componentChanged);
+		} else {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					redrawBreweryComponentSwing(componentChanged);
+				}
+			});
+		}
+	}
+
+	private void redrawBreweryComponentSwing(BreweryComponent componentChanged) {
+		Graphics2D g2 = (Graphics2D) getGraphics();
+		if (g2 != null) {
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			for (BreweryComponentDisplay display : displays) {
+				BreweryComponent displayComponent = display.getComponent();
+				if (displayComponent == componentChanged) {
+					drawComponent(g2, display, false);
+				}
 			}
 		}
 	}
 
 	@Override
 	public void redrawAll() {
+
+		if (SwingUtilities.isEventDispatchThread()) {
+			redrawAllSwing();
+		} else {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					redrawAllSwing();
+				}
+			});
+		}
+	}
+
+	private void redrawAllSwing() {
 		Graphics2D g2 = (Graphics2D) getGraphics();
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		for (BreweryComponentDisplay display : displays) {
-			drawComponent(g2, display, false);
+		if (g2 != null) {
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			for (BreweryComponentDisplay display : displays) {
+				drawComponent(g2, display, false);
+			}
 		}
 	}
 
@@ -152,7 +186,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	private void drawHeatElement(Graphics2D g, BreweryComponentDisplay display) {
-
 		HeatElement heater = (HeatElement) display.getComponent();
 		int duty = heater.getDuty();
 		String text = null;
@@ -168,7 +201,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				if (controlPointForPin.isAutomaticControl()) {
 					color = Colors.INACTIVE;
 				}
-
 				if (selectedStep.isActive()) {
 					if (controlPointForPin.isAutomaticControl()) {
 						text = Integer.toString(duty) + "%";
@@ -192,7 +224,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		if (text == null) {
 			text = Integer.toString(duty) + "%";
 		}
-		// System.out.println("Draw element: " + text);
 		drawText(g, display, text, color, true);
 
 	}
