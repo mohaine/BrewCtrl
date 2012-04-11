@@ -48,4 +48,47 @@ public class BreweryLayout {
 
 	}
 
+	public BrewHardwareControl findBrewHardwareControlByNameOrParentName(String name) {
+		// Find by name
+		for (Tank tank : tanks) {
+			HeatElement heater = tank.getHeater();
+			if (heater != null && heater.getName() != null && heater.getName().equals(name)) {
+				return heater;
+			}
+		}
+		for (Pump pump : pumps) {
+			if (pump != null && pump.getName() != null && pump.getName().equals(name)) {
+				return pump;
+			}
+		}
+
+		// Find by parent name
+		for (Tank tank : tanks) {
+			HeatElement heater = tank.getHeater();
+			if (heater != null && tank.getName().equals(name)) {
+				return heater;
+			}
+		}
+		return null;
+	}
+
+	public Sensor findSensorByNameOrParentName(String name) {
+		// Find by name
+		for (Tank tank : tanks) {
+			Sensor sensor = tank.getSensor();
+			if (sensor != null && sensor.getName() != null && sensor.getName().equals(name)) {
+				return sensor;
+			}
+		}
+
+		// Find by parent name
+		for (Tank tank : tanks) {
+			Sensor sensor = tank.getSensor();
+			if (sensor != null && tank.getName().equals(name)) {
+				return sensor;
+			}
+		}
+		return null;
+	}
+
 }

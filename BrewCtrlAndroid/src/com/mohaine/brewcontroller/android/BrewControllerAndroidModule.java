@@ -23,9 +23,7 @@ import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
-import com.mohaine.brewcontroller.android.display.MainMenuDisplayAndroid;
 import com.mohaine.brewcontroller.android.display.OverviewDisplayAndroid;
-import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.serial.RxTxComm;
 import com.mohaine.brewcontroller.serial.SerialConnection;
@@ -39,7 +37,6 @@ public class BrewControllerAndroidModule extends AbstractModule {
 		bind(ControllerGui.class).to(ControllerInterfaceAndroid.class);
 		bind(Controller.class).to(ControllerImpl.class).asEagerSingleton();
 
-		bind(MainMenuDisplay.class).to(MainMenuDisplayAndroid.class);
 		bind(OverviewDisplay.class).to(OverviewDisplayAndroid.class);
 		bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
 		bind(SerialConnection.class).to(RxTxComm.class).asEagerSingleton();

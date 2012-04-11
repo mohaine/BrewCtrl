@@ -60,10 +60,142 @@
    ],
    "stepLists":[
       {
-         "name":"1 Step Mash"
+         "name":"1 Step Mash",
+         "steps":[
+            {
+               "name":"Mash",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":79.4444444,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":73.8888889,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash",
+               "time":"60:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":72.7777778,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":67.2222222,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash Out",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":82.2222222,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":76.6666667,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            }
+         ]
       },
       {
-         "name":"3 Step Mash"
+         "name":"3 Step Mash",
+         "steps":[
+            {
+               "name":"Mash",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":48.3333333,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":43.3333333,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash 1",
+               "time":"30:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":45.5555556,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":40.0,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash 2",
+               "time":"30:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":55.5555556,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":50.0,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash 3",
+               "time":"30:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":73.5555556,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":68.0,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash Out",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":82.2222222,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":76.6666667,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            }
+         ]
       }
    ]
 }

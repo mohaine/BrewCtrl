@@ -39,11 +39,18 @@ import javax.swing.SwingUtilities;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.mohaine.brewcontroller.Configuration;
+import com.mohaine.brewcontroller.ConfigurationHeaterStep;
+import com.mohaine.brewcontroller.ConfigurationHeaterStepControlPoint;
+import com.mohaine.brewcontroller.ConfigurationStepList;
 import com.mohaine.brewcontroller.Controller;
-import com.mohaine.brewcontroller.StepList;
+import com.mohaine.brewcontroller.TimeParser;
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
+import com.mohaine.brewcontroller.layout.BrewHardwareControl;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.bus.EventBus;
 
@@ -118,7 +125,7 @@ public class StepDisplayList extends JPanel {
 		});
 		controlPanel.add(addNewLabel, BorderLayout.WEST);
 
-		List<StepList> stepLists = config.getStepLists();
+		List<ConfigurationStepList> stepLists = config.getStepLists();
 		if (stepLists != null && stepLists.size() > 0) {
 			final JLabel listLabel = new JLabel("List");
 
@@ -126,13 +133,13 @@ public class StepDisplayList extends JPanel {
 
 			final JPopupMenu popup = new JPopupMenu();
 
-			for (StepList stepList : stepLists) {
+			for (final ConfigurationStepList stepList : stepLists) {
 				popup.add(new JMenuItem(new AbstractAction(stepList.getName()) {
 					private static final long serialVersionUID = 1L;
 
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
-						// TODO LAUNCH LIST
+						launchList(stepList);
 					}
 				}));
 			}
@@ -177,6 +184,32 @@ public class StepDisplayList extends JPanel {
 		add(extraPanel, gbc);
 
 		updateSteps();
+	}
+
+	protected void launchList(ConfigurationStepList stepList) {
+		BreweryLayout layout = controller.getLayout();
+		TimeParser tp = new TimeParser();
+
+		ArrayList<HeaterStep> heaterSteps = new ArrayList<HeaterStep>();
+		for (ConfigurationHeaterStep configurationHeaterStep : stepList.getSteps()) {
+			HeaterStep step = controller.createManualStep(configurationHeaterStep.getName());
+			step.setTimeRemaining(tp.parse(configurationHeaterStep.getTime()));
+			for (ConfigurationHeaterStepControlPoint cfgCp : configurationHeaterStep.getControlPoints()) {
+				BrewHardwareControl bhc = layout.findBrewHardwareControlByNameOrParentName(cfgCp.getControlName());
+				Sensor sensor = layout.findSensorByNameOrParentName(cfgCp.getTargetName());
+				if (bhc != null && sensor != null) {
+					ControlPoint controlPoint = step.getControlPointForPin(bhc.getPin());
+					if (controlPoint != null) {
+						controlPoint.setAutomaticControl(true);
+						controlPoint.setTargetTemp(cfgCp.getTargetTemp());
+						controlPoint.setTempSensorAddress(sensor.getAddress());
+					}
+				}
+			}
+			heaterSteps.add(step);
+		}
+		controller.setSteps(heaterSteps);
+
 	}
 
 	@Override

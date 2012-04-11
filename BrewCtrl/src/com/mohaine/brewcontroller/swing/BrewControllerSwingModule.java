@@ -29,12 +29,14 @@ import java.io.OutputStream;
 import com.google.inject.AbstractModule;
 import com.mohaine.brewcontroller.CloseAction;
 import com.mohaine.brewcontroller.Configuration;
+import com.mohaine.brewcontroller.ConfigurationHeaterStep;
+import com.mohaine.brewcontroller.ConfigurationHeaterStepControlPoint;
+import com.mohaine.brewcontroller.ConfigurationStepList;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.SensorConfiguration;
-import com.mohaine.brewcontroller.StepList;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.json.JsonObjectConverter;
 import com.mohaine.brewcontroller.json.JsonPrettyPrint;
@@ -44,13 +46,11 @@ import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
-import com.mohaine.brewcontroller.page.MainMenu.MainMenuDisplay;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.serial.MockComm;
 import com.mohaine.brewcontroller.serial.SerialConnection;
 import com.mohaine.brewcontroller.serial.SerialHardwareComm;
 import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
-import com.mohaine.brewcontroller.swing.page.MainMenuDisplaySwing;
 import com.mohaine.brewcontroller.swing.page.OverviewDisplaySwing;
 import com.mohaine.brewcontroller.util.StreamUtils;
 import com.mohaine.event.bus.EventBus;
@@ -96,7 +96,9 @@ public class BrewControllerSwingModule extends AbstractModule {
 		JsonObjectConverter jc = new JsonObjectConverter(false);
 		jc.addHandler(ReflectionJsonHandler.build(Configuration.class));
 		jc.addHandler(ReflectionJsonHandler.build(SensorConfiguration.class));
-		jc.addHandler(ReflectionJsonHandler.build(StepList.class));
+		jc.addHandler(ReflectionJsonHandler.build(ConfigurationStepList.class));
+		jc.addHandler(ReflectionJsonHandler.build(ConfigurationHeaterStep.class));
+		jc.addHandler(ReflectionJsonHandler.build(ConfigurationHeaterStepControlPoint.class));
 		jc.addHandler(ReflectionJsonHandler.build(BreweryLayout.class));
 		jc.addHandler(ReflectionJsonHandler.build(Tank.class));
 		jc.addHandler(ReflectionJsonHandler.build(Sensor.class));
@@ -132,7 +134,6 @@ public class BrewControllerSwingModule extends AbstractModule {
 		bind(ControllerGui.class).to(SwingControllerInterface.class).asEagerSingleton();
 		bind(Controller.class).to(ControllerImpl.class).asEagerSingleton();
 
-		bind(MainMenuDisplay.class).to(MainMenuDisplaySwing.class);
 		bind(OverviewDisplay.class).to(OverviewDisplaySwing.class);
 		bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
 

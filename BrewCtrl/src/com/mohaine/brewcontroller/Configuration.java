@@ -13,8 +13,8 @@ public class Configuration {
 	@ListType(SensorConfiguration.class)
 	private List<SensorConfiguration> sensors;
 
-	@ListType(StepList.class)
-	private List<StepList> stepLists;
+	@ListType(ConfigurationStepList.class)
+	private List<ConfigurationStepList> stepLists;
 
 	public Configuration() {
 
@@ -69,11 +69,11 @@ public class Configuration {
 		return sensor;
 	}
 
-	public List<StepList> getStepLists() {
+	public List<ConfigurationStepList> getStepLists() {
 		return stepLists;
 	}
 
-	public void setStepLists(List<StepList> stepLists) {
+	public void setStepLists(List<ConfigurationStepList> stepLists) {
 		this.stepLists = stepLists;
 	}
 

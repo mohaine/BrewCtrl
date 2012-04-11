@@ -19,9 +19,7 @@
 package com.mohaine.brewcontroller.page;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.ClickEvent;
 import com.mohaine.brewcontroller.Controller;
-import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.event.ClickHandler;
 import com.mohaine.event.bus.EventBus;
@@ -41,31 +39,14 @@ public class Overview extends BasePage {
 
 	private OverviewDisplay display;
 
-	private ControllerGui controllerGui;
-
-	private MainMenu mainMenu;
-
 	@Inject
-	public Overview(OverviewDisplay displayp, EventBus eventBusp, Controller controller, final ControllerGui ci, final MainMenu mainMenu) {
+	public Overview(OverviewDisplay displayp, EventBus eventBusp, Controller controller) {
 		super();
 		this.display = displayp;
-		this.mainMenu = mainMenu;
-		this.controllerGui = ci;
 		display.init();
-
-		display.addClickable("Main Menu", new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				goMainMenu();
-			}
-		});
 
 		display.setBreweryLayout(controller.getLayout());
 
-	}
-
-	private void goMainMenu() {
-		controllerGui.displayPage(mainMenu);
 	}
 
 	@Override
