@@ -57,5 +57,13 @@
          "name":"",
          "location":"TUN"
       }
+   ],
+   "stepLists":[
+      {
+         "name":"1 Step Mash"
+      },
+      {
+         "name":"3 Step Mash"
+      }
    ]
 }

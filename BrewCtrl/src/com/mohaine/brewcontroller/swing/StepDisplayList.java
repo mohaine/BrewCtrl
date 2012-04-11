@@ -23,18 +23,24 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.StepList;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
@@ -55,7 +61,7 @@ public class StepDisplayList extends JPanel {
 	private Provider<StepEditorSwing> providerStepEditorSwing;
 
 	@Inject
-	public StepDisplayList(Controller controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing) {
+	public StepDisplayList(Controller controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing, Configuration config) {
 		super();
 		this.providerStepEditorSwing = providerStepEditorSwing;
 		this.eventBus = eventBusp;
@@ -77,10 +83,11 @@ public class StepDisplayList extends JPanel {
 
 		gbc.gridx = 0;
 		gbc.gridy++;
-		JPanel addNew = new JPanel();
-		addNew.setLayout(new BorderLayout());
+		JPanel controlPanel = new JPanel();
+		controlPanel.setLayout(new BorderLayout());
 
-		add(addNew, gbc);
+		add(controlPanel, gbc);
+
 		JLabel addNewLabel = new JLabel("+ Add New Step");
 		addNewLabel.addMouseListener(new MouseListener() {
 
@@ -109,8 +116,56 @@ public class StepDisplayList extends JPanel {
 
 			}
 		});
+		controlPanel.add(addNewLabel, BorderLayout.WEST);
 
-		addNew.add(addNewLabel, BorderLayout.WEST);
+		List<StepList> stepLists = config.getStepLists();
+		if (stepLists != null && stepLists.size() > 0) {
+			final JLabel listLabel = new JLabel("List");
+
+			controlPanel.add(listLabel, BorderLayout.EAST);
+
+			final JPopupMenu popup = new JPopupMenu();
+
+			for (StepList stepList : stepLists) {
+				popup.add(new JMenuItem(new AbstractAction(stepList.getName()) {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO LAUNCH LIST
+					}
+				}));
+			}
+			listLabel.addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+
+				}
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Locate better
+					popup.show(listLabel, e.getX(), e.getY());
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+
+				}
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+
+				}
+			});
+
+		}
 
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;

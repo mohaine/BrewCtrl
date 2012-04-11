@@ -34,6 +34,7 @@ import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerImpl;
 import com.mohaine.brewcontroller.Hardware;
 import com.mohaine.brewcontroller.SensorConfiguration;
+import com.mohaine.brewcontroller.StepList;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.json.JsonObjectConverter;
 import com.mohaine.brewcontroller.json.JsonPrettyPrint;
@@ -95,6 +96,7 @@ public class BrewControllerSwingModule extends AbstractModule {
 		JsonObjectConverter jc = new JsonObjectConverter(false);
 		jc.addHandler(ReflectionJsonHandler.build(Configuration.class));
 		jc.addHandler(ReflectionJsonHandler.build(SensorConfiguration.class));
+		jc.addHandler(ReflectionJsonHandler.build(StepList.class));
 		jc.addHandler(ReflectionJsonHandler.build(BreweryLayout.class));
 		jc.addHandler(ReflectionJsonHandler.build(Tank.class));
 		jc.addHandler(ReflectionJsonHandler.build(Sensor.class));
