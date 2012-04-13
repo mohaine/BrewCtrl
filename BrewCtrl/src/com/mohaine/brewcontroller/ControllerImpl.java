@@ -105,11 +105,11 @@ public class ControllerImpl implements Controller {
 	private Configuration configuration;
 
 	@Inject
-	public ControllerImpl(EventBus eventBusp, Hardware hardware, Configuration configuration) throws Exception {
+	public ControllerImpl(EventBus eventBusp, Hardware hardware, ConfigurationLoader configurationLoader) throws Exception {
 		super();
 		this.eventBus = eventBusp;
 		this.hardware = hardware;
-		this.configuration = configuration;
+		this.configuration = configurationLoader.getConfiguration();
 
 		initLayout();
 
@@ -229,6 +229,7 @@ public class ControllerImpl implements Controller {
 			updateSelection = selectedStep == null || !steps.contains(selectedStep);
 		}
 
+		updateHardware();
 		eventBus.fireEvent(new StepsModifyEvent());
 
 		if (updateSelection) {
@@ -345,7 +346,7 @@ public class ControllerImpl implements Controller {
 						break;
 					}
 				}
-				
+
 				if (tankTs == null) {
 					tankTs = new HardwareSensor();
 				}

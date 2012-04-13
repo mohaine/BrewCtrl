@@ -44,9 +44,9 @@ public class SerialHardwareComm extends HardwareBase implements Hardware {
 	private ReadWriteThread readWriteThread;
 
 	@Inject
-	public SerialHardwareComm(Configuration config, SerialConnection serialConn) {
+	public SerialHardwareComm(SerialConnection serialConn) {
 		hardareControl.setMode(HeaterMode.OFF);
-		readWriteThread = new ReadWriteThread(this, config, serialConn);
+		readWriteThread = new ReadWriteThread(this, serialConn);
 		new Thread(readWriteThread).start();
 	}
 

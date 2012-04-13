@@ -38,6 +38,7 @@ import javax.swing.JTextField;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.Configuration;
+import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.SensorConfiguration;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.layout.Tank;
@@ -56,9 +57,9 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 	private Configuration config;
 
 	@Inject
-	public SensorEditor(Configuration config) {
+	public SensorEditor(ConfigurationLoader configLoader) {
 		super();
-		this.config = config;
+		this.config = configLoader.getConfiguration();
 		setLayout(new BorderLayout());
 		label.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
 
@@ -170,7 +171,7 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 			editing = false;
 			removeAll();
 			setValue(value);
-			
+
 			add(label);
 			this.doLayout();
 			repaint();

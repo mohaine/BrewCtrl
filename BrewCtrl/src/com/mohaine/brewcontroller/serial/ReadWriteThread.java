@@ -24,7 +24,7 @@ package com.mohaine.brewcontroller.serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mohaine.brewcontroller.Configuration;
+import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
@@ -68,7 +68,7 @@ final class ReadWriteThread implements Runnable {
 
 	}
 
-	public ReadWriteThread(SerialHardwareComm serialHardwareComm, final Configuration config, SerialConnection conn) {
+	public ReadWriteThread(SerialHardwareComm serialHardwareComm, SerialConnection conn) {
 		this.serialHardwareComm = serialHardwareComm;
 		this.conn = conn;
 

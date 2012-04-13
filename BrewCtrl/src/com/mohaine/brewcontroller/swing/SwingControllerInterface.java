@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.CloseAction;
+import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.DisplayPage;
 
@@ -39,15 +39,14 @@ public class SwingControllerInterface implements ControllerGui {
 
 	DisplayPage currentPage;
 	private StatusDisplay statusDisplay;
-	private CloseAction closeAction;
+	private ConfigurationLoader configurationLoader;
 
 	@Inject
-	public SwingControllerInterface(StatusDisplay statusDisplay, CloseAction closeAction) {
+	public SwingControllerInterface(StatusDisplay statusDisplay, ConfigurationLoader configurationLoader) {
 		super();
-		this.closeAction = closeAction;
+		this.configurationLoader = configurationLoader;
 		this.statusDisplay = statusDisplay;
 		mainPanel.setLayout(new BorderLayout());
-
 	}
 
 	@Override
@@ -95,7 +94,11 @@ public class SwingControllerInterface implements ControllerGui {
 
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				closeAction.run();
+				try {
+					configurationLoader.saveConfiguration();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 			@Override

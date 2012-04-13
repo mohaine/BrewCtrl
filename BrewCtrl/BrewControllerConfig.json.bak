@@ -5,7 +5,7 @@
             "name":"HLT",
             "sensor":{
                "reading":true,
-               "tempatureC":22.875,
+               "tempatureC":23.0,
                "address":"289c167d02000048"
             },
             "heater":{

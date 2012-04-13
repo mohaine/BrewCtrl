@@ -38,9 +38,9 @@ import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.ConfigurationHeaterStep;
 import com.mohaine.brewcontroller.ConfigurationHeaterStepControlPoint;
+import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ConfigurationStepList;
 import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.TimeParser;
@@ -68,7 +68,7 @@ public class StepDisplayList extends JPanel {
 	private Provider<StepEditorSwing> providerStepEditorSwing;
 
 	@Inject
-	public StepDisplayList(Controller controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing, Configuration config) {
+	public StepDisplayList(Controller controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing, ConfigurationLoader configLoader) {
 		super();
 		this.providerStepEditorSwing = providerStepEditorSwing;
 		this.eventBus = eventBusp;
@@ -125,7 +125,7 @@ public class StepDisplayList extends JPanel {
 		});
 		controlPanel.add(addNewLabel, BorderLayout.WEST);
 
-		List<ConfigurationStepList> stepLists = config.getStepLists();
+		List<ConfigurationStepList> stepLists = configLoader.getConfiguration().getStepLists();
 		if (stepLists != null && stepLists.size() > 0) {
 			final JLabel listLabel = new JLabel("List");
 
