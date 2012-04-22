@@ -24,7 +24,6 @@ package com.mohaine.brewcontroller.serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
@@ -51,7 +50,10 @@ final class ReadWriteThread implements Runnable {
 	private ControlPointReaderWriter controlPointReader = new ControlPointReaderWriter();
 	private ControlPointReaderWriter controlPointWriter = new ControlPointReaderWriter();
 
-	{
+	public ReadWriteThread(SerialHardwareComm serialHardwareComm, SerialConnection conn, boolean logMessages) {
+		this.serialHardwareComm = serialHardwareComm;
+		this.conn = conn;
+
 		HardwareControl control = new HardwareControl();
 		control.setControlPoints(new ArrayList<ControlPoint>());
 		controlMsgReader.setControl(control);
@@ -64,13 +66,7 @@ final class ReadWriteThread implements Runnable {
 		readers.add(controlMsgReader);
 		readers.add(sensorMessageReader);
 		readers.add(controlPointReader);
-		processor = new MessageProcessor(readers);
-
-	}
-
-	public ReadWriteThread(SerialHardwareComm serialHardwareComm, SerialConnection conn) {
-		this.serialHardwareComm = serialHardwareComm;
-		this.conn = conn;
+		processor = new MessageProcessor(logMessages, readers);
 
 		sensorMessageReader.setListener(new ReadListener<SensorMessageReaderWriter>() {
 			@Override

@@ -173,7 +173,10 @@ void serialWriteStatus(){
     buffer[offset++] = DATA_END;
   }
 
-  Serial.write(buffer,offset);
+  for(int i=0;i<offset;i++){
+    Serial.write(buffer[i]);
+  }
+ // Serial.write(buffer,offset);
 
 }
 

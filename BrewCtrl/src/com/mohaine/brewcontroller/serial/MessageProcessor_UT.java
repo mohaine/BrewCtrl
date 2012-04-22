@@ -33,7 +33,7 @@ public class MessageProcessor_UT extends TestCase {
 		ArrayList<MessageReader> binaryMessages = new ArrayList<MessageReader>();
 		binaryMessages.add(msg2);
 		binaryMessages.add(msg3);
-		MessageProcessor mp = new MessageProcessor(binaryMessages);
+		MessageProcessor mp = new MessageProcessor(false,binaryMessages);
 
 		for (int i = 0; i < 1.5 * (MessageProcessor.BUFFER_SIZE / stringBytes.length); i++) {
 			assertFalse(mp.readStream(new ByteArrayInputStream(stringBytes, 0, stringBytes.length)));
@@ -58,7 +58,7 @@ public class MessageProcessor_UT extends TestCase {
 		ArrayList<MessageReader> binaryMessages = new ArrayList<MessageReader>();
 		binaryMessages.add(msg2);
 		binaryMessages.add(msg3);
-		MessageProcessor mp = new MessageProcessor(binaryMessages);
+		MessageProcessor mp = new MessageProcessor(false,binaryMessages);
 
 		byte[] data = new byte[0];
 		assertFalse(mp.readStream(new ByteArrayInputStream(data, 0, 0)));

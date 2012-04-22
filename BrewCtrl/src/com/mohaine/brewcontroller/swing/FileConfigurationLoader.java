@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -41,11 +42,20 @@ public class FileConfigurationLoader implements ConfigurationLoader {
 			JsonPrettyPrint jpp = new JsonPrettyPrint();
 			jpp.setStripNullAttributes(true);
 			byte[] cfg = jpp.prettyPrint(json).getBytes();
+			boolean dirty = false;
 
-			String newSha1 = FileUtils.getSHA1(new ByteArrayInputStream(cfg));
-			String existingSha1 = FileUtils.getSHA1(configFile);
-			if (!newSha1.equals(existingSha1)) {
-				configFile.renameTo(new File(configFile.getParentFile(), configFile.getName() + ".bak"));
+			if (configFile.exists()) {
+				String newSha1 = FileUtils.getSHA1(new ByteArrayInputStream(cfg));
+				String existingSha1 = FileUtils.getSHA1(configFile);
+				if (!newSha1.equals(existingSha1)) {
+					configFile.renameTo(new File(configFile.getParentFile(), configFile.getName() + ".bak"));
+					dirty = true;
+				}
+			} else {
+				dirty = true;
+			}
+
+			if (dirty) {
 				OutputStream fis = new FileOutputStream(configFile);
 				try {
 					fis.write(cfg);
@@ -59,9 +69,16 @@ public class FileConfigurationLoader implements ConfigurationLoader {
 
 	public synchronized Configuration getConfiguration() {
 		if (config == null) {
-			config = loadConfiguration();
+			if (configFile.exists()) {
+				config = loadConfiguration();
+			}
 			if (config == null) {
-				config = new Configuration();
+				try {
+					InputStream resourceAsStream = getClass().getResourceAsStream("/BrewControllerConfig.json");
+					config = readCfg(resourceAsStream);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
 			}
 		}
@@ -70,19 +87,23 @@ public class FileConfigurationLoader implements ConfigurationLoader {
 
 	private Configuration loadConfiguration() {
 		try {
-			JsonObjectConverter jc = getJsonConverter();
 
 			InputStream fis = new FileInputStream(configFile);
-			try {
-				String json = new String(StreamUtils.readStream(fis));
-				return jc.decode(json, Configuration.class);
-			} finally {
-				StreamUtils.close(fis);
-			}
+			return readCfg(fis);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private Configuration readCfg(InputStream fis) throws IOException, Exception {
+		try {
+			String json = new String(StreamUtils.readStream(fis));
+			JsonObjectConverter jc = getJsonConverter();
+			return jc.decode(json, Configuration.class);
+		} finally {
+			StreamUtils.close(fis);
+		}
 	}
 
 	private static JsonObjectConverter getJsonConverter() throws Exception {

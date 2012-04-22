@@ -23,7 +23,6 @@ import java.io.File;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mohaine.brewcontroller.BrewControllerStartup;
-import com.mohaine.brewcontroller.Configuration;
 
 public class SwingController {
 	public static void main(String[] args) {

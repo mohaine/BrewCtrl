@@ -40,20 +40,75 @@
 			<classpath refid="compile.classpath" />
 			<exclude name="**/**_UT.java" />
 		</javac>
-	</target>
 
-	<target name="build-jar" depends="compile" description="Generate war directory">
-		<jar file="${build.home}/${app.name}.war" duplicate="fail">
-			<fileset dir="${build.home}/classes">
-				<include name="**/*" />
+		<copy todir="${build.home}/classes">
+			<fileset dir="src">
+				<exclude name="*/**.java" />
 			</fileset>
-		</jar>
+		</copy>
 	</target>
 
 	<target name="run" depends="" description="Generate war directory">
 		<java classpathref="run.classpath" classname="com.mohaine.brewcontroller.swing.SwingController" fork="yes">
-			
+
 		</java>
+	</target>
+
+	<target name="build-dist" depends="clean,build-jar" description="Create Jar">
+		<property name="brewcontrol.zip" value="${build.home}/brewcontrol.zip" />
+		<property name="brewcontrol.jar" value="${build.home}/brewcontrol.jar" />
+
+
+		<property name="dist" value="${build.home}/BrewCtrl" />
+
+		<mkdir dir="${dist}" />
+
+		<echo file="${dist}/run.cmd">java -jar brewcontrol.jar
+		</echo>
+
+		<copy todir="${dist}/BrewCtrlArduino">
+			<fileset dir="../BrewCtrlArduino/">
+				<include name="*.*" />
+			</fileset>
+		</copy>
+		<copy todir="${dist}">
+			<fileset dir=".">
+				<include name="*.dll" />
+			</fileset>
+		</copy>
+		<copy file="${brewcontrol.jar}" todir="${dist}" />
+
+		<zip destfile="${brewcontrol.zip}">
+			<fileset dir="${build.home}">
+				<include name="BrewCtrl/**/**.*" />
+			</fileset>
+
+		</zip>
+	</target>
+
+
+	<target name="build-jar" depends="compile" description="Create Jar">
+
+		<echo file="${build.home}/manifest.mf">Manifest-Version: 1.0
+Main-Class: com.mohaine.brewcontroller.swing.SwingController
+Local-ClassPath: lib/
+Class-Path: properties/
+</echo>
+
+		<property name="brewcontrol.jar" value="${build.home}/brewcontrol.jar" />
+
+		<unzip dest="${build.home}/classes">
+			<fileset dir="lib">
+				<include name="*.jar" />
+			</fileset>
+		</unzip>
+		<jar jarfile="${brewcontrol.jar}" duplicate="fail" manifest="${build.home}/manifest.mf">
+			<fileset dir="${build.home}/classes">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+
+
 	</target>
 
 </project>

@@ -46,7 +46,6 @@
       "turnOffOnCommLoss":true
    },
    "commPorts":"",
-   "logMessages":true,
    "sensors":[
       {
          "address":"0000000000000001",

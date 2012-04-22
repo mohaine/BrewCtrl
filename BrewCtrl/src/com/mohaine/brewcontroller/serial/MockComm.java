@@ -45,7 +45,7 @@ public class MockComm implements SerialConnection, Runnable {
 		readers.add(createCpReader());
 		controlMsgWriter.setControl(control);
 
-		processor = new MessageProcessor(readers);
+		processor = new MessageProcessor(false,readers);
 
 		Thread thread = new Thread(this);
 		thread.setDaemon(true);

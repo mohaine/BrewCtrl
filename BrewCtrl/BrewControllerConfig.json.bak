@@ -5,13 +5,13 @@
             "name":"HLT",
             "sensor":{
                "reading":true,
-               "tempatureC":23.0,
+               "tempatureC":23.75,
                "address":"289c167d02000048"
             },
             "heater":{
                "name":"HTL Element",
                "pin":9,
-               "duty":100,
+               "duty":0,
                "canPulse":true,
                "fullOnAmps":18
             }
@@ -28,7 +28,7 @@
             "heater":{
                "name":"Kettle Element",
                "pin":7,
-               "duty":0,
+               "duty":65,
                "canPulse":true,
                "fullOnAmps":23
             }
@@ -45,6 +45,7 @@
       "maxAmps":25,
       "turnOffOnCommLoss":true
    },
+   "commPorts":"",
    "sensors":[
       {
          "address":"0000000000000001",

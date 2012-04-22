@@ -30,8 +30,10 @@ public class MessageProcessor {
 	private byte[] serialBuffer = new byte[BUFFER_SIZE];
 	private int serialBufferOffset = 0;
 	private Collection<MessageReader> binaryMessages;
+	private boolean logMessages;
 
-	public MessageProcessor(Collection<MessageReader> binaryMessages) {
+	public MessageProcessor(boolean logMessages, Collection<MessageReader> binaryMessages) {
+		this.logMessages = logMessages;
 		this.binaryMessages = binaryMessages;
 	}
 
@@ -59,7 +61,9 @@ public class MessageProcessor {
 						if (MessageEnvelope.validateMessage(serialBuffer, messageStart, mr)) {
 							mr.readFrom(serialBuffer, messageStart + MessageEnvelope.START_SIZE);
 
-							log(serialBuffer, messageStart, bufferOffset - messageStart + 1);
+							if (logMessages) {
+								log(serialBuffer, messageStart, bufferOffset - messageStart + 1);
+							}
 
 							readMessage = true;
 							if (messageStart > 0) {
@@ -84,7 +88,7 @@ public class MessageProcessor {
 	}
 
 	private void log(byte[] serialBuffer, int offset, int length) throws IOException {
-		File file = new File("log.txt");
+		File file = new File("brewlog.bin");
 		FileOutputStream fos = new FileOutputStream(file, true);
 		try {
 			fos.write(serialBuffer, offset, length);
