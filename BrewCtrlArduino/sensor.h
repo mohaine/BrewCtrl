@@ -46,6 +46,7 @@ DS18B20 hooked up to ear phone connectior like this:
 typedef struct {
   byte address[8];
   double lastTemp;
+  bool bModel;
   bool reading;
 } 
 TempSensor;
@@ -63,7 +64,7 @@ TempSensor* getSensor(byte* address){
       same = sensor->address[j] == address[j]; 
     }
     if(same){
-       return sensor;
+      return sensor;
     }
   }
   return NULL;
@@ -89,8 +90,14 @@ void  searchForTempSensors(){
       //Serial.print("CRC is not valid!\n");
       continue;
     }
-    if ( sensors[sensorCount].address[0] != 0x28) {
-      //Serial.print("Device is not a DS18B20 family device.\n");
+    if ( sensors[sensorCount].address[0] == 0x28) {
+      sensors[sensorCount].bModel = true;
+    } 
+    else   if ( sensors[sensorCount].address[0] == 0x10) {
+      sensors[sensorCount].bModel = false;
+    } 
+    else {
+      Serial.print("Device is not a DS18B20 family device.\n");
       continue;
     }
     boolean existingSensor = false;
@@ -116,7 +123,26 @@ void  searchForTempSensors(){
   //  Serial.println( "  DS18B20 Temp Sensors.");
 }
 
-double getTemp(byte* data){
+double getTempS(byte* data){
+  int LowByte = data[0];
+  int HighByte = data[1];
+  int TReading = (HighByte << 8) + LowByte;
+  int SignBit = TReading & 0x8000;  // test most sig bit
+  if (SignBit) // negative
+  {
+    TReading = (TReading ^ 0xffff) + 1; // 2's comp
+  }
+  int Tc_100 = (TReading*100/2);    
+
+  int Whole = Tc_100 / 100;  // separate off the whole and fractional portions
+  int Fract = Tc_100 % 100;
+
+  //sprintf(buf, "%d:%c%d.%d\337C     ",sensor,SignBit ? '-' : '+', Whole, Fract < 10 ? 0 : Fract);
+
+  return Whole + Fract/100.0;
+}
+
+double getTempB(byte* data){
   int lsb = data[0];
   int msb = data[1];
   bool negative = false;
@@ -159,8 +185,7 @@ boolean readSensorRetry(TempSensor *sensor){
     }
 
     if (OneWire::crc8( data , 8) == data[8]) {
-      double tempC = getTemp(data);
-
+      double tempC = sensor->bModel?  getTempB(data) : getTempS(data);
 
       // 85 is the chips start up temp.  It reads as a valid temp so......      
       if(!sensor->reading && tempC == 85){
@@ -212,6 +237,8 @@ void readSensors(){
 
 
 #endif
+
+
 
 
 
