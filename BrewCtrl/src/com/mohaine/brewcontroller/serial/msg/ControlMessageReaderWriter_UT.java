@@ -46,7 +46,7 @@ public class ControlMessageReaderWriter_UT {
 			control.setMode(random.nextBoolean() ? HeaterMode.ON : HeaterMode.OFF);
 			control.setMaxAmps(random.nextInt(200));
 			control.setTurnOffOnCommLoss(random.nextBoolean());
-
+			control.setMillis(random.nextInt());
 			w.writeTo(buffer, offset);
 			r.readFrom(buffer, offset);
 

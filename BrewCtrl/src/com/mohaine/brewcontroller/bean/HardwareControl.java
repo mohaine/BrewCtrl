@@ -23,6 +23,7 @@ import java.util.List;
 public class HardwareControl {
 	private HeaterMode mode = HeaterMode.UNKNOWN;
 	private int controlId;
+	private int millis;
 	private int maxAmps;
 	private boolean turnOffOnCommLoss;
 
@@ -71,5 +72,15 @@ public class HardwareControl {
 	public void setControlPoints(List<ControlPoint> controlPoints) {
 		this.controlPoints = controlPoints;
 	}
+
+	public int getMillis() {
+		return millis;
+	}
+
+	public void setMillis(int millis) {
+		this.millis = millis;
+	}
+
+	
 
 }
