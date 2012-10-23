@@ -20,7 +20,7 @@ package com.mohaine.brewcontroller.bean;
 
 import java.util.List;
 
-public class HardwareControl {
+public class HardwareControl implements Cloneable {
 	private HeaterMode mode = HeaterMode.UNKNOWN;
 	private int controlId;
 	private int millis;
@@ -81,6 +81,8 @@ public class HardwareControl {
 		this.millis = millis;
 	}
 
-	
+	public HardwareControl getClone() throws CloneNotSupportedException {
+		return (HardwareControl) clone();
+	}
 
 }

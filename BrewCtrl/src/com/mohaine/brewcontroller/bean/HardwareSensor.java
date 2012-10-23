@@ -18,7 +18,7 @@
 
 package com.mohaine.brewcontroller.bean;
 
-public class HardwareSensor {
+public class HardwareSensor implements Cloneable {
 
 	private String address;
 	private double tempatureC;
@@ -51,6 +51,10 @@ public class HardwareSensor {
 	@Override
 	public String toString() {
 		return address;
+	}
+
+	public HardwareSensor getClone() throws CloneNotSupportedException {
+		return (HardwareSensor) clone();
 	}
 
 }
