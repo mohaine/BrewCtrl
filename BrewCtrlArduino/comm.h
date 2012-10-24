@@ -64,6 +64,14 @@ void writeInt(byte *buffer, int offset, int value) {
   buffer[offset] = data[0];
   buffer[offset+1] = data[1];
 }
+void writeLong(byte *buffer, int offset, long value) {
+  byte *data;
+  data = (unsigned byte *) &value;
+  buffer[offset] = data[0];
+  buffer[offset+1] = data[1];
+  buffer[offset+2] = data[2];
+  buffer[offset+3] = data[3];
+}
 
 float readFloat( byte *buffer, int offset) {
   float out;
@@ -104,6 +112,8 @@ void serialWriteStatus(){
 
   writeInt(buffer,offset, control.controlId);
   offset+=2;
+  writeLong(buffer,offset, millis());
+  offset+=4;
 
   buffer[offset++] = (control.mode);
   buffer[offset++] = (control.maxAmps);
@@ -266,6 +276,8 @@ void readControlMessage(byte * serialBuffer,int offset){
   lastControlIdTime = millis();
   control.controlId = readInt(serialBuffer,offset);
   offset+=2;
+  // Skip Time
+  offset+=4;
 
   control.mode = serialBuffer[offset++];
   control.maxAmps = serialBuffer[offset++];
@@ -291,7 +303,7 @@ void handleExtra(byte* data, int offset, int length) {
 
 void setupComm(){
   readMessages[0].msgId = HARDWARE_CONTROL; 
-  readMessages[0].length = 5; 
+  readMessages[0].length = 9; 
   readMessages[0].processFunction = readControlMessage;
   readMessages[1].msgId = CONTROL_POINT; 
   readMessages[1].length = 16; 
