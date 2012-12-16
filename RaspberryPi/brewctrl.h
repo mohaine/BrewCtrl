@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2011 Michael Graessle
+ Copyright 2009-2011 Michael Graessle
  
  
  This program is free software: you can redistribute it and/or modify
@@ -17,42 +17,30 @@
  
  */
 
+#ifndef BREWCTRL_H_
+#define BREWCTRL_H_
+
+#define bool _Bool
+#define false 0
+#define true 1
+
+#define byte unsigned char
+
+#define MODE_OFF 0
+#define MODE_ON 1
+
+// Need to remove these
+#define LOW 0
+#define HIGH 1
+#define OUTPUT 0
 
 
-#ifndef DUTY_H_
-#define DUTY_H_
-
-
-#include "brewctrl.h"
-
-typedef struct
-{
-
-  unsigned long dutyOnOffLastChange;
-  unsigned long dutyLastCheckTime;  
-  unsigned long timeOn;  
-  unsigned long timeOff;  
-  int duty;
-  bool on;
-  bool pinState;
-  byte controlPin;
-} 
-DutyController;
-
-
-void setHeatOn(DutyController * hs, bool newState);
-void updateHeatForStateAndDuty(DutyController * hs);
-void updateForPinState(DutyController * hs, bool newHeatPinState);
-void setHeatDuty(DutyController * hs, int duty);
-void resetDutyState(DutyController * hs);
-void setupDutyController(DutyController * hs, byte pin);
-
+#ifndef NULL
+#define NULL 0
 #endif
 
+long millis();
 
 
-
-
-
-
+#endif
 

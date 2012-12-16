@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2011 Michael Graessle
+ Copyright 2009-2011 Michael Graessle
  
  
  This program is free software: you can redistribute it and/or modify
@@ -17,42 +17,16 @@
  
  */
 
-
-
-#ifndef DUTY_H_
-#define DUTY_H_
-
-
 #include "brewctrl.h"
 
-typedef struct
-{
+#include <sys/time.h>
 
-  unsigned long dutyOnOffLastChange;
-  unsigned long dutyLastCheckTime;  
-  unsigned long timeOn;  
-  unsigned long timeOff;  
-  int duty;
-  bool on;
-  bool pinState;
-  byte controlPin;
-} 
-DutyController;
+long millis() {
 
+	struct timeval time;
 
-void setHeatOn(DutyController * hs, bool newState);
-void updateHeatForStateAndDuty(DutyController * hs);
-void updateForPinState(DutyController * hs, bool newHeatPinState);
-void setHeatDuty(DutyController * hs, int duty);
-void resetDutyState(DutyController * hs);
-void setupDutyController(DutyController * hs, byte pin);
+	gettimeofday(&time, NULL);
 
-#endif
-
-
-
-
-
-
-
+	return ((time.tv_sec) * 1000 + time.tv_usec / 1000.0) + 0.5;
+}
 
