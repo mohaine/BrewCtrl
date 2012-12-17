@@ -18,14 +18,37 @@ void readSensors() {
 
 	for (byte sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
 		TempSensor *sensor = &sensors[sensorIndex];
+		sensor->reading = false;
+
 		sprintf(tmp, "%s/%s", sensor->sysfile, "w1_slave");
 		FILE* f = fopen(tmp, "rb");
 		if (f) {
-			int readSize = fread(data, 8, sizeof(data), f);
-			printf("  readSize: %d\n", readSize);
-			if (readSize == 8) {
-				sensor->reading = false;
-				sensorCount++;
+			int readSize = fread(data, 1, sizeof(data), f);
+			if (readSize > 0) {
+				data[sizeof(data) - 1] = 0;
+
+				char* crcIndex = strstr(data, "crc=");
+				if (crcIndex > 0) {
+					crcIndex += 7;
+					if (strcmp(crcIndex, "YES")) {
+						// Have a valid read. Get the value
+
+						char* tIndex = strstr(crcIndex, "t=");
+						if (tIndex > 0) {
+							tIndex += 2;
+							tIndex[10] = 0;
+							for (int i = 0; i < 10; i++) {
+								char c = tIndex[i];
+								if (c < '0' || c > '9') {
+									tIndex[i] = 0;
+								}
+							}
+							int milliCs = atoi(tIndex);
+							sensor->reading = true;
+							sensor->lastTemp = ((double) milliCs) / 1000;
+						}
+					}
+				}
 			}
 		}
 	}

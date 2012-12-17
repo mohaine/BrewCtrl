@@ -36,7 +36,7 @@ int main() {
 		}
 
 		if (sensor->reading) {
-			printf("%0.000f", sensor->lastTemp);
+			printf(" Temp: %0.3f", sensor->lastTemp);
 
 		}
 		printf("\n");
