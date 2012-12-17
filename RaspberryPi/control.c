@@ -34,3 +34,11 @@ void turnOff(void) {
 		setHeatOn(&controlPoints[cpIndex].dutyController, false);
 	}
 }
+
+void checkForControlTimeout() {
+	if (control.turnOffOnCommLoss) {
+		if (millis() - lastControlIdTime() > 10000) {
+			turnOff();
+		}
+	}
+}

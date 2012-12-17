@@ -18,8 +18,6 @@ typedef struct {
 	Pid pid;
 } ControlPoint;
 
-
-
 void turnOff(void);
 void setupControl();
 Control* getControl();
@@ -27,5 +25,6 @@ ControlPoint* getControlPointByIndex(int i);
 
 int getControlPointCount();
 void addControlPoint();
+void checkForControlTimeout();
 
 #endif

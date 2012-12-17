@@ -29,125 +29,25 @@
 #include "comm.h"
 #include "control.h"
 
-#define HEAT_DELAY 100
-#define DUTY_DELAY 1000
-#define SEARCH_DELAY 10000
+#define LOOP_FUNCTIONS 4
 
-unsigned long lastHeatUpdate = 0;
-unsigned long lastDutyUpdate = 0;
-unsigned long lastPumpOnChangeTime = 0;
-unsigned long lastSearchTime = 0;
+typedef struct {
+	unsigned int delayTime;
+	long lastRunTime;
+	void (*workFunction)();
+} LoopFunction;
+
+LoopFunction loopFunctions[LOOP_FUNCTIONS];
+
+long lastHeatUpdate = 0;
+long lastDutyUpdate = 0;
+long lastPumpOnChangeTime = 0;
+long lastSearchTime = 0;
 
 Pid pid;
 
-void setup(void) {
-
-	setupControl();
-	turnOff();
-	setupComm();
-
-	searchForTempSensors();
-}
-
-void updateControlPointState();
-
-void loop(void) {
-
-	//  Serial.println("LOOP");
-	unsigned long now = millis();
-
-	Control* control = getControl();
-
-	if (control->turnOffOnCommLoss) {
-		if (now - lastControlIdTime() > 10000) {
-			turnOff();
-		}
-	}
-
-	// Update automaticly controlled duty/on/off states
-	if (lastDutyUpdate > now) {
-		lastDutyUpdate = 0;
-	}
-	if (now - lastDutyUpdate > DUTY_DELAY) {
-		lastDutyUpdate = lastDutyUpdate + DUTY_DELAY;
-		readSensors();
-		updateControlPointState();
-	}
-
-	// Update pin so we acheive the correct on/off ratio for our selected duty
-	if (lastHeatUpdate > now) {
-		lastHeatUpdate = 0;
-	}
-	if (now - lastHeatUpdate > HEAT_DELAY) {
-		lastHeatUpdate = lastHeatUpdate + HEAT_DELAY;
-
-		if (control->mode == MODE_ON) {
-			int currentAmps = 0;
-
-			int controlPointCount = getControlPointCount();
-			for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-				ControlPoint *cp = getControlPointByIndex(cpIndex);
-
-				/*
-				 Serial.print(cp->controlPin);
-				 Serial.print(" has duty: ");
-				 Serial.print(cp->hasDuty? "true":"false");
-				 Serial.println();
-				 */
-
-				int duty = cp->duty;
-				if (currentAmps + cp->fullOnAmps > control->maxAmps) {
-					duty = 0;
-				}
-
-				if (cp->hasDuty) {
-					setHeatDuty(&cp->dutyController, duty);
-					updateHeatForStateAndDuty(&cp->dutyController);
-				} else {
-					updateForPinState(&cp->dutyController, duty > 0);
-				}
-				if (cp->dutyController.pinState) {
-					currentAmps += cp->fullOnAmps;
-				}
-
-				/*
-				 Serial.print(" Full On: " );
-				 Serial.print(cp->fullOnAmps);
-				 Serial.print(" currentAmps: " );
-				 Serial.print(currentAmps);
-				 Serial.println();
-				 */
-			}
-		}
-	}
-
-	readSerial();
-
-	// Search for new sensors
-	if (lastSearchTime > now) {
-		lastSearchTime = 0;
-	}
-	if (now - lastSearchTime > SEARCH_DELAY) {
-		lastSearchTime = lastSearchTime + SEARCH_DELAY;
-		searchForTempSensors();
-	}
-
-}
-
-byte getHexValue(char iValue) {
-	if (iValue >= '0' && iValue <= '9') {
-		return (iValue - '0');
-	}
-	if (iValue >= 'A' && iValue <= 'F') {
-		return (iValue - 'A' + 10);
-	}
-	if (iValue >= 'a' && iValue <= 'f') {
-		return (iValue - 'a' + 10);
-	}
-	return 0;
-}
-
-void updateControlPointState() {
+void updateDuty() {
+	readSensors();
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
 		int controlPointCount = getControlPointCount();
@@ -180,3 +80,70 @@ void updateControlPointState() {
 	}
 }
 
+void updatePinsForSetDuty() {
+	Control* control = getControl();
+
+	if (control->mode == MODE_ON) {
+		int currentAmps = 0;
+
+		int controlPointCount = getControlPointCount();
+		for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
+			ControlPoint *cp = getControlPointByIndex(cpIndex);
+
+			int duty = cp->duty;
+			if (currentAmps + cp->fullOnAmps > control->maxAmps) {
+				duty = 0;
+			}
+
+			if (cp->hasDuty) {
+				setHeatDuty(&cp->dutyController, duty);
+				updateHeatForStateAndDuty(&cp->dutyController);
+			} else {
+				updateForPinState(&cp->dutyController, duty > 0);
+			}
+			if (cp->dutyController.pinState) {
+				currentAmps += cp->fullOnAmps;
+			}
+
+		}
+	}
+
+}
+
+void setup(void) {
+	setupControl();
+	turnOff();
+	setupComm();
+	searchForTempSensors();
+
+	loopFunctions[0].delayTime = 1000;
+	loopFunctions[0].workFunction = checkForControlTimeout;
+
+	loopFunctions[1].delayTime = 1000;
+	loopFunctions[1].workFunction = updateDuty;
+
+	loopFunctions[2].delayTime = 100;
+	loopFunctions[2].workFunction = updatePinsForSetDuty;
+
+	loopFunctions[3].delayTime = 10000;
+	loopFunctions[3].workFunction = searchForTempSensors;
+
+}
+
+void loop(void) {
+
+	//  Serial.println("LOOP");
+	unsigned long now = millis();
+
+	for (int i = 0; i < LOOP_FUNCTIONS; i++) {
+		LoopFunction* lf = &loopFunctions[i];
+		if (now - lf->lastRunTime > lf->delayTime) {
+			lf->lastRunTime = lf->lastRunTime + lf->delayTime;
+			lf->workFunction();
+		}
+	}
+
+	readSerial();
+	// Need to usleep
+
+}
