@@ -21,9 +21,13 @@
 
 #include "brewctrl.h"
 
+#include <linux/limits.h>
+
 typedef struct {
 	byte address[8];
-	double lastTemp;bool bModel;bool reading;
+	double lastTemp;bool reading;
+	char sysfile[PATH_MAX];
+
 } TempSensor;
 
 void readSensors();

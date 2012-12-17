@@ -1,4 +1,5 @@
 #include "control.h"
+#include "comm.h"
 
 Control control;
 int controlPointCount = 0;

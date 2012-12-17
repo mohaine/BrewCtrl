@@ -1,23 +1,31 @@
 CC=gcc
 CFLAGS=-c -Wall -std=c99 
 LDFLAGS=
-SOURCES=main.c pid.c duty.c brewctrl.c comm.c crc8.c loop.c control.c sensor.c
-OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=brewctrl
+SOURCES= pid.c duty.c brewctrl.c comm.c crc8.c loop.c control.c sensor.c 
+OBJECTS=$(SOURCES:.c=.o) 
+BREWCTRL=brewctrl
+LISTSENSORS=listsensors
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(SOURCES) $(BREWCTRL) $(LISTSENSORS)
 	
-$(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+$(LISTSENSORS): $(OBJECTS) listsensors.o
+	$(CC) $(LDFLAGS) $(OBJECTS) listsensors.o -o $@
+
+$(BREWCTRL): $(OBJECTS) main.o
+	$(CC) $(LDFLAGS) $(OBJECTS) main.o -o $@ 
 
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@
 
-run: all
-	./$(EXECUTABLE)
+brewctrlrun: $(BREWCTRL)
+	./$(BREWCTRL)
 	
+listrun: $(LISTSENSORS)
+	./$(LISTSENSORS)
+	
+
 	
 default: all
 	
 clean: 
-	rm -f $(EXECUTABLE) *.o	
+	rm -f $(BREWCTRL) $(LISTSENSORS) *.o	

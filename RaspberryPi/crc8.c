@@ -35,14 +35,6 @@ static void init_crc8()
 	}
 }
 
-byte computeCrc8(byte * buffer, int offset, int length) {
-	byte result = 0;
-	for (int i = offset; i < length; i++) {
-		crc8(&result, buffer[i]);
-	}
-	return result;
-}
-
 void crc8(unsigned char *crc, unsigned char m)
 /*
  * For a byte array whose accumulated crc value is stored in *crc, computes
@@ -54,4 +46,12 @@ void crc8(unsigned char *crc, unsigned char m)
 
 	*crc = crc8_table[(*crc) ^ m];
 	*crc &= 0xFF;
+}
+
+byte computeCrc8(byte * buffer, int offset, int length) {
+	byte result = 0;
+	for (int i = offset; i < length; i++) {
+		crc8(&result, buffer[i]);
+	}
+	return result;
 }
