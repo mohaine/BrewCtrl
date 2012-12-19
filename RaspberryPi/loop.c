@@ -47,8 +47,6 @@ long lastSearchTime = 0;
 Pid pid;
 
 void updateDuty() {
-	printf("update duty \n");
-
 	readSensors();
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
@@ -150,6 +148,6 @@ void loop(void) {
 		}
 
 		// Caculate time
-		usleep(100);
+		usleep(1000);
 	}
 }

@@ -194,7 +194,7 @@ void writeStatus(int clntSocket) {
 		buffer[offset++] = DATA_END;
 	}
 
-	write(clntSocket, &buffer, offset);
+	send(clntSocket, &buffer, offset, MSG_NOSIGNAL | MSG_DONTWAIT);
 
 }
 
@@ -330,7 +330,7 @@ void setupMessages() {
 void* handleClientThread(void *ptr) {
 	int * number = (int *) ptr;
 	int clntSocket = *number;
-	bool readMessage = false;
+	bool sendResponse = false;
 
 	byte serialBuffer[READ_BUFFER_SIZE];
 	int serialBufferOffset = 0;
@@ -338,10 +338,10 @@ void* handleClientThread(void *ptr) {
 	while (1) {
 		ssize_t readSize;
 
-		readSize = read(clntSocket, &serialBuffer + serialBufferOffset,
-				READ_BUFFER_SIZE - serialBufferOffset);
+		readSize = recv(clntSocket, &serialBuffer + serialBufferOffset,
+				READ_BUFFER_SIZE - serialBufferOffset, 0);
 
-		if (readSize < 0) {
+		if (readSize <= 0) {
 			//Read error.  Clean up.
 			break;
 		}
@@ -366,7 +366,7 @@ void* handleClientThread(void *ptr) {
 							readMessages[messageIndex].processFunction(
 									serialBuffer,
 									messageStart + MESSAGE_ENEVELOP_START_SIZE);
-							readMessage = true;
+							sendResponse = true;
 							if (messageStart > 0) {
 								int extraLength = messageStart - 1;
 								if (extraLength > 0) {
@@ -398,13 +398,16 @@ void* handleClientThread(void *ptr) {
 			serialBufferOffset = 0;
 		}
 
-		if (readMessage) {
+		if (sendResponse) {
+			printf("Write\n");
 			writeStatus(clntSocket);
+			sendResponse = false;
 		}
 
 	}
 	close(clntSocket);
 
+	fflush(stdout);
 	return NULL;
 }
 
