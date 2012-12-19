@@ -16,7 +16,7 @@
  
  */
 
-#define ONE_WIRE_PIN 3
+#define ONE_WIRE_PIN 4
 #define DEFAULT_PORT 2739
 
 #include "sensor.h"

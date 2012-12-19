@@ -8,14 +8,13 @@
 #include <string.h>
 #include <linux/limits.h>
 #include <limits.h>
-#include <stdlib.h>
 
 #define MAX_SENSORS 100
 
 TempSensor sensors[MAX_SENSORS];
 int sensorCount = 0;
 
-#define W1_ROOT "mock/sys/bus/w1/devices/"
+#define W1_ROOT SYS_PATH"/bus/w1/devices/"
 
 void readSensors() {
 	char tmp[PATH_MAX];

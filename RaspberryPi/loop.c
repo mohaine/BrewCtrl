@@ -155,7 +155,7 @@ void loop(void) {
 
 	startLoopFunction(1000, checkForControlTimeout);
 	startLoopFunction(1000, updateDuty);
-//	startLoopFunction(100, updatePinsForSetDuty);
+	startLoopFunction(100, updatePinsForSetDuty);
 	startLoopFunction(10000, searchForTempSensors);
 
 	while (true) {

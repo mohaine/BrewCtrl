@@ -1,5 +1,6 @@
-CC=gcc
-CFLAGS=-c -Wall -std=c99 
+CC=gcc 
+CFLAGSD= 
+CFLAGS=-c -Wall -std=c99 $(CFLAGSD)
 LDFLAGS=-lpthread  
 SOURCES= pid.c duty.c brewctrl.c comm.c crc8.c loop.c control.c sensor.c 
 OBJECTS=$(SOURCES:.c=.o) 

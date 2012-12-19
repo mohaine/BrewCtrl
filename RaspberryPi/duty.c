@@ -19,12 +19,61 @@
 
 #include "duty.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <string.h>
+#include <linux/limits.h>
+#include <limits.h>
+
+#define GPIO_ROOT SYS_PATH"/class/gpio/"
 
 void pinMode(int pin, bool inout) {
-	printf("IMPLMENT pinMode\n");
+#ifdef MOCK
+	printf("Pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
+#else
+	char tmp[10];
+	char path[PATH_MAX];
+	sprintf(path, "%s/export", GPIO_ROOT);
+	FILE* f = fopen(path, "wb");
+	if (f) {
+		sprintf(tmp, "%d", pin);
+		fwrite(tmp, 1, strlen(tmp), f);
+		fclose(f);
+	} else {
+		fprintf(stderr, "Failed export pin %d In/Out to %s\n", pin,
+				inout ? "In" : "Out");
+	}
+	sprintf(path, "%s/gpio%d/direction", GPIO_ROOT, pin);
+	f = fopen(path, "wb");
+	if (f) {
+		sprintf(tmp, "%s", inout ? "in" : "out");
+		fwrite(tmp, 1, strlen(tmp), f);
+		fclose(f);
+	} else {
+		fprintf(stderr, "Failed to set direction on pin %d In/Out to %s\n", pin,
+				inout ? "In" : "Out");
+	}
+#endif
 }
+
 void digitalWrite(int pin, bool hilow) {
-	printf("IMPLMENT digitalWrite\n");
+#ifdef MOCK
+	printf("Pin %d set to %s\n", pin, hilow ? "On" : "Off");
+#else
+	char tmp[10];
+	char path[PATH_MAX];
+	sprintf(path, "%s/gpio%d/value", GPIO_ROOT, pin);
+	FILE* f = fopen(path, "wb");
+	if (f) {
+		sprintf(tmp, "%s", hilow ? "1" : "0");
+		fwrite(tmp, 1, strlen(tmp), f);
+		fclose(f);
+	} else {
+		fprintf(stderr, "Failed to set output on pin %d to %s\n", pin,
+				hilow ? "On" : "Off");
+	}
+#endif
+
 }
 
 void setupDutyController(DutyController * hs, byte pin) {

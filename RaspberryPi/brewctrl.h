@@ -20,6 +20,7 @@
 #ifndef BREWCTRL_H_
 #define BREWCTRL_H_
 
+
 #define bool _Bool
 #define false 0
 #define true 1
@@ -37,6 +38,16 @@
 
 #ifndef NULL
 #define NULL 0
+#endif
+
+
+#ifdef MOCK
+#define SYS_PATH "mock/sys"
+#endif
+
+
+#ifndef SYS_PATH
+#define SYS_PATH "/sys"
 #endif
 
 long millis();
