@@ -1,4 +1,4 @@
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

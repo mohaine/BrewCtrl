@@ -1,4 +1,4 @@
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm.serial;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -11,6 +11,8 @@ import java.util.Enumeration;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ConfigurationLoader;
+import com.mohaine.brewcontroller.comm.SerialConnection;
+import com.mohaine.brewcontroller.comm.SerialHardwareComm;
 
 public class RxTxComm implements SerialConnection {
 
@@ -78,7 +80,6 @@ public class RxTxComm implements SerialConnection {
 				return SerialHardwareComm.STATUS_CONNECT_ERROR;
 			}
 		}
-
 		return null;
 	}
 

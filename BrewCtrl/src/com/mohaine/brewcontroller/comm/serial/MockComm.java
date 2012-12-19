@@ -1,4 +1,4 @@
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm.serial;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +10,15 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.serial.msg.ControlMessageReaderWriter;
-import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
-import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
+import com.mohaine.brewcontroller.comm.Buffer;
+import com.mohaine.brewcontroller.comm.ControlPointReaderListUpdater;
+import com.mohaine.brewcontroller.comm.MessageEnvelope;
+import com.mohaine.brewcontroller.comm.MessageProcessor;
+import com.mohaine.brewcontroller.comm.MessageReader;
+import com.mohaine.brewcontroller.comm.SerialConnection;
+import com.mohaine.brewcontroller.comm.msg.ControlMessageReaderWriter;
+import com.mohaine.brewcontroller.comm.msg.ControlPointReaderWriter;
+import com.mohaine.brewcontroller.comm.msg.SensorMessageReaderWriter;
 
 public class MockComm implements SerialConnection, Runnable {
 	private final HardwareControl control = new HardwareControl();

@@ -1,12 +1,12 @@
-package com.mohaine.brewcontroller.serial.msg;
+package com.mohaine.brewcontroller.comm.msg;
 
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.serial.BinaryMessage;
-import com.mohaine.brewcontroller.serial.ByteUtils;
-import com.mohaine.brewcontroller.serial.MessageReader;
-import com.mohaine.brewcontroller.serial.MessageWriter;
-import com.mohaine.brewcontroller.serial.ReadListener;
-import com.mohaine.brewcontroller.serial.SerialConstants;
+import com.mohaine.brewcontroller.comm.BinaryMessage;
+import com.mohaine.brewcontroller.comm.ByteUtils;
+import com.mohaine.brewcontroller.comm.MessageReader;
+import com.mohaine.brewcontroller.comm.MessageWriter;
+import com.mohaine.brewcontroller.comm.ReadListener;
+import com.mohaine.brewcontroller.comm.CommConstants;
 
 public class SensorMessageReaderWriter extends BinaryMessage implements MessageReader, MessageWriter {
 	private ByteUtils byteUtils = new ByteUtils();
@@ -14,7 +14,7 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 	private ReadListener<SensorMessageReaderWriter> listener;
 
 	public SensorMessageReaderWriter() {
-		super(SerialConstants.SENSOR_CONTROL, 13);
+		super(CommConstants.SENSOR_CONTROL, 13);
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 		sensor.setAddress(readAddress(buffer, offset));
 		offset += 8;
 
-		sensor.setReading(buffer[offset++] == SerialConstants.TRUE);
+		sensor.setReading(buffer[offset++] == CommConstants.TRUE);
 		sensor.setTempatureC(byteUtils.getFloat(buffer, offset));
 		offset += 4;
 
@@ -35,7 +35,7 @@ public class SensorMessageReaderWriter extends BinaryMessage implements MessageR
 	public void writeTo(byte[] buffer, int offset) {
 		writeAddress(buffer, offset, sensor.getAddress());
 		offset += 8;
-		buffer[offset++] = sensor.isReading() ? SerialConstants.TRUE : SerialConstants.FALSE;
+		buffer[offset++] = sensor.isReading() ? CommConstants.TRUE : CommConstants.FALSE;
 		byteUtils.putFloat(buffer, offset, (float) sensor.getTempatureC());
 		offset += 4;
 

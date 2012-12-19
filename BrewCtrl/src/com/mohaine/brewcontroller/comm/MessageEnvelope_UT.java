@@ -16,7 +16,7 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import java.util.Random;
 
@@ -111,7 +111,7 @@ public class MessageEnvelope_UT extends TestCase {
 
 		int testOffset = offset;
 		int startOffset = testOffset;
-		assertEquals(SerialConstants.DATA_START, buffer[testOffset++]);
+		assertEquals(CommConstants.DATA_START, buffer[testOffset++]);
 		assertEquals(sbe.getMessageId(), buffer[testOffset++]);
 		for (int i = 0; i < sbe.getLength(); i++) {
 			assertEquals(sbe.getByte(i), buffer[testOffset++]);
@@ -119,7 +119,7 @@ public class MessageEnvelope_UT extends TestCase {
 
 		int crcLength = testOffset - startOffset;
 		assertEquals((byte) CRC8.compute(buffer, startOffset++, crcLength), buffer[testOffset++]);
-		assertEquals(SerialConstants.DATA_END, buffer[testOffset++]);
+		assertEquals(CommConstants.DATA_END, buffer[testOffset++]);
 	}
 
 	private static class SimpleBinaryMessage extends BinaryMessage implements MessageReader, MessageWriter {

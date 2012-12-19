@@ -1,15 +1,14 @@
-package com.mohaine.brewcontroller.serial.msg;
+package com.mohaine.brewcontroller.comm.msg;
 
-import static com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter.readAddress;
-import static com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter.writeAddress;
+import static com.mohaine.brewcontroller.comm.msg.SensorMessageReaderWriter.*;
 
 import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.serial.BinaryMessage;
-import com.mohaine.brewcontroller.serial.ByteUtils;
-import com.mohaine.brewcontroller.serial.MessageReader;
-import com.mohaine.brewcontroller.serial.MessageWriter;
-import com.mohaine.brewcontroller.serial.ReadListener;
-import com.mohaine.brewcontroller.serial.SerialConstants;
+import com.mohaine.brewcontroller.comm.BinaryMessage;
+import com.mohaine.brewcontroller.comm.ByteUtils;
+import com.mohaine.brewcontroller.comm.MessageReader;
+import com.mohaine.brewcontroller.comm.MessageWriter;
+import com.mohaine.brewcontroller.comm.ReadListener;
+import com.mohaine.brewcontroller.comm.CommConstants;
 
 public class ControlPointReaderWriter extends BinaryMessage implements MessageReader, MessageWriter {
 	private static final int HAS_DUTY_MASK = 0x02;
@@ -19,7 +18,7 @@ public class ControlPointReaderWriter extends BinaryMessage implements MessageRe
 	private ReadListener<ControlPointReaderWriter> listener;
 
 	public ControlPointReaderWriter() {
-		super(SerialConstants.CONTROL_POINT_MSG, 16);
+		super(CommConstants.CONTROL_POINT_MSG, 16);
 	}
 
 	@Override

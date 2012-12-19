@@ -1,4 +1,4 @@
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 /*---------------------------------------------------------------------------
  * Copyright (C) 1999,2000 Dallas Semiconductor Corporation, All Rights Reserved.

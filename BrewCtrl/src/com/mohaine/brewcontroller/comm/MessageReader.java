@@ -16,7 +16,7 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 public interface MessageReader {
 

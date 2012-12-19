@@ -19,7 +19,7 @@
 /**
  * 
  */
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +28,11 @@ import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterMode;
-import com.mohaine.brewcontroller.serial.msg.ControlMessageReaderWriter;
-import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
-import com.mohaine.brewcontroller.serial.msg.SensorMessageReaderWriter;
+import com.mohaine.brewcontroller.comm.msg.ControlMessageReaderWriter;
+import com.mohaine.brewcontroller.comm.msg.ControlPointReaderWriter;
+import com.mohaine.brewcontroller.comm.msg.SensorMessageReaderWriter;
 
-final class ReadWriteThread implements Runnable {
+public class ReadWriteThread implements Runnable {
 
 	private final SerialHardwareComm serialHardwareComm;
 	private final SerialConnection conn;
@@ -98,7 +98,7 @@ final class ReadWriteThread implements Runnable {
 
 	public void run() {
 		try {
-			while (this.serialHardwareComm.run) {
+			while (this.serialHardwareComm.isRun()) {
 
 				String connectError = conn.reconnectIfNeeded();
 

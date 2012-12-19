@@ -16,7 +16,7 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;

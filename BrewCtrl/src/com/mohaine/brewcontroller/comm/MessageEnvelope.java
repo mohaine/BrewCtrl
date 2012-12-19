@@ -16,9 +16,9 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
-import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
+import com.mohaine.brewcontroller.comm.msg.ControlPointReaderWriter;
 
 public class MessageEnvelope {
 
@@ -29,7 +29,7 @@ public class MessageEnvelope {
 	public static int writeMessage(byte[] buffer, int offset, MessageWriter writer) {
 		int startOffset = offset;
 
-		buffer[offset++] = SerialConstants.DATA_START;
+		buffer[offset++] = CommConstants.DATA_START;
 		buffer[offset++] = writer.getMessageId();
 
 		writer.writeTo(buffer, offset);
@@ -41,7 +41,7 @@ public class MessageEnvelope {
 		// This is only 8 bits so double calculate
 
 		buffer[offset++] = computeCrc8(buffer, startOffset++, crcLength);
-		buffer[offset++] = SerialConstants.DATA_END;
+		buffer[offset++] = CommConstants.DATA_END;
 
 		return offset;
 	}
@@ -50,7 +50,7 @@ public class MessageEnvelope {
 		boolean valid = true;
 		int startOffset = offset;
 
-		valid = valid && buffer[offset++] == SerialConstants.DATA_START;
+		valid = valid && buffer[offset++] == CommConstants.DATA_START;
 		valid = valid && buffer[offset++] == reader.getMessageId();
 
 		if (valid) {
@@ -58,7 +58,7 @@ public class MessageEnvelope {
 			int crcLength = offset - startOffset;
 
 			valid = valid && buffer[offset++] == computeCrc8(buffer, startOffset++, crcLength);
-			valid = valid && buffer[offset++] == SerialConstants.DATA_END;
+			valid = valid && buffer[offset++] == CommConstants.DATA_END;
 		}
 		return valid;
 	}

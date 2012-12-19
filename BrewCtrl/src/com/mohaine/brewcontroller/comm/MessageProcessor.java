@@ -16,7 +16,7 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,7 +51,7 @@ public class MessageProcessor {
 			serialBuffer[serialBufferOffset++] = (byte) readValue;
 
 			int bufferOffset = serialBufferOffset - 1;
-			if (serialBuffer[bufferOffset] == SerialConstants.DATA_END) {
+			if (serialBuffer[bufferOffset] == CommConstants.DATA_END) {
 
 				for (MessageReader mr : binaryMessages) {
 					// On stop bit

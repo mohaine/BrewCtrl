@@ -1,4 +1,4 @@
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import java.io.InputStream;
 import java.io.OutputStream;

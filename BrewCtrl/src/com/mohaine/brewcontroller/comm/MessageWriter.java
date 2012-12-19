@@ -16,24 +16,13 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
-public class BinaryMessage {
-	private final byte messageId;
-	private final int length;
+public interface MessageWriter {
+	public byte getMessageId();
 
-	public BinaryMessage(byte messageId, int length) {
-		super();
-		this.messageId = messageId;
-		this.length = length;
-	}
+	public int getLength();
 
-	public byte getMessageId() {
-		return messageId;
-	}
-
-	public int getLength() {
-		return length;
-	}
+	public abstract void writeTo(byte[] data, int offset);
 
 }

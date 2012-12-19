@@ -1,4 +1,4 @@
-package com.mohaine.brewcontroller.serial.msg;
+package com.mohaine.brewcontroller.comm.msg;
 
 import static org.junit.Assert.*;
 

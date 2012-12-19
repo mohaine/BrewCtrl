@@ -16,7 +16,7 @@
  
  */
 
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ConfigurationLoader;
@@ -27,12 +27,12 @@ import com.mohaine.brewcontroller.bean.HeaterMode;
 
 public class SerialHardwareComm extends HardwareBase implements Hardware {
 
-	static final String STATUS_CONNECT_NO_PORT = "NO TTY";
-	static final String STATUS_CONNECT_ERROR = "NO CONNECT";
-	static final String STATUS_NO_COMM_WRITE = "NO WRITE";
-	static final String STATUS_CONTROL_ID = "CONTROL ID";
-	static final String STATUS_NO_COMM_READ = "NO READ";
-	static final String STATUS_COMM = "Ok";
+	public static final String STATUS_CONNECT_NO_PORT = "NO TTY";
+	public static final String STATUS_CONNECT_ERROR = "NO CONNECT";
+	public static final String STATUS_NO_COMM_WRITE = "NO WRITE";
+	public static final String STATUS_CONTROL_ID = "CONTROL ID";
+	public static final String STATUS_NO_COMM_READ = "NO READ";
+	public static final String STATUS_COMM = "Ok";
 
 	static final int MAX_CONTROL_ID = 999;
 
@@ -46,7 +46,7 @@ public class SerialHardwareComm extends HardwareBase implements Hardware {
 	@Inject
 	public SerialHardwareComm(SerialConnection serialConn, ConfigurationLoader configurationLoader) {
 		hardareControl.setMode(HeaterMode.OFF);
-		readWriteThread = new ReadWriteThread(this, serialConn,configurationLoader.getConfiguration().isLogMessages());
+		readWriteThread = new ReadWriteThread(this, serialConn, configurationLoader.getConfiguration().isLogMessages());
 		new Thread(readWriteThread).start();
 	}
 
@@ -78,6 +78,10 @@ public class SerialHardwareComm extends HardwareBase implements Hardware {
 			this.status = status;
 			fireStateChangeHandlers();
 		}
+	}
+
+	public boolean isRun() {
+		return run;
 	}
 
 }

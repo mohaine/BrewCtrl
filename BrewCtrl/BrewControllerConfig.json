@@ -5,8 +5,8 @@
             "name":"HLT",
             "sensor":{
                "reading":true,
-               "tempatureC":23.875,
-               "address":"289c167d02000048"
+               "tempatureC":25.0,
+               "address":"0000000000000001"
             },
             "heater":{
                "name":"HTL Element",
@@ -19,8 +19,9 @@
          {
             "name":"TUN",
             "sensor":{
-               "reading":false,
-               "tempatureC":0.0
+               "reading":true,
+               "tempatureC":26.0,
+               "address":"0000000000000002"
             }
          },
          {
@@ -28,7 +29,7 @@
             "heater":{
                "name":"Kettle Element",
                "pin":7,
-               "duty":65,
+               "duty":0,
                "canPulse":true,
                "fullOnAmps":23
             }

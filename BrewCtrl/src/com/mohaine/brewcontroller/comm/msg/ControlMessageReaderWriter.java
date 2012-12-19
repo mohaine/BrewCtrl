@@ -1,13 +1,13 @@
-package com.mohaine.brewcontroller.serial.msg;
+package com.mohaine.brewcontroller.comm.msg;
 
 import com.mohaine.brewcontroller.bean.HardwareControl;
 import com.mohaine.brewcontroller.bean.HeaterMode;
-import com.mohaine.brewcontroller.serial.BinaryMessage;
-import com.mohaine.brewcontroller.serial.ByteUtils;
-import com.mohaine.brewcontroller.serial.MessageReader;
-import com.mohaine.brewcontroller.serial.MessageWriter;
-import com.mohaine.brewcontroller.serial.ReadListener;
-import com.mohaine.brewcontroller.serial.SerialConstants;
+import com.mohaine.brewcontroller.comm.BinaryMessage;
+import com.mohaine.brewcontroller.comm.ByteUtils;
+import com.mohaine.brewcontroller.comm.MessageReader;
+import com.mohaine.brewcontroller.comm.MessageWriter;
+import com.mohaine.brewcontroller.comm.ReadListener;
+import com.mohaine.brewcontroller.comm.CommConstants;
 
 public class ControlMessageReaderWriter extends BinaryMessage implements MessageWriter, MessageReader {
 	private static final int COMM_LOSS_MASK = 0x01;
@@ -16,7 +16,7 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 	private ReadListener<ControlMessageReaderWriter> listener;
 
 	public ControlMessageReaderWriter() {
-		super(SerialConstants.HARDWARE_CONTROL, 9);
+		super(CommConstants.HARDWARE_CONTROL, 9);
 	}
 
 	@Override

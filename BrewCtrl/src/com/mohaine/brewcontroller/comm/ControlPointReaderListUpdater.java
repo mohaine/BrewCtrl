@@ -1,9 +1,9 @@
-package com.mohaine.brewcontroller.serial;
+package com.mohaine.brewcontroller.comm;
 
 import java.util.List;
 
 import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.serial.msg.ControlPointReaderWriter;
+import com.mohaine.brewcontroller.comm.msg.ControlPointReaderWriter;
 
 public class ControlPointReaderListUpdater implements ReadListener<ControlPointReaderWriter> {
 	List<ControlPoint> controlPoints;
