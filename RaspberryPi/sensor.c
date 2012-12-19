@@ -16,6 +16,8 @@ int sensorCount = 0;
 
 #define W1_ROOT SYS_PATH"/bus/w1/devices/"
 
+#define BAD_READ "00 00 00 00 00 00 00 00 00 : crc=00 YES"
+
 void readSensors() {
 	char tmp[PATH_MAX];
 
@@ -31,25 +33,29 @@ void readSensors() {
 			int readSize = fread(data, 1, sizeof(data), f);
 			if (readSize > 0) {
 				data[sizeof(data) - 1] = 0;
-				char* crcIndex = strstr(data, "crc=");
-				if (crcIndex > 0) {
-					crcIndex += 7;
-					if (strcmp(crcIndex, "YES")) {
-						// Have a valid read. Get the value
 
-						char* tIndex = strstr(crcIndex, "t=");
-						if (tIndex > 0) {
-							tIndex += 2;
-							tIndex[10] = 0;
-							for (int i = 0; i < 10; i++) {
-								char c = tIndex[i];
-								if (c < '0' || c > '9') {
-									tIndex[i] = 0;
+				if (!memcmp(BAD_READ, data, sizeof(BAD_READ))) {
+					char* crcIndex = strstr(data, "crc=");
+					if (crcIndex > 0) {
+
+						crcIndex += 7;
+						if (strcmp(crcIndex, "YES")) {
+							// Have a valid read. Get the value
+
+							char* tIndex = strstr(crcIndex, "t=");
+							if (tIndex > 0) {
+								tIndex += 2;
+								tIndex[10] = 0;
+								for (int i = 0; i < 10; i++) {
+									char c = tIndex[i];
+									if (c < '0' || c > '9') {
+										tIndex[i] = 0;
+									}
 								}
+								int milliCs = atoi(tIndex);
+								sensor->lastTemp = ((double) milliCs) / 1000;
+								successfulRead = true;
 							}
-							int milliCs = atoi(tIndex);
-							sensor->lastTemp = ((double) milliCs) / 1000;
-							successfulRead = true;
 						}
 					}
 				}
@@ -57,9 +63,7 @@ void readSensors() {
 
 			fclose(f);
 		}
-		if (sensor->reading != successfulRead) {
-			sensor->reading = successfulRead;
-		}
+		sensor->reading = successfulRead;
 
 	}
 
