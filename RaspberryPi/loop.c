@@ -113,7 +113,6 @@ void updatePinsForSetDuty() {
 void setup(void) {
 	setupControl();
 	turnOff();
-	setupComm();
 	searchForTempSensors();
 
 	loopFunctions[0].delayTime = 1000;
@@ -142,8 +141,5 @@ void loop(void) {
 			lf->workFunction();
 		}
 	}
-
-	readSerial();
-	// Need to usleep
 
 }

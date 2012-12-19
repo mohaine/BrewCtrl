@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2011 Michael Graessle
+ Copyright 2009-2011 Michael Graessle
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,22 +21,8 @@
 
 #include "brewctrl.h"
 
-
-
-void setupComm();
-bool readSerial();
+void startComm();
 long lastControlIdTime();
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
 

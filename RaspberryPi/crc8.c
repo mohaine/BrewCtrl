@@ -1,57 +1,44 @@
 #include "crc8.h"
 
-/*
- * crc8.c
- *
- * Computes a 8-bit CRC
- *
- */
+byte dscrc_table[256];
+bool validTable = false;
 
-#include <stdio.h>
+void buildTable() {
 
-#define GP  0x107   /* x^8 + x^2 + x + 1 */
-#define DI  0x07
+	if (!validTable) {
+		int acc;
+		int crc;
 
-static unsigned char crc8_table[256]; /* 8-bit table */
-static int made_table = 0;
+		for (int i = 0; i < 256; i++) {
+			acc = i;
+			crc = 0;
 
-static void init_crc8()
-/*
- * Should be called before any other crc function.
- */
-{
-	int i, j;
-	unsigned char crc;
+			for (int j = 0; j < 8; j++) {
+				if (((acc ^ crc) & 0x01) == 0x01) {
+					crc = ((crc ^ 0x18) >> 1) | 0x80;
+				} else
+					crc = crc >> 1;
 
-	if (!made_table) {
-		for (i = 0; i < 256; i++) {
-			crc = i;
-			for (j = 0; j < 8; j++)
-				crc = (crc << 1) ^ ((crc & 0x80) ? DI : 0);
-			crc8_table[i] = crc & 0xFF;
-			/* printf("table[%d] = %d (0x%X)\n", i, crc, crc); */
+				acc = acc >> 1;
+			}
+
+			dscrc_table[i] = (byte) crc;
+
 		}
-		made_table = 1;
+		validTable = true;
 	}
-}
-
-void crc8(unsigned char *crc, unsigned char m)
-/*
- * For a byte array whose accumulated crc value is stored in *crc, computes
- * resultant crc obtained by appending m to the byte array
- */
-{
-	if (!made_table)
-		init_crc8();
-
-	*crc = crc8_table[(*crc) ^ m];
-	*crc &= 0xFF;
 }
 
 byte computeCrc8(byte * buffer, int offset, int length) {
-	byte result = 0;
-	for (int i = offset; i < length; i++) {
-		crc8(&result, buffer[i]);
+
+	buildTable();
+	byte crc = 0;
+
+	for (int i = 0; i < length; i++) {
+		crc = dscrc_table[(crc ^ buffer[i + offset]) & 0x0FF];
 	}
-	return result;
+
+	return (crc & 0x0FF);
+	return crc;
+
 }

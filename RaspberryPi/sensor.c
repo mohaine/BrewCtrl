@@ -1,10 +1,14 @@
 #include "sensor.h"
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
 #include <linux/limits.h>
+#include <limits.h>
+#include <stdlib.h>
 
 TempSensor sensors[8];
 int sensorCount = 0;
@@ -61,12 +65,14 @@ void searchForTempSensors() {
 
 	dp = opendir(W1_ROOT);
 	if (dp != NULL) {
+		char * restrict tmp = malloc(PATH_MAX);
 		while ((ep = readdir(dp))) {
 			if (strlen(ep->d_name) == 15 && ep->d_name[2] == '-') {
-				char tmp[PATH_MAX];
 				sprintf(tmp, "%s/%s", W1_ROOT, ep->d_name);
 				TempSensor* sensor = &sensors[sensorCount];
-				if (realpath(&tmp, sensor->sysfile)) {
+
+				sensor->sysfile = realpath(tmp, NULL);
+				if (sensor->sysfile) {
 					sprintf(tmp, "%s/%s", sensor->sysfile, "id");
 					FILE* f = fopen(tmp, "rb");
 					if (f) {
@@ -81,6 +87,8 @@ void searchForTempSensors() {
 
 			}
 		}
+
+		free(tmp);
 		(void) closedir(dp);
 
 	} else {

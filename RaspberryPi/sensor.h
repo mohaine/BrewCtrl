@@ -25,9 +25,7 @@
 
 typedef struct {
 	byte address[8];
-	double lastTemp;bool reading;
-	char sysfile[PATH_MAX];
-
+	double lastTemp;bool reading;char * restrict sysfile;
 } TempSensor;
 
 void readSensors();
