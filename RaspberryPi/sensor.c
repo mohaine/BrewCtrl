@@ -82,7 +82,7 @@ void searchForTempSensors() {
 					if (f) {
 						int readSize = fread(&sensor->address, 1, 8, f);
 						if (readSize == 8) {
-							if (getSensor(&sensor->address) == NULL) {
+							if (getSensor(sensor->address) == NULL) {
 								sensor->reading = false;
 								sensorCount++;
 							}

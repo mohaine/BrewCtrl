@@ -399,7 +399,6 @@ void* handleClientThread(void *ptr) {
 		}
 
 		if (sendResponse) {
-			printf("Write\n");
 			writeStatus(clntSocket);
 			sendResponse = false;
 		}

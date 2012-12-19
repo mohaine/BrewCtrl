@@ -22,12 +22,22 @@
  #define BOIL_HEAT_CONTROL_PIN 7
  */
 
+#define _GNU_SOURCE
+
 #include "brewctrl.h"
 #include "sensor.h"
 #include "duty.h"
 #include "pid.h"
 #include "comm.h"
 #include "control.h"
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <strings.h>
+#include <errno.h>
+#include <pthread.h>
 
 #define LOOP_FUNCTIONS 4
 
@@ -36,13 +46,6 @@ typedef struct {
 	long lastRunTime;
 	void (*workFunction)();
 } LoopFunction;
-
-LoopFunction loopFunctions[LOOP_FUNCTIONS];
-
-long lastHeatUpdate = 0;
-long lastDutyUpdate = 0;
-long lastPumpOnChangeTime = 0;
-long lastSearchTime = 0;
 
 Pid pid;
 
@@ -110,44 +113,53 @@ void updatePinsForSetDuty() {
 
 }
 
-void setupLoop(void) {
-	setupControl();
-	turnOff();
-	searchForTempSensors();
-	listSensors();
+void* loopFunctionPThread(void *ptr) {
+	LoopFunction *lf = ptr;
 
-	loopFunctions[0].delayTime = 1000;
-	loopFunctions[0].workFunction = checkForControlTimeout;
+	lf->lastRunTime = millis() - lf->delayTime;
 
-	loopFunctions[1].delayTime = 1000;
-	loopFunctions[1].workFunction = updateDuty;
+	while (true) {
+		int sleepTime = (lf->lastRunTime + lf->delayTime) - millis();
 
-	loopFunctions[2].delayTime = 100;
-	loopFunctions[2].workFunction = updatePinsForSetDuty;
+		if (sleepTime > 0) {
+			usleep(sleepTime * 1000);
+		} else {
+			lf->lastRunTime = lf->lastRunTime + lf->delayTime;
+			lf->workFunction();
+		}
+	}
+	free(lf);
 
-	loopFunctions[3].delayTime = 10000;
-	loopFunctions[3].workFunction = searchForTempSensors;
+	return NULL;
+}
 
+void startLoopFunction(int delayTime, void (*workFunction)()) {
+	LoopFunction *lf = malloc(sizeof(LoopFunction));
+
+	lf->delayTime = delayTime;
+	lf->workFunction = workFunction;
+
+	pthread_t thread;
+	pthread_create(&thread, NULL, loopFunctionPThread, lf);
+
+}
+void test(void) {
+	printf("Test %lu\n", millis());
 }
 
 void loop(void) {
 
-	setupLoop();
+	setupControl();
+	turnOff();
+	searchForTempSensors();
 
-	while (1) {
+	startLoopFunction(1000, checkForControlTimeout);
+	startLoopFunction(1000, updateDuty);
+//	startLoopFunction(100, updatePinsForSetDuty);
+	startLoopFunction(10000, searchForTempSensors);
 
-		//  Serial.println("LOOP");
-		unsigned long now = millis();
-
-		for (int i = 0; i < LOOP_FUNCTIONS; i++) {
-			LoopFunction* lf = &loopFunctions[i];
-			if (now - lf->lastRunTime > lf->delayTime) {
-				lf->lastRunTime = lf->lastRunTime + lf->delayTime;
-				lf->workFunction();
-			}
-		}
-
-		// Caculate time
-		usleep(1000);
+	while (true) {
+		sleep(100000);
 	}
+
 }
