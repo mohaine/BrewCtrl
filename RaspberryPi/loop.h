@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2012 Michael Graessle
+ Copyright 2009-2012 Michael Graessle
  
  
  This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,9 @@
  
  */
 
-
-
 #ifndef LOOP_H_
 #define LOOP_H_
 
-
-
-
-
+void loop(void);
 #endif
-
-
-
-
-
-
-
 

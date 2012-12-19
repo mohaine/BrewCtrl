@@ -10,7 +10,9 @@
 #include <limits.h>
 #include <stdlib.h>
 
-TempSensor sensors[8];
+#define MAX_SENSORS 100
+
+TempSensor sensors[MAX_SENSORS];
 int sensorCount = 0;
 
 #define W1_ROOT "mock/sys/bus/w1/devices/"
@@ -54,6 +56,8 @@ void readSensors() {
 					}
 				}
 			}
+
+			fclose(f);
 		}
 	}
 
@@ -78,13 +82,14 @@ void searchForTempSensors() {
 					if (f) {
 						int readSize = fread(&sensor->address, 1, 8, f);
 						if (readSize == 8) {
-							sensor->reading = false;
-							sensorCount++;
+							if (getSensor(&sensor->address) == NULL) {
+								sensor->reading = false;
+								sensorCount++;
+							}
 						}
+						fclose(f);
 					}
-
 				}
-
 			}
 		}
 
@@ -117,4 +122,38 @@ TempSensor* getSensorByIndex(int i) {
 
 int getSensorCount() {
 	return sensorCount;
+}
+
+byte getHexValue(char iValue) {
+	if (iValue >= '0' && iValue <= '9') {
+		return (iValue - '0');
+	}
+	if (iValue >= 'A' && iValue <= 'F') {
+		return (iValue - 'A' + 10);
+	}
+	if (iValue >= 'a' && iValue <= 'f') {
+		return (iValue - 'a' + 10);
+	}
+	return 0;
+}
+
+void listSensors() {
+	int sensorCount = getSensorCount();
+
+	for (int i = 0; i < sensorCount; i++) {
+		TempSensor *sensor = getSensorByIndex(i);
+
+		printf("Sensor %d ", i);
+
+		for (int j = 0; j < 8; j++) {
+			printf("%02x", sensor->address[j]);
+		}
+
+		if (sensor->reading) {
+			printf(" Temp: %0.3f", sensor->lastTemp);
+
+		}
+		printf("\n");
+
+	}
 }

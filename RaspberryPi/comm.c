@@ -411,7 +411,8 @@ void* handleClientThread(void *ptr) {
 	return NULL;
 }
 
-void startComm() {
+void* listenThread(void *ptr) {
+
 	int sock;
 	int connected;
 	int setSockOp = 1;
@@ -424,13 +425,13 @@ void startComm() {
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		perror("Socket");
-		exit(1);
+		return NULL;
 	}
 
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &setSockOp, sizeof(int))
 			== -1) {
 		perror("Setsockopt");
-		exit(1);
+		return NULL;
 	}
 
 	server_addr.sin_family = AF_INET;
@@ -461,5 +462,10 @@ void startComm() {
 
 		pthread_create(&thread, NULL, handleClientThread, (void*) &connected);
 	}
+	return NULL;
+}
+void startComm() {
+	pthread_t thread;
+	pthread_create(&thread, NULL, listenThread, NULL);
 
 }

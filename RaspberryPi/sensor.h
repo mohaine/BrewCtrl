@@ -33,6 +33,7 @@ void searchForTempSensors();
 TempSensor* getSensor(byte* address);
 TempSensor* getSensorByIndex(int i);
 int getSensorCount();
+void listSensors();
 
 #endif
 

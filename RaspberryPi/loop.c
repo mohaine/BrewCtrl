@@ -47,6 +47,8 @@ long lastSearchTime = 0;
 Pid pid;
 
 void updateDuty() {
+	printf("update duty \n");
+
 	readSensors();
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
@@ -110,10 +112,11 @@ void updatePinsForSetDuty() {
 
 }
 
-void setup(void) {
+void setupLoop(void) {
 	setupControl();
 	turnOff();
 	searchForTempSensors();
+	listSensors();
 
 	loopFunctions[0].delayTime = 1000;
 	loopFunctions[0].workFunction = checkForControlTimeout;
@@ -131,15 +134,22 @@ void setup(void) {
 
 void loop(void) {
 
-	//  Serial.println("LOOP");
-	unsigned long now = millis();
+	setupLoop();
 
-	for (int i = 0; i < LOOP_FUNCTIONS; i++) {
-		LoopFunction* lf = &loopFunctions[i];
-		if (now - lf->lastRunTime > lf->delayTime) {
-			lf->lastRunTime = lf->lastRunTime + lf->delayTime;
-			lf->workFunction();
+	while (1) {
+
+		//  Serial.println("LOOP");
+		unsigned long now = millis();
+
+		for (int i = 0; i < LOOP_FUNCTIONS; i++) {
+			LoopFunction* lf = &loopFunctions[i];
+			if (now - lf->lastRunTime > lf->delayTime) {
+				lf->lastRunTime = lf->lastRunTime + lf->delayTime;
+				lf->workFunction();
+			}
 		}
-	}
 
+		// Caculate time
+		usleep(100);
+	}
 }

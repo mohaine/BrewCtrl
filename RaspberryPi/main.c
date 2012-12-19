@@ -10,7 +10,10 @@
 
 int main() {
 
+	printf("Start Comm\n");
 	startComm();
+	printf("Start Loop\n");
+	loop();
 
 }
 
