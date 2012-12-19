@@ -34,7 +34,7 @@ void readSensors() {
 			if (readSize > 0) {
 				data[sizeof(data) - 1] = 0;
 
-				if (!memcmp(BAD_READ, data, sizeof(BAD_READ))) {
+				if (memcmp(BAD_READ, data, sizeof(BAD_READ) - 1) != 0) {
 					char* crcIndex = strstr(data, "crc=");
 					if (crcIndex > 0) {
 
@@ -58,6 +58,7 @@ void readSensors() {
 							}
 						}
 					}
+
 				}
 			}
 
