@@ -330,7 +330,6 @@ void setupMessages() {
 void* handleClientThread(void *ptr) {
 	int * number = (int *) ptr;
 	int clntSocket = *number;
-	printf("HANDLE  %d\n", clntSocket);
 	bool readMessage = false;
 
 	byte serialBuffer[READ_BUFFER_SIZE];
@@ -404,8 +403,6 @@ void* handleClientThread(void *ptr) {
 		}
 
 	}
-	printf("Close  %d\n", clntSocket);
-
 	close(clntSocket);
 
 	return NULL;
@@ -442,12 +439,12 @@ void* listenThread(void *ptr) {
 	if (bind(sock, (struct sockaddr *) &server_addr, sizeof(struct sockaddr))
 			== -1) {
 		perror("Unable to bind");
-		exit(1);
+		return NULL;
 	}
 
 	if (listen(sock, 5) == -1) {
 		perror("Listen");
-		exit(1);
+		return NULL;
 	}
 
 	printf("Waiting for client on port %d\n", DEFAULT_PORT);
@@ -458,7 +455,6 @@ void* listenThread(void *ptr) {
 		connected = accept(sock, (struct sockaddr *) &client_addr, &sin_size);
 		printf("Connection from (%s , %d)\n", inet_ntoa(client_addr.sin_addr),
 				ntohs(client_addr.sin_port));
-		printf("Thread for  %d\n", connected);
 
 		pthread_create(&thread, NULL, handleClientThread, (void*) &connected);
 	}
