@@ -56,9 +56,25 @@ void pinMode(int pin, bool inout) {
 #endif
 }
 
+long lastChange = 0;
+;
+
 void digitalWrite(int pin, bool hilow) {
 #ifdef MOCK
-	printf("Pin %d set to %s\n", pin, hilow ? "On" : "Off");
+//	printf("Pin %d set to %s\n", pin, hilow ? "On" : "Off");
+
+	long now = millis();
+	if(lastChange > 0) {
+		int timeAtState = now - lastChange;
+		if(hilow) {
+			printf("%lu,%d,0\n", now,timeAtState);
+		} else {
+			printf("%lu,0,%d\n", now,timeAtState);
+		}
+	}
+
+	lastChange = now;
+
 #else
 	char tmp[10];
 	char path[PATH_MAX];

@@ -66,28 +66,41 @@ long lastControlIdTime() {
 	return lastSuccessfulControlIdTime;
 }
 
-int readInt(byte *buffer, int offset) {
-	int out;
+/*
+ int readShort(byte *buffer, int offset) {
+ int out;
+ byte *data;
+ data = (byte *) &out;
+ data[0] = buffer[offset];
+ data[1] = buffer[offset + 1];
+ return out;
+ }
+
+ void writeShort(byte *buffer, int offset, int value) {
+ byte *data;
+ data = (byte *) &value;
+ buffer[offset] = data[0];
+ buffer[offset + 1] = data[1];
+ }
+ */
+
+int readLong(byte *buffer, int offset) {
+	long out;
 	byte *data;
 	data = (byte *) &out;
-	data[0] = buffer[offset];
-	data[1] = buffer[offset + 1];
+
+	for (int i = 0; i < 8; i++) {
+		data[i] = buffer[offset + i];
+	}
 	return out;
 }
 
-void writeInt(byte *buffer, int offset, int value) {
-	byte *data;
-	data = (byte *) &value;
-	buffer[offset] = data[0];
-	buffer[offset + 1] = data[1];
-}
 void writeLong(byte *buffer, int offset, long value) {
 	byte *data;
 	data = (byte *) &value;
-	buffer[offset] = data[0];
-	buffer[offset + 1] = data[1];
-	buffer[offset + 2] = data[2];
-	buffer[offset + 3] = data[3];
+	for (int i = 0; i < 8; i++) {
+		buffer[offset + i] = data[i];
+	}
 }
 
 float readFloat(byte *buffer, int offset) {
@@ -123,10 +136,10 @@ void writeStatus(int clntSocket) {
 	buffer[offset++] = DATA_START;
 	buffer[offset++] = HARDWARE_CONTROL;
 
-	writeInt(buffer, offset, control->controlId);
-	offset += 2;
+	writeLong(buffer, offset, control->controlId);
+	offset += 8;
 	writeLong(buffer, offset, millis());
-	offset += 4;
+	offset += 8;
 
 	buffer[offset++] = (control->mode);
 	buffer[offset++] = (control->maxAmps);
@@ -292,10 +305,10 @@ void readControlMessage(byte * serialBuffer, int offset) {
 	Control* control = getControl();
 
 	lastSuccessfulControlIdTime = millis();
-	control->controlId = readInt(serialBuffer, offset);
-	offset += 2;
-// Skip Time
-	offset += 4;
+	control->controlId = readLong(serialBuffer, offset);
+	offset += 8;
+	// Skip Time
+	offset += 8;
 
 	control->mode = serialBuffer[offset++];
 	control->maxAmps = serialBuffer[offset++];
@@ -320,7 +333,7 @@ void handleExtra(byte* data, int offset, int length) {
 
 void setupMessages() {
 	readMessages[0].msgId = HARDWARE_CONTROL;
-	readMessages[0].length = 9;
+	readMessages[0].length = 19;
 	readMessages[0].processFunction = readControlMessage;
 	readMessages[1].msgId = CONTROL_POINT;
 	readMessages[1].length = 16;
@@ -399,6 +412,8 @@ void* handleClientThread(void *ptr) {
 		}
 
 		if (sendResponse) {
+
+			printf("sendResponse\n");
 			writeStatus(clntSocket);
 			sendResponse = false;
 		}

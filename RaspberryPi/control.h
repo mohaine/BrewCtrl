@@ -8,7 +8,7 @@
 
 typedef struct {
 	bool mode;
-	int controlId;byte maxAmps;bool turnOffOnCommLoss;
+	long controlId;byte maxAmps;bool turnOffOnCommLoss;
 } Control;
 
 typedef struct {
