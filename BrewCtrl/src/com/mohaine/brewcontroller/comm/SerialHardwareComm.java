@@ -32,7 +32,7 @@ public class SerialHardwareComm extends HardwareBase implements Hardware {
 	public static final String STATUS_NO_COMM_WRITE = "NO WRITE";
 	public static final String STATUS_CONTROL_ID = "CONTROL ID";
 	public static final String STATUS_NO_COMM_READ = "NO READ";
-	public static final String STATUS_COMM = "Ok";
+	public static final String STATUS_COMM_GOOD = "Ok";
 
 	static final int MAX_CONTROL_ID = 999;
 

@@ -37,10 +37,8 @@ public class ReadWriteThread implements Runnable {
 	private final SerialHardwareComm serialHardwareComm;
 	private final SerialConnection conn;
 
-	private int controlId;
-	private int lastWriteControlId = -1;
+	private long controlId;
 	private long lastWriteTime = System.currentTimeMillis() - 10000;
-
 	private long lastReadTime;
 
 	private final MessageProcessor processor;
@@ -105,7 +103,13 @@ public class ReadWriteThread implements Runnable {
 				if (connectError == null) {
 					processRead();
 					processWrite();
-					processControlId();
+
+					long now = System.currentTimeMillis();
+					if (now - lastReadTime > 5000) {
+						this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_NO_COMM_READ);
+					} else {
+						this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_COMM_GOOD);
+					}
 				} else {
 					serialHardwareComm.changeStatus(connectError);
 				}
@@ -120,48 +124,9 @@ public class ReadWriteThread implements Runnable {
 		}
 	}
 
-	private void processControlId() {
-		try {
-
-			if (!this.serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_NO_COMM_READ)) {
-				long now = System.currentTimeMillis();
-
-				if (now - lastReadTime > 5000) {
-					this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_NO_COMM_READ);
-				}
-			}
-
-			if (this.serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_COMM) || serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_CONTROL_ID)) {
-				int lastReadControlId = controlMsgReader.getControl().getControlId();
-
-				boolean invalid = lastWriteControlId - lastReadControlId > 5;
-
-				if (lastWriteControlId < lastReadControlId && lastWriteControlId != 0) {
-					invalid = true;
-				}
-
-				if (invalid) {
-					this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_CONTROL_ID);
-				} else {
-					this.serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_COMM);
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	int count = 0;
 
 	private void processWrite() {
-		// if (count++ % 10 == 0) {
-		// for (ControlPoint controlPoint :
-		// controlMsgReader.getControl().getControlPoints()) {
-		// System.out.println("controlPoint: " + controlPoint);
-		// }
-		// }
-
 		try {
 			long now = System.currentTimeMillis();
 			int timeSinceLast = (int) (now - lastWriteTime);
@@ -173,17 +138,11 @@ public class ReadWriteThread implements Runnable {
 
 					lastWriteTime = now;
 					controlId++;
-					if (controlId > Short.MAX_VALUE) {
-						controlId = 0;
-					}
-					lastWriteControlId = controlId;
-					byte[] buffer = new byte[126];
-
+					byte[] buffer = new byte[conn.getMaxWriteSize()];
 					control.setControlId(controlId);
 
 					controlMsgWriter.setControl(control);
 					int offset = MessageEnvelope.writeMessage(buffer, 0, controlMsgWriter);
-
 					if (control.getMode() == HeaterMode.ON) {
 						if (MessageEnvelope.canFit(controlPointWriter, offset, buffer)) {
 							List<ControlPoint> controlPointsWriter = control.getControlPoints();
@@ -263,9 +222,11 @@ public class ReadWriteThread implements Runnable {
 			if (changes) {
 
 				lastReadTime = System.currentTimeMillis();
-				if (serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_NO_COMM_READ)) {
-					serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_COMM);
-				}
+				// if
+				// (serialHardwareComm.getStatus().equals(SerialHardwareComm.STATUS_NO_COMM_READ))
+				// {
+				serialHardwareComm.changeStatus(SerialHardwareComm.STATUS_COMM_GOOD);
+				// }
 
 				this.serialHardwareComm.fireStateChangeHandlers();
 			}

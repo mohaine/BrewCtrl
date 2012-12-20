@@ -22,18 +22,18 @@ import java.util.List;
 
 public class HardwareControl implements Cloneable {
 	private HeaterMode mode = HeaterMode.UNKNOWN;
-	private int controlId;
-	private int millis;
+	private long controlId;
+	private long millis;
 	private int maxAmps;
 	private boolean turnOffOnCommLoss;
 
 	private List<ControlPoint> controlPoints;
 
-	public int getControlId() {
+	public long getControlId() {
 		return controlId;
 	}
 
-	public void setControlId(int controlId) {
+	public void setControlId(long controlId) {
 		this.controlId = controlId;
 	}
 
@@ -73,11 +73,11 @@ public class HardwareControl implements Cloneable {
 		this.controlPoints = controlPoints;
 	}
 
-	public int getMillis() {
+	public long getMillis() {
 		return millis;
 	}
 
-	public void setMillis(int millis) {
+	public void setMillis(long millis) {
 		this.millis = millis;
 	}
 

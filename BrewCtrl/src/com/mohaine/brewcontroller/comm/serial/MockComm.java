@@ -138,4 +138,9 @@ public class MockComm implements SerialConnection, Runnable {
 		}
 
 	}
+
+	@Override
+	public int getMaxWriteSize() {
+		return 20000;
+	}
 }

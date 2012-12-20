@@ -16,15 +16,15 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 	private ReadListener<ControlMessageReaderWriter> listener;
 
 	public ControlMessageReaderWriter() {
-		super(CommConstants.HARDWARE_CONTROL, 9);
+		super(CommConstants.HARDWARE_CONTROL, 19);
 	}
 
 	@Override
 	public void readFrom(byte[] buffer, int offset) {
-		control.setControlId(byteUtils.getShort(buffer, offset));
-		offset += 2;
-		control.setMillis(byteUtils.getInt(buffer, offset));
-		offset += 4;
+		control.setControlId(byteUtils.getLong(buffer, offset));
+		offset += 8;
+		control.setMillis(byteUtils.getLong(buffer, offset));
+		offset += 8;
 		control.setMode(buffer[offset++] == 1 ? HeaterMode.ON : HeaterMode.OFF);
 		control.setMaxAmps(buffer[offset++]);
 
@@ -39,10 +39,10 @@ public class ControlMessageReaderWriter extends BinaryMessage implements Message
 	@Override
 	public void writeTo(byte[] buffer, int offset) {
 
-		byteUtils.putShort(buffer, offset, (short) control.getControlId());
-		offset += 2;
-		byteUtils.putInt(buffer, offset, (int) control.getMillis());
-		offset += 4;
+		byteUtils.putLong(buffer, offset, (short) control.getControlId());
+		offset += 8;
+		byteUtils.putLong(buffer, offset, (int) control.getMillis());
+		offset += 8;
 		buffer[offset++] = (byte) (control.getMode() == HeaterMode.ON ? 1 : 0);
 		buffer[offset++] = (byte) control.getMaxAmps();
 

@@ -144,4 +144,9 @@ public class RxTxComm implements SerialConnection {
 	public InputStream getInputStream() {
 		return inputStream;
 	}
+
+	@Override
+	public int getMaxWriteSize() {
+		return 126;
+	}
 }

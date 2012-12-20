@@ -26,7 +26,10 @@ public class TcpComm implements SerialConnection {
 	public String reconnectIfNeeded() {
 		if (socket == null) {
 			try {
-				socket = new Socket(InetAddress.getLocalHost(), DEFAULT_PORT);
+				// socket = new Socket(InetAddress.getLocalHost(),
+				// DEFAULT_PORT);
+				socket = new Socket("localhost", DEFAULT_PORT);
+				// socket = new Socket("smaug", DEFAULT_PORT);
 
 				outputStream = socket.getOutputStream();
 				inputStream = socket.getInputStream();
@@ -71,6 +74,11 @@ public class TcpComm implements SerialConnection {
 	@Override
 	public InputStream getInputStream() {
 		return inputStream;
+	}
+
+	@Override
+	public int getMaxWriteSize() {
+		return 1024;
 	}
 
 }

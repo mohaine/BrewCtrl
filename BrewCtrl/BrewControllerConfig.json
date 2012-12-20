@@ -5,8 +5,8 @@
             "name":"HLT",
             "sensor":{
                "reading":true,
-               "tempatureC":25.0,
-               "address":"0000000000000001"
+               "tempatureC":21.125,
+               "address":"289c167d02000048"
             },
             "heater":{
                "name":"HTL Element",
@@ -19,9 +19,8 @@
          {
             "name":"TUN",
             "sensor":{
-               "reading":true,
-               "tempatureC":26.0,
-               "address":"0000000000000002"
+               "reading":false,
+               "tempatureC":0.0
             }
          },
          {

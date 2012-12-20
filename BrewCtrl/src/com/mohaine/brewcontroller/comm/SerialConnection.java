@@ -17,4 +17,6 @@ public interface SerialConnection {
 
 	public abstract InputStream getInputStream();
 
+	public abstract int getMaxWriteSize();
+
 }
