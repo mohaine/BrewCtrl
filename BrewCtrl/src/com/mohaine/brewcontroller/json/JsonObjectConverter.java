@@ -18,7 +18,12 @@
 
 package com.mohaine.brewcontroller.json;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 
 public class JsonObjectConverter {
 	public static final String TYPE = "__type__";
@@ -64,4 +69,22 @@ public class JsonObjectConverter {
 		return (T) parseJson;
 	}
 
+	public <T> List<T> decodeList(String json, Class<? extends T> class1) {
+		JsonDecoder jsonDecoder = new JsonDecoder(config, json);
+		Object parseJson = jsonDecoder.parseJson();
+		if (parseJson instanceof List) {
+			List<T> results = new ArrayList<T>();
+			@SuppressWarnings("unchecked")
+			List<Object> parseList = (List<Object>) parseJson;
+			for (Object object : parseList) {
+				if (object instanceof JsonUnknownObject) {
+					results.add(config.convertToObject((JsonUnknownObject) object, class1));
+				}
+			}
+			return results;
+
+		}
+
+		return null;
+	}
 }

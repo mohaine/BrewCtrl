@@ -19,20 +19,32 @@
 package com.mohaine.brewcontroller.bean;
 
 import java.util.ArrayList;
+import java.util.UUID;
+
+import com.mohaine.brewcontroller.json.ListType;
 
 public class HeaterStep {
 	private String name;
+	private String id = UUID.randomUUID().toString();
 
+	@ListType(ControlPoint.class)
 	private ArrayList<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
 
 	private boolean active;
-
 	private long stepTime = 0;
 	private long extraCompletedTime = 0;
 	private long lastStartTime = 0;
 
 	public HeaterStep() {
 		super();
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public HeaterStep(String name, double tunTemp, long stepTime) {

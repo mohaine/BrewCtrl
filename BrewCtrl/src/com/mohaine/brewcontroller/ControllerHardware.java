@@ -2,8 +2,8 @@ package com.mohaine.brewcontroller;
 
 import java.util.List;
 
-import com.mohaine.brewcontroller.bean.HardwareControl;
-import com.mohaine.brewcontroller.bean.HardwareControl.Mode;
+import com.mohaine.brewcontroller.bean.ControllerStatus;
+import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -28,7 +28,7 @@ public interface ControllerHardware {
 
 	public List<HardwareSensor> getSensors();
 
-	public HardwareControl getHardwareStatus();
+	public ControllerStatus getHardwareStatus();
 
 	public String getStatus();
 

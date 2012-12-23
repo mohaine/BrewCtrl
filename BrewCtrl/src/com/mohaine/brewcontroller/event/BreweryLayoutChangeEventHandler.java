@@ -18,9 +18,9 @@
 
 package com.mohaine.brewcontroller.event;
 
-import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.event.bus.EventHandler;
 
-public interface ChangeModeEventHandler extends EventHandler {
-	public void onChangeMode(Mode mode);
+public interface BreweryLayoutChangeEventHandler extends EventHandler {
+	public void onChange(BreweryLayout breweryLayout);
 }

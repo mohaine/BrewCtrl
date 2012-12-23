@@ -10,7 +10,7 @@ import java.util.Set;
 public class HTTPResponse {
 
 	private final OutputStream outputStream;
-	private int statusCode = 200;
+	private int statusCode = HttpCodes.OK;
 	private String status = "OK";
 	private String protocol = "HTTP/1.1";
 
@@ -66,25 +66,33 @@ public class HTTPResponse {
 	private void writeHeaders() throws IOException {
 		if (!this.wroteHeaders) {
 			this.wroteHeaders = true;
-			writeLine(protocol + " " + statusCode + " " + status);
+			writeLineRaw(protocol + " " + statusCode + " " + status);
 			Set<String> keySet = headerMap.keySet();
 			for (String header : keySet) {
 				String value = headerMap.get(header);
-				writeLine(header + ": " + value);
+				writeLineRaw(header + ": " + value);
 			}
-			writeLine("");
+			writeLineRaw("");
 		}
+	}
+
+	private void writeLineRaw(String line) throws IOException {
+		outputStream.write(line.getBytes());
+		outputStream.write("\r\n".getBytes());
+	}
+
+	private void writeRaw(String line) throws IOException {
+		outputStream.write(line.getBytes());
 	}
 
 	public void writeLine(String line) throws IOException {
 		writeHeaders();
-		write(line);
-		outputStream.write("\r\n".getBytes());
+		writeLineRaw(line);
 	}
 
 	public void write(String line) throws IOException {
 		writeHeaders();
-		outputStream.write(line.getBytes());
+		writeRaw(line);
 	}
 
 	public void setProtocol(String protocol) {

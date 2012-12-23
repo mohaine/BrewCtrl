@@ -40,8 +40,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.UnitConversion;
-import com.mohaine.brewcontroller.bean.HardwareControl;
-import com.mohaine.brewcontroller.bean.HardwareControl.Mode;
+import com.mohaine.brewcontroller.bean.ControllerStatus;
+import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
@@ -282,7 +282,7 @@ public class StatusDisplay extends JPanel {
 			status.setForeground(statusOk ? normalStatusForeground : Color.red);
 		}
 
-		HardwareControl hardwareStatus = controller.getHardwareStatus();
+		ControllerStatus hardwareStatus = controller.getHardwareStatus();
 		if (hardwareStatus != null) {
 			switch (hardwareStatus.getMode()) {
 			case OFF:
@@ -290,6 +290,9 @@ public class StatusDisplay extends JPanel {
 				break;
 			case ON:
 				mode.setText("On");
+				break;
+			case HOLD:
+				mode.setText("Hold");
 				break;
 			default:
 				mode.setText("???????");

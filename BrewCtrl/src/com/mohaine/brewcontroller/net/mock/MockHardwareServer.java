@@ -24,6 +24,9 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mohaine.brewcontroller.bean.ControllerStatus;
+import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.net.ControllerHardwareJson;
 
 public class MockHardwareServer {
@@ -40,8 +43,18 @@ public class MockHardwareServer {
 	}
 
 	public static void main(String[] args) {
+
+		MockHardware mock = new MockHardware();
+		ControllerStatus status = new ControllerStatus();
+		status.setSteps(new ArrayList<HeaterStep>());
+
+		status.setMode(Mode.OFF);
+		mock.setStatus(status);
+
 		MockHardwareServer server = new MockHardwareServer();
 		server.addHtmlService(new VersionService());
+		server.addHtmlService(new LayoutService(mock));
+		server.addHtmlService(new StatusService(mock));
 
 		server.listen(ControllerHardwareJson.DEFAULT_PORT);
 		while (true) {
@@ -103,6 +116,7 @@ public class MockHardwareServer {
 		}
 
 		private void processConnect(Socket socket) throws Exception {
+
 			HTTPRequest request = new HTTPRequest(socket);
 			HTTPResponse response = new HTTPResponse(socket);
 			try {
@@ -123,8 +137,10 @@ public class MockHardwareServer {
 					}
 				}
 				if (!found) {
-					response.setStatusCode(404);
+					response.setStatusCode(HttpCodes.NOT_FOUND);
 					response.setStatus("Not Found");
+					response.sendContent("404 Not Found\n");
+
 				}
 
 			} finally {

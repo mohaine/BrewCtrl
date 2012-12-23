@@ -20,18 +20,21 @@ package com.mohaine.brewcontroller.bean;
 
 import java.util.List;
 
-public class HardwareControl implements Cloneable {
-	
+import com.mohaine.brewcontroller.json.ListType;
+
+public class ControllerStatus implements Cloneable {
+
 	public enum Mode {
-		ON, HOLD, OFF,UNKNOWN
+		ON, HOLD, OFF, UNKNOWN
 	}
-	
+
 	private Mode mode = Mode.UNKNOWN;
 	private long controlId;
 	private long millis;
 	private int maxAmps;
 	private boolean turnOffOnCommLoss;
 
+	@ListType(HeaterStep.class)
 	private List<HeaterStep> steps;
 
 	public long getControlId() {
@@ -86,8 +89,8 @@ public class HardwareControl implements Cloneable {
 		this.millis = millis;
 	}
 
-	public HardwareControl getClone() throws CloneNotSupportedException {
-		return (HardwareControl) clone();
+	public ControllerStatus getClone() throws CloneNotSupportedException {
+		return (ControllerStatus) clone();
 	}
 
 }

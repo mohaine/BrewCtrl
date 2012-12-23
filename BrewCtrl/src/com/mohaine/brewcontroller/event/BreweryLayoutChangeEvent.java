@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2011 Michael Graessle
+    Copyright 2009-2012 Michael Graessle
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -18,30 +18,30 @@
 
 package com.mohaine.brewcontroller.event;
 
-import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.event.bus.Event;
 
-public class ChangeModeEvent extends Event<ChangeModeEventHandler> {
-	private static Type<ChangeModeEventHandler> TYPE;
+public class BreweryLayoutChangeEvent extends Event<BreweryLayoutChangeEventHandler> {
+	private static Type<BreweryLayoutChangeEventHandler> TYPE;
 
-	public static Type<ChangeModeEventHandler> getType() {
-		return TYPE != null ? TYPE : (TYPE = new Type<ChangeModeEventHandler>());
+	public static Type<BreweryLayoutChangeEventHandler> getType() {
+		return TYPE != null ? TYPE : (TYPE = new Type<BreweryLayoutChangeEventHandler>());
 	}
 
-	private final Mode mode;
+	private BreweryLayout breweryLayout;
 
-	public ChangeModeEvent(Mode mode) {
+	public BreweryLayoutChangeEvent(BreweryLayout breweryLayout) {
 		super();
-		this.mode = mode;
+		this.breweryLayout = breweryLayout;
 	}
 
 	@Override
-	public void dispatch(ChangeModeEventHandler event) {
-		event.onChangeMode(mode);
+	public void dispatch(BreweryLayoutChangeEventHandler event) {
+		event.onChange(breweryLayout);
 	}
 
 	@Override
-	public final Type<ChangeModeEventHandler> getAssociatedType() {
+	public final Type<BreweryLayoutChangeEventHandler> getAssociatedType() {
 		return TYPE;
 	}
 }

@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.HardwareControl.Mode;
+import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;

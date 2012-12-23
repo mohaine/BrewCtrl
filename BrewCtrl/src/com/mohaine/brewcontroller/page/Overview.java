@@ -20,6 +20,8 @@ package com.mohaine.brewcontroller.page;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ControllerHardware;
+import com.mohaine.brewcontroller.event.BreweryLayoutChangeEvent;
+import com.mohaine.brewcontroller.event.BreweryLayoutChangeEventHandler;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.event.ClickHandler;
 import com.mohaine.event.bus.EventBus;
@@ -46,6 +48,16 @@ public class Overview extends BasePage {
 		display.init();
 
 		display.setBreweryLayout(controller.getBreweryLayout());
+
+		eventBusp.addHandler(BreweryLayoutChangeEvent.getType(), new BreweryLayoutChangeEventHandler() {
+			@Override
+			public void onChange(BreweryLayout breweryLayout) {
+
+				display.setBreweryLayout(breweryLayout);
+				
+				
+			}
+		});
 
 	}
 
