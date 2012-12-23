@@ -1,3 +1,20 @@
+/*
+    Copyright 2009-2012 Michael Graessle
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
 package com.mohaine.brewcontroller.json;
 
 import java.util.ArrayList;
@@ -42,7 +59,7 @@ public class JsonConverterConfig {
 	@SuppressWarnings("unchecked")
 	public <T> T convertToObject(JsonUnknownObject unknownObject, Class<? extends T> class1) {
 		for (JsonObjectHandler<?> handler : objectHandlers) {
-			if (handler.getObjectType().isAssignableFrom(class1)) {
+			if (handler.handlesType(class1)) {
 				return (T) convertToObject(unknownObject, handler);
 			}
 		}
@@ -57,23 +74,19 @@ public class JsonConverterConfig {
 				for (JsonObjectHandler<?> handler : objectHandlers) {
 					if (typeString.equals(handler.getType())) {
 						return convertToObject(unknownObject, handler);
-		 			}
+					}
 				}
 			}
 		}
 		return unknownObject;
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public <T> T convertToObject(JsonUnknownObject unknownObject, JsonObjectHandler<T> handler) {
 		try {
-			Class<?> objectType = handler.getObjectType();
-			Object obj = objectType.newInstance();
-			handler.processFromUnknown((T) obj, unknownObject, this);
-			return (T) obj;
+			T obj = handler.createNewObject();
+			handler.processFromUnknown(obj, unknownObject, this);
+			return obj;
 		} catch (Exception e) {
-			e.printStackTrace();
-			
 			throw new RuntimeException(e);
 		}
 	}

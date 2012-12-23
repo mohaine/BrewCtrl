@@ -28,7 +28,7 @@ public class BrewControllerStartup {
 	private boolean started = false;
 
 	@Inject
-	public BrewControllerStartup(ControllerGui ci, Overview startupPage, final Controller controller, final UnitConversion conversion) {
+	public BrewControllerStartup(ControllerGui ci, Overview startupPage, final ControllerHardware controller, final UnitConversion conversion) {
 		super();
 		this.ci = ci;
 		this.startupPage = startupPage;

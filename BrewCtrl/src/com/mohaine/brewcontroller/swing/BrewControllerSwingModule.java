@@ -22,14 +22,10 @@ import java.io.File;
 
 import com.google.inject.AbstractModule;
 import com.mohaine.brewcontroller.ConfigurationLoader;
-import com.mohaine.brewcontroller.Controller;
 import com.mohaine.brewcontroller.ControllerGui;
-import com.mohaine.brewcontroller.ControllerImpl;
-import com.mohaine.brewcontroller.Hardware;
+import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
-import com.mohaine.brewcontroller.comm.SerialConnection;
-import com.mohaine.brewcontroller.comm.SerialHardwareComm;
-import com.mohaine.brewcontroller.comm.tcp.TcpComm;
+import com.mohaine.brewcontroller.net.ControllerHardwareJson;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
 import com.mohaine.brewcontroller.swing.page.OverviewDisplaySwing;
@@ -49,14 +45,9 @@ public class BrewControllerSwingModule extends AbstractModule {
 		bind(ConfigurationLoader.class).toInstance(new FileConfigurationLoader(configFile));
 
 		bind(ControllerGui.class).to(SwingControllerInterface.class).asEagerSingleton();
-		bind(Controller.class).to(ControllerImpl.class).asEagerSingleton();
+		bind(ControllerHardware.class).to(ControllerHardwareJson.class).asEagerSingleton();
 
 		bind(OverviewDisplay.class).to(OverviewDisplaySwing.class);
-		bind(Hardware.class).to(SerialHardwareComm.class).asEagerSingleton();
-
-		bind(SerialConnection.class).to(TcpComm.class).asEagerSingleton();
-		// bind(SerialConnection.class).to(RxTxComm.class).asEagerSingleton();
-		// bind(SerialConnection.class).to(MockComm.class).asEagerSingleton();
 
 		bind(EventBus.class).asEagerSingleton();
 

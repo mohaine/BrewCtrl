@@ -1,3 +1,21 @@
+/*
+    Copyright 2009-2012 Michael Graessle
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
+
 package com.mohaine.brewcontroller.json;
 
 import java.util.ArrayList;
@@ -12,35 +30,12 @@ public class JsonPrettyPrint {
 	private String indent = "   ";
 	private boolean stripNullAttributes;
 	private int depth = 0;
-
-	// public static void main(String[] args) throws IOException {
-	// File dir = new File("../QActionBase/testdata");
-	//
-	// File[] files = dir.listFiles(new FileFilter() {
-	//
-	// @Override
-	// public boolean accept(File arg0) {
-	// return arg0.isFile() &&
-	// arg0.getName().toLowerCase().endsWith("oryx.json");
-	// }
-	// });
-	//
-	// for (File file : files) {
-	// if (file.exists()) {
-	// String json = FileUtils.readFromFile(file);
-	// String prettyPrint = new JsonPrettyPrint().prettyPrint(json);
-	// FileUtils.writeToFile(prettyPrint, file);
-	// } else {
-	// System.out.println("Couln't find " + file.getAbsolutePath());
-	// }
-	// }
-	//
-	// }
+	private boolean escapeSpecials = true;
 
 	public String prettyPrint(String json) {
 		depth = 0;
 		StringBuffer sb = new StringBuffer();
-		JsonParser jp = new OrderJsonParser(json);
+		OrderJsonParser jp = new OrderJsonParser(json);
 		Object jsonObj = jp.parseJson();
 		appendObject(sb, jsonObj);
 		return sb.toString();
@@ -48,20 +43,6 @@ public class JsonPrettyPrint {
 
 	private void appendList(StringBuffer sb, List<Object> values) {
 		startLevel(sb, "[");
-
-		// if (depth == 2) {
-		// Collections.sort(values, new Comparator<Object>() {
-		//
-		// @Override
-		// public int compare(Object o1, Object o2) {
-		//
-		// Map o1Map = (Map) o1;
-		// Map o2Map = (Map) o2;
-		// return String.CASE_INSENSITIVE_ORDER.compare((String)
-		// o1Map.get("name"), (String) o2Map.get("name"));
-		// }
-		// });
-		// }
 
 		int count = 0;
 		if (values != null) {
@@ -97,8 +78,8 @@ public class JsonPrettyPrint {
 		int count = 0;
 
 		OrderedMap<String, Object> om = (OrderedMap<String, Object>) map;
-
 		for (String key : om.keysInOrder) {
+
 			Object value = map.get(key);
 
 			if (value != null || !stripNullAttributes) {
@@ -147,20 +128,21 @@ public class JsonPrettyPrint {
 
 	@SuppressWarnings("unchecked")
 	private boolean appendObject(StringBuffer sb, Object value) {
+
 		if (value == null) {
 			sb.append("null");
+		} else if (value instanceof String) {
+			appendString(sb, (String) value);
+		} else if (value instanceof Number) {
+			sb.append(value.toString());
+		} else if (value instanceof Boolean) {
+			appendBoolean(sb, value);
+		} else if (value instanceof List) {
+			appendList(sb, (List<Object>) value);
+		} else if (value instanceof Map) {
+			appendMap(sb, (Map<String, Object>) value);
 		} else {
-			if (value instanceof String) {
-				appendString(sb, (String) value);
-			} else if (value instanceof Number) {
-				sb.append(value.toString());
-			} else if (value instanceof Boolean) {
-				appendBoolean(sb, value);
-			} else if (value instanceof List) {
-				appendList(sb, (List<Object>) value);
-			} else if (value instanceof Map) {
-				appendMap(sb, (Map<String, Object>) value);
-			}
+			return false;
 		}
 		return true;
 	}
@@ -184,33 +166,18 @@ public class JsonPrettyPrint {
 	}
 
 	private void escapeStringForJson(StringBuffer sb, String value) {
-
 		if (value == null) {
 			sb.append("null");
 		} else {
 			char[] toCharArray = value.toCharArray();
 			for (int i = 0; i < toCharArray.length; i++) {
 				char curChar = toCharArray[i];
-
 				if (curChar == '"') {
-					sb.append('\\');
-					sb.append(curChar);
-				} else if (curChar == '\'') {
 					sb.append('\\');
 					sb.append(curChar);
 				} else if (curChar == '\\') {
 					sb.append('\\');
 					sb.append(curChar);
-				} else if (curChar == '\b') {
-					sb.append("\\b");
-				} else if (curChar == '\f') {
-					sb.append("\\f");
-				} else if (curChar == '\n') {
-					sb.append("\\n");
-				} else if (curChar == '\r') {
-					sb.append("\\r");
-				} else if (curChar == '\t') {
-					sb.append("\\t");
 				} else if (curChar > 255) {
 					sb.append("\\u");
 					String hex = Integer.toHexString(curChar);
@@ -218,10 +185,22 @@ public class JsonPrettyPrint {
 						sb.append('0');
 					}
 					sb.append(hex);
+				} else if (escapeSpecials && curChar == '\'') {
+					sb.append('\\');
+					sb.append(curChar);
+				} else if (escapeSpecials && curChar == '\b') {
+					sb.append("\\b");
+				} else if (escapeSpecials && curChar == '\f') {
+					sb.append("\\f");
+				} else if (escapeSpecials && curChar == '\n') {
+					sb.append("\\n");
+				} else if (escapeSpecials && curChar == '\r') {
+					sb.append("\\r");
+				} else if (escapeSpecials && curChar == '\t') {
+					sb.append("\\t");
 				} else {
 					sb.append(curChar);
 				}
-
 			}
 		}
 	}
@@ -331,6 +310,14 @@ public class JsonPrettyPrint {
 
 	public void setStripNullAttributes(boolean stripNullValues) {
 		this.stripNullAttributes = stripNullValues;
+	}
+
+	public boolean isEscapeSpecials() {
+		return escapeSpecials;
+	}
+
+	public void setEscapeSpecials(boolean escapeSpecials) {
+		this.escapeSpecials = escapeSpecials;
 	}
 
 }

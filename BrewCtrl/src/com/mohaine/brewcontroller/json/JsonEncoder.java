@@ -1,6 +1,23 @@
+/*
+    Copyright 2009-2012 Michael Graessle
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
+
 package com.mohaine.brewcontroller.json;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -10,8 +27,6 @@ import java.util.Map;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class JsonEncoder {
-	private static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
-	private static SimpleDateFormat encodedDateFormat = new SimpleDateFormat(DATE_FORMAT_NOW);
 	private JsonConverterConfig config;
 
 	public JsonEncoder() {
@@ -151,6 +166,17 @@ public class JsonEncoder {
 		return true;
 	}
 
+	private void appendDate(StringBuffer sb, Date date) {
+
+		if (date == null) {
+			sb.append("null");
+		}
+		sb.append("\"\\/Date(");
+		sb.append(date.getTime());
+		sb.append(")\\/\"");
+
+	}
+
 	private void appendBoolean(StringBuffer sb, Object value) {
 		if (((Boolean) value).booleanValue()) {
 			sb.append("true");
@@ -163,7 +189,7 @@ public class JsonEncoder {
 		ArrayList<JsonObjectHandler<?>> objectHandlers = config.getObjectHandlers();
 		if (objectHandlers != null) {
 			for (JsonObjectHandler handler : objectHandlers) {
-				if (handler.getObjectType().isAssignableFrom(value.getClass())) {
+				if (handler.handlesType(value.getClass())) {
 					sb.append('{');
 					boolean first = true;
 					if (config.isAddTypes()) {
@@ -260,16 +286,6 @@ public class JsonEncoder {
 		} else {
 			sb.append('"');
 			escapeStringForJson(sb, name);
-			sb.append("\"");
-		}
-	}
-
-	public void appendDate(StringBuffer sb, Date value) {
-		if (value == null) {
-			sb.append("null");
-		} else {
-			sb.append('"');
-			sb.append(encodedDateFormat.format(value));
 			sb.append("\"");
 		}
 	}

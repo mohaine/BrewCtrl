@@ -21,13 +21,18 @@ package com.mohaine.brewcontroller.bean;
 import java.util.List;
 
 public class HardwareControl implements Cloneable {
-	private HeaterMode mode = HeaterMode.UNKNOWN;
+	
+	public enum Mode {
+		ON, HOLD, OFF,UNKNOWN
+	}
+	
+	private Mode mode = Mode.UNKNOWN;
 	private long controlId;
 	private long millis;
 	private int maxAmps;
 	private boolean turnOffOnCommLoss;
 
-	private List<ControlPoint> controlPoints;
+	private List<HeaterStep> steps;
 
 	public long getControlId() {
 		return controlId;
@@ -57,20 +62,20 @@ public class HardwareControl implements Cloneable {
 		this.turnOffOnCommLoss = turnOffOnCommLoss;
 	}
 
-	public HeaterMode getMode() {
+	public Mode getMode() {
 		return mode;
 	}
 
-	public void setMode(HeaterMode mode) {
+	public void setMode(Mode mode) {
 		this.mode = mode;
 	}
 
-	public List<ControlPoint> getControlPoints() {
-		return controlPoints;
+	public List<HeaterStep> getSteps() {
+		return steps;
 	}
 
-	public void setControlPoints(List<ControlPoint> controlPoints) {
-		this.controlPoints = controlPoints;
+	public void setSteps(List<HeaterStep> steps) {
+		this.steps = steps;
 	}
 
 	public long getMillis() {

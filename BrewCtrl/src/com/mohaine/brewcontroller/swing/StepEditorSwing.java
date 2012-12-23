@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.TimeParser;
 import com.mohaine.brewcontroller.bean.HeaterStep;
@@ -89,12 +89,12 @@ public class StepEditorSwing extends JPanel {
 
 	private ArrayList<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 
-	private Controller controller;
+	private ControllerHardware controller;
 
 	private JPanel edit;
 
 	@Inject
-	public StepEditorSwing(EventBus eventBus, Controller controller) {
+	public StepEditorSwing(EventBus eventBus, ControllerHardware controller) {
 		super();
 		this.eventBus = eventBus;
 		this.controller = controller;
@@ -244,7 +244,7 @@ public class StepEditorSwing extends JPanel {
 		if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this, "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete", JOptionPane.OK_CANCEL_OPTION)) {
 			List<HeaterStep> steps = new ArrayList<HeaterStep>(controller.getSteps());
 			steps.remove(heaterStep);
-			controller.setSteps(steps);
+			controller.changeSteps(steps);
 		}
 	}
 }

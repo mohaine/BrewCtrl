@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2011 Michael Graessle
+    Copyright 2009-2012 Michael Graessle
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,32 +16,28 @@
  
  */
 
-package com.mohaine.brewcontroller.bean;
+package com.mohaine.brewcontroller.event;
 
-public enum HeaterMode {
-	ON {
+import com.mohaine.event.bus.Event;
 
-		@Override
-		public String toString() {
-			return "ON";
-		}
+public class StatusChangeEvent extends Event<StatusChangeEventHandler> {
+	private static Type<StatusChangeEventHandler> TYPE;
 
-	},
-	OFF {
-
-		@Override
-		public String toString() {
-			return "OFF";
-		}
-
-	},
-	UNKNOWN {
-
-		@Override
-		public String toString() {
-			return "UNKNOWN";
-		}
-
+	public static Type<StatusChangeEventHandler> getType() {
+		return TYPE != null ? TYPE : (TYPE = new Type<StatusChangeEventHandler>());
 	}
 
+	public StatusChangeEvent() {
+		super();
+	}
+
+	@Override
+	public void dispatch(StatusChangeEventHandler event) {
+		event.onChangeStatus();
+	}
+
+	@Override
+	public final Type<StatusChangeEventHandler> getAssociatedType() {
+		return TYPE;
+	}
 }

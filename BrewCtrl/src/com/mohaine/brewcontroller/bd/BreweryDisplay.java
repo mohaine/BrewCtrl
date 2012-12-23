@@ -6,9 +6,9 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Controller;
-import com.mohaine.brewcontroller.Controller.Mode;
+import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.bean.ControlPoint;
+import com.mohaine.brewcontroller.bean.HardwareControl.Mode;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
@@ -48,13 +48,13 @@ public class BreweryDisplay {
 	private BreweryDisplayDrawer drawer;
 	// private BreweryLayout brewLayout;
 	private List<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
-	private Controller controller;
+	private ControllerHardware controller;
 
 	private DragState dragState;
 	private EventBus eventBus;
 
 	@Inject
-	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus, Controller controller) {
+	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus, ControllerHardware controller) {
 		this.drawer = drawer;
 		this.controller = controller;
 		this.eventBus = eventBus;

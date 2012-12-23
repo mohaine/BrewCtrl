@@ -1,6 +1,25 @@
+/*
+    Copyright 2009-2012 Michael Graessle
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
+
 package com.mohaine.brewcontroller.json;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class JsonDecoder {
@@ -29,7 +48,26 @@ public class JsonDecoder {
 		char startChar = jsonString.charAt(offset);
 
 		if (startChar == '\"') {
-			return parseString();
+			int startIndex = offset;
+			String str = parseString();
+
+			if (validateStringAt("\\/Date(", startIndex + 1) && validateStringAt(")\\/", offset - 4)) {
+				String epoch = str.substring(6, str.length() - 2);
+
+				boolean validDate = true;
+				for (int i = 0; i < epoch.length(); i++) {
+					char value = epoch.charAt(i);
+					if (value < '0' || value > '9') {
+						validDate = false;
+						break;
+					}
+				}
+				if (validDate) {
+					return new Date(Long.parseLong(epoch));
+				}
+			}
+
+			return str;
 		} else if (startChar == '-' || (startChar >= '0' && startChar <= '9')) {
 			return parseNumber();
 		} else if (startChar == 't' || startChar == 'f') {
@@ -42,6 +80,18 @@ public class JsonDecoder {
 			return parseObject();
 		}
 		throw new RuntimeException("JSON: invalid entry '" + startChar + "' at " + getLineChar(startOffset));
+	}
+
+	private boolean validateStringAt(String string, int startIndex) {
+		if (jsonString.length() < startIndex + string.length()) {
+			return false;
+		}
+		for (int i = 0; i < string.length(); i++) {
+			if (jsonString.charAt(i + startIndex) != string.charAt(i)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private String getLineChar(int offset) {

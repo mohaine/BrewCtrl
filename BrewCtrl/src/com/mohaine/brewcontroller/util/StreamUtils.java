@@ -7,6 +7,26 @@ import java.io.OutputStream;
 
 public class StreamUtils {
 
+	public static String readLine(InputStream inputStream) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		while (true) {
+			int read = inputStream.read();
+			if (read < 0) {
+				if (sb.length() == 0) {
+					return null;
+				}
+				break;
+			}
+			if (read == '\n') {
+				break;
+			}
+			if (read != '\r' && read != '\n') {
+				sb.append((char) read);
+			}
+		}
+		return sb.toString();
+	}
+
 	public static byte[] readStream(InputStream is) throws IOException {
 		byte[] toByteArray;
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

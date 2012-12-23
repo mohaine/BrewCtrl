@@ -22,7 +22,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
@@ -45,10 +45,10 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	private NumberFormat numberFormat = new DecimalFormat("0.0");
 	private NumberFormat numberFormatWhole = new DecimalFormat("0");
 	private UnitConversion conversion;
-	private Controller controller;
+	private ControllerHardware controller;
 
 	@Inject
-	public BreweryDisplayDrawerSwing(final UnitConversion conversion, Controller controller) {
+	public BreweryDisplayDrawerSwing(final UnitConversion conversion, ControllerHardware controller) {
 		super();
 		this.conversion = conversion;
 		this.controller = controller;

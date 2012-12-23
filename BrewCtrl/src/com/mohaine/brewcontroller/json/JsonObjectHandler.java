@@ -1,9 +1,23 @@
+/*
+    Copyright 2009-2012 Michael Graessle
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ */
+
 package com.mohaine.brewcontroller.json;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +25,6 @@ import java.util.Map;
 import com.mohaine.brewcontroller.util.StringUtils;
 
 public abstract class JsonObjectHandler<T> {
-	final static String RFC1123 = "EEE, dd MMM yyyy HH:mm:ss zzz";
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat(RFC1123);
 
 	private Map<String, JsonObjectPropertyHandler<T, ?>> fieldHandlers = new HashMap<String, JsonObjectPropertyHandler<T, ?>>();
 
@@ -25,11 +37,13 @@ public abstract class JsonObjectHandler<T> {
 		}
 	}
 
-	public abstract Class<? extends T> getObjectType();
-
 	public abstract String getType();
 
+	public abstract boolean handlesType(Class<?> value);
+
 	public abstract List<JsonObjectPropertyHandler<T, ?>> getPropertyHandlers();
+
+	public abstract T createNewObject() throws Exception;
 
 	protected String encodeBoolean(Boolean bool) {
 		if (bool != null && bool.booleanValue()) {
@@ -42,25 +56,6 @@ public abstract class JsonObjectHandler<T> {
 		return "true".equals(str) ? Boolean.TRUE : Boolean.FALSE;
 	}
 
-	protected String encodeDate(Date date) {
-		if (date == null) {
-			return null;
-		} else {
-			return DATE_FORMAT.format(date);
-		}
-	}
-
-	protected Date decodeDate(String dateStr) {
-		if (dateStr == null) {
-			return null;
-		}
-		try {
-			return DATE_FORMAT.parse(dateStr);
-		} catch (ParseException pe) {
-			return null;
-		}
-	}
-
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void processFromUnknown(T obj, JsonUnknownObject unknownObject, JsonConverterConfig config) {
 		List<JsonObjectPropertyHandler<T, ?>> propertyHandlers = getPropertyHandlers();
@@ -70,38 +65,30 @@ public abstract class JsonObjectHandler<T> {
 
 				Object property = unknownObject.getProperty(phT.getName());
 				if (property instanceof JsonUnknownObject) {
-
 					if (phT.isJson()) {
 						StringBuffer sb = new StringBuffer();
 						new JsonEncoder(config).appendObject(sb, property);
 						property = sb.toString();
 					} else {
-						Class<Object> expectedType = phT.getExpectedType();
+						Class<Object> expectedType = (Class<Object>) phT.getExpectedType();
 						if (expectedType != null) {
 							property = config.convertToObject((JsonUnknownObject) property, expectedType);
 						}
 					}
-				}
-
-				// TODO
-				if (property instanceof List) {
-					Class<Object> expectedType = phT.getExpectedType();
+				} else if (property instanceof List) {
+					Class<Object> expectedType = (Class<Object>) phT.getExpectedType();
 					if (expectedType != null) {
-						if (!List.class.isAssignableFrom(expectedType)) {
-							List list = (List) property;
-							for (int i = 0; i < list.size(); i++) {
-								Object listObj = list.get(i);
-								if (listObj instanceof JsonUnknownObject) {
-									listObj = config.convertToObject((JsonUnknownObject) listObj, expectedType);
-									list.set(i, listObj);
-								}
-
+						// if (!List.class.isAssignableFrom(expectedType)) {
+						List list = (List) property;
+						for (int i = 0; i < list.size(); i++) {
+							Object listObj = list.get(i);
+							if (listObj instanceof JsonUnknownObject) {
+								listObj = config.convertToObject((JsonUnknownObject) listObj, expectedType);
+								list.set(i, listObj);
 							}
 						}
-
 					}
 				}
-
 				phT.setValue(obj, property);
 			}
 		}
@@ -133,4 +120,5 @@ public abstract class JsonObjectHandler<T> {
 			}
 		}
 	}
+
 }

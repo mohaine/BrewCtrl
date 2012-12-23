@@ -18,7 +18,7 @@
 
 package com.mohaine.brewcontroller.event;
 
-import com.mohaine.brewcontroller.Controller.Mode;
+import com.mohaine.brewcontroller.bean.HardwareControl.Mode;
 import com.mohaine.event.bus.Event;
 
 public class ChangeModeEvent extends Event<ChangeModeEventHandler> {

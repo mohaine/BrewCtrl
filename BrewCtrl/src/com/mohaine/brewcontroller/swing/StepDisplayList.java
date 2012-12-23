@@ -42,7 +42,7 @@ import com.mohaine.brewcontroller.ConfigurationHeaterStep;
 import com.mohaine.brewcontroller.ConfigurationHeaterStepControlPoint;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ConfigurationStepList;
-import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.TimeParser;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.HeaterStep;
@@ -57,7 +57,7 @@ import com.mohaine.event.bus.EventBus;
 public class StepDisplayList extends JPanel {
 	private static final long serialVersionUID = 1L;
 
-	private Controller controller;
+	private ControllerHardware controller;
 	private EventBus eventBus;
 	private ArrayList<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 
@@ -68,7 +68,7 @@ public class StepDisplayList extends JPanel {
 	private Provider<StepEditorSwing> providerStepEditorSwing;
 
 	@Inject
-	public StepDisplayList(Controller controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing, ConfigurationLoader configLoader) {
+	public StepDisplayList(ControllerHardware controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing, ConfigurationLoader configLoader) {
 		super();
 		this.providerStepEditorSwing = providerStepEditorSwing;
 		this.eventBus = eventBusp;
@@ -187,7 +187,7 @@ public class StepDisplayList extends JPanel {
 	}
 
 	protected void launchList(ConfigurationStepList stepList) {
-		BreweryLayout layout = controller.getLayout();
+		BreweryLayout layout = controller.getBreweryLayout();
 		TimeParser tp = new TimeParser();
 
 		ArrayList<HeaterStep> heaterSteps = new ArrayList<HeaterStep>();
@@ -208,7 +208,7 @@ public class StepDisplayList extends JPanel {
 			}
 			heaterSteps.add(step);
 		}
-		controller.setSteps(heaterSteps);
+		controller.changeSteps(heaterSteps);
 
 	}
 
@@ -273,7 +273,7 @@ public class StepDisplayList extends JPanel {
 	private void addNewStep() {
 		List<HeaterStep> steps = new ArrayList<HeaterStep>(controller.getSteps());
 		steps.add(controller.createManualStep("New Step"));
-		controller.setSteps(steps);
+		controller.changeSteps(steps);
 	}
 
 }

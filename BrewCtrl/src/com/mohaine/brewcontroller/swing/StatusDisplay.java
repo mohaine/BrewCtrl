@@ -38,22 +38,22 @@ import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.mohaine.brewcontroller.Controller;
-import com.mohaine.brewcontroller.Controller.Mode;
-import com.mohaine.brewcontroller.Hardware;
+import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.bean.HardwareControl;
+import com.mohaine.brewcontroller.bean.HardwareControl.Mode;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
+import com.mohaine.brewcontroller.event.StatusChangeEvent;
+import com.mohaine.brewcontroller.event.StatusChangeEventHandler;
 import com.mohaine.event.AbstractHasValue;
 import com.mohaine.event.ChangeEvent;
 import com.mohaine.event.HandlerRegistration;
 import com.mohaine.event.HasValue;
-import com.mohaine.event.StatusChangeHandler;
 import com.mohaine.event.bus.EventBus;
 
-public class StatusDisplay extends JPanel implements StatusChangeHandler {
+public class StatusDisplay extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JToggleButton modeOnButton = new JToggleButton(new AbstractAction("Go") {
@@ -116,9 +116,8 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 	private JLabel mode;
 	private JLabel status;
-	private Controller controller;
+	private ControllerHardware controller;
 
-	private Hardware hardware;
 	private ArrayList<SensorLabel> sensorLabels = new ArrayList<SensorLabel>();
 	private static final NumberFormat tempFormat = new DecimalFormat("0.0");
 	private GridBagConstraints gbc = new GridBagConstraints();
@@ -135,9 +134,8 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 	private Provider<SensorEditor> providerSensorEditor;
 
 	@Inject
-	public StatusDisplay(Hardware hardware, UnitConversion conversion, Controller controller, EventBus eventBus, StepDisplayList stepDisplay, Provider<SensorEditor> providerSensorEditor) {
+	public StatusDisplay(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayList stepDisplay, Provider<SensorEditor> providerSensorEditor) {
 		super();
-		this.hardware = hardware;
 		this.conversion = conversion;
 		this.controller = controller;
 		this.eventBus = eventBus;
@@ -185,7 +183,19 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 		removeHandlers();
 
-		handlers.add(hardware.addStatusChangeHandler(this));
+		handlers.add(eventBus.addHandler(StatusChangeEvent.getType(), new StatusChangeEventHandler() {
+
+			@Override
+			public void onChangeStatus() {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						updateState();
+					}
+				});
+			}
+		}));
+
 		handlers.add(eventBus.addHandler(ChangeModeEvent.getType(), new ChangeModeEventHandler() {
 
 			@Override
@@ -217,7 +227,7 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 	private void changeMode(Mode newMode) {
 		modeHasValue.setValue(newMode, true);
-		controller.setMode(newMode);
+		controller.changeMode(newMode);
 	}
 
 	private void updateMode(Mode mode) {
@@ -250,7 +260,7 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		SensorEditor label = providerSensorEditor.get();
 		panel.add(label, gbc);
-		
+
 		gbc.weightx = 1;
 		gbc.gridx++;
 		gbc.anchor = GridBagConstraints.NORTHEAST;
@@ -267,12 +277,12 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 
 	private void updateState() {
 		{
-			status.setText(hardware.getStatus());
-			boolean statusOk = "Ok".equals(hardware.getStatus());
+			status.setText(controller.getStatus());
+			boolean statusOk = "Ok".equals(controller.getStatus());
 			status.setForeground(statusOk ? normalStatusForeground : Color.red);
 		}
 
-		HardwareControl hardwareStatus = hardware.getHardwareStatus();
+		HardwareControl hardwareStatus = controller.getHardwareStatus();
 		if (hardwareStatus != null) {
 			switch (hardwareStatus.getMode()) {
 			case OFF:
@@ -287,7 +297,7 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 			}
 		}
 
-		List<HardwareSensor> sensors = hardware.getSensors();
+		List<HardwareSensor> sensors = controller.getSensors();
 		for (HardwareSensor tempSensor : sensors) {
 
 			boolean found = false;
@@ -304,16 +314,6 @@ public class StatusDisplay extends JPanel implements StatusChangeHandler {
 				sensorLabels.add(sensorLabel);
 			}
 		}
-	}
-
-	@Override
-	public void onStateChange() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				updateState();
-			}
-		});
 	}
 
 	private class SensorLabel {

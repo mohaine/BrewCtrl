@@ -16,13 +16,10 @@
  
  */
 
-package com.mohaine.brewcontroller.comm;
+package com.mohaine.brewcontroller.event;
 
-public interface MessageWriter {
-	public byte getMessageId();
+import com.mohaine.event.bus.EventHandler;
 
-	public int getLength();
-
-	public abstract void writeTo(byte[] data, int offset);
-
+public interface StatusChangeEventHandler extends EventHandler {
+	public void onChangeStatus();
 }

@@ -22,98 +22,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.HardwareControl;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.HeaterMode;
+import com.mohaine.brewcontroller.bean.HardwareControl.Mode;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
-import com.mohaine.brewcontroller.event.ChangeModeEvent;
-import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
 import com.mohaine.brewcontroller.event.StepModifyEventHandler;
-import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
-import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
-import com.mohaine.event.StatusChangeHandler;
 import com.mohaine.event.bus.EventBus;
 
-public class ControllerImpl implements Controller {
-
-	private class Monitor implements Runnable {
-
-		@Override
-		public void run() {
-			while (true) {
-				HeaterStep heaterStep = null;
-				synchronized (steps) {
-					if (steps.size() > 0) {
-						heaterStep = steps.get(0);
-					}
-				}
-				if (heaterStep != null) {
-					synchronized (heaterStep) {
-						switch (mode) {
-						case ON: {
-							heaterStep.startTimer();
-
-							if (heaterStep.isComplete()) {
-								nextStep();
-							} else {
-								if (heaterStep.getStepTime() > 0) {
-									eventBus.fireEvent(new StepModifyEvent(heaterStep));
-								}
-							}
-							break;
-						}
-						case HOLD: {
-							heaterStep.stopTimer();
-							break;
-						}
-						case OFF: {
-							heaterStep.stopTimer();
-							updateHardware();
-							break;
-						}
-						}
-
-					}
-				}
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-
-			}
-		}
-	}
+public class ControllerImpl {
 
 	private List<HeaterStep> steps = new ArrayList<HeaterStep>();
 	private List<BrewHardwareControl> brewHardwareControls = new ArrayList<BrewHardwareControl>();
 	private HeaterStep selectedStep = null;;
 	private Mode mode = Mode.OFF;
 	private EventBus eventBus;
-	private Hardware hardware;
+	private ControllerHardware hardware;
 	private BreweryLayout brewLayout;
-	private Monitor monitor = new Monitor();
 	private Configuration configuration;
 
 	@Inject
-	public ControllerImpl(EventBus eventBusp, Hardware hardware, ConfigurationLoader configurationLoader) throws Exception {
+	public ControllerImpl(EventBus eventBusp, ConfigurationLoader configurationLoader) throws Exception {
 		super();
 		this.eventBus = eventBusp;
-		this.hardware = hardware;
 		this.configuration = configurationLoader.getConfiguration();
 
 		initLayout();
 
-		steps.add(createManualStep("Default"));
 		selectedStep = steps.get(0);
 		updateHardware();
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
@@ -125,85 +65,6 @@ public class ControllerImpl implements Controller {
 			}
 		});
 
-		hardware.addStatusChangeHandler(new StatusChangeHandler() {
-			@Override
-			public void onStateChange() {
-				updateLayoutState(false);
-			}
-		});
-
-		new Thread(monitor).start();
-
-	}
-
-	public void nextStep() {
-		boolean updateSelection = false;
-		HeaterStep newSelection = null;
-		synchronized (steps) {
-
-			if (steps.size() > 0) {
-				HeaterStep remove = steps.remove(0);
-				updateSelection = remove == selectedStep;
-			}
-
-			if (steps.size() == 0) {
-				steps.add(createManualStep("Default"));
-			}
-			newSelection = steps.get(0);
-		}
-		updateHardware();
-
-		if (updateSelection) {
-			setSelectedStep(newSelection);
-		}
-		updateLayoutState(true);
-		eventBus.fireEvent(new StepsModifyEvent());
-	}
-
-	@Override
-	public HeaterStep createManualStep(String name) {
-		HeaterStep step = new HeaterStep();
-		step.setName(name);
-		ArrayList<ControlPoint> controlPoints = step.getControlPoints();
-
-		List<Pump> pumps = brewLayout.getPumps();
-		for (Pump pump : pumps) {
-			ControlPoint controlPoint = new ControlPoint();
-			controlPoint.setAutomaticControl(false);
-			controlPoint.setControlPin(pump.getPin());
-			controlPoint.setHasDuty(pump.isHasDuty());
-			controlPoints.add(controlPoint);
-		}
-
-		List<Tank> tanks = brewLayout.getTanks();
-		for (Tank tank : tanks) {
-			HeatElement heater = tank.getHeater();
-			if (heater != null) {
-				ControlPoint controlPoint = new ControlPoint();
-				controlPoint.setAutomaticControl(false);
-				controlPoint.setControlPin(heater.getPin());
-				controlPoint.setHasDuty(heater.isHasDuty());
-				controlPoint.setFullOnAmps(heater.getFullOnAmps());
-
-				Sensor sensor = tank.getSensor();
-				if (sensor != null) {
-					List<HardwareSensor> sensors = hardware.getSensors();
-					for (HardwareSensor hardwareSensor : sensors) {
-						SensorConfiguration findSensorByLocation = configuration.findSensor(hardwareSensor.getAddress());
-
-						if (findSensorByLocation != null && tank.getName().equals(findSensorByLocation.getLocation())) {
-							controlPoint.setAutomaticControl(false);
-							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
-							break;
-						}
-					}
-				}
-
-				controlPoints.add(controlPoint);
-			}
-		}
-
-		return step;
 	}
 
 	private boolean isCurrentStep(HeaterStep step) {
@@ -213,81 +74,8 @@ public class ControllerImpl implements Controller {
 		return false;
 	}
 
-	@Override
-	public List<HeaterStep> getSteps() {
-		return steps;
-	}
-
-	@Override
-	public void setSteps(List<HeaterStep> steps) {
-		this.steps = steps;
-		boolean updateSelection;
-		synchronized (steps) {
-			if (steps.size() == 0) {
-				steps.add(createManualStep("Default"));
-			}
-			updateSelection = selectedStep == null || !steps.contains(selectedStep);
-		}
-
-		updateHardware();
-		eventBus.fireEvent(new StepsModifyEvent());
-
-		if (updateSelection) {
-			setSelectedStep(steps.get(0));
-		}
-	}
-
-	@Override
-	public HeaterStep getSelectedStep() {
-		return selectedStep;
-	}
-
-	@Override
-	public Mode getMode() {
-		return mode;
-	}
-
-	@Override
-	public void setMode(Mode mode) {
-		boolean dirty = this.mode != mode;
-		this.mode = mode;
-		updateHardware();
-		if (dirty && eventBus != null) {
-			eventBus.fireEvent(new ChangeModeEvent(mode));
-		}
-	}
-
-	@Override
-	public void setSelectedStep(HeaterStep step) {
-		boolean dirty = this.selectedStep != step;
-		this.selectedStep = step;
-		if (dirty && eventBus != null) {
-			eventBus.fireEvent(new ChangeSelectedStepEvent(selectedStep));
-		}
-	}
-
 	private void updateHardware() {
-		HardwareControl hc = new HardwareControl();
-		hc.setMaxAmps(brewLayout.getMaxAmps());
-		hc.setTurnOffOnCommLoss(brewLayout.isTurnOffOnCommLoss());
 
-		HeaterMode heaterMode = mode == Mode.OFF ? HeaterMode.OFF : HeaterMode.ON;
-
-		hc.setMode(heaterMode);
-
-		if (steps.size() > 0) {
-			HeaterStep currentStep = steps.get(0);
-			boolean active = heaterMode == HeaterMode.ON;
-			if (active != currentStep.isActive()) {
-				currentStep.setActive(active);
-				eventBus.fireEvent(new StepModifyEvent(currentStep));
-				updateLayoutState(true);
-			}
-
-			ArrayList<ControlPoint> controlPoints = currentStep.getControlPoints();
-			hc.setControlPoints(controlPoints);
-		}
-		hardware.setHardwareControl(hc);
 	}
 
 	public BreweryLayout getLayout() {
@@ -315,56 +103,6 @@ public class ControllerImpl implements Controller {
 			}
 		}
 
-	}
-
-	private void updateLayoutState(boolean forceDirty) {
-
-		for (BrewHardwareControl bhc : brewHardwareControls) {
-			HardwareControl hardwareStatus = hardware.getHardwareStatus();
-			List<ControlPoint> controlPoints = hardwareStatus.getControlPoints();
-			for (ControlPoint controlPoint : controlPoints) {
-				if (controlPoint.getControlPin() == bhc.getPin()) {
-					if (forceDirty || bhc.getDuty() != controlPoint.getDuty()) {
-						bhc.setDuty(controlPoint.getDuty());
-						fireBreweryComponentChangeHandler(bhc);
-					}
-				}
-			}
-		}
-
-		List<Tank> tanks = brewLayout.getTanks();
-		for (Tank tank : tanks) {
-			Sensor sensor = tank.getSensor();
-			if (sensor != null) {
-
-				HardwareSensor tankTs = null;
-				List<HardwareSensor> sensors = hardware.getSensors();
-				for (HardwareSensor tempSensor : sensors) {
-					SensorConfiguration findSensor = configuration.findSensor(tempSensor.getAddress());
-					if (findSensor != null && tank.getName().equals(findSensor.getLocation())) {
-						tankTs = tempSensor;
-						break;
-					}
-				}
-
-				if (tankTs == null) {
-					tankTs = new HardwareSensor();
-				}
-
-				Double temp = sensor.getTempatureC();
-				boolean reading = sensor.isReading();
-				sensor.setAddress(tankTs.getAddress());
-				sensor.setReading(tankTs.isReading());
-				sensor.setTempatureC(tankTs.getTempatureC());
-
-				boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
-				if (diff) {
-					fireBreweryComponentChangeHandler(sensor);
-				}
-
-			}
-
-		}
 	}
 
 	private boolean equals(Double temp, Double tempatureC) {

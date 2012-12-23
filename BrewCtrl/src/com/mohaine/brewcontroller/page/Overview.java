@@ -19,7 +19,7 @@
 package com.mohaine.brewcontroller.page;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Controller;
+import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.event.ClickHandler;
 import com.mohaine.event.bus.EventBus;
@@ -40,12 +40,12 @@ public class Overview extends BasePage {
 	private OverviewDisplay display;
 
 	@Inject
-	public Overview(OverviewDisplay displayp, EventBus eventBusp, Controller controller) {
+	public Overview(OverviewDisplay displayp, EventBus eventBusp, ControllerHardware controller) {
 		super();
 		this.display = displayp;
 		display.init();
 
-		display.setBreweryLayout(controller.getLayout());
+		display.setBreweryLayout(controller.getBreweryLayout());
 
 	}
 
