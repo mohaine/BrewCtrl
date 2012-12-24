@@ -133,6 +133,7 @@ public class StepEditorSwing extends JPanel {
 				if (heaterStep != null) {
 					int stepTime = timeValue.getValue();
 					if (stepTime != heaterStep.getTimeRemaining()) {
+
 						heaterStep.setTimeRemaining(stepTime);
 						fireChange();
 					}

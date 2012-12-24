@@ -77,7 +77,9 @@ public class HeaterStep {
 	}
 
 	public void setTimeRemaining(int time) {
-		stepTime = getTotalCompletedTime() + time;
+		lastStartTime = 0;
+		extraCompletedTime = 0;
+		stepTime = time;
 	}
 
 	public int getExtraCompletedTime() {
@@ -109,15 +111,15 @@ public class HeaterStep {
 			throw new RuntimeException("Tried to to start stared");
 		}
 		lastStartTime = now;
-
 	}
 
-	private long getMillis() {
-		return System.currentTimeMillis() - START_TIME;
+	private int getMillis() {
+		return (int) (System.currentTimeMillis() - START_TIME);
 	}
 
 	public boolean isComplete() {
-		return stepTime > 0 && getTotalCompletedTime() >= stepTime;
+		boolean complete = stepTime > 0 && getTotalCompletedTime() >= stepTime;
+		return complete;
 	}
 
 	public List<ControlPoint> getControlPoints() {
@@ -192,6 +194,17 @@ public class HeaterStep {
 			return false;
 		}
 		return true;
+	}
+
+	public void copyFrom(HeaterStep modStep) {
+
+		this.controlPoints = modStep.controlPoints;
+		this.extraCompletedTime = modStep.extraCompletedTime;
+		this.id = modStep.id;
+		this.lastStartTime = modStep.lastStartTime;
+		this.name = modStep.name;
+		this.stepTime = modStep.stepTime;
+
 	}
 
 }

@@ -135,6 +135,7 @@ public class MockHardware {
 									if (!heaterStep.isStarted()) {
 										heaterStep.startTimer();
 									} else {
+
 										if (heaterStep.isComplete()) {
 											synchronized (steps) {
 												status.getSteps().remove(heaterStep);
@@ -174,8 +175,7 @@ public class MockHardware {
 			synchronized (steps) {
 				for (HeaterStep step : steps) {
 					if (step.getId().equals(modStep.getId())) {
-						step.setName(modStep.getName());
-						step.setStepTime(modStep.getStepTime());
+						step.copyFrom(modStep);
 					}
 				}
 			}
