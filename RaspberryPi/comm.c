@@ -19,6 +19,12 @@
 #define ONE_WIRE_PIN 4
 #define DEFAULT_PORT 2739
 
+#define BUFFER_SIZE 1024*20
+#define PATH_SIZE 1024
+#define METHOD_SIZE 10
+#define STATUS_SIZE 30
+#define CONTENT_TYPE_SIZE 30
+
 #include "sensor.h"
 #include "comm.h"
 #include "crc8.h"
@@ -36,308 +42,37 @@
 #include <errno.h>
 #include <pthread.h>
 
-#define DATA_START 0x11
-#define SENSOR_CONTROL 0x12
-#define HARDWARE_CONTROL  0x13
-#define CONTROL_POINT  0x14
-#define DATA_END '\r'
-#define MESSAGE_ENEVELOP_SIZE 4
-#define MESSAGE_ENEVELOP_START_SIZE 2
-
-#define COMM_LOSS_MASK 0x01
-
-#define AUTO_MASK  0x01
-#define HAS_DUTY_MASK  0x02
-
-#define READ_BUFFER_SIZE 250
+typedef struct {
+	char method[METHOD_SIZE];
+	char path[PATH_SIZE];
+} Request;
 
 typedef struct {
-	byte msgId;
-	byte length;
-	void (*processFunction)(byte * serialBuffer, int offset);
-} ReadMessage;
+	char method[METHOD_SIZE];
+	int statusCode;
+	char status[STATUS_SIZE];
+	char contentType[CONTENT_TYPE_SIZE];
+	int dataSize;
+	char data[BUFFER_SIZE];
+} Response;
 
-ReadMessage readMessages[2];
-byte readMessagesCount = 2;
-
-long lastSuccessfulControlIdTime = 0;
+long lastCommTime = 0;
 
 long lastControlIdTime() {
-	return lastSuccessfulControlIdTime;
+	return lastCommTime;
 }
 
-/*
- int readShort(byte *buffer, int offset) {
- int out;
- byte *data;
- data = (byte *) &out;
- data[0] = buffer[offset];
- data[1] = buffer[offset + 1];
- return out;
- }
+void sendHttpResponse(int clntSocket, Response *response) {
+	byte * buffer = malloc(BUFFER_SIZE);
 
- void writeShort(byte *buffer, int offset, int value) {
- byte *data;
- data = (byte *) &value;
- buffer[offset] = data[0];
- buffer[offset + 1] = data[1];
- }
- */
-
-int readLong(byte *buffer, int offset) {
-	long out;
-	byte *data;
-	data = (byte *) &out;
-
-	for (int i = 0; i < 8; i++) {
-		data[i] = buffer[offset + i];
-	}
-	return out;
-}
-
-void writeLong(byte *buffer, int offset, long value) {
-	byte *data;
-	data = (byte *) &value;
-	for (int i = 0; i < 8; i++) {
-		buffer[offset + i] = data[i];
-	}
-}
-
-float readFloat(byte *buffer, int offset) {
-	float out;
-	byte *data;
-	data = (byte *) &out;
-
-	data[0] = buffer[offset];
-	data[1] = buffer[offset + 1];
-	data[2] = buffer[offset + 2];
-	data[3] = buffer[offset + 3];
-
-	return out;
-}
-void writeFloat(byte *buffer, int offset, float value) {
-	byte *data;
-	data = (byte *) &value;
-	buffer[offset] = data[0];
-	buffer[offset + 1] = data[1];
-	buffer[offset + 2] = data[2];
-	buffer[offset + 3] = data[3];
-}
-
-void writeStatus(int clntSocket) {
-
-	Control* control = getControl();
-
-	byte buffer[250];
-	byte offset = 0;
-
-	buffer[offset++] = '\r';
-	int crcStart = offset;
-	buffer[offset++] = DATA_START;
-	buffer[offset++] = HARDWARE_CONTROL;
-
-	writeLong(buffer, offset, control->controlId);
-	offset += 8;
-	writeLong(buffer, offset, millis());
-	offset += 8;
-
-	buffer[offset++] = (control->mode);
-	buffer[offset++] = (control->maxAmps);
-
-	{
-		byte boolValues = 0x00;
-		if (control->turnOffOnCommLoss) {
-			boolValues = boolValues | COMM_LOSS_MASK;
-		}
-		buffer[offset++] = boolValues;
-	}
-
-	int crcLength = offset - crcStart;
-	buffer[offset++] = computeCrc8(buffer, crcStart, crcLength);
-	buffer[offset++] = DATA_END;
-
-	int controlPointCount = getControlPointCount();
-	for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-		ControlPoint *controlPoint = getControlPointByIndex(cpIndex);
-
-		int crcStart = offset;
-		buffer[offset++] = DATA_START;
-		buffer[offset++] = CONTROL_POINT;
-
-		buffer[offset++] = controlPoint->controlPin;
-		buffer[offset++] = (byte) controlPoint->duty;
-		buffer[offset++] = (controlPoint->fullOnAmps);
-
-		byte boolValues = 0x00;
-		if (controlPoint->automaticControl) {
-			boolValues = boolValues | AUTO_MASK;
-		}
-		if (controlPoint->hasDuty) {
-			boolValues = boolValues | HAS_DUTY_MASK;
-		}
-		buffer[offset++] = boolValues;
-
-		writeFloat(buffer, offset, controlPoint->targetTemp);
-		offset += 4;
-
-		for (byte i = 0; i < 8; i++) {
-			buffer[offset++] = controlPoint->tempSensorAddress[i];
-		}
-
-		crcLength = offset - crcStart;
-		buffer[offset++] = computeCrc8(buffer, crcStart++, crcLength);
-		buffer[offset++] = DATA_END;
-	}
-
-	int sensorCount = getSensorCount();
-	for (int sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
-		TempSensor *sensor = getSensorByIndex(sensorIndex);
-		int crcStart = offset;
-		buffer[offset++] = DATA_START;
-		buffer[offset++] = SENSOR_CONTROL;
-
-		for (int i = 0; i < 8; i++) {
-			buffer[offset++] = sensor->address[i];
-		}
-		buffer[offset++] = sensor->reading;
-		writeFloat(buffer, offset, sensor->lastTemp);
-		offset += 4;
-		crcLength = offset - crcStart;
-		buffer[offset++] = computeCrc8(buffer, crcStart++, crcLength);
-		buffer[offset++] = DATA_END;
-	}
-
-	send(clntSocket, &buffer, offset, MSG_NOSIGNAL | MSG_DONTWAIT);
-
-}
-
-bool validateMessage(byte* buffer, int offset, byte messageId,
-		int messageLength) {
-	bool valid = true;
-	int startOffset = offset;
-
-	valid = valid && buffer[offset++] == DATA_START;
-	valid = valid && buffer[offset++] == messageId;
-	if (valid) {
-		offset += messageLength;
-		int crcLength = offset - startOffset;
-
-		valid = valid
-				&& buffer[offset++]
-						== computeCrc8(buffer, startOffset++, crcLength);
-
-		valid = valid && buffer[offset++] == DATA_END;
-	}
-	return valid;
-}
-void readControlPoint(byte * serialBuffer, int offset) {
-
-	byte pin = serialBuffer[offset++];
-	byte duty = serialBuffer[offset++];
-	byte fullOnAmps = serialBuffer[offset++];
-
-	ControlPoint* cp = NULL;
-
-	int controlPointCount = getControlPointCount();
-	for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-		ControlPoint *controlPoint = getControlPointByIndex(cpIndex);
-		if (controlPoint->controlPin == pin) {
-			cp = controlPoint;
-			break;
-		}
-	}
-
-	byte boolValues = serialBuffer[offset++];
-	bool automaticControl = (boolValues & AUTO_MASK) != 0;
-	bool hasDuty = (boolValues & HAS_DUTY_MASK) != 0;
-
-	Control* control = getControl();
-
-	if (cp == NULL && controlPointCount < MAX_CP_COUNT && pin != ONE_WIRE_PIN) {
-		cp = getControlPointByIndex(controlPointCount);
-		cp->controlPin = pin;
-		//Toogle so we init below
-		cp->hasDuty = !hasDuty;
-		cp->automaticControl = !automaticControl;
-
-		setHeatOn(&cp->dutyController, control->mode == MODE_ON);
-		resetDutyState(&cp->dutyController);
-
-		addControlPoint();
-	}
-
-	if (cp != NULL) {
-		cp->fullOnAmps = fullOnAmps;
-
-		if (control->mode != MODE_ON) {
-			duty = 0;
-			automaticControl = false;
-		}
-
-		if (automaticControl != cp->automaticControl) {
-			cp->automaticControl = automaticControl;
-			if (automaticControl) {
-				cp->duty = 0;
-				setupPid(&cp->pid);
-			}
-		}
-
-		if (!automaticControl) {
-			cp->duty = duty;
-		}
-
-		if (hasDuty != cp->hasDuty) {
-			cp->hasDuty = hasDuty;
-			setupDutyController(&cp->dutyController, cp->controlPin);
-		}
-
-		cp->targetTemp = readFloat(serialBuffer, offset);
-		offset += 4;
-
-		for (byte i = 0; i < 8; i++) {
-			cp->tempSensorAddress[i] = serialBuffer[offset + i];
-		}
-
-	}
-}
-
-void readControlMessage(byte * serialBuffer, int offset) {
-	Control* control = getControl();
-
-	lastSuccessfulControlIdTime = millis();
-	control->controlId = readLong(serialBuffer, offset);
-	offset += 8;
-	// Skip Time
-	offset += 8;
-
-	control->mode = serialBuffer[offset++];
-	control->maxAmps = serialBuffer[offset++];
-	byte boolValues = serialBuffer[offset++];
-	control->turnOffOnCommLoss = (boolValues & COMM_LOSS_MASK) != 0;
-
-	if (control->mode == MODE_ON) {
-		int controlPointCount = getControlPointCount();
-		for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-			ControlPoint *controlPoint = getControlPointByIndex(cpIndex);
-			setHeatOn(&controlPoint->dutyController, true);
-		}
-	} else {
-		turnOff();
-	}
-
-}
-
-void handleExtra(byte* data, int offset, int length) {
-
-}
-
-void setupMessages() {
-	readMessages[0].msgId = HARDWARE_CONTROL;
-	readMessages[0].length = 19;
-	readMessages[0].processFunction = readControlMessage;
-	readMessages[1].msgId = CONTROL_POINT;
-	readMessages[1].length = 16;
-	readMessages[1].processFunction = readControlPoint;
+	sprintf(buffer,
+			"%s %d %s\r\nContent-Length: %d\r\nContent-Type: %s\r\n\r\n",
+			response->method, response->statusCode, response->status,
+			response->dataSize, response->contentType);
+	send(clntSocket, buffer, strlen(buffer), MSG_NOSIGNAL | MSG_DONTWAIT);
+	send(clntSocket, response->data, response->dataSize,
+			MSG_NOSIGNAL | MSG_DONTWAIT);
+	free(buffer);
 }
 
 void* handleClientThread(void *ptr) {
@@ -345,83 +80,101 @@ void* handleClientThread(void *ptr) {
 	int clntSocket = *number;
 	bool sendResponse = false;
 
-	byte serialBuffer[READ_BUFFER_SIZE];
-	int serialBufferOffset = 0;
+	byte * buffer = malloc(BUFFER_SIZE);
+	Request * request = malloc(sizeof(Request));
+	Response * response = malloc(sizeof(Response));
+	request->method[0] = 0;
+	request->path[0] = 0;
+
+	int bufferOffset = 0;
+
+	printf("Listens %c:\n", buffer[bufferOffset]);
+
+	int headerLine = 0;
+	char lastChar = 0;
+	char curChar = 0;
 
 	while (1) {
 		ssize_t readSize;
-
-		readSize = recv(clntSocket, &serialBuffer + serialBufferOffset,
-				READ_BUFFER_SIZE - serialBufferOffset, 0);
-
-		if (readSize <= 0) {
-			//Read error.  Clean up.
+		readSize = recv(clntSocket, buffer + bufferOffset, 1, 0);
+		if (readSize == 0) {
 			break;
 		}
 
-		int newDataStart = 0;
-		int dataEnd = serialBufferOffset + readSize;
-		for (int bufferOffset = serialBufferOffset; bufferOffset < dataEnd;
-				bufferOffset++) {
+		lastChar = curChar;
+		curChar = buffer[bufferOffset];
 
-			if (serialBuffer[bufferOffset] == DATA_END) {
-				// On stop bit
-				for (int messageIndex = 0; messageIndex < readMessagesCount;
-						messageIndex++) {
+		// Double newline
+		if (lastChar == '\n' && curChar == '\r') {
+			curChar = 0;
+			continue;
+		}
+		if (lastChar == '\r' && curChar == '\n') {
+			curChar = 0;
+			continue;
+		}
 
-					int messageStart = bufferOffset
-							- (readMessages[messageIndex].length
-									+ MESSAGE_ENEVELOP_SIZE - 1);
-					if (messageStart >= 0) {
-						if (validateMessage(serialBuffer, messageStart,
-								readMessages[messageIndex].msgId,
-								readMessages[messageIndex].length)) {
-							readMessages[messageIndex].processFunction(
-									serialBuffer,
-									messageStart + MESSAGE_ENEVELOP_START_SIZE);
-							sendResponse = true;
-							if (messageStart > 0) {
-								int extraLength = messageStart - 1;
-								if (extraLength > 0) {
-									handleExtra(serialBuffer, 0, extraLength);
-								}
-							}
-							newDataStart = bufferOffset + 1;
-						}
+		if (curChar == '\r' || curChar == '\n') {
+			buffer[bufferOffset] = 0;
+			//printf("  READ LINE: %s %d\n", buffer, strlen(buffer));
+
+			if (headerLine == 0) {
+				int index = 0;
+				for (int i = 0; i < METHOD_SIZE; i++) {
+					request->method[i] = buffer[i + index];
+					if (request->method[i] == ' ' || request->method[i] == 0) {
+						request->method[i] = 0;
+						index = index + i;
+						break;
 					}
 				}
+				if (index > 0) {
+					for (; index < bufferOffset; index++) {
+						if (buffer[index] != ' ') {
+							break;
+						}
+					}
+					for (int i = 0; i < PATH_SIZE; i++) {
+						request->path[i] = buffer[i + index];
+						if (request->path[i] == ' ' || request->path[i] == 0) {
+							request->path[i] = 0;
+							index = index + i;
+							break;
+						}
+					}
+
+				}
 			}
-		}
 
-		serialBufferOffset = dataEnd;
+			if (strlen(buffer) == 0) {
+				// Empty Line.  End of header.
 
-		if (newDataStart > 0) {
-			if (newDataStart == serialBufferOffset) {
-				serialBufferOffset = 0;
-			} else {
-				int dataLength = dataEnd - newDataStart;
-				memcpy(serialBuffer, serialBuffer + newDataStart, dataLength);
-				serialBufferOffset = dataLength;
+				sprintf(response->method, "HTTP/1.1");
+				response->statusCode = 200;
+				sprintf(response->status, "OK");
+
+				sprintf(response->data, "OK");
+				sprintf(response->contentType, "text/json");
+
+				sprintf(response->data, "HELP ME");
+				response->dataSize = strlen(response->data);
+
+				sendHttpResponse(clntSocket, response);
 			}
+
+			headerLine++;
+			bufferOffset = 0;
+		} else {
+			bufferOffset += readSize;
 		}
-
-		//Overflow
-		if (serialBufferOffset == sizeof(serialBuffer)) {
-			handleExtra(serialBuffer, 0, serialBufferOffset);
-			serialBufferOffset = 0;
-		}
-
-		if (sendResponse) {
-
-			printf("sendResponse\n");
-			writeStatus(clntSocket);
-			sendResponse = false;
-		}
-
 	}
-	close(clntSocket);
 
+	close(clntSocket);
 	fflush(stdout);
+	free(request);
+	free(response);
+	free(buffer);
+
 	return NULL;
 }
 
@@ -431,8 +184,6 @@ void* listenThread(void *ptr) {
 	int connected;
 	int setSockOp = 1;
 	pthread_t thread;
-
-	setupMessages();
 
 	struct sockaddr_in server_addr, client_addr;
 	socklen_t sin_size;
@@ -475,6 +226,7 @@ void* listenThread(void *ptr) {
 
 		pthread_create(&thread, NULL, handleClientThread, (void*) &connected);
 	}
+
 	return NULL;
 }
 void startComm() {
