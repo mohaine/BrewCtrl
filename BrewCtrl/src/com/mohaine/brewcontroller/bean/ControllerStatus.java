@@ -33,6 +33,9 @@ public class ControllerStatus implements Cloneable {
 	@ListType(HeaterStep.class)
 	private List<HeaterStep> steps;
 
+	@ListType(HardwareSensor.class)
+	List<HardwareSensor> sensors;
+
 	public Mode getMode() {
 		return mode;
 	}
@@ -53,11 +56,20 @@ public class ControllerStatus implements Cloneable {
 		return (ControllerStatus) clone();
 	}
 
+	public List<HardwareSensor> getSensors() {
+		return sensors;
+	}
+
+	public void setSensors(List<HardwareSensor> sensors) {
+		this.sensors = sensors;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
+		result = prime * result + ((sensors == null) ? 0 : sensors.hashCode());
 		result = prime * result + ((steps == null) ? 0 : steps.hashCode());
 		return result;
 	}
@@ -72,6 +84,11 @@ public class ControllerStatus implements Cloneable {
 			return false;
 		ControllerStatus other = (ControllerStatus) obj;
 		if (mode != other.mode)
+			return false;
+		if (sensors == null) {
+			if (other.sensors != null)
+				return false;
+		} else if (!sensors.equals(other.sensors))
 			return false;
 		if (steps == null) {
 			if (other.steps != null)

@@ -19,6 +19,7 @@
 package com.mohaine.brewcontroller.bean;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.mohaine.brewcontroller.json.ListType;
@@ -29,7 +30,7 @@ public class HeaterStep {
 	private String id = UUID.randomUUID().toString();
 
 	@ListType(ControlPoint.class)
-	private ArrayList<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
+	private List<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
 
 	private int stepTime = 0;
 	private int extraCompletedTime = 0;
@@ -119,11 +120,11 @@ public class HeaterStep {
 		return stepTime > 0 && getTotalCompletedTime() >= stepTime;
 	}
 
-	public ArrayList<ControlPoint> getControlPoints() {
+	public List<ControlPoint> getControlPoints() {
 		return controlPoints;
 	}
 
-	public void setControlPoints(ArrayList<ControlPoint> controlPoints) {
+	public void setControlPoints(List<ControlPoint> controlPoints) {
 		this.controlPoints = controlPoints;
 	}
 

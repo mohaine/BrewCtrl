@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mohaine.brewcontroller.bean.ControllerStatus;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.net.ControllerHardwareJson;
@@ -47,6 +48,21 @@ public class MockHardwareServer {
 		MockHardware mock = new MockHardware();
 		ControllerStatus status = new ControllerStatus();
 		status.setSteps(new ArrayList<HeaterStep>());
+		
+		List<HardwareSensor> sensors = new ArrayList<HardwareSensor>();
+
+		HardwareSensor sensor1 = new HardwareSensor();
+		sensor1.setAddress("0000000000000001");
+		sensor1.setReading(true);
+		sensor1.setTempatureC(25);
+		sensors.add(sensor1);
+		HardwareSensor sensor2 = new HardwareSensor();
+		sensor2.setAddress("0000000000000002");
+		sensor2.setReading(true);
+		sensor2.setTempatureC(26);
+		sensors.add(sensor2);
+
+		status.setSensors(sensors);
 
 		status.setMode(Mode.OFF);
 		mock.setStatus(status);

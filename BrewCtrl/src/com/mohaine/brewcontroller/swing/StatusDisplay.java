@@ -309,12 +309,11 @@ public class StatusDisplay extends JPanel {
 			}
 		}
 
-		List<HardwareSensor> sensors = controller.getSensors();
+		List<HardwareSensor> sensors = controller.getHardwareStatus().getSensors();
 		for (HardwareSensor tempSensor : sensors) {
-
 			boolean found = false;
 			for (SensorLabel sensorLabel : sensorLabels) {
-				if (sensorLabel.sensor == tempSensor) {
+				if (sensorLabel.sensor.getAddress().equals(tempSensor.getAddress())) {
 					sensorLabel.update();
 					found = true;
 					break;

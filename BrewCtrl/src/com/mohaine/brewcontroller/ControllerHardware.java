@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.mohaine.brewcontroller.bean.ControllerStatus;
 import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 
@@ -25,8 +24,6 @@ public interface ControllerHardware {
 	public void changeSteps(List<HeaterStep> steps);
 
 	public BreweryLayout getBreweryLayout();
-
-	public List<HardwareSensor> getSensors();
 
 	public ControllerStatus getHardwareStatus();
 

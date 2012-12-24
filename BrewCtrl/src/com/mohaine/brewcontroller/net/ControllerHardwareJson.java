@@ -17,6 +17,7 @@ import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.bean.VersionBean;
+import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryLayoutChangeEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StatusChangeEvent;
@@ -36,8 +37,6 @@ public class ControllerHardwareJson implements ControllerHardware {
 	private final JsonObjectConverter converter = BrewJsonConverter.getJsonConverter();
 
 	public static int DEFAULT_PORT = 2739;
-
-	private ArrayList<HardwareSensor> tempSensors = new ArrayList<HardwareSensor>();
 
 	private List<BrewHardwareControl> brewHardwareControls = new ArrayList<BrewHardwareControl>();
 
@@ -71,6 +70,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 		controllerStatus = new ControllerStatus();
 		controllerStatus.setSteps(new ArrayList<HeaterStep>());
+		controllerStatus.setSensors(new ArrayList<HardwareSensor>());
 
 		brewLayout = configurationLoader.getConfiguration().getBrewLayout();
 
@@ -133,6 +133,8 @@ public class ControllerHardwareJson implements ControllerHardware {
 						ControllerStatus lastStatus = controllerStatus;
 
 						controllerStatus = converter.decode(response, ControllerStatus.class);
+
+						updateLayoutState(false);
 
 						eventBus.fireEvent(new StatusChangeEvent());
 						if (controllerStatus != null) {
@@ -217,6 +219,77 @@ public class ControllerHardwareJson implements ControllerHardware {
 				}
 			}
 		}
+	}
+
+	private void updateLayoutState(boolean forceDirty) {
+
+		if (controllerStatus != null) {
+
+			List<HeaterStep> steps = controllerStatus.getSteps();
+			if (steps.size() > 0) {
+				HeaterStep heaterStep = steps.get(0);
+				List<ControlPoint> controlPoints = heaterStep.getControlPoints();
+
+				if (controlPoints != null) {
+					for (BrewHardwareControl bhc : brewHardwareControls) {
+						for (ControlPoint controlPoint : controlPoints) {
+							if (controlPoint.getControlPin() == bhc.getPin()) {
+								if (forceDirty || bhc.getDuty() != controlPoint.getDuty()) {
+									bhc.setDuty(controlPoint.getDuty());
+
+									eventBus.fireEvent(new BreweryComponentChangeEvent(bhc));
+
+								}
+							}
+						}
+					}
+				}
+			}
+
+			List<Tank> tanks = brewLayout.getTanks();
+			for (Tank tank : tanks) {
+				Sensor sensor = tank.getSensor();
+				if (sensor != null) {
+
+					HardwareSensor tankTs = null;
+					List<HardwareSensor> sensors = controllerStatus.getSensors();
+					for (HardwareSensor tempSensor : sensors) {
+						SensorConfiguration findSensor = configuration.findSensor(tempSensor.getAddress());
+						if (findSensor != null && tank.getName().equals(findSensor.getLocation())) {
+							tankTs = tempSensor;
+							break;
+						}
+					}
+
+					if (tankTs == null) {
+						tankTs = new HardwareSensor();
+					}
+
+					Double temp = sensor.getTempatureC();
+					boolean reading = sensor.isReading();
+					sensor.setAddress(tankTs.getAddress());
+					sensor.setReading(tankTs.isReading());
+					sensor.setTempatureC(tankTs.getTempatureC());
+
+					boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
+					if (diff) {
+						eventBus.fireEvent(new BreweryComponentChangeEvent(sensor));
+					}
+
+				}
+
+			}
+		}
+	}
+
+	private boolean equals(Double temp, Double tempatureC) {
+		if (temp == tempatureC) {
+			return true;
+		} else if (temp == null || tempatureC == null) {
+			return false;
+		}
+
+		return Math.abs(temp - tempatureC) < 0.001;
 	}
 
 	private void connect() throws Exception {
@@ -316,64 +389,13 @@ public class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	@Override
-	public HeaterStep createManualStep(String name) {
-		HeaterStep step = new HeaterStep();
-		step.setName(name);
-		ArrayList<ControlPoint> controlPoints = step.getControlPoints();
-
-		List<Pump> pumps = brewLayout.getPumps();
-		for (Pump pump : pumps) {
-			ControlPoint controlPoint = new ControlPoint();
-			controlPoint.setAutomaticControl(false);
-			controlPoint.setControlPin(pump.getPin());
-			controlPoint.setHasDuty(pump.isHasDuty());
-			controlPoints.add(controlPoint);
-		}
-
-		List<Tank> tanks = brewLayout.getTanks();
-		for (Tank tank : tanks) {
-			HeatElement heater = tank.getHeater();
-			if (heater != null) {
-				ControlPoint controlPoint = new ControlPoint();
-				controlPoint.setAutomaticControl(false);
-				controlPoint.setControlPin(heater.getPin());
-				controlPoint.setHasDuty(heater.isHasDuty());
-				controlPoint.setFullOnAmps(heater.getFullOnAmps());
-
-				Sensor sensor = tank.getSensor();
-				if (sensor != null) {
-					List<HardwareSensor> sensors = getSensors();
-					for (HardwareSensor hardwareSensor : sensors) {
-						SensorConfiguration findSensorByLocation = configuration.findSensor(hardwareSensor.getAddress());
-
-						if (findSensorByLocation != null && tank.getName().equals(findSensorByLocation.getLocation())) {
-							controlPoint.setAutomaticControl(false);
-							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
-							break;
-						}
-					}
-				}
-
-				controlPoints.add(controlPoint);
-			}
-		}
-
-		return step;
-	}
-
-	@Override
 	public BreweryLayout getBreweryLayout() {
 		return brewLayout;
 	}
 
 	@Override
-	public List<HardwareSensor> getSensors() {
-		return tempSensors;
-	}
-
-	@Override
 	public Double getSensorTemp(String sensorAddress) {
-		List<HardwareSensor> sensors = getSensors();
+		List<HardwareSensor> sensors = controllerStatus.getSensors();
 		for (int i = 0; i < sensors.size(); i++) {
 			HardwareSensor tempSensor = sensors.get(i);
 			if (tempSensor.getAddress().equals(sensorAddress)) {
@@ -416,6 +438,49 @@ public class ControllerHardwareJson implements ControllerHardware {
 			}
 		}
 
+	}
+
+	public HeaterStep createManualStep(String name) {
+		HeaterStep step = new HeaterStep();
+		step.setName(name);
+		List<ControlPoint> controlPoints = step.getControlPoints();
+
+		List<Pump> pumps = brewLayout.getPumps();
+		for (Pump pump : pumps) {
+			ControlPoint controlPoint = new ControlPoint();
+			controlPoint.setAutomaticControl(false);
+			controlPoint.setControlPin(pump.getPin());
+			controlPoint.setHasDuty(pump.isHasDuty());
+			controlPoints.add(controlPoint);
+		}
+
+		List<Tank> tanks = brewLayout.getTanks();
+		for (Tank tank : tanks) {
+			HeatElement heater = tank.getHeater();
+			if (heater != null) {
+				ControlPoint controlPoint = new ControlPoint();
+				controlPoint.setAutomaticControl(false);
+				controlPoint.setControlPin(heater.getPin());
+				controlPoint.setHasDuty(heater.isHasDuty());
+				controlPoint.setFullOnAmps(heater.getFullOnAmps());
+
+				Sensor sensor = tank.getSensor();
+				if (sensor != null) {
+					List<HardwareSensor> sensors = controllerStatus.getSensors();
+					for (HardwareSensor hardwareSensor : sensors) {
+						if (sensor.getAddress().equals(hardwareSensor.getAddress())) {
+							controlPoint.setAutomaticControl(false);
+							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
+							break;
+						}
+					}
+				}
+
+				controlPoints.add(controlPoint);
+			}
+		}
+
+		return step;
 	}
 
 	public void disconnect() {
