@@ -282,7 +282,7 @@ public class StatusDisplay extends JPanel {
 			status.setForeground(statusOk ? normalStatusForeground : Color.red);
 		}
 
-		ControllerStatus hardwareStatus = controller.getHardwareStatus();
+		ControllerStatus hardwareStatus = controller.getControllerStatus();
 		if (hardwareStatus != null) {
 			switch (hardwareStatus.getMode()) {
 			case OFF:
@@ -309,7 +309,7 @@ public class StatusDisplay extends JPanel {
 			}
 		}
 
-		List<HardwareSensor> sensors = controller.getHardwareStatus().getSensors();
+		List<HardwareSensor> sensors = controller.getSensors();
 		for (HardwareSensor tempSensor : sensors) {
 			boolean found = false;
 			for (SensorLabel sensorLabel : sensorLabels) {

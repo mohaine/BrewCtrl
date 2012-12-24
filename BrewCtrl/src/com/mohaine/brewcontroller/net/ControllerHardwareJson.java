@@ -1,7 +1,6 @@
 package com.mohaine.brewcontroller.net;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -69,10 +68,6 @@ public class ControllerHardwareJson implements ControllerHardware {
 		super();
 		this.eventBus = eventBusp;
 		this.configuration = configurationLoader.getConfiguration();
-
-		controllerStatus = new ControllerStatus();
-		controllerStatus.setSteps(new ArrayList<HeaterStep>());
-		controllerStatus.setSensors(new ArrayList<HardwareSensor>());
 
 		brewLayout = configurationLoader.getConfiguration().getBrewLayout();
 
@@ -301,13 +296,15 @@ public class ControllerHardwareJson implements ControllerHardware {
 			connected = true;
 			setStatus("Connected");
 
-			brewLayout = converter.decode(getCommandRequest("layout").getString(), BreweryLayout.class);
+			String layoutJson = getCommandRequest("layout").getString();
+
+			brewLayout = converter.decode(layoutJson, BreweryLayout.class);
 			if (brewLayout == null) {
-				System.out.println(String.format("Server doesn't have layout, upload local version"));
 				URLRequest layoutRequest = getCommandRequest("layout");
-				String encode = converter.encode(configuration.getBrewLayout());
-				layoutRequest.addParameter("layout", encode);
-				this.brewLayout = converter.decode(layoutRequest.getString(), BreweryLayout.class);
+				layoutRequest.addParameter("layout", converter.encode(configuration.getBrewLayout()));
+				layoutJson = layoutRequest.getString();
+				brewLayout = converter.decode(layoutJson, BreweryLayout.class);
+
 			}
 
 			if (brewLayout != null) {
@@ -337,12 +334,16 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 	@Override
 	public List<HeaterStep> getSteps() {
-		return controllerStatus.getSteps();
+		return controllerStatus != null ? controllerStatus.getSteps() : new ArrayList<HeaterStep>();
+	}
+
+	public List<HardwareSensor> getSensors() {
+		return controllerStatus != null ? controllerStatus.getSensors() : new ArrayList<HardwareSensor>();
 	}
 
 	@Override
 	public Mode getMode() {
-		return controllerStatus.getMode();
+		return controllerStatus != null ? controllerStatus.getMode() : Mode.UNKNOWN;
 	}
 
 	@Override
@@ -406,7 +407,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	@Override
-	public ControllerStatus getHardwareStatus() {
+	public ControllerStatus getControllerStatus() {
 		return controllerStatus;
 	}
 

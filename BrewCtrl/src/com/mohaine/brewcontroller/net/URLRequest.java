@@ -265,7 +265,7 @@ public class URLRequest implements Serializable {
 
 		if (postParameters != null) {
 			int count = 0;
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			for (Iterator<String[]> iter = postParameters.iterator(); iter.hasNext();) {
 				String[] param = iter.next();
 
@@ -389,7 +389,6 @@ public class URLRequest implements Serializable {
 	}
 
 	public void addParameter(String name, String value) {
-		 System.out.println(name + " = " + value);
 		if (postParameters == null) {
 			postParameters = new ArrayList<String[]>();
 		}
