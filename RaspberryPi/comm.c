@@ -25,6 +25,8 @@
 #define STATUS_SIZE 30
 #define CONTENT_TYPE_SIZE 30
 
+#define SERVICES_COUNT 1
+
 #include "sensor.h"
 #include "comm.h"
 #include "crc8.h"
@@ -56,14 +58,37 @@ typedef struct {
 	char data[BUFFER_SIZE];
 } Response;
 
+typedef struct {
+	char * path;
+	void (*handleRequest)(Request * request, Response * response);
+} HttpService;
+
+HttpService services[SERVICES_COUNT];
+
+void handleVersionRequest(Request * request, Response * response) {
+	sprintf(response->contentType, "text/json");
+	sprintf(response->data, "{\"version\":\"1.0\"}\r\n");
+	response->dataSize = strlen(response->data);
+
+}
+
+void setupComm() {
+	services[0].path = "/cmd/version";
+	services[0].handleRequest = handleVersionRequest;
+}
+
 long lastCommTime = 0;
 
 long lastControlIdTime() {
 	return lastCommTime;
 }
 
+typedef struct {
+	int clntSocket;
+} HandleClientParmas;
+
 void sendHttpResponse(int clntSocket, Response *response) {
-	byte * buffer = malloc(BUFFER_SIZE);
+	char * buffer = malloc(BUFFER_SIZE);
 
 	sprintf(buffer,
 			"%s %d %s\r\nContent-Length: %d\r\nContent-Type: %s\r\n\r\n",
@@ -76,11 +101,12 @@ void sendHttpResponse(int clntSocket, Response *response) {
 }
 
 void* handleClientThread(void *ptr) {
-	int * number = (int *) ptr;
-	int clntSocket = *number;
-	bool sendResponse = false;
 
-	byte * buffer = malloc(BUFFER_SIZE);
+	HandleClientParmas * params = (HandleClientParmas *) ptr;
+	int clntSocket = params->clntSocket;
+	free(params);
+
+	char * buffer = malloc(BUFFER_SIZE);
 	Request * request = malloc(sizeof(Request));
 	Response * response = malloc(sizeof(Response));
 	request->method[0] = 0;
@@ -88,14 +114,13 @@ void* handleClientThread(void *ptr) {
 
 	int bufferOffset = 0;
 
-	printf("Listens %c:\n", buffer[bufferOffset]);
-
 	int headerLine = 0;
 	char lastChar = 0;
 	char curChar = 0;
 
 	while (1) {
 		ssize_t readSize;
+
 		readSize = recv(clntSocket, buffer + bufferOffset, 1, 0);
 		if (readSize == 0) {
 			break;
@@ -116,9 +141,10 @@ void* handleClientThread(void *ptr) {
 
 		if (curChar == '\r' || curChar == '\n') {
 			buffer[bufferOffset] = 0;
-			//printf("  READ LINE: %s %d\n", buffer, strlen(buffer));
+			printf("  READ LINE: %s\n", buffer);
 
 			if (headerLine == 0) {
+				// Parse Header
 				int index = 0;
 				for (int i = 0; i < METHOD_SIZE; i++) {
 					request->method[i] = buffer[i + index];
@@ -149,16 +175,32 @@ void* handleClientThread(void *ptr) {
 			if (strlen(buffer) == 0) {
 				// Empty Line.  End of header.
 
+				printf("  END OF HEADER\n");
+
+				bool handled = false;
+
 				sprintf(response->method, "HTTP/1.1");
-				response->statusCode = 200;
 				sprintf(response->status, "OK");
+				sprintf(response->contentType, "text/html");
+				response->statusCode = 200;
+				response->dataSize = 0;
 
-				sprintf(response->data, "OK");
-				sprintf(response->contentType, "text/json");
+				for (int i = 0; i < SERVICES_COUNT; i++) {
 
-				sprintf(response->data, "HELP ME");
-				response->dataSize = strlen(response->data);
+					if (strcmp(request->path, services[i].path) == 0) {
+						services[i].handleRequest(request, response);
+						handled = true;
+						break;
+					}
 
+				}
+
+				if (!handled) {
+					sprintf(response->status, "Not Found");
+					response->statusCode = 404;
+					sprintf(response->data, "Not Found");
+					response->dataSize = strlen(response->data);
+				}
 				sendHttpResponse(clntSocket, response);
 			}
 
@@ -220,16 +262,22 @@ void* listenThread(void *ptr) {
 
 	while (1) {
 		sin_size = sizeof(struct sockaddr_in);
-		connected = accept(sock, (struct sockaddr *) &client_addr, &sin_size);
+
+		HandleClientParmas * params = malloc(sizeof(HandleClientParmas));
+
+		params->clntSocket = accept(sock, (struct sockaddr *) &client_addr,
+				&sin_size);
 		printf("Connection from (%s , %d)\n", inet_ntoa(client_addr.sin_addr),
 				ntohs(client_addr.sin_port));
 
-		pthread_create(&thread, NULL, handleClientThread, (void*) &connected);
+		pthread_create(&thread, NULL, handleClientThread, (void*) params);
 	}
 
 	return NULL;
 }
 void startComm() {
+	setupComm();
+
 	pthread_t thread;
 	pthread_create(&thread, NULL, listenThread, NULL);
 
