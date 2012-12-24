@@ -68,6 +68,7 @@ public class BreweryDisplay {
 
 			@Override
 			public void mouseDown(DrawerMouseEvent e) {
+
 				dragState = new DragState();
 				dragState.x = e.getX();
 				dragState.y = e.getY();
@@ -166,7 +167,8 @@ public class BreweryDisplay {
 			HeaterStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
 				if (component instanceof BrewHardwareControl) {
-					ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+					BrewHardwareControl brewHardwareControl = (BrewHardwareControl) component;
+					ControlPoint controlPoint = selectedStep.getControlPointForPin(brewHardwareControl.getPin());
 					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 						if (component instanceof Pump) {
 							controlPoint.setDuty(controlPoint.getDuty() > 0 ? 0 : 100);

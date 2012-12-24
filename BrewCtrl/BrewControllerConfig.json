@@ -50,7 +50,7 @@
    "sensors":[
       {
          "address":"0000000000000001",
-         "name":"",
+         "name":"Hlt",
          "location":"HLT"
       },
       {

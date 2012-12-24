@@ -2,21 +2,13 @@ package com.mohaine.brewcontroller.bean;
 
 public class ControlPoint implements Cloneable {
 
-	private byte controlPin;
+	private int controlPin;
 	private int duty;
 	private int fullOnAmps;
 	private String tempSensorAddress = "0000000000000000";
 	private double targetTemp;
 	private boolean hasDuty;
 	private boolean automaticControl;
-
-	public byte getControlPin() {
-		return controlPin;
-	}
-
-	public void setControlPin(byte controlPin) {
-		this.controlPin = controlPin;
-	}
 
 	public String getTempSensorAddress() {
 		return tempSensorAddress;
@@ -50,8 +42,12 @@ public class ControlPoint implements Cloneable {
 		this.automaticControl = automaticControl;
 	}
 
+	public int getControlPin() {
+		return controlPin;
+	}
+
 	public void setControlPin(int i) {
-		setControlPin((byte) i);
+		controlPin = i;
 	}
 
 	public int getDuty() {
@@ -81,11 +77,10 @@ public class ControlPoint implements Cloneable {
 	public void setFullOnAmps(int fullOnAmps) {
 		this.fullOnAmps = fullOnAmps;
 	}
-	
+
 	public void setFullOnAmps(byte fullOnAmps) {
 		this.fullOnAmps = (int) fullOnAmps & 0xff;
 	}
-
 
 	@Override
 	public int hashCode() {

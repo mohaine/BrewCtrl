@@ -1,5 +1,7 @@
 package com.mohaine.brewcontroller.net;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -81,9 +83,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 			@Override
 			public void onStepChange(HeaterStep step, boolean fromServer) {
-
 				if (!fromServer) {
-					System.out.println("modify Step: " + step.getName());
 					modifyStep(step);
 				}
 			}
@@ -430,14 +430,16 @@ public class ControllerHardwareJson implements ControllerHardware {
 					} catch (InterruptedException e) {
 						// ignore
 					}
-				} catch (Exception e) {
-					setStatus(e.getMessage());
+				} catch (IOException e) {
 					disconnect();
+					setStatus(e.getMessage());
+				} catch (Exception e) {
+					e.printStackTrace();
+					setStatus(e.getMessage());
 				}
 
 			}
 		}
-
 	}
 
 	public HeaterStep createManualStep(String name) {

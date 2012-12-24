@@ -1,5 +1,6 @@
 package com.mohaine.brewcontroller;
 
+import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.ControllerStatus;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.bean.HeaterStep;
@@ -31,6 +32,7 @@ public class BrewJsonConverter {
 		jc.addHandler(ReflectionJsonHandler.build(ControllerStatus.class));
 		jc.addHandler(ReflectionJsonHandler.build(HeaterStep.class));
 		jc.addHandler(ReflectionJsonHandler.build(HardwareSensor.class));
+		jc.addHandler(ReflectionJsonHandler.build(ControlPoint.class));
 
 		return jc;
 	}
