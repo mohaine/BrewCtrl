@@ -6,8 +6,12 @@
 #include "duty.h"
 #define MAX_CP_COUNT 8
 
+#define MODE_OFF 0
+#define MODE_ON 1
+#define MODE_HOLD 2
+
 typedef struct {
-	bool mode;
+	int mode;
 	long controlId;byte maxAmps;bool turnOffOnCommLoss;
 } Control;
 

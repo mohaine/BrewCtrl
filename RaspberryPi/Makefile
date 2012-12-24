@@ -7,6 +7,11 @@ OBJECTS=$(SOURCES:.c=.o)
 BREWCTRL=brewctrl
 LISTSENSORS=listsensors
 
+
+
+CFLAGS += $(shell pkg-config --cflags json)
+LDFLAGS += $(shell pkg-config --libs json)
+
 all: $(SOURCES) $(BREWCTRL) $(LISTSENSORS)
 	
 $(LISTSENSORS): $(OBJECTS) listsensors.o

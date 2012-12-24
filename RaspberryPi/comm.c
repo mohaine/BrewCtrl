@@ -43,6 +43,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <pthread.h>
+#include <json.h>
 
 char LAYOUT[BUFFER_SIZE];
 int LAYOUT_SIZE;
@@ -107,6 +108,7 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 				length++;
 				index++;
 			}
+			dest[length] = 0;
 
 			return length;
 
@@ -148,8 +150,74 @@ void handleLayoutRequest(Request * request, Response * response) {
 	response->contentLength = LAYOUT_SIZE;
 }
 void handleStatusRequest(Request * request, Response * response) {
+	char tmp[BUFFER_SIZE];
+
+	if (request->contentLength > 0) {
+		int paramSize = readParam("mode", request->content,
+				request->contentLength, &tmp);
+		if (paramSize > 0) {
+			if (strcmp(tmp, "OFF") == 0) {
+				getControl()->mode = MODE_OFF;
+				turnOff();
+			} else if (strcmp(tmp, "ON") == 0) {
+				getControl()->mode = MODE_ON;
+			} else if (strcmp(tmp, "HOLD") == 0) {
+				getControl()->mode = MODE_HOLD;
+			} else {
+				response->statusCode = 400;
+				sprintf(response->status, "Bad Request");
+				sprintf(response->content, "Bad Request");
+				return;
+			}
+		}
+	}
+
+//	if (Mode.OFF.toString().equals(modeParam)) {
+//		status.setMode(Mode.OFF);
+//	} else if (Mode.ON.toString().equals(modeParam)) {
+//		status.setMode(Mode.ON);
+//	} else if (Mode.HOLD.toString().equals(modeParam)) {
+//		status.setMode(Mode.HOLD);
+//	}
+
 	sprintf(response->contentType, "text/json");
-	sprintf(response->content, "null");
+
+	json_object *status, *sensor, *sensors, *steps;
+
+	status = json_object_new_object();
+
+	if (getControl()->mode == MODE_OFF) {
+		json_object_object_add(status, "mode", json_object_new_string("OFF"));
+	} else if (getControl()->mode == MODE_ON) {
+		json_object_object_add(status, "mode", json_object_new_string("ON"));
+	} else if (getControl()->mode == MODE_HOLD) {
+		json_object_object_add(status, "mode", json_object_new_string("HOLD"));
+	}
+
+	sensors = json_object_new_array();
+	json_object_object_add(status, "sensors", sensors);
+	steps = json_object_new_array();
+	json_object_object_add(status, "steps", steps);
+
+	for (int i = 0; i < getSensorCount(); i++) {
+		TempSensor *sensor = getSensorByIndex(i);
+
+		sprintf(&tmp, "%02x%02x%02x%02x%02x%02x%02x%02x", sensor->address[0],
+				sensor->address[1], sensor->address[2], sensor->address[3],
+				sensor->address[4], sensor->address[5], sensor->address[6],
+				sensor->address[7]);
+
+		sensor = json_object_new_object();
+		json_object_object_add(sensor, "address", json_object_new_string(tmp));
+
+		json_object_object_add(sensor, "tempatureC",
+				json_object_new_double(sensor->lastTemp));
+		json_object_object_add(sensor, "reading",
+				json_object_new_boolean(sensor->reading));
+		json_object_array_add(sensors, sensor);
+	}
+
+	sprintf(&response->content, "%s", json_object_get_string(status));
 	response->contentLength = strlen(response->content);
 }
 
