@@ -25,7 +25,7 @@
 #define STATUS_SIZE 30
 #define CONTENT_TYPE_SIZE 30
 
-#define SERVICES_COUNT 1
+#define SERVICES_COUNT 3
 
 #include "sensor.h"
 #include "comm.h"
@@ -44,9 +44,14 @@
 #include <errno.h>
 #include <pthread.h>
 
+char LAYOUT[BUFFER_SIZE];
+int LAYOUT_SIZE;
+
 typedef struct {
 	char method[METHOD_SIZE];
 	char path[PATH_SIZE];
+	int contentLength;
+	char content[BUFFER_SIZE];
 } Request;
 
 typedef struct {
@@ -54,8 +59,8 @@ typedef struct {
 	int statusCode;
 	char status[STATUS_SIZE];
 	char contentType[CONTENT_TYPE_SIZE];
-	int dataSize;
-	char data[BUFFER_SIZE];
+	int contentLength;
+	char content[BUFFER_SIZE];
 } Response;
 
 typedef struct {
@@ -67,14 +72,99 @@ HttpService services[SERVICES_COUNT];
 
 void handleVersionRequest(Request * request, Response * response) {
 	sprintf(response->contentType, "text/json");
-	sprintf(response->data, "{\"version\":\"1.0\"}\r\n");
-	response->dataSize = strlen(response->data);
+	sprintf(response->content, "{\"version\":\"1.0\"}\r\n");
+	response->contentLength = strlen(response->content);
+}
 
+int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
+	int paramSize = -1;
+	int nameLenght = strlen(name);
+
+	int index = 0;
+
+	while (index < paramDataLength) {
+
+		if (paramData[index + nameLenght] == '='
+				&& strncmp(name, paramData + index, nameLenght) == 0) {
+
+			index = index + nameLenght + 1;
+
+			int length = 0;
+
+			while (index < paramDataLength && paramData[index] != '\r'
+					&& paramData[index] != '\n') {
+
+				if (paramData[index] == '%' && index < paramDataLength + 2) {
+					index++;
+					unsigned int data;
+
+					sscanf(paramData + index, "%02x", &data);
+					dest[length] = (char) data;
+					index++;
+				} else {
+					dest[length] = paramData[index];
+				}
+				length++;
+				index++;
+			}
+
+			return length;
+
+		} else {
+// Find the EOL
+			while (index < paramDataLength && paramData[index] != '\r'
+					&& paramData[index] != '\n') {
+				index++;
+			}
+// Go past the EOL
+			while (index < paramDataLength
+					&& (paramData[index] == '\r' || paramData[index] == '\n')) {
+				index++;
+			}
+		}
+
+	}
+
+	return paramSize;
+}
+
+void handleLayoutRequest(Request * request, Response * response) {
+
+	if (request->contentLength > 0) {
+		int paramSize = readParam("layout", request->content,
+				request->contentLength, LAYOUT);
+		if (paramSize > 0) {
+			LAYOUT_SIZE = paramSize;
+		} else {
+			response->statusCode = 400;
+			sprintf(response->status, "Bad Request");
+			sprintf(response->content, "Bad Request");
+			return;
+		}
+	}
+
+	sprintf(response->contentType, "text/json");
+	memcpy(response->content, LAYOUT, LAYOUT_SIZE);
+	response->contentLength = LAYOUT_SIZE;
+}
+void handleStatusRequest(Request * request, Response * response) {
+	sprintf(response->contentType, "text/json");
+	sprintf(response->content, "null");
+	response->contentLength = strlen(response->content);
 }
 
 void setupComm() {
-	services[0].path = "/cmd/version";
-	services[0].handleRequest = handleVersionRequest;
+
+	LAYOUT_SIZE = 0;
+	services[0].path = "/cmd/status";
+	services[0].handleRequest = handleStatusRequest;
+
+	services[1].path = "/cmd/layout";
+	services[1].handleRequest = handleLayoutRequest;
+
+	services[2].path = "/cmd/version";
+	services[2].handleRequest = handleVersionRequest;
+
 }
 
 long lastCommTime = 0;
@@ -93,10 +183,13 @@ void sendHttpResponse(int clntSocket, Response *response) {
 	sprintf(buffer,
 			"%s %d %s\r\nContent-Length: %d\r\nContent-Type: %s\r\n\r\n",
 			response->method, response->statusCode, response->status,
-			response->dataSize, response->contentType);
+			response->contentLength, response->contentType);
 	send(clntSocket, buffer, strlen(buffer), MSG_NOSIGNAL | MSG_DONTWAIT);
-	send(clntSocket, response->data, response->dataSize,
+	send(clntSocket, response->content, response->contentLength,
 			MSG_NOSIGNAL | MSG_DONTWAIT);
+
+//	write(stdout, response->content, response->contentLength);
+
 	free(buffer);
 }
 
@@ -111,6 +204,7 @@ void* handleClientThread(void *ptr) {
 	Response * response = malloc(sizeof(Response));
 	request->method[0] = 0;
 	request->path[0] = 0;
+	request->contentLength = 0;
 
 	int bufferOffset = 0;
 
@@ -129,19 +223,13 @@ void* handleClientThread(void *ptr) {
 		lastChar = curChar;
 		curChar = buffer[bufferOffset];
 
-		// Double newline
-		if (lastChar == '\n' && curChar == '\r') {
-			curChar = 0;
-			continue;
-		}
-		if (lastChar == '\r' && curChar == '\n') {
-			curChar = 0;
+		if (curChar == '\r') {
 			continue;
 		}
 
-		if (curChar == '\r' || curChar == '\n') {
+		if (lastChar == '\r' && curChar == '\n') {
 			buffer[bufferOffset] = 0;
-			printf("  READ LINE: %s\n", buffer);
+//			printf("  READ LINE: %s\n", buffer);
 
 			if (headerLine == 0) {
 				// Parse Header
@@ -170,38 +258,74 @@ void* handleClientThread(void *ptr) {
 					}
 
 				}
+			} else {
+
+				if (strncmp("Content-Length: ", buffer,
+						strlen("Content-Length: ")) == 0) {
+					sscanf(buffer + strlen("Content-Length: "), "%d",
+							&request->contentLength);
+				}
+
 			}
 
 			if (strlen(buffer) == 0) {
 				// Empty Line.  End of header.
-
-				printf("  END OF HEADER\n");
-
 				bool handled = false;
 
 				sprintf(response->method, "HTTP/1.1");
 				sprintf(response->status, "OK");
 				sprintf(response->contentType, "text/html");
 				response->statusCode = 200;
-				response->dataSize = 0;
+				response->contentLength = 0;
 
-				for (int i = 0; i < SERVICES_COUNT; i++) {
+				if (request->contentLength > 0) {
 
-					if (strcmp(request->path, services[i].path) == 0) {
-						services[i].handleRequest(request, response);
+					if (request->contentLength > BUFFER_SIZE) {
 						handled = true;
-						break;
+						response->statusCode = 400;
+						sprintf(response->status, "Bad Request");
+						sprintf(response->content, "Bad Request");
+						response->contentLength = strlen(response->content);
+					} else {
+
+						for (int i = 0; i < request->contentLength; i++) {
+							request->content[i] = 0;
+						}
+
+						readSize = recv(clntSocket, request->content,
+								request->contentLength, 0);
+						if (readSize == 0) {
+							break;
+						}
 					}
 
 				}
 
 				if (!handled) {
+					for (int i = 0; i < SERVICES_COUNT; i++) {
+						if (strcmp(request->path, services[i].path) == 0) {
+							services[i].handleRequest(request, response);
+							handled = true;
+							break;
+						}
+					}
+				}
+
+				if (!handled) {
 					sprintf(response->status, "Not Found");
 					response->statusCode = 404;
-					sprintf(response->data, "Not Found");
-					response->dataSize = strlen(response->data);
+					sprintf(response->content, "Not Found");
+					response->contentLength = strlen(response->content);
 				}
 				sendHttpResponse(clntSocket, response);
+
+				headerLine = 0;
+				bufferOffset = 0;
+				request->method[0] = 0;
+				request->path[0] = 0;
+				request->contentLength = 0;
+
+				continue;
 			}
 
 			headerLine++;
@@ -223,7 +347,6 @@ void* handleClientThread(void *ptr) {
 void* listenThread(void *ptr) {
 
 	int sock;
-	int connected;
 	int setSockOp = 1;
 	pthread_t thread;
 
