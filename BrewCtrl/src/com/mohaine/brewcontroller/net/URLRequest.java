@@ -389,6 +389,7 @@ public class URLRequest implements Serializable {
 	}
 
 	public void addParameter(String name, String value) {
+		 System.out.println(name + " = " + value);
 		if (postParameters == null) {
 			postParameters = new ArrayList<String[]>();
 		}

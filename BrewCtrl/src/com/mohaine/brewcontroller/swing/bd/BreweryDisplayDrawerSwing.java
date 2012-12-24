@@ -201,7 +201,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				if (controlPointForPin.isAutomaticControl()) {
 					color = Colors.INACTIVE;
 				}
-				if (selectedStep.isActive()) {
+				if (selectedStep.isStarted()) {
 					if (controlPointForPin.isAutomaticControl()) {
 						text = Integer.toString(duty) + "%";
 					} else {
@@ -323,7 +323,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 					backPaint = Colors.INACTIVE;
 				}
 
-				if (selectedStep.isActive()) {
+				if (selectedStep.isStarted()) {
 
 					if (controlPointForPin.isAutomaticControl()) {
 

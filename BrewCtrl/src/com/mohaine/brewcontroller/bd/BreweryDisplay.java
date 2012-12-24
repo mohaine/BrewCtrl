@@ -252,7 +252,7 @@ public class BreweryDisplay {
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
-		// this.brewLayout = brewLayout;
+		displays.clear();
 		List<Tank> tanks = brewLayout.getTanks();
 
 		for (Tank tank : tanks) {

@@ -12,7 +12,7 @@
  GNU General Public License for more details.
  
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ aint with this program.  If not, see <http://www.gnu.org/licenses/>.
  
  */
 
@@ -24,16 +24,16 @@ import java.util.UUID;
 import com.mohaine.brewcontroller.json.ListType;
 
 public class HeaterStep {
+	private static final long START_TIME = System.currentTimeMillis();
 	private String name;
 	private String id = UUID.randomUUID().toString();
 
 	@ListType(ControlPoint.class)
 	private ArrayList<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
 
-	private boolean active;
-	private long stepTime = 0;
-	private long extraCompletedTime = 0;
-	private long lastStartTime = 0;
+	private int stepTime = 0;
+	private int extraCompletedTime = 0;
+	private int lastStartTime = 0;
 
 	public HeaterStep() {
 		super();
@@ -47,12 +47,6 @@ public class HeaterStep {
 		this.id = id;
 	}
 
-	public HeaterStep(String name, double tunTemp, long stepTime) {
-		super();
-		this.name = name;
-		this.stepTime = stepTime;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -61,60 +55,64 @@ public class HeaterStep {
 		this.name = name;
 	}
 
-	public long getStepTime() {
+	public int getStepTime() {
 		return stepTime;
 	}
 
-	public void setStepTime(long stepTime) {
+	public void setStepTime(int stepTime) {
 		this.stepTime = stepTime;
 	}
 
-	public long getLastStartTime() {
+	public int getLastStartTime() {
 		return lastStartTime;
 	}
 
-	public void setLastStartTime(long lastStartTime) {
+	public void setLastStartTime(int lastStartTime) {
 		this.lastStartTime = lastStartTime;
 	}
 
-	public long getTimeRemaining() {
+	public int getTimeRemaining() {
 		return stepTime - getTotalCompletedTime();
 	}
 
-	public void setTimeRemaining(long time) {
+	public void setTimeRemaining(int time) {
 		stepTime = getTotalCompletedTime() + time;
 	}
 
-	public long getExtraCompletedTime() {
+	public int getExtraCompletedTime() {
 		return extraCompletedTime;
 	}
 
-	public void setExtraCompletedTime(long extraCompletedTime) {
+	public void setExtraCompletedTime(int extraCompletedTime) {
 		this.extraCompletedTime = extraCompletedTime;
 	}
 
-	public long getTotalCompletedTime() {
-		long total = extraCompletedTime;
+	public int getTotalCompletedTime() {
+		int total = extraCompletedTime;
 		if (lastStartTime > 0) {
-			total += (System.currentTimeMillis() - lastStartTime);
+			total += (getMillis() - lastStartTime);
 		}
 		return total;
 	}
 
 	public void stopTimer() {
 		if (lastStartTime > 0) {
-			extraCompletedTime += (System.currentTimeMillis() - lastStartTime);
+			extraCompletedTime += (getMillis() - lastStartTime);
 		}
 		lastStartTime = 0;
 	}
 
 	public void startTimer() {
-		long now = System.currentTimeMillis();
+		int now = (int) getMillis();
 		if (lastStartTime > 0) {
-			extraCompletedTime += (now - lastStartTime);
+			throw new RuntimeException("Tried to to start stared");
 		}
 		lastStartTime = now;
 
+	}
+
+	private long getMillis() {
+		return System.currentTimeMillis() - START_TIME;
 	}
 
 	public boolean isComplete() {
@@ -138,12 +136,8 @@ public class HeaterStep {
 		return null;
 	}
 
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
+	public boolean isStarted() {
+		return lastStartTime > 0;
 	}
 
 	public ControlPoint getControlPointForAddress(String address) {
@@ -155,6 +149,48 @@ public class HeaterStep {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	public boolean equals(HeaterStep obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		HeaterStep other = (HeaterStep) obj;
+		if (controlPoints == null) {
+			if (other.controlPoints != null)
+				return false;
+		} else if (!controlPoints.equals(other.controlPoints))
+			return false;
+		if (extraCompletedTime != other.extraCompletedTime)
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (lastStartTime != other.lastStartTime)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+
+		if (stepTime != other.stepTime) {
+			return false;
+		}
+		return true;
 	}
 
 }

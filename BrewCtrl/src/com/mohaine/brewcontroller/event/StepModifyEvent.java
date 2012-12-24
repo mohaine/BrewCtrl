@@ -25,20 +25,27 @@ public class StepModifyEvent extends Event<StepModifyEventHandler> {
 	private static Type<StepModifyEventHandler> TYPE;
 
 	public static Type<StepModifyEventHandler> getType() {
-		return TYPE != null ? TYPE
-				: (TYPE = new Type<StepModifyEventHandler>());
+		return TYPE != null ? TYPE : (TYPE = new Type<StepModifyEventHandler>());
 	}
 
 	private final HeaterStep step;
+	private final boolean fromServer;
+
+	public StepModifyEvent(HeaterStep step, boolean fromServer) {
+		super();
+		this.step = step;
+		this.fromServer = fromServer;
+	}
 
 	public StepModifyEvent(HeaterStep step) {
 		super();
 		this.step = step;
+		this.fromServer = false;
 	}
 
 	@Override
 	public void dispatch(StepModifyEventHandler event) {
-		event.onStepChange(step);
+		event.onStepChange(step, fromServer);
 	}
 
 	@Override

@@ -52,6 +52,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 	public boolean connected = false;
 
 	private boolean updating;
+	private boolean forceUpdate;
 
 	private List<HeaterStep> pendingSteps;
 	private List<HeaterStep> pendingStepEdits = new ArrayList<HeaterStep>();;
@@ -59,6 +60,8 @@ public class ControllerHardwareJson implements ControllerHardware {
 	private Thread statusThread;
 
 	private Mode pendingMode;
+
+	private long lastUpdateTime;
 
 	@Inject
 	public ControllerHardwareJson(EventBus eventBusp, ConfigurationLoader configurationLoader) throws Exception {
@@ -77,18 +80,25 @@ public class ControllerHardwareJson implements ControllerHardware {
 		// Listen for step mods, update remote if there is a change
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 			@Override
-			public void onStepChange(HeaterStep step) {
-				modifyStep(step);
-			}
+			public void onStepChange(HeaterStep step, boolean fromServer) {
 
+				if (!fromServer) {
+					System.out.println("modify Step: " + step.getName());
+					modifyStep(step);
+				}
+			}
 		});
 	}
 
 	private void updateStatus() throws Exception {
 		if (connected) {
-			if (!updating) {
+			long now = System.currentTimeMillis();
+			if (!updating && (forceUpdate || now - lastUpdateTime > 500)) {
+				forceUpdate = false;
 				updating = true;
+				lastUpdateTime = now;
 				try {
+
 					URLRequest commandRequest = getCommandRequest("status");
 
 					Mode pendingMode = this.pendingMode;
@@ -100,42 +110,106 @@ public class ControllerHardwareJson implements ControllerHardware {
 					// New List?
 					List<HeaterStep> pendingSteps = this.pendingSteps;
 					if (pendingSteps != null) {
+						this.pendingSteps = null;
 						commandRequest.addParameter("steps", converter.encode(pendingSteps));
 					}
 
 					// Step Edits?
+					List<HeaterStep> modifySteps = null;
 					synchronized (pendingStepEdits) {
 						if (pendingStepEdits.size() > 0) {
-							List<HeaterStep> modifySteps = new ArrayList<HeaterStep>(pendingStepEdits);
+							modifySteps = new ArrayList<HeaterStep>(pendingStepEdits);
 							pendingStepEdits.clear();
-							if (pendingSteps != null) {
-								commandRequest.addParameter("modifySteps", converter.encode(modifySteps));
-							}
+							String encode = converter.encode(modifySteps);
+							commandRequest.addParameter("modifySteps", encode);
 						}
 					}
 
+					boolean success = false;
 					try {
-						controllerStatus = converter.decode(commandRequest.getString(), ControllerStatus.class);
+
+						String response = commandRequest.getString();
+
+						ControllerStatus lastStatus = controllerStatus;
+
+						controllerStatus = converter.decode(response, ControllerStatus.class);
+
+						eventBus.fireEvent(new StatusChangeEvent());
+						if (controllerStatus != null) {
+							List<HeaterStep> newSteps = controllerStatus.getSteps();
+
+							boolean stepsStructureChanged = true;
+							if (lastStatus != null) {
+
+								List<HeaterStep> oldSteps = lastStatus.getSteps();
+
+								if (oldSteps.size() == newSteps.size()) {
+									stepsStructureChanged = false;
+									for (int i = 0; i < oldSteps.size(); i++) {
+										HeaterStep oldStep = oldSteps.get(i);
+										HeaterStep newStep = newSteps.get(i);
+										if (!oldStep.getId().equals(newStep.getId())) {
+											stepsStructureChanged = true;
+											break;
+										}
+									}
+								}
+
+							}
+
+							List<HeaterStep> oldSteps = lastStatus.getSteps();
+
+							if (stepsStructureChanged) {
+								eventBus.fireEvent(new StepsModifyEvent());
+								boolean foundSelected = false;
+								if (selectedStep != null) {
+									for (int i = 0; i < newSteps.size(); i++) {
+										HeaterStep step = newSteps.get(i);
+										if (step.getId().equals(selectedStep.getId())) {
+											foundSelected = true;
+											break;
+										}
+									}
+								}
+
+								if (!foundSelected && newSteps.size() > 0) {
+									selectedStep = newSteps.get(0);
+									eventBus.fireEvent(new ChangeSelectedStepEvent(selectedStep));
+								}
+
+							} else {
+								for (int i = 0; i < oldSteps.size(); i++) {
+									HeaterStep oldStep = oldSteps.get(i);
+									HeaterStep newStep = newSteps.get(i);
+									if (newStep.isStarted() || oldStep.isStarted() || !oldStep.equals(newStep)) {
+										eventBus.fireEvent(new StepModifyEvent(newStep, true));
+									}
+								}
+							}
+
+							success = true;
+						}
 					} finally {
 
 						// If we failed put back pendings
-						if (controllerStatus == null) {
+
+						if (!success) {
+
+							disconnect();
+
 							if (this.pendingSteps != null) {
 								this.pendingSteps = pendingSteps;
 							}
 							if (this.pendingMode != null) {
 								this.pendingMode = pendingMode;
 							}
+
+							synchronized (pendingStepEdits) {
+								if (modifySteps != null) {
+									this.pendingSteps.addAll(0, modifySteps);
+								}
+							}
 						}
-					}
-					if (controllerStatus == null) {
-						disconnect();
-					} else {
-						eventBus.fireEvent(new StatusChangeEvent());
-
-						// Only do if there is a change
-						eventBus.fireEvent(new StepsModifyEvent());
-
 					}
 
 				} finally {
@@ -147,14 +221,12 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 	private void connect() throws Exception {
 		disconnect();
-		System.out.println(String.format("Connect to %s", getBaseCmdUrl()));
+		// System.out.println(String.format("Connect to %s", getBaseCmdUrl()));
 		version = converter.decode(getCommandRequest("version").getString(), VersionBean.class);
 		if (version != null) {
 			System.out.println(String.format("Connected to %s version %s", getBaseCmdUrl(), version.getVersion()));
-
-			status = "Connected";
 			connected = true;
-			eventBus.fireEvent(new StatusChangeEvent());
+			setStatus("Connected");
 
 			brewLayout = converter.decode(getCommandRequest("layout").getString(), BreweryLayout.class);
 			if (brewLayout == null) {
@@ -203,6 +275,11 @@ public class ControllerHardwareJson implements ControllerHardware {
 	@Override
 	public void changeMode(Mode mode) {
 		this.pendingMode = mode;
+		updateStatusNow();
+	}
+
+	private void updateStatusNow() {
+		forceUpdate = true;
 		statusThread.interrupt();
 	}
 
@@ -235,7 +312,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 	@Override
 	public void changeSteps(List<HeaterStep> steps) {
 		this.pendingSteps = steps;
-		statusThread.interrupt();
+		updateStatusNow();
 	}
 
 	@Override
@@ -332,10 +409,8 @@ public class ControllerHardwareJson implements ControllerHardware {
 						// ignore
 					}
 				} catch (Exception e) {
-					status = e.getMessage();
-					e.printStackTrace();
+					setStatus(e.getMessage());
 					disconnect();
-
 				}
 
 			}
@@ -348,6 +423,11 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 	}
 
+	public void setStatus(String message) {
+		status = message;
+		eventBus.fireEvent(new StatusChangeEvent());
+	}
+
 	private void modifyStep(HeaterStep step) {
 		synchronized (pendingStepEdits) {
 			for (int i = 0; i < pendingStepEdits.size(); i++) {
@@ -356,6 +436,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 					return;
 				}
 			}
+
 			pendingStepEdits.add(step);
 		}
 	}

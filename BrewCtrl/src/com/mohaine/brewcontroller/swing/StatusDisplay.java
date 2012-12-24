@@ -286,12 +286,21 @@ public class StatusDisplay extends JPanel {
 		if (hardwareStatus != null) {
 			switch (hardwareStatus.getMode()) {
 			case OFF:
+				modeOffButton.setSelected(true);
+				modeOnButton.setSelected(false);
+				modeHoldButton.setSelected(false);
 				mode.setText("Off");
 				break;
 			case ON:
+				modeOffButton.setSelected(false);
+				modeOnButton.setSelected(true);
+				modeHoldButton.setSelected(false);
 				mode.setText("On");
 				break;
 			case HOLD:
+				modeOffButton.setSelected(false);
+				modeOnButton.setSelected(false);
+				modeHoldButton.setSelected(true);
 				mode.setText("Hold");
 				break;
 			default:

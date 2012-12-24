@@ -29,41 +29,9 @@ public class ControllerStatus implements Cloneable {
 	}
 
 	private Mode mode = Mode.UNKNOWN;
-	private long controlId;
-	private long millis;
-	private int maxAmps;
-	private boolean turnOffOnCommLoss;
 
 	@ListType(HeaterStep.class)
 	private List<HeaterStep> steps;
-
-	public long getControlId() {
-		return controlId;
-	}
-
-	public void setControlId(long controlId) {
-		this.controlId = controlId;
-	}
-
-	public int getMaxAmps() {
-		return maxAmps;
-	}
-
-	public void setMaxAmps(int maxAmps) {
-		this.maxAmps = maxAmps;
-	}
-
-	public void setMaxAmps(byte maxAmps) {
-		this.maxAmps = (int) maxAmps & 0xff;
-	}
-
-	public boolean isTurnOffOnCommLoss() {
-		return turnOffOnCommLoss;
-	}
-
-	public void setTurnOffOnCommLoss(boolean turnOffOnCommLoss) {
-		this.turnOffOnCommLoss = turnOffOnCommLoss;
-	}
 
 	public Mode getMode() {
 		return mode;
@@ -81,16 +49,36 @@ public class ControllerStatus implements Cloneable {
 		this.steps = steps;
 	}
 
-	public long getMillis() {
-		return millis;
-	}
-
-	public void setMillis(long millis) {
-		this.millis = millis;
-	}
-
 	public ControllerStatus getClone() throws CloneNotSupportedException {
 		return (ControllerStatus) clone();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
+		result = prime * result + ((steps == null) ? 0 : steps.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ControllerStatus other = (ControllerStatus) obj;
+		if (mode != other.mode)
+			return false;
+		if (steps == null) {
+			if (other.steps != null)
+				return false;
+		} else if (!steps.equals(other.steps))
+			return false;
+		return true;
 	}
 
 }

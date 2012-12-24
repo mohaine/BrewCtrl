@@ -22,5 +22,5 @@ import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.event.bus.EventHandler;
 
 public interface StepModifyEventHandler extends EventHandler {
-	public void onStepChange(HeaterStep step);
+	public void onStepChange(HeaterStep step, boolean fromServer);
 }

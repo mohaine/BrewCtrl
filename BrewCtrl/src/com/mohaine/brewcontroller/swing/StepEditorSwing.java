@@ -65,7 +65,7 @@ public class StepEditorSwing extends JPanel {
 		}
 
 	});
-	private ClickEditor<Long> timeValue = new ClickEditor<Long>(new Converter<Long, String>() {
+	private ClickEditor<Integer> timeValue = new ClickEditor<Integer>(new Converter<Integer, String>() {
 		TimeParser tp = new TimeParser();
 
 		{
@@ -73,12 +73,12 @@ public class StepEditorSwing extends JPanel {
 		}
 
 		@Override
-		public String convertFrom(Long value) {
+		public String convertFrom(Integer value) {
 			return tp.format(value);
 		}
 
 		@Override
-		public Long convertTo(String value) {
+		public Integer convertTo(String value) {
 			return tp.parse(value);
 		}
 	});
@@ -131,7 +131,7 @@ public class StepEditorSwing extends JPanel {
 			@Override
 			public void onChange(ChangeEvent event) {
 				if (heaterStep != null) {
-					long stepTime = timeValue.getValue();
+					int stepTime = timeValue.getValue();
 					if (stepTime != heaterStep.getTimeRemaining()) {
 						heaterStep.setTimeRemaining(stepTime);
 						fireChange();
@@ -175,9 +175,10 @@ public class StepEditorSwing extends JPanel {
 		super.addNotify();
 		removeHandlers();
 		handlers.add(eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
+
 			@Override
-			public void onStepChange(HeaterStep step) {
-				if (step == heaterStep) {
+			public void onStepChange(HeaterStep step, boolean fromServer) {
+	if (step.getId().equals(heaterStep.getId())) {
 					setStep(step);
 				}
 			}
@@ -216,7 +217,9 @@ public class StepEditorSwing extends JPanel {
 		this.heaterStep = heaterStep;
 		nameValue.setValue(heaterStep.getName());
 		timeValue.setValue(heaterStep.getTimeRemaining(), false);
-		updateSelected(heaterStep == controller.getSelectedStep());
+		HeaterStep selectedStep = controller.getSelectedStep();
+
+		updateSelected(selectedStep != null && selectedStep.getId().equals(heaterStep.getId()));
 	}
 
 	private void updateName() {

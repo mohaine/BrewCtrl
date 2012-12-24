@@ -28,22 +28,41 @@ public class StatusService implements HtmlService {
 		JsonObjectConverter converter = BrewJsonConverter.getJsonConverter();
 		response.setContentType("text/json");
 
-		String modeParam = request.getParameter("mode");
-		if (StringUtils.hasLength(modeParam)) {
-			mock.setMode(modeParam);
-		}
-		String stepsParam = request.getParameter("steps");
-		if (StringUtils.hasLength(stepsParam)) {
-			List<HeaterStep> steps = converter.decodeList(stepsParam, HeaterStep.class);
-			if (steps != null) {
-				mock.setSteps(steps);
-			} else {
-				response.setStatusCode(HttpCodes.BAD_REQUEST);
-				return;
+		{
+			String modeParam = request.getParameter("mode");
+			if (StringUtils.hasLength(modeParam)) {
+				mock.setMode(modeParam);
 			}
 		}
+		{
+			String stepsParam = request.getParameter("steps");
+			if (StringUtils.hasLength(stepsParam)) {
+				List<HeaterStep> steps = converter.decodeList(stepsParam, HeaterStep.class);
+				if (steps != null) {
+					mock.setSteps(steps);
+				} else {
+					response.setStatusCode(HttpCodes.BAD_REQUEST);
+					return;
+				}
+			}
+		}
+		{
+			String modifyStepsParam = request.getParameter("modifySteps");
+			if (StringUtils.hasLength(modifyStepsParam)) {
 
+				List<HeaterStep> steps = converter.decodeList(modifyStepsParam, HeaterStep.class);
+				if (steps != null) {
+					for (HeaterStep heaterStep : steps) {
+						mock.updateStep(heaterStep);
+					}
+				} else {
+					response.setStatusCode(HttpCodes.BAD_REQUEST);
+					return;
+				}
+			}
+		}
 		ControllerStatus status = mock.getStatus();
+
 		byte[] bytes = converter.encode(status).getBytes();
 		response.sendContent(bytes);
 	}

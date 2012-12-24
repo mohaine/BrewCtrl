@@ -8,7 +8,7 @@ public class TimeParser {
 		super();
 	}
 
-	public long parse(String strValue) {
+	public int parse(String strValue) {
 
 		if (zeroDescription != null && zeroDescription.equalsIgnoreCase(strValue)) {
 			return 0;
@@ -16,16 +16,16 @@ public class TimeParser {
 
 		String[] split = strValue.split(":");
 
-		long seconds = 0;
+		int seconds = 0;
 		if (split.length == 1) {
-			seconds = Long.parseLong(split[0]);
+			seconds = Integer.parseInt(split[0]);
 		} else if (split.length == 2) {
-			seconds = Long.parseLong(split[0]) * 60;
-			seconds += Long.parseLong(split[1]);
+			seconds = Integer.parseInt(split[0]) * 60;
+			seconds += Integer.parseInt(split[1]);
 		} else if (split.length == 3) {
-			seconds = Long.parseLong(split[0]) * 60 * 60;
-			seconds += Long.parseLong(split[1]) * 60;
-			seconds += Long.parseLong(split[2]);
+			seconds = Integer.parseInt(split[0]) * 60 * 60;
+			seconds += Integer.parseInt(split[1]) * 60;
+			seconds += Integer.parseInt(split[2]);
 		}
 
 		return (seconds) * 1000;
