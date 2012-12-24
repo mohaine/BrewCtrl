@@ -178,7 +178,7 @@ public class StepEditorSwing extends JPanel {
 
 			@Override
 			public void onStepChange(HeaterStep step, boolean fromServer) {
-	if (step.getId().equals(heaterStep.getId())) {
+				if (step.getId().equals(heaterStep.getId())) {
 					setStep(step);
 				}
 			}
@@ -246,7 +246,15 @@ public class StepEditorSwing extends JPanel {
 	private void deleteStep() {
 		if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this, "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete", JOptionPane.OK_CANCEL_OPTION)) {
 			List<HeaterStep> steps = new ArrayList<HeaterStep>(controller.getSteps());
-			steps.remove(heaterStep);
+
+			for (int i = 0; i < steps.size(); i++) {
+				HeaterStep s = steps.get(i);
+				if (s.getId().equals(heaterStep.getId())) {
+					steps.remove(i);
+					break;
+				}
+			}
+
 			controller.changeSteps(steps);
 		}
 	}
