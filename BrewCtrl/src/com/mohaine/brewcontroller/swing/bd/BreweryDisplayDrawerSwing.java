@@ -17,6 +17,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -388,7 +389,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	@Override
 	public void setDisplays(List<BreweryComponentDisplay> displays) {
 		invalidate();
-		this.displays = displays;
+		this.displays = new ArrayList<BreweryComponentDisplay>(displays);
 	}
 
 	@Override

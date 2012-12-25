@@ -106,7 +106,9 @@ public class ControllerHardwareJson implements ControllerHardware {
 					List<HeaterStep> pendingSteps = this.pendingSteps;
 					if (pendingSteps != null) {
 						this.pendingSteps = null;
-						commandRequest.addParameter("steps", converter.encode(pendingSteps));
+						String encode = converter.encode(pendingSteps);
+						System.out.println("Steps: " + encode);
+						commandRequest.addParameter("steps", encode);
 					}
 
 					// Step Edits?
@@ -122,17 +124,11 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 					boolean success = false;
 					try {
-
 						String response = commandRequest.getString();
-
-						System.out.println("response: " + response);
-
 						ControllerStatus lastStatus = controllerStatus;
-
 						controllerStatus = converter.decode(response, ControllerStatus.class);
 
 						updateLayoutState(false);
-
 						eventBus.fireEvent(new StatusChangeEvent());
 						if (controllerStatus != null) {
 							List<HeaterStep> newSteps = controllerStatus.getSteps();
@@ -153,10 +149,11 @@ public class ControllerHardwareJson implements ControllerHardware {
 										}
 									}
 								}
-
 							}
 
 							if (stepsStructureChanged) {
+
+								System.out.println("StepsModifyEvent()");
 								eventBus.fireEvent(new StepsModifyEvent());
 								boolean foundSelected = false;
 								if (selectedStep != null) {
@@ -175,9 +172,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 								}
 
 							} else {
-
 								List<HeaterStep> oldSteps = lastStatus.getSteps();
-
 								for (int i = 0; i < oldSteps.size(); i++) {
 									HeaterStep oldStep = oldSteps.get(i);
 									HeaterStep newStep = newSteps.get(i);

@@ -183,7 +183,7 @@ public class StepDisplayList extends JPanel {
 		JPanel extraPanel = new JPanel();
 		add(extraPanel, gbc);
 
-		updateSteps();
+		
 	}
 
 	protected void launchList(ConfigurationStepList stepList) {
@@ -218,7 +218,6 @@ public class StepDisplayList extends JPanel {
 
 		removeHandlers();
 		handlers.add(eventBus.addHandler(StepsModifyEvent.getType(), new StepsModifyEventHandler() {
-
 			@Override
 			public void onStepsChange() {
 				SwingUtilities.invokeLater(new Runnable() {
@@ -230,6 +229,7 @@ public class StepDisplayList extends JPanel {
 
 			}
 		}));
+		updateSteps();
 
 	}
 
