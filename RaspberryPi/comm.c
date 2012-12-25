@@ -263,8 +263,11 @@ void handleStatusRequest(Request * request, Response * response) {
 	char tmp[BUFFER_SIZE];
 
 	if (request->contentLength > 0) {
+
+		bool valid = true;
+
 		int paramSize = readParam("mode", request->content, request->contentLength, tmp);
-		if (paramSize > 0) {
+		if (valid && paramSize > 0) {
 			if (strcmp(tmp, "OFF") == 0) {
 				getControl()->mode = MODE_OFF;
 				turnOff();
@@ -273,55 +276,79 @@ void handleStatusRequest(Request * request, Response * response) {
 			} else if (strcmp(tmp, "HOLD") == 0) {
 				getControl()->mode = MODE_HOLD;
 			} else {
-				response->statusCode = 400;
-				sprintf(response->status, "Bad Request");
-				sprintf(response->content, "Bad Request");
-				return;
+				valid = false;
 			}
 		}
 		paramSize = readParam("steps", request->content, request->contentLength, tmp);
-		if (paramSize > 0) {
+		if (valid && paramSize > 0) {
+
+			printf("Change steps\n");
+
 			json_object *steps = json_tokener_parse(tmp);
 
-			bool valid = true;
 			if (steps == NULL || json_object_get_type(steps) != json_type_array) {
 				valid = false;
 			} else {
 				int stepCount = json_object_array_length(steps);
 				lockSteps();
-
 				for (int i = 0; valid && i < stepCount; i++) {
 					json_object *step = json_object_array_get_idx(steps, i);
 					ControlStep *cs = getControlStep(i);
 					valid = parseJsonStep(step, cs);
 				}
-
 				if (valid) {
 					setControlStepCount(stepCount);
 				} else {
 					setControlStepCount(0);
 				}
 				unlockSteps();
-
 			}
 
 			if (steps != NULL) {
 				json_object_put(steps);
 			}
+		}
+		paramSize = readParam("modifySteps", request->content, request->contentLength, tmp);
+		if (valid && paramSize > 0) {
+			json_object *steps = json_tokener_parse(tmp);
 
-			if (!valid) {
-				response->statusCode = 400;
-				sprintf(response->status, "Bad Request");
-				sprintf(response->content, "Bad Request");
+			if (steps == NULL || json_object_get_type(steps) != json_type_array) {
+				valid = false;
+			} else {
+				int stepCount = json_object_array_length(steps);
+				lockSteps();
+				for (int i = 0; valid && i < stepCount; i++) {
+					json_object *step = json_object_array_get_idx(steps, i);
 
-				return;
+					json_object * value = json_object_object_get(step, "id");
+
+					if (value != NULL) {
+						for (int j = 0; valid && j < getControlStepCount(); j++) {
+							ControlStep *cs = getControlStep(j);
+							if (strcmp(json_object_get_string(value), cs->id) == 0) {
+								printf("Update step %s\n", cs->name);
+								valid = parseJsonStep(step, cs);
+								break;
+							}
+						}
+					} else {
+						valid = false;
+					}
+				}
+				unlockSteps();
 			}
 
+			if (steps != NULL) {
+				json_object_put(steps);
+			}
 		}
-
+		if (!valid) {
+			response->statusCode = 400;
+			sprintf(response->status, "Bad Request");
+			sprintf(response->content, "Bad Request");
+			return;
+		}
 	}
-
-//TODO Modify Steps
 
 	sprintf(response->contentType, "text/json");
 
