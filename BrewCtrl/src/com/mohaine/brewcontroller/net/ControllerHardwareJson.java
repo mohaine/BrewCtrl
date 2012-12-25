@@ -107,7 +107,6 @@ public class ControllerHardwareJson implements ControllerHardware {
 					if (pendingSteps != null) {
 						this.pendingSteps = null;
 						String encode = converter.encode(pendingSteps);
-						System.out.println("Steps: " + encode);
 						commandRequest.addParameter("steps", encode);
 					}
 
@@ -152,8 +151,6 @@ public class ControllerHardwareJson implements ControllerHardware {
 							}
 
 							if (stepsStructureChanged) {
-
-								System.out.println("StepsModifyEvent()");
 								eventBus.fireEvent(new StepsModifyEvent());
 								boolean foundSelected = false;
 								if (selectedStep != null) {
