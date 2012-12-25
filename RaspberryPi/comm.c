@@ -200,20 +200,20 @@ void handleStatusRequest(Request * request, Response * response) {
 	json_object_object_add(status, "steps", steps);
 
 	for (int i = 0; i < getSensorCount(); i++) {
-		TempSensor *sensor = getSensorByIndex(i);
+		TempSensor *ts = getSensorByIndex(i);
 
-		sprintf(&tmp, "%02x%02x%02x%02x%02x%02x%02x%02x", sensor->address[0],
-				sensor->address[1], sensor->address[2], sensor->address[3],
-				sensor->address[4], sensor->address[5], sensor->address[6],
-				sensor->address[7]);
+		sprintf(&tmp, "%02x%02x%02x%02x%02x%02x%02x%02x", ts->address[0],
+				ts->address[1], ts->address[2], ts->address[3],
+				ts->address[4], ts->address[5], ts->address[6],
+				ts->address[7]);
 
 		sensor = json_object_new_object();
 		json_object_object_add(sensor, "address", json_object_new_string(tmp));
 
 		json_object_object_add(sensor, "tempatureC",
-				json_object_new_double(sensor->lastTemp));
+				json_object_new_double(ts->lastTemp));
 		json_object_object_add(sensor, "reading",
-				json_object_new_boolean(sensor->reading));
+				json_object_new_boolean(ts->reading));
 		json_object_array_add(sensors, sensor);
 	}
 
