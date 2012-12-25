@@ -295,6 +295,14 @@ void handleStatusRequest(Request * request, Response * response) {
 					json_object *step = json_object_array_get_idx(steps, i);
 					ControlStep *cs = getControlStep(i);
 					valid = parseJsonStep(step, cs);
+
+					//Init Steps
+					if (valid) {
+						for (int cpI = 0; valid && cpI < cs->controlPointCount; cpI++) {
+							ControlPoint *cp = &cs->controlPoints[cpI];
+							cp->initComplete = false;
+						}
+					}
 				}
 				if (valid) {
 					setControlStepCount(stepCount);

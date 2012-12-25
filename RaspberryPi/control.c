@@ -38,42 +38,58 @@ void unlockSteps() {
 	pthread_mutex_unlock(&stepMutux);
 }
 
+void setupControlPoint(ControlPoint *cp) {
+	if (!cp->initComplete) {
+
+		if (cp->automaticControl) {
+			cp->duty = 0;
+			setupPid(&cp->pid);
+		}
+
+		if (cp->hasDuty) {
+			setupDutyController(&cp->dutyController, cp->controlPin);
+		}
+		cp->initComplete = true;
+	}
+}
+
 void updateDuty() {
 	readSensors();
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
-//		lockSteps();
-//		if (stepCount > 0) {
-//			ControlStep * step = &controlSteps[0];
-//			int controlPointCount = step->controlPointCount;
-//			for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-//				ControlPoint *cp = &step->controlPoints[cpIndex];
-//				if (cp->automaticControl) {
-//					TempSensor* sensor = getSensor(cp->tempSensorAddress);
-//					if (sensor != NULL) {
-//						if (sensor->reading) {
-//							if (cp->hasDuty) {
-//								cp->duty = getDutyFromAdjuster(&cp->pid,
-//										cp->targetTemp, sensor->lastTemp);
-//							} else {
-//								//TODO MIN TOGGLE TIME!!!!
-//								if (sensor->lastTemp < cp->targetTemp) {
-//									cp->duty = 100;
-//								} else {
-//									cp->duty = 0;
-//								}
-//							}
-//						} else {
-//							//Serial.println("Sensor not reading");
-//							cp->duty = 0;
-//						}
-//					} else {
-//						//Serial.println("Failed to find sensor");
-//					}
-//				}
-//			}
-//		}
-//		unlockSteps();
+		lockSteps();
+
+		if (stepCount > 0) {
+			ControlStep * step = &controlSteps[0];
+			int controlPointCount = step->controlPointCount;
+			for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
+				ControlPoint *cp = &step->controlPoints[cpIndex];
+				setupControlPoint(cp);
+				if (cp->automaticControl) {
+					TempSensor* sensor = getSensor(cp->tempSensorAddress);
+					if (sensor != NULL) {
+						if (sensor->reading) {
+							if (cp->hasDuty) {
+								cp->duty = getDutyFromAdjuster(&cp->pid, cp->targetTemp, sensor->lastTemp);
+							} else {
+								//TODO MIN TOGGLE TIME!!!!
+								if (sensor->lastTemp < cp->targetTemp) {
+									cp->duty = 100;
+								} else {
+									cp->duty = 0;
+								}
+							}
+						} else {
+							//Serial.println("Sensor not reading");
+							cp->duty = 0;
+						}
+					} else {
+						//Serial.println("Failed to find sensor");
+					}
+				}
+			}
+		}
+		unlockSteps();
 	}
 }
 
@@ -81,31 +97,31 @@ void updatePinsForSetDuty() {
 	Control* control = getControl();
 
 	if (control->mode == MODE_ON) {
-//		int currentAmps = 0;
-//		lockSteps();
-//		if (stepCount > 0) {
-//			ControlStep * step = &controlSteps[0];
-//			int controlPointCount = step->controlPointCount;
-//			for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-//				ControlPoint *cp = &step->controlPoints[cpIndex];
-//
-//				int duty = cp->duty;
-//				if (currentAmps + cp->fullOnAmps > control->maxAmps) {
-//					duty = 0;
-//				}
-//
-//				if (cp->hasDuty) {
-//					setHeatDuty(&cp->dutyController, duty);
-//					updateHeatForStateAndDuty(&cp->dutyController);
-//				} else {
-//					updateForPinState(&cp->dutyController, duty > 0);
-//				}
-//				if (cp->dutyController.pinState) {
-//					currentAmps += cp->fullOnAmps;
-//				}
-//			}
-//		}
-//		unlockSteps();
+		int currentAmps = 0;
+		lockSteps();
+		if (stepCount > 0) {
+			ControlStep * step = &controlSteps[0];
+			int controlPointCount = step->controlPointCount;
+			for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
+				ControlPoint *cp = &step->controlPoints[cpIndex];
+				setupControlPoint(cp);
+				int duty = cp->duty;
+				if (currentAmps + cp->fullOnAmps > control->maxAmps) {
+					duty = 0;
+				}
+
+				if (cp->hasDuty) {
+					setHeatDuty(&cp->dutyController, duty);
+					updateHeatForStateAndDuty(&cp->dutyController);
+				} else {
+					updateForPinState(&cp->dutyController, duty > 0);
+				}
+				if (cp->dutyController.pinState) {
+					currentAmps += cp->fullOnAmps;
+				}
+			}
+		}
+		unlockSteps();
 	}
 }
 

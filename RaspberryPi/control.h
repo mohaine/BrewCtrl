@@ -18,6 +18,7 @@ typedef struct {
 } Control;
 
 typedef struct {
+	bool initComplete;
 	int controlPin;
 	int duty;
 	int fullOnAmps;byte tempSensorAddress[8];
@@ -43,7 +44,6 @@ Control* getControl();
 int getControlStepCount();
 void setControlStepCount(int count);
 ControlStep * getControlStep(int index);
-
 
 void updateDuty();
 void updatePinsForSetDuty();
