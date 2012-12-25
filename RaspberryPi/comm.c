@@ -154,7 +154,7 @@ void handleStatusRequest(Request * request, Response * response) {
 
 	if (request->contentLength > 0) {
 		int paramSize = readParam("mode", request->content,
-				request->contentLength, &tmp);
+				request->contentLength, tmp);
 		if (paramSize > 0) {
 			if (strcmp(tmp, "OFF") == 0) {
 				getControl()->mode = MODE_OFF;
@@ -172,17 +172,10 @@ void handleStatusRequest(Request * request, Response * response) {
 		}
 	}
 
-//	if (Mode.OFF.toString().equals(modeParam)) {
-//		status.setMode(Mode.OFF);
-//	} else if (Mode.ON.toString().equals(modeParam)) {
-//		status.setMode(Mode.ON);
-//	} else if (Mode.HOLD.toString().equals(modeParam)) {
-//		status.setMode(Mode.HOLD);
-//	}
-
 	sprintf(response->contentType, "text/json");
 
-	json_object *status, *sensor, *sensors, *steps;
+	json_object *status, *sensor, *sensors, *steps, *step, *controlPoints,
+			*controlPoint;
 
 	status = json_object_new_object();
 
@@ -199,25 +192,78 @@ void handleStatusRequest(Request * request, Response * response) {
 	steps = json_object_new_array();
 	json_object_object_add(status, "steps", steps);
 
+	lockSteps();
+	for (int i = 0; i < getControlStepCount(); i++) {
+		ControlStep *cs = getControlStep(i);
+
+		step = json_object_new_object();
+		json_object_array_add(steps, step);
+
+		controlPoints = json_object_new_array();
+
+		json_object_object_add(step, "name", json_object_new_string(cs->name));
+		json_object_object_add(step, "id", json_object_new_string(cs->id));
+		json_object_object_add(step, "stepTime",
+				json_object_new_int(cs->stepTime));
+		json_object_object_add(step, "extraCompletedTime",
+				json_object_new_int(cs->extraCompletedTime));
+		json_object_object_add(step, "lastStartTime",
+				json_object_new_int(cs->lastStartTime));
+
+		for (int cpI = 0; cpI < cs->controlPointCount; cpI++) {
+
+			ControlPoint * cp = &cs->controlPoints[cpI];
+			controlPoint = json_object_new_object();
+			json_object_array_add(controlPoints, controlPoint);
+
+			json_object_object_add(step, "controlPin",
+					json_object_new_int(cp->controlPin));
+			json_object_object_add(step, "duty", json_object_new_int(cp->duty));
+			json_object_object_add(step, "fullOnAmps",
+					json_object_new_int(cp->fullOnAmps));
+
+			sprintf(tmp, "%02x%02x%02x%02x%02x%02x%02x%02x",
+					cp->tempSensorAddress[0], cp->tempSensorAddress[1],
+					cp->tempSensorAddress[2], cp->tempSensorAddress[3],
+					cp->tempSensorAddress[4], cp->tempSensorAddress[5],
+					cp->tempSensorAddress[6], cp->tempSensorAddress[7]);
+
+			json_object_object_add(sensor, "tempSensorAddress",
+					json_object_new_string(tmp));
+
+			json_object_object_add(step, "targetTemp",
+					json_object_new_double(cp->targetTemp));
+			json_object_object_add(step, "hasDuty",
+					json_object_new_boolean(cp->hasDuty));
+			json_object_object_add(step, "automaticControl",
+					json_object_new_boolean(cp->automaticControl));
+
+		}
+
+	}
+	unlockSteps();
+
 	for (int i = 0; i < getSensorCount(); i++) {
 		TempSensor *ts = getSensorByIndex(i);
 
-		sprintf(&tmp, "%02x%02x%02x%02x%02x%02x%02x%02x", ts->address[0],
-				ts->address[1], ts->address[2], ts->address[3],
-				ts->address[4], ts->address[5], ts->address[6],
-				ts->address[7]);
-
 		sensor = json_object_new_object();
+		json_object_array_add(sensors, sensor);
+
+		sprintf(tmp, "%02x%02x%02x%02x%02x%02x%02x%02x", ts->address[0],
+				ts->address[1], ts->address[2], ts->address[3], ts->address[4],
+				ts->address[5], ts->address[6], ts->address[7]);
+
 		json_object_object_add(sensor, "address", json_object_new_string(tmp));
 
 		json_object_object_add(sensor, "tempatureC",
 				json_object_new_double(ts->lastTemp));
 		json_object_object_add(sensor, "reading",
 				json_object_new_boolean(ts->reading));
-		json_object_array_add(sensors, sensor);
 	}
 
-	sprintf(&response->content, "%s", json_object_get_string(status));
+	sprintf(response->content, "%s", json_object_get_string(status));
+	json_object_put(status);
+
 	response->contentLength = strlen(response->content);
 }
 

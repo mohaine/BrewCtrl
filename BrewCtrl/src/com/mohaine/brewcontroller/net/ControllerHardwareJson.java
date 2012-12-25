@@ -125,6 +125,8 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 						String response = commandRequest.getString();
 
+						System.out.println("response: " + response);
+
 						ControllerStatus lastStatus = controllerStatus;
 
 						controllerStatus = converter.decode(response, ControllerStatus.class);
@@ -154,8 +156,6 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 							}
 
-							List<HeaterStep> oldSteps = lastStatus.getSteps();
-
 							if (stepsStructureChanged) {
 								eventBus.fireEvent(new StepsModifyEvent());
 								boolean foundSelected = false;
@@ -175,6 +175,9 @@ public class ControllerHardwareJson implements ControllerHardware {
 								}
 
 							} else {
+
+								List<HeaterStep> oldSteps = lastStatus.getSteps();
+
 								for (int i = 0; i < oldSteps.size(); i++) {
 									HeaterStep oldStep = oldSteps.get(i);
 									HeaterStep newStep = newSteps.get(i);

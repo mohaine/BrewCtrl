@@ -49,70 +49,6 @@ typedef struct {
 
 Pid pid;
 
-void updateDuty() {
-	readSensors();
-	Control* control = getControl();
-	if (control->mode == MODE_ON) {
-		int controlPointCount = getControlPointCount();
-		for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-			ControlPoint *cp = getControlPointByIndex(cpIndex);
-			if (cp->automaticControl) {
-				TempSensor* sensor = getSensor(cp->tempSensorAddress);
-				if (sensor != NULL) {
-					if (sensor->reading) {
-						if (cp->hasDuty) {
-							cp->duty = getDutyFromAdjuster(&cp->pid,
-									cp->targetTemp, sensor->lastTemp);
-						} else {
-							//TODO MIN TOGGLE TIME!!!!
-							if (sensor->lastTemp < cp->targetTemp) {
-								cp->duty = 100;
-							} else {
-								cp->duty = 0;
-							}
-						}
-					} else {
-						//Serial.println("Sensor not reading");
-						cp->duty = 0;
-					}
-				} else {
-					//Serial.println("Failed to find sensor");
-				}
-			}
-		}
-	}
-}
-
-void updatePinsForSetDuty() {
-	Control* control = getControl();
-
-	if (control->mode == MODE_ON) {
-		int currentAmps = 0;
-
-		int controlPointCount = getControlPointCount();
-		for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
-			ControlPoint *cp = getControlPointByIndex(cpIndex);
-
-			int duty = cp->duty;
-			if (currentAmps + cp->fullOnAmps > control->maxAmps) {
-				duty = 0;
-			}
-
-			if (cp->hasDuty) {
-				setHeatDuty(&cp->dutyController, duty);
-				updateHeatForStateAndDuty(&cp->dutyController);
-			} else {
-				updateForPinState(&cp->dutyController, duty > 0);
-			}
-			if (cp->dutyController.pinState) {
-				currentAmps += cp->fullOnAmps;
-			}
-
-		}
-	}
-
-}
-
 void* loopFunctionPThread(void *ptr) {
 	LoopFunction *lf = ptr;
 
@@ -153,7 +89,6 @@ void loop(void) {
 	turnOff();
 	searchForTempSensors();
 
-	startLoopFunction(1000, checkForControlTimeout);
 	startLoopFunction(1000, updateDuty);
 	startLoopFunction(100, updatePinsForSetDuty);
 	startLoopFunction(10000, searchForTempSensors);
