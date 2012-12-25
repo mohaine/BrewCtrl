@@ -12,6 +12,10 @@ Control control;
 int stepCount = 0;
 ControlStep controlSteps[MAX_STEP_COUNT];
 
+void setControlStepCount(int count) {
+	stepCount = count;
+}
+
 int getControlStepCount() {
 	return stepCount;
 }
