@@ -7,7 +7,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <strings.h>
-long stepMillisOffset = 0;
+
+long lastOnTime = 0;
 
 pthread_mutex_t stepMutux = PTHREAD_MUTEX_INITIALIZER;
 
@@ -42,14 +43,6 @@ void unlockSteps() {
 	pthread_mutex_unlock(&stepMutux);
 }
 
-// get millis since startup. Has a nicer size
-int getStepMillis() {
-	if (stepMillisOffset <= 0) {
-		stepMillisOffset = millis() - 300000;
-	}
-	return (int) (millis() - stepMillisOffset);
-}
-
 void setupControlPoint(ControlPoint *cp) {
 	if (!cp->initComplete) {
 
@@ -65,35 +58,6 @@ void setupControlPoint(ControlPoint *cp) {
 	}
 }
 
-int getTotalCompletedControlStepTime(ControlStep * step) {
-	int total = step->extraCompletedTime;
-	if (step->lastStartTime > 0) {
-		total += (getStepMillis() - step->lastStartTime);
-	}
-	return total;
-}
-
-void stopControlStepTimer(ControlStep * step) {
-	if (step->lastStartTime > 0) {
-		step->extraCompletedTime += (getStepMillis() - step->lastStartTime);
-	}
-	step->lastStartTime = 0;
-}
-void startControlStepTimer(ControlStep * step) {
-	int now = getStepMillis();
-	if (step->lastStartTime > 0) {
-		stopControlStepTimer(step);
-	}
-	step->lastStartTime = now;
-}
-
-bool isControlStepComplete(ControlStep * step) {
-	bool complete = step->stepTime > 0 && getTotalCompletedControlStepTime(step) >= step->stepTime;
-	return complete;
-}
-bool isControlStepStarted(ControlStep * step) {
-	return step->lastStartTime > 0;
-}
 void updateStepTimer() {
 	Control* control = getControl();
 	lockSteps();
@@ -103,28 +67,50 @@ void updateStepTimer() {
 
 		if (control->mode == MODE_ON) {
 
-			if (!isControlStepStarted(step)) {
+			if (!step->active) {
+				lastOnTime = 0;
+				step->active = true;
+			}
+			int stepTime = step->stepTime;
+			if (stepTime > 0) {
+				long now = millis();
+				long onTime = 0;
+				if (lastOnTime > 0) {
+					onTime = now - lastOnTime;
+					while (onTime > 1000) {
+						int newStepTime = stepTime - 1;
+						onTime -= 1000;
+						if (newStepTime <= 0) {
+							stepCount--;
 
-				printf("Start %s, LST %d ECT %d Time %d\n", step->name, step->lastStartTime, step->extraCompletedTime, step->stepTime);
-
-				startControlStepTimer(step);
-			} else {
-
-				printf("RUN %s, LST %d ECT %d Time %d\n", step->name, step->lastStartTime, step->extraCompletedTime, step->stepTime);
-
-				if (isControlStepComplete(step)) {
-					printf("Complete %s\n", step->name);
-					stepCount--;
-					for (int i = 0; i < stepCount; i++) {
-						printf("  Copy %s over %s\n", controlSteps[i + 1].name, controlSteps[i].name);
-						memcpy(&controlSteps[i], &controlSteps[i + 1], sizeof(ControlStep));
+							if (stepCount == 0) {
+								turnOff();
+							} else {
+								for (int i = 0; i < stepCount; i++) {
+									memcpy(&controlSteps[i], &controlSteps[i + 1], sizeof(ControlStep));
+									controlSteps[i].active = false;
+								}
+							}
+							break;
+						} else {
+							step->stepTime = newStepTime;
+						}
 					}
+
 				}
+				// Put extra back into lastOnTime;
+				lastOnTime = now - onTime;
 			}
 
-		} else if (control->mode == MODE_OFF || control->mode == MODE_HOLD) {
-			stopControlStepTimer(step);
+		} else if (control->mode == MODE_HOLD) {
+			lastOnTime = 0;
+			step->active = true;
+
+		} else if (control->mode == MODE_OFF) {
+			lastOnTime = 0;
+			step->active = false;
 		}
+
 	}
 	unlockSteps();
 }

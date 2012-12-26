@@ -70,7 +70,7 @@
          "steps":[
             {
                "name":"Mash In",
-               "time":"0",
+               "time":"10",
                "controlPoints":[
                   {
                      "targetTemp":79.4444444,
@@ -86,7 +86,7 @@
             },
             {
                "name":"Mash",
-               "time":"60:00",
+               "time":"10",
                "controlPoints":[
                   {
                      "targetTemp":72.7777778,
@@ -102,7 +102,7 @@
             },
             {
                "name":"Mash Out",
-               "time":"0",
+               "time":"10",
                "controlPoints":[
                   {
                      "targetTemp":82.2222222,

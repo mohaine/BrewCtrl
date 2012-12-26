@@ -29,7 +29,7 @@
 
 void pinMode(int pin, bool inout) {
 #ifdef MOCK
-	printf("Pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
+	printf("          Pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
 #else
 	char tmp[10];
 	char path[PATH_MAX];
@@ -67,9 +67,9 @@ void digitalWrite(int pin, bool hilow) {
 	if(lastChange > 0) {
 		int timeAtState = now - lastChange;
 		if(hilow) {
-			printf("%lu,%d,0\n", now,timeAtState);
+			printf("          %lu,%d,0\n", now,timeAtState);
 		} else {
-			printf("%lu,0,%d\n", now,timeAtState);
+			printf("          %lu,0,%d\n", now,timeAtState);
 		}
 	}
 

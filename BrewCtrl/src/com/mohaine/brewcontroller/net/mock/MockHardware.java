@@ -138,14 +138,15 @@ public class MockHardware {
 										heaterStep.setActive(true);
 									}
 									int stepTime = heaterStep.getStepTime();
-
 									if (stepTime > 0) {
 										long now = System.currentTimeMillis();
 										long onTime = 0;
 										if (lastOnTime > 0) {
 											onTime = now - lastOnTime;
-											while (onTime > 1) {
+
+											while (onTime > 1000) {
 												int newStepTime = stepTime - 1;
+												onTime -= 1000;
 												if (newStepTime <= 0) {
 													synchronized (steps) {
 														status.getSteps().remove(heaterStep);
@@ -153,7 +154,6 @@ public class MockHardware {
 													break;
 												} else {
 													heaterStep.setStepTime(newStepTime);
-													onTime--;
 												}
 											}
 
@@ -181,7 +181,7 @@ public class MockHardware {
 					}
 				}
 				try {
-					Thread.sleep(500);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					// ignore
 				}

@@ -134,9 +134,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 							boolean stepsStructureChanged = true;
 							if (lastStatus != null) {
-
 								List<ControlStep> oldSteps = lastStatus.getSteps();
-
 								if (oldSteps.size() == newSteps.size()) {
 									stepsStructureChanged = false;
 									for (int i = 0; i < oldSteps.size(); i++) {

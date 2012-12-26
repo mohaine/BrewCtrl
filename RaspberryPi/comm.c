@@ -170,18 +170,11 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 		valid = false;
 	}
 
-	value = json_object_object_get(step, "extraCompletedTime");
-	if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
-		cs->extraCompletedTime = json_object_get_int(value);
+	value = json_object_object_get(step, "active");
+	if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
+		cs->active = json_object_get_boolean(value);
 	} else {
-		valid = false;
-	}
-
-	value = json_object_object_get(step, "lastStartTime");
-	if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
-		cs->lastStartTime = json_object_get_int(value);
-	} else {
-		valid = false;
+		cs->active = false;
 	}
 
 	if (valid) {
@@ -189,6 +182,10 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 
 		if (controlPoints != NULL && json_object_get_type(controlPoints) == json_type_array) {
 			int controlPointCount = json_object_array_length(controlPoints);
+
+			if (controlPointCount > MAX_CP_COUNT) {
+				controlPointCount = MAX_CP_COUNT;
+			}
 			cs->controlPointCount = controlPointCount;
 			for (int cpI = 0; valid && cpI < controlPointCount; cpI++) {
 
@@ -291,10 +288,15 @@ void handleStatusRequest(Request * request, Response * response) {
 				valid = false;
 			} else {
 				int stepCount = json_object_array_length(steps);
+				if (stepCount > MAX_STEP_COUNT) {
+					stepCount = MAX_STEP_COUNT;
+				}
+
 				lockSteps();
 				for (int i = 0; valid && i < stepCount; i++) {
 					json_object *step = json_object_array_get_idx(steps, i);
 					ControlStep *cs = getControlStep(i);
+					cs->active = false;
 					valid = parseJsonStep(step, cs);
 
 					//Init Steps
@@ -390,8 +392,7 @@ void handleStatusRequest(Request * request, Response * response) {
 		json_object_object_add(step, "name", json_object_new_string(cs->name));
 		json_object_object_add(step, "id", json_object_new_string(cs->id));
 		json_object_object_add(step, "stepTime", json_object_new_int(cs->stepTime));
-		json_object_object_add(step, "extraCompletedTime", json_object_new_int(cs->extraCompletedTime));
-		json_object_object_add(step, "lastStartTime", json_object_new_int(cs->lastStartTime));
+		json_object_object_add(step, "active", json_object_new_boolean(cs->active));
 
 		json_object_object_add(step, "controlPoints", controlPoints);
 		for (int cpI = 0; cpI < cs->controlPointCount; cpI++) {

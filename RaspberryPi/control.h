@@ -30,9 +30,7 @@ typedef struct {
 typedef struct {
 	char id[STEP_FIELD_LENGTH];
 	char name[STEP_FIELD_LENGTH];
-	int stepTime;
-	int extraCompletedTime;
-	int lastStartTime;
+	int stepTime;bool active;
 	ControlPoint controlPoints[MAX_CP_COUNT];
 	int controlPointCount;
 } ControlStep;
@@ -51,6 +49,5 @@ void updatePinsForSetDuty();
 void lockSteps();
 void unlockSteps();
 void updateStepTimer();
-
 
 #endif
