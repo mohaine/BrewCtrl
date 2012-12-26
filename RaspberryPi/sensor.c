@@ -83,7 +83,9 @@ void searchForTempSensors() {
 				TempSensor* sensor = &sensors[sensorCount];
 
 				sensor->sysfile = realpath(tmp, NULL);
+
 				if (sensor->sysfile) {
+					bool valid = false;
 					sprintf(tmp, "%s/%s", sensor->sysfile, "id");
 					FILE* f = fopen(tmp, "rb");
 					if (f) {
@@ -92,11 +94,17 @@ void searchForTempSensors() {
 							if (getSensor(sensor->address) == NULL) {
 								sensor->reading = false;
 								sensorCount++;
+								valid = true;
 							}
 						}
 						fclose(f);
 					}
+					if (!valid) {
+						free(sensor->sysfile);
+						sensor->sysfile = NULL;
+					}
 				}
+
 			}
 		}
 
