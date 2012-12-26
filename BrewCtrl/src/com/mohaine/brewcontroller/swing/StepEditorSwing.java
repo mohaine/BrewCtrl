@@ -36,7 +36,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.TimeParser;
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
@@ -83,7 +83,7 @@ public class StepEditorSwing extends JPanel {
 		}
 	});
 
-	private HeaterStep heaterStep;
+	private ControlStep heaterStep;
 
 	private EventBus eventBus;
 
@@ -178,7 +178,7 @@ public class StepEditorSwing extends JPanel {
 		handlers.add(eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 
 			@Override
-			public void onStepChange(HeaterStep step, boolean fromServer) {
+			public void onStepChange(ControlStep step, boolean fromServer) {
 				if (step.getId().equals(heaterStep.getId())) {
 					setStep(step);
 				}
@@ -188,7 +188,7 @@ public class StepEditorSwing extends JPanel {
 		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
 
 			@Override
-			public void onStepChange(HeaterStep step) {
+			public void onStepChange(ControlStep step) {
 				updateSelected(step == heaterStep);
 			}
 
@@ -214,11 +214,11 @@ public class StepEditorSwing extends JPanel {
 		}
 	}
 
-	public void setStep(HeaterStep heaterStep) {
+	public void setStep(ControlStep heaterStep) {
 		this.heaterStep = heaterStep;
 		nameValue.setValue(heaterStep.getName());
 		timeValue.setValue(heaterStep.getStepTime(), false);
-		HeaterStep selectedStep = controller.getSelectedStep();
+		ControlStep selectedStep = controller.getSelectedStep();
 
 		updateSelected(selectedStep != null && selectedStep.getId().equals(heaterStep.getId()));
 	}
@@ -246,10 +246,10 @@ public class StepEditorSwing extends JPanel {
 
 	private void deleteStep() {
 		if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this, "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete", JOptionPane.OK_CANCEL_OPTION)) {
-			List<HeaterStep> steps = new ArrayList<HeaterStep>(controller.getSteps());
+			List<ControlStep> steps = new ArrayList<ControlStep>(controller.getSteps());
 
 			for (int i = 0; i < steps.size(); i++) {
-				HeaterStep s = steps.get(i);
+				ControlStep s = steps.get(i);
 				if (s.getId().equals(heaterStep.getId())) {
 					steps.remove(i);
 					break;

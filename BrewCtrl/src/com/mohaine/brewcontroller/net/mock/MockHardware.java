@@ -7,7 +7,7 @@ import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.ControllerStatus;
 import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
 import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
@@ -52,12 +52,12 @@ public class MockHardware {
 
 	}
 
-	public void setSteps(List<HeaterStep> steps) {
+	public void setSteps(List<ControlStep> steps) {
 		status.setSteps(steps);
 	}
 
-	public HeaterStep createManualStep(String name) {
-		HeaterStep step = new HeaterStep();
+	public ControlStep createManualStep(String name) {
+		ControlStep step = new ControlStep();
 		step.setName(name);
 		List<ControlPoint> controlPoints = step.getControlPoints();
 
@@ -108,7 +108,7 @@ public class MockHardware {
 			Random r = new Random();
 			while (true) {
 
-				HeaterStep heaterStep = null;
+				ControlStep heaterStep = null;
 
 				if (status != null) {
 					List<HardwareSensor> sensors = status.getSensors();
@@ -116,7 +116,7 @@ public class MockHardware {
 						hardwareSensor.setTempatureC(hardwareSensor.getTempatureC() + (r.nextDouble() - 0.5));
 					}
 
-					List<HeaterStep> steps = status.getSteps();
+					List<ControlStep> steps = status.getSteps();
 					if (steps != null) {
 
 						synchronized (steps) {
@@ -133,9 +133,9 @@ public class MockHardware {
 							synchronized (heaterStep) {
 								switch (status.getMode()) {
 								case ON: {
-									if (!heaterStep.isStarted()) {
+									if (!heaterStep.isActive()) {
 										lastOnTime = 0;
-										heaterStep.setStarted(true);
+										heaterStep.setActive(true);
 									}
 									int stepTime = heaterStep.getStepTime();
 
@@ -165,12 +165,12 @@ public class MockHardware {
 								}
 								case HOLD: {
 									lastOnTime = 0;
-									heaterStep.setStarted(true);
+									heaterStep.setActive(true);
 									break;
 								}
 								case OFF: {
 									lastOnTime = 0;
-									heaterStep.setStarted(false);
+									heaterStep.setActive(false);
 									break;
 								}
 								default:
@@ -190,11 +190,11 @@ public class MockHardware {
 		}
 	}
 
-	public void updateStep(HeaterStep modStep) {
-		List<HeaterStep> steps = status.getSteps();
+	public void updateStep(ControlStep modStep) {
+		List<ControlStep> steps = status.getSteps();
 		if (steps != null) {
 			synchronized (steps) {
-				for (HeaterStep step : steps) {
+				for (ControlStep step : steps) {
 					if (step.getId().equals(modStep.getId())) {
 						step.copyFrom(modStep);
 					}

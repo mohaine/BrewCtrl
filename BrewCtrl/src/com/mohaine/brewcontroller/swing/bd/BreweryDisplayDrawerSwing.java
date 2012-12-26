@@ -31,7 +31,7 @@ import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.bd.DrawerMouseListener;
 import com.mohaine.brewcontroller.bd.DrawerMouseListener.DrawerMouseEvent;
 import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
@@ -192,7 +192,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		String text = null;
 		Color color = Colors.FOREGROUND;
 
-		HeaterStep selectedStep = controller.getSelectedStep();
+		ControlStep selectedStep = controller.getSelectedStep();
 
 		if (selectedStep != null) {
 			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getPin());
@@ -202,7 +202,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				if (controlPointForPin.isAutomaticControl()) {
 					color = Colors.INACTIVE;
 				}
-				if (selectedStep.isStarted()) {
+				if (selectedStep.isActive()) {
 					if (controlPointForPin.isAutomaticControl()) {
 						text = Integer.toString(duty) + "%";
 					} else {
@@ -245,7 +245,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 			drawText(g, tempDisplay, textColor, false, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, Colors.TEMP_FONT);
 
 			boolean clearText = true;
-			HeaterStep selectedStep = controller.getSelectedStep();
+			ControlStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
 				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
 				if (cp != null && cp.isAutomaticControl()) {
@@ -314,7 +314,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 		Color backPaint = null;
 
-		HeaterStep selectedStep = controller.getSelectedStep();
+		ControlStep selectedStep = controller.getSelectedStep();
 		if (selectedStep != null) {
 			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(pump.getPin());
 			if (controlPointForPin != null) {
@@ -324,7 +324,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 					backPaint = Colors.INACTIVE;
 				}
 
-				if (selectedStep.isStarted()) {
+				if (selectedStep.isActive()) {
 
 					if (controlPointForPin.isAutomaticControl()) {
 

@@ -16,7 +16,7 @@ import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.ControllerStatus;
 import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.bean.VersionBean;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryLayoutChangeEvent;
@@ -43,7 +43,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 	private ControllerStatus controllerStatus;
 	private String status;
-	private HeaterStep selectedStep;
+	private ControlStep selectedStep;
 	private BreweryLayout brewLayout;
 	private Configuration configuration;
 	private EventBus eventBus;
@@ -54,8 +54,8 @@ public class ControllerHardwareJson implements ControllerHardware {
 	private boolean updating;
 	private boolean forceUpdate;
 
-	private List<HeaterStep> pendingSteps;
-	private List<HeaterStep> pendingStepEdits = new ArrayList<HeaterStep>();;
+	private List<ControlStep> pendingSteps;
+	private List<ControlStep> pendingStepEdits = new ArrayList<ControlStep>();;
 
 	private Thread statusThread;
 
@@ -77,7 +77,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 		// Listen for step mods, update remote if there is a change
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 			@Override
-			public void onStepChange(HeaterStep step, boolean fromServer) {
+			public void onStepChange(ControlStep step, boolean fromServer) {
 				if (!fromServer) {
 					modifyStep(step);
 				}
@@ -103,7 +103,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 						commandRequest.addParameter("mode", string);
 					}
 					// New List?
-					List<HeaterStep> pendingSteps = this.pendingSteps;
+					List<ControlStep> pendingSteps = this.pendingSteps;
 					if (pendingSteps != null) {
 						this.pendingSteps = null;
 						String encode = converter.encode(pendingSteps);
@@ -111,10 +111,10 @@ public class ControllerHardwareJson implements ControllerHardware {
 					}
 
 					// Step Edits?
-					List<HeaterStep> modifySteps = null;
+					List<ControlStep> modifySteps = null;
 					synchronized (pendingStepEdits) {
 						if (pendingStepEdits.size() > 0) {
-							modifySteps = new ArrayList<HeaterStep>(pendingStepEdits);
+							modifySteps = new ArrayList<ControlStep>(pendingStepEdits);
 							pendingStepEdits.clear();
 							String encode = converter.encode(modifySteps);
 							commandRequest.addParameter("modifySteps", encode);
@@ -130,18 +130,18 @@ public class ControllerHardwareJson implements ControllerHardware {
 						updateLayoutState(false);
 						eventBus.fireEvent(new StatusChangeEvent());
 						if (controllerStatus != null) {
-							List<HeaterStep> newSteps = controllerStatus.getSteps();
+							List<ControlStep> newSteps = controllerStatus.getSteps();
 
 							boolean stepsStructureChanged = true;
 							if (lastStatus != null) {
 
-								List<HeaterStep> oldSteps = lastStatus.getSteps();
+								List<ControlStep> oldSteps = lastStatus.getSteps();
 
 								if (oldSteps.size() == newSteps.size()) {
 									stepsStructureChanged = false;
 									for (int i = 0; i < oldSteps.size(); i++) {
-										HeaterStep oldStep = oldSteps.get(i);
-										HeaterStep newStep = newSteps.get(i);
+										ControlStep oldStep = oldSteps.get(i);
+										ControlStep newStep = newSteps.get(i);
 										if (!oldStep.getId().equals(newStep.getId())) {
 											stepsStructureChanged = true;
 											break;
@@ -155,7 +155,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 								boolean foundSelected = false;
 								if (selectedStep != null) {
 									for (int i = 0; i < newSteps.size(); i++) {
-										HeaterStep step = newSteps.get(i);
+										ControlStep step = newSteps.get(i);
 										if (step.getId().equals(selectedStep.getId())) {
 											foundSelected = true;
 											break;
@@ -169,11 +169,11 @@ public class ControllerHardwareJson implements ControllerHardware {
 								}
 
 							} else {
-								List<HeaterStep> oldSteps = lastStatus.getSteps();
+								List<ControlStep> oldSteps = lastStatus.getSteps();
 								for (int i = 0; i < oldSteps.size(); i++) {
-									HeaterStep oldStep = oldSteps.get(i);
-									HeaterStep newStep = newSteps.get(i);
-									if (newStep.isStarted() || oldStep.isStarted() || !oldStep.equals(newStep)) {
+									ControlStep oldStep = oldSteps.get(i);
+									ControlStep newStep = newSteps.get(i);
+									if (newStep.isActive() || oldStep.isActive() || !oldStep.equals(newStep)) {
 										eventBus.fireEvent(new StepModifyEvent(newStep, true));
 									}
 								}
@@ -215,9 +215,9 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 		if (controllerStatus != null) {
 
-			List<HeaterStep> steps = controllerStatus.getSteps();
+			List<ControlStep> steps = controllerStatus.getSteps();
 			if (steps.size() > 0) {
-				HeaterStep heaterStep = steps.get(0);
+				ControlStep heaterStep = steps.get(0);
 				List<ControlPoint> controlPoints = heaterStep.getControlPoints();
 
 				if (controlPoints != null) {
@@ -323,13 +323,13 @@ public class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	@Override
-	public HeaterStep getSelectedStep() {
+	public ControlStep getSelectedStep() {
 		return selectedStep;
 	}
 
 	@Override
-	public List<HeaterStep> getSteps() {
-		return controllerStatus != null ? controllerStatus.getSteps() : new ArrayList<HeaterStep>();
+	public List<ControlStep> getSteps() {
+		return controllerStatus != null ? controllerStatus.getSteps() : new ArrayList<ControlStep>();
 	}
 
 	public List<HardwareSensor> getSensors() {
@@ -353,7 +353,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	@Override
-	public void setSelectedStep(HeaterStep step) {
+	public void setSelectedStep(ControlStep step) {
 		boolean dirty = this.selectedStep != step;
 		this.selectedStep = step;
 		if (dirty && eventBus != null) {
@@ -379,7 +379,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	@Override
-	public void changeSteps(List<HeaterStep> steps) {
+	public void changeSteps(List<ControlStep> steps) {
 		this.pendingSteps = steps;
 		updateStatusNow();
 	}
@@ -438,8 +438,8 @@ public class ControllerHardwareJson implements ControllerHardware {
 		}
 	}
 
-	public HeaterStep createManualStep(String name) {
-		HeaterStep step = new HeaterStep();
+	public ControlStep createManualStep(String name) {
+		ControlStep step = new ControlStep();
 		step.setName(name);
 		List<ControlPoint> controlPoints = step.getControlPoints();
 
@@ -491,7 +491,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 		eventBus.fireEvent(new StatusChangeEvent());
 	}
 
-	private void modifyStep(HeaterStep step) {
+	private void modifyStep(ControlStep step) {
 		synchronized (pendingStepEdits) {
 			for (int i = 0; i < pendingStepEdits.size(); i++) {
 				if (pendingStepEdits.get(i).getId().equals(step.getId())) {

@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.bean.ControlPoint;
 import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
 import com.mohaine.brewcontroller.event.ChangeModeEvent;
@@ -147,7 +147,7 @@ public class BreweryDisplay {
 
 		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
 			@Override
-			public void onStepChange(HeaterStep step) {
+			public void onStepChange(ControlStep step) {
 				BreweryDisplay.this.drawer.redrawAll();
 			}
 		}));
@@ -164,7 +164,7 @@ public class BreweryDisplay {
 	private void handleDragDown() {
 		if (dragState.display != null) {
 			BreweryComponent component = dragState.display.getComponent();
-			HeaterStep selectedStep = controller.getSelectedStep();
+			ControlStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
 				if (component instanceof BrewHardwareControl) {
 					BrewHardwareControl brewHardwareControl = (BrewHardwareControl) component;
@@ -200,7 +200,7 @@ public class BreweryDisplay {
 			}
 
 			BreweryComponent component = dragState.display.getComponent();
-			HeaterStep selectedStep = controller.getSelectedStep();
+			ControlStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
 
 				if (component instanceof BrewHardwareControl) {

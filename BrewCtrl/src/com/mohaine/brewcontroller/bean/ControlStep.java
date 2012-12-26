@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import com.mohaine.brewcontroller.json.ListType;
 
-public class HeaterStep {
+public class ControlStep {
 	private String name;
 	private String id = UUID.randomUUID().toString();
 
@@ -32,9 +32,9 @@ public class HeaterStep {
 	private List<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
 
 	private int stepTime = 0;
-	private boolean started;
+	private boolean active;
 
-	public HeaterStep() {
+	public ControlStep() {
 		super();
 	}
 
@@ -98,14 +98,14 @@ public class HeaterStep {
 		return result;
 	}
 
-	public boolean equals(HeaterStep obj) {
+	public boolean equals(ControlStep obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		HeaterStep other = (HeaterStep) obj;
+		ControlStep other = (ControlStep) obj;
 		if (controlPoints == null) {
 			if (other.controlPoints != null)
 				return false;
@@ -129,20 +129,20 @@ public class HeaterStep {
 		return true;
 	}
 
-	public void copyFrom(HeaterStep modStep) {
+	public void copyFrom(ControlStep modStep) {
 		this.controlPoints = modStep.controlPoints;
 		this.id = modStep.id;
 		this.name = modStep.name;
 		this.stepTime = modStep.stepTime;
-		this.started = modStep.started;
+		this.active = modStep.active;
 	}
 
-	public boolean isStarted() {
-		return started;
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setStarted(boolean started) {
-		this.started = started;
+	public void setActive(boolean started) {
+		this.active = started;
 	}
 
 }

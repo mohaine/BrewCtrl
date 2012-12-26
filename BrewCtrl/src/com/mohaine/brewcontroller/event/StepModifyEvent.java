@@ -18,7 +18,7 @@
 
 package com.mohaine.brewcontroller.event;
 
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.event.bus.Event;
 
 public class StepModifyEvent extends Event<StepModifyEventHandler> {
@@ -28,16 +28,16 @@ public class StepModifyEvent extends Event<StepModifyEventHandler> {
 		return TYPE != null ? TYPE : (TYPE = new Type<StepModifyEventHandler>());
 	}
 
-	private final HeaterStep step;
+	private final ControlStep step;
 	private final boolean fromServer;
 
-	public StepModifyEvent(HeaterStep step, boolean fromServer) {
+	public StepModifyEvent(ControlStep step, boolean fromServer) {
 		super();
 		this.step = step;
 		this.fromServer = fromServer;
 	}
 
-	public StepModifyEvent(HeaterStep step) {
+	public StepModifyEvent(ControlStep step) {
 		super();
 		this.step = step;
 		this.fromServer = false;

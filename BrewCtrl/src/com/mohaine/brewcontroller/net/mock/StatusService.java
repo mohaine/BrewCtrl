@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.mohaine.brewcontroller.BrewJsonConverter;
 import com.mohaine.brewcontroller.bean.ControllerStatus;
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.json.JsonObjectConverter;
 import com.mohaine.brewcontroller.net.mock.MockHardwareServer.HtmlService;
 import com.mohaine.brewcontroller.util.StringUtils;
@@ -37,7 +37,7 @@ public class StatusService implements HtmlService {
 		{
 			String stepsParam = request.getParameter("steps");
 			if (StringUtils.hasLength(stepsParam)) {
-				List<HeaterStep> steps = converter.decodeList(stepsParam, HeaterStep.class);
+				List<ControlStep> steps = converter.decodeList(stepsParam, ControlStep.class);
 				if (steps != null) {
 					mock.setSteps(steps);
 				} else {
@@ -50,9 +50,9 @@ public class StatusService implements HtmlService {
 			String modifyStepsParam = request.getParameter("modifySteps");
 			if (StringUtils.hasLength(modifyStepsParam)) {
 
-				List<HeaterStep> steps = converter.decodeList(modifyStepsParam, HeaterStep.class);
+				List<ControlStep> steps = converter.decodeList(modifyStepsParam, ControlStep.class);
 				if (steps != null) {
-					for (HeaterStep heaterStep : steps) {
+					for (ControlStep heaterStep : steps) {
 						mock.updateStep(heaterStep);
 					}
 				} else {

@@ -30,8 +30,8 @@ public class ControllerStatus implements Cloneable {
 
 	private Mode mode = Mode.UNKNOWN;
 
-	@ListType(HeaterStep.class)
-	private List<HeaterStep> steps;
+	@ListType(ControlStep.class)
+	private List<ControlStep> steps;
 
 	@ListType(HardwareSensor.class)
 	List<HardwareSensor> sensors;
@@ -44,11 +44,11 @@ public class ControllerStatus implements Cloneable {
 		this.mode = mode;
 	}
 
-	public List<HeaterStep> getSteps() {
+	public List<ControlStep> getSteps() {
 		return steps;
 	}
 
-	public void setSteps(List<HeaterStep> steps) {
+	public void setSteps(List<ControlStep> steps) {
 		this.steps = steps;
 	}
 

@@ -18,7 +18,7 @@
 
 package com.mohaine.brewcontroller.event;
 
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.event.bus.Event;
 
 public class ChangeSelectedStepEvent extends Event<ChangeSelectedStepEventHandler> {
@@ -29,9 +29,9 @@ public class ChangeSelectedStepEvent extends Event<ChangeSelectedStepEventHandle
 				: (TYPE = new Type<ChangeSelectedStepEventHandler>());
 	}
 
-	private final HeaterStep step;
+	private final ControlStep step;
 
-	public ChangeSelectedStepEvent(HeaterStep step) {
+	public ChangeSelectedStepEvent(ControlStep step) {
 		super();
 		this.step = step;
 	}

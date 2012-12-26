@@ -45,7 +45,7 @@ import com.mohaine.brewcontroller.ConfigurationStepList;
 import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.TimeParser;
 import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.HeaterStep;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.event.StepsModifyEvent;
 import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
@@ -190,9 +190,9 @@ public class StepDisplayList extends JPanel {
 		BreweryLayout layout = controller.getBreweryLayout();
 		TimeParser tp = new TimeParser();
 
-		ArrayList<HeaterStep> heaterSteps = new ArrayList<HeaterStep>();
+		ArrayList<ControlStep> heaterSteps = new ArrayList<ControlStep>();
 		for (ConfigurationHeaterStep configurationHeaterStep : stepList.getSteps()) {
-			HeaterStep step = controller.createManualStep(configurationHeaterStep.getName());
+			ControlStep step = controller.createManualStep(configurationHeaterStep.getName());
 			step.setStepTime(tp.parse(configurationHeaterStep.getTime()));
 			for (ConfigurationHeaterStepControlPoint cfgCp : configurationHeaterStep.getControlPoints()) {
 				BrewHardwareControl bhc = layout.findBrewHardwareControlByNameOrParentName(cfgCp.getControlName());
@@ -248,9 +248,9 @@ public class StepDisplayList extends JPanel {
 
 	private void updateSteps() {
 
-		List<HeaterStep> steps = controller.getSteps();
+		List<ControlStep> steps = controller.getSteps();
 		int index = 0;
-		for (HeaterStep heaterStep : steps) {
+		for (ControlStep heaterStep : steps) {
 			StepEditorSwing stepEditor;
 			if (index < editors.size()) {
 				stepEditor = editors.get(index);
@@ -271,7 +271,7 @@ public class StepDisplayList extends JPanel {
 	}
 
 	private void addNewStep() {
-		List<HeaterStep> steps = new ArrayList<HeaterStep>(controller.getSteps());
+		List<ControlStep> steps = new ArrayList<ControlStep>(controller.getSteps());
 		steps.add(controller.createManualStep("New Step"));
 		controller.changeSteps(steps);
 	}
