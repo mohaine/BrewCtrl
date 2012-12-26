@@ -28,15 +28,13 @@ public class TimeParser {
 			seconds += Integer.parseInt(split[2]);
 		}
 
-		return (seconds) * 1000;
+		return (seconds);
 	}
 
 	public String format(long time) {
 		if (time <= 0 && zeroDescription != null) {
 			return zeroDescription;
 		}
-
-		time = time / 1000;
 
 		int minutes = (int) (time / 60);
 		int seconds = (int) time - (minutes * 60);

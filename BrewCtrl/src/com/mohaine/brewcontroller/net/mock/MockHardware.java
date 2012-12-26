@@ -103,6 +103,8 @@ public class MockHardware {
 
 		@Override
 		public void run() {
+			long lastOnTime = 0;
+
 			Random r = new Random();
 			while (true) {
 
@@ -131,25 +133,44 @@ public class MockHardware {
 							synchronized (heaterStep) {
 								switch (status.getMode()) {
 								case ON: {
-
 									if (!heaterStep.isStarted()) {
-										heaterStep.startTimer();
-									} else {
+										lastOnTime = 0;
+										heaterStep.setStarted(true);
+									}
+									int stepTime = heaterStep.getStepTime();
 
-										if (heaterStep.isComplete()) {
-											synchronized (steps) {
-												status.getSteps().remove(heaterStep);
+									if (stepTime > 0) {
+										long now = System.currentTimeMillis();
+										long onTime = 0;
+										if (lastOnTime > 0) {
+											onTime = now - lastOnTime;
+											while (onTime > 1) {
+												int newStepTime = stepTime - 1;
+												if (newStepTime <= 0) {
+													synchronized (steps) {
+														status.getSteps().remove(heaterStep);
+													}
+													break;
+												} else {
+													heaterStep.setStepTime(newStepTime);
+													onTime--;
+												}
 											}
+
 										}
+										// Put extra back into lastOnTime;
+										lastOnTime = now - onTime;
 									}
 									break;
 								}
 								case HOLD: {
-									heaterStep.stopTimer();
+									lastOnTime = 0;
+									heaterStep.setStarted(true);
 									break;
 								}
 								case OFF: {
-									heaterStep.stopTimer();
+									lastOnTime = 0;
+									heaterStep.setStarted(false);
 									break;
 								}
 								default:

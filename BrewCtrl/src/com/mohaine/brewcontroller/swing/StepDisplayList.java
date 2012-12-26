@@ -193,7 +193,7 @@ public class StepDisplayList extends JPanel {
 		ArrayList<HeaterStep> heaterSteps = new ArrayList<HeaterStep>();
 		for (ConfigurationHeaterStep configurationHeaterStep : stepList.getSteps()) {
 			HeaterStep step = controller.createManualStep(configurationHeaterStep.getName());
-			step.setTimeRemaining(tp.parse(configurationHeaterStep.getTime()));
+			step.setStepTime(tp.parse(configurationHeaterStep.getTime()));
 			for (ConfigurationHeaterStepControlPoint cfgCp : configurationHeaterStep.getControlPoints()) {
 				BrewHardwareControl bhc = layout.findBrewHardwareControlByNameOrParentName(cfgCp.getControlName());
 				Sensor sensor = layout.findSensorByNameOrParentName(cfgCp.getTargetName());

@@ -5,7 +5,7 @@
             "name":"HLT",
             "sensor":{
                "reading":true,
-               "tempatureC":21.125,
+               "tempatureC":23.875,
                "address":"289c167d02000048"
             },
             "heater":{
@@ -28,7 +28,7 @@
             "heater":{
                "name":"Kettle Element",
                "pin":7,
-               "duty":0,
+               "duty":65,
                "canPulse":true,
                "fullOnAmps":23
             }
@@ -50,7 +50,7 @@
    "sensors":[
       {
          "address":"0000000000000001",
-         "name":"Hlt",
+         "name":"",
          "location":"HLT"
       },
       {

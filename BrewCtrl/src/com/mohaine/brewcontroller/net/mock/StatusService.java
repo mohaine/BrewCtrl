@@ -6,7 +6,6 @@ import com.mohaine.brewcontroller.BrewJsonConverter;
 import com.mohaine.brewcontroller.bean.ControllerStatus;
 import com.mohaine.brewcontroller.bean.HeaterStep;
 import com.mohaine.brewcontroller.json.JsonObjectConverter;
-import com.mohaine.brewcontroller.json.JsonPrettyPrint;
 import com.mohaine.brewcontroller.net.mock.MockHardwareServer.HtmlService;
 import com.mohaine.brewcontroller.util.StringUtils;
 
@@ -65,7 +64,6 @@ public class StatusService implements HtmlService {
 		ControllerStatus status = mock.getStatus();
 
 		String statusJson = converter.encode(status);
-		System.out.println(new JsonPrettyPrint().prettyPrint(statusJson));
 
 		byte[] bytes = statusJson.getBytes();
 		response.sendContent(bytes);

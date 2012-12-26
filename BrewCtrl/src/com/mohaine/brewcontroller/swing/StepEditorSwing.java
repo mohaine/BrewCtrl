@@ -132,9 +132,9 @@ public class StepEditorSwing extends JPanel {
 			public void onChange(ChangeEvent event) {
 				if (heaterStep != null) {
 					int stepTime = timeValue.getValue();
-					if (stepTime != heaterStep.getTimeRemaining()) {
+					if (stepTime != heaterStep.getStepTime()) {
 
-						heaterStep.setTimeRemaining(stepTime);
+						heaterStep.setStepTime(stepTime);
 						fireChange();
 					}
 				}
@@ -217,7 +217,7 @@ public class StepEditorSwing extends JPanel {
 	public void setStep(HeaterStep heaterStep) {
 		this.heaterStep = heaterStep;
 		nameValue.setValue(heaterStep.getName());
-		timeValue.setValue(heaterStep.getTimeRemaining(), false);
+		timeValue.setValue(heaterStep.getStepTime(), false);
 		HeaterStep selectedStep = controller.getSelectedStep();
 
 		updateSelected(selectedStep != null && selectedStep.getId().equals(heaterStep.getId()));

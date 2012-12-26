@@ -25,7 +25,6 @@ import java.util.UUID;
 import com.mohaine.brewcontroller.json.ListType;
 
 public class HeaterStep {
-	private static final long START_TIME = System.currentTimeMillis();
 	private String name;
 	private String id = UUID.randomUUID().toString();
 
@@ -33,8 +32,7 @@ public class HeaterStep {
 	private List<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
 
 	private int stepTime = 0;
-	private int extraCompletedTime = 0;
-	private int lastStartTime = 0;
+	private boolean started;
 
 	public HeaterStep() {
 		super();
@@ -64,64 +62,6 @@ public class HeaterStep {
 		this.stepTime = stepTime;
 	}
 
-	public int getLastStartTime() {
-		return lastStartTime;
-	}
-
-	public void setLastStartTime(int lastStartTime) {
-		this.lastStartTime = lastStartTime;
-	}
-
-	public int getTimeRemaining() {
-		return stepTime - getTotalCompletedTime();
-	}
-
-	public void setTimeRemaining(int time) {
-		lastStartTime = 0;
-		extraCompletedTime = 0;
-		stepTime = time;
-	}
-
-	public int getExtraCompletedTime() {
-		return extraCompletedTime;
-	}
-
-	public void setExtraCompletedTime(int extraCompletedTime) {
-		this.extraCompletedTime = extraCompletedTime;
-	}
-
-	public int getTotalCompletedTime() {
-		int total = extraCompletedTime;
-		if (lastStartTime > 0) {
-			total += (getMillis() - lastStartTime);
-		}
-		return total;
-	}
-
-	public void stopTimer() {
-		if (lastStartTime > 0) {
-			extraCompletedTime += (getMillis() - lastStartTime);
-		}
-		lastStartTime = 0;
-	}
-
-	public void startTimer() {
-		int now = (int) getMillis();
-		if (lastStartTime > 0) {
-			throw new RuntimeException("Tried to to start stared");
-		}
-		lastStartTime = now;
-	}
-
-	private int getMillis() {
-		return (int) (System.currentTimeMillis() - START_TIME);
-	}
-
-	public boolean isComplete() {
-		boolean complete = stepTime > 0 && getTotalCompletedTime() >= stepTime;
-		return complete;
-	}
-
 	public List<ControlPoint> getControlPoints() {
 		return controlPoints;
 	}
@@ -137,10 +77,6 @@ public class HeaterStep {
 			}
 		}
 		return null;
-	}
-
-	public boolean isStarted() {
-		return lastStartTime > 0;
 	}
 
 	public ControlPoint getControlPointForAddress(String address) {
@@ -175,14 +111,11 @@ public class HeaterStep {
 				return false;
 		} else if (!controlPoints.equals(other.controlPoints))
 			return false;
-		if (extraCompletedTime != other.extraCompletedTime)
-			return false;
+
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
-			return false;
-		if (lastStartTime != other.lastStartTime)
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -197,14 +130,19 @@ public class HeaterStep {
 	}
 
 	public void copyFrom(HeaterStep modStep) {
-
 		this.controlPoints = modStep.controlPoints;
-		this.extraCompletedTime = modStep.extraCompletedTime;
 		this.id = modStep.id;
-		this.lastStartTime = modStep.lastStartTime;
 		this.name = modStep.name;
 		this.stepTime = modStep.stepTime;
+		this.started = modStep.started;
+	}
 
+	public boolean isStarted() {
+		return started;
+	}
+
+	public void setStarted(boolean started) {
+		this.started = started;
 	}
 
 }
