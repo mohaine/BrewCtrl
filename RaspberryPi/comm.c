@@ -96,6 +96,7 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 				if (paramData[index] == '%' && index < paramDataLength + 2) {
 					index++;
 					unsigned int data;
+					data = 0;
 					sscanf(paramData + index, "%02x", &data);
 					dest[length] = (char) data;
 					index++;

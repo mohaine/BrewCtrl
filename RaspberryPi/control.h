@@ -50,5 +50,7 @@ void updatePinsForSetDuty();
 
 void lockSteps();
 void unlockSteps();
+void updateStepTimer();
+
 
 #endif
