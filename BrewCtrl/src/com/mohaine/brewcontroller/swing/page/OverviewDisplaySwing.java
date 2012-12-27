@@ -25,12 +25,12 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.ControllerHardware;
-import com.mohaine.brewcontroller.bd.BreweryDisplay;
-import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.display.BreweryDisplay;
+import com.mohaine.brewcontroller.client.event.ClickHandler;
+import com.mohaine.brewcontroller.client.layout.BreweryLayout;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
-import com.mohaine.event.ClickHandler;
 
 public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 	private static final long serialVersionUID = 1L;
@@ -43,7 +43,7 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 		this.breweryDisplay = breweryDisplayp;
 		setLayout(new BorderLayout());
 
-		Component drawer = (Component) breweryDisplay.getDrawer();
+		Component drawer = (Component) breweryDisplay.getDisplay();
 		add(drawer, BorderLayout.CENTER);
 		add(controlPanel, BorderLayout.SOUTH);
 	}

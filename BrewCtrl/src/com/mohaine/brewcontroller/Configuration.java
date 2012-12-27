@@ -3,8 +3,8 @@ package com.mohaine.brewcontroller;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mohaine.brewcontroller.json.ListType;
-import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.client.layout.BreweryLayout;
+import com.mohaine.brewcontroller.shared.json.ListType;
 
 public class Configuration {
 

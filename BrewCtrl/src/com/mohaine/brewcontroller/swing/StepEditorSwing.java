@@ -33,18 +33,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.TimeParser;
-import com.mohaine.brewcontroller.bean.ControlStep;
-import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
-import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
-import com.mohaine.brewcontroller.event.StepModifyEvent;
-import com.mohaine.brewcontroller.event.StepModifyEventHandler;
-import com.mohaine.event.ChangeEvent;
-import com.mohaine.event.ChangeHandler;
-import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.bean.ControlStep;
+import com.mohaine.brewcontroller.client.event.ChangeEvent;
+import com.mohaine.brewcontroller.client.event.ChangeHandler;
+import com.mohaine.brewcontroller.client.event.ChangeSelectedStepEvent;
+import com.mohaine.brewcontroller.client.event.ChangeSelectedStepEventHandler;
+import com.mohaine.brewcontroller.client.event.HandlerRegistration;
+import com.mohaine.brewcontroller.client.event.StepModifyEvent;
+import com.mohaine.brewcontroller.client.event.StepModifyEventHandler;
+import com.mohaine.brewcontroller.client.event.bus.EventBus;
 
 public class StepEditorSwing extends JPanel {
 

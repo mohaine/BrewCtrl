@@ -1,10 +1,10 @@
 package com.mohaine.brewcontroller.net.mock;
 
-import com.mohaine.brewcontroller.BrewJsonConverter;
-import com.mohaine.brewcontroller.json.JsonObjectConverter;
-import com.mohaine.brewcontroller.layout.BreweryLayout;
+import com.mohaine.brewcontroller.BrewJsonConverterRefection;
+import com.mohaine.brewcontroller.client.layout.BreweryLayout;
 import com.mohaine.brewcontroller.net.mock.MockHardwareServer.HtmlService;
-import com.mohaine.brewcontroller.util.StringUtils;
+import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.shared.util.StringUtils;
 
 public class LayoutService implements HtmlService {
 
@@ -22,7 +22,7 @@ public class LayoutService implements HtmlService {
 
 	@Override
 	public void process(HTTPRequest request, HTTPResponse response) throws Exception {
-		JsonObjectConverter converter = BrewJsonConverter.getJsonConverter();
+		JsonObjectConverter converter = new BrewJsonConverterRefection().getJsonConverter();
 		response.setContentType("text/json");
 
 		String layoutParam = request.getParameter("layout");
@@ -40,5 +40,4 @@ public class LayoutService implements HtmlService {
 		byte[] bytes = converter.encode(mock.getLayout()).getBytes();
 		response.sendContent(bytes);
 	}
-
 }

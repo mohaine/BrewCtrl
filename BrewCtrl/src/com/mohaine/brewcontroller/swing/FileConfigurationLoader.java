@@ -8,13 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.mohaine.brewcontroller.BrewJsonConverter;
+import com.mohaine.brewcontroller.BrewJsonConverterRefection;
 import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.ConfigurationLoader;
-import com.mohaine.brewcontroller.json.JsonObjectConverter;
-import com.mohaine.brewcontroller.json.JsonPrettyPrint;
-import com.mohaine.brewcontroller.util.FileUtils;
-import com.mohaine.brewcontroller.util.StreamUtils;
+import com.mohaine.brewcontroller.server.util.FileUtils;
+import com.mohaine.brewcontroller.server.util.StreamUtils;
+import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.shared.json.JsonPrettyPrint;
 
 public class FileConfigurationLoader implements ConfigurationLoader {
 
@@ -27,7 +27,7 @@ public class FileConfigurationLoader implements ConfigurationLoader {
 
 	public void saveConfiguration() throws Exception {
 		if (config != null) {
-			JsonObjectConverter jc = BrewJsonConverter.getJsonConverter();
+			JsonObjectConverter jc = new BrewJsonConverterRefection().getJsonConverter();
 			String json = jc.encode(config);
 
 			JsonPrettyPrint jpp = new JsonPrettyPrint();
@@ -90,11 +90,10 @@ public class FileConfigurationLoader implements ConfigurationLoader {
 	private Configuration readCfg(InputStream fis) throws IOException, Exception {
 		try {
 			String json = new String(StreamUtils.readStream(fis));
-			JsonObjectConverter jc = BrewJsonConverter.getJsonConverter();
+			JsonObjectConverter jc = new BrewJsonConverterRefection().getJsonConverter();
 			return jc.decode(json, Configuration.class);
 		} finally {
 			StreamUtils.close(fis);
 		}
 	}
-
 }

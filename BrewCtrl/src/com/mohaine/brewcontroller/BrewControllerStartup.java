@@ -19,6 +19,7 @@
 package com.mohaine.brewcontroller;
 
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.page.Overview;
 
 public class BrewControllerStartup {

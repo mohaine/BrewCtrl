@@ -40,16 +40,16 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.SensorConfiguration;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.layout.Tank;
-import com.mohaine.brewcontroller.util.StringUtils;
-import com.mohaine.brewcontroller.util.Timeout;
-import com.mohaine.event.ChangeEvent;
-import com.mohaine.event.ChangeHandler;
-import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.HasValue;
+import com.mohaine.brewcontroller.client.bean.TempSensor;
+import com.mohaine.brewcontroller.client.event.ChangeEvent;
+import com.mohaine.brewcontroller.client.event.ChangeHandler;
+import com.mohaine.brewcontroller.client.event.HandlerRegistration;
+import com.mohaine.brewcontroller.client.event.HasValue;
+import com.mohaine.brewcontroller.client.layout.Tank;
+import com.mohaine.brewcontroller.server.util.Timeout;
+import com.mohaine.brewcontroller.shared.util.StringUtils;
 
-public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
+public class SensorEditor extends JPanel implements HasValue<TempSensor> {
 	private static final long serialVersionUID = 1L;
 
 	private JLabel label = new JLabel();
@@ -95,7 +95,7 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 	}
 
 	private ArrayList<ChangeHandler> changeHandlers = new ArrayList<ChangeHandler>();
-	private HardwareSensor value;
+	private TempSensor value;
 
 	private boolean editing;
 
@@ -119,17 +119,17 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 	}
 
 	@Override
-	public HardwareSensor getValue() {
+	public TempSensor getValue() {
 		return value;
 	}
 
 	@Override
-	public void setValue(HardwareSensor value) {
+	public void setValue(TempSensor value) {
 		setValue(value, true);
 	}
 
 	@Override
-	public void setValue(HardwareSensor value, boolean fireEvents) {
+	public void setValue(TempSensor value, boolean fireEvents) {
 		this.value = value;
 		if (fireEvents) {
 			fireEvent(new ChangeEvent());
@@ -157,7 +157,7 @@ public class SensorEditor extends JPanel implements HasValue<HardwareSensor> {
 		label.setText(sb.toString());
 	}
 
-	private SensorConfiguration getSensorConfig(HardwareSensor value) {
+	private SensorConfiguration getSensorConfig(TempSensor value) {
 		SensorConfiguration sConfig = config.findSensor(value.getAddress());
 		if (sConfig == null) {
 			sConfig = new SensorConfiguration();

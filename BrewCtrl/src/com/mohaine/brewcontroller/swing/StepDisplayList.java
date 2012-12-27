@@ -42,17 +42,17 @@ import com.mohaine.brewcontroller.ConfigurationHeaterStep;
 import com.mohaine.brewcontroller.ConfigurationHeaterStepControlPoint;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ConfigurationStepList;
-import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.TimeParser;
-import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.ControlStep;
-import com.mohaine.brewcontroller.event.StepsModifyEvent;
-import com.mohaine.brewcontroller.event.StepsModifyEventHandler;
-import com.mohaine.brewcontroller.layout.BrewHardwareControl;
-import com.mohaine.brewcontroller.layout.BreweryLayout;
-import com.mohaine.brewcontroller.layout.Sensor;
-import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.bean.ControlPoint;
+import com.mohaine.brewcontroller.client.bean.ControlStep;
+import com.mohaine.brewcontroller.client.event.HandlerRegistration;
+import com.mohaine.brewcontroller.client.event.StepsModifyEvent;
+import com.mohaine.brewcontroller.client.event.StepsModifyEventHandler;
+import com.mohaine.brewcontroller.client.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.layout.BrewHardwareControl;
+import com.mohaine.brewcontroller.client.layout.BreweryLayout;
+import com.mohaine.brewcontroller.client.layout.Sensor;
 
 public class StepDisplayList extends JPanel {
 	private static final long serialVersionUID = 1L;

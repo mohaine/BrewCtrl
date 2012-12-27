@@ -32,10 +32,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.mohaine.brewcontroller.Converter;
-import com.mohaine.event.ChangeEvent;
-import com.mohaine.event.ChangeHandler;
-import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.HasValue;
+import com.mohaine.brewcontroller.client.event.ChangeEvent;
+import com.mohaine.brewcontroller.client.event.ChangeHandler;
+import com.mohaine.brewcontroller.client.event.HandlerRegistration;
+import com.mohaine.brewcontroller.client.event.HasValue;
 
 public class ClickEditor<T> extends JPanel implements HasValue<T> {
 	private static final long serialVersionUID = 1L;

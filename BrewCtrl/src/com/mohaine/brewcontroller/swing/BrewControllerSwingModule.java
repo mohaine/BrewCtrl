@@ -21,15 +21,17 @@ package com.mohaine.brewcontroller.swing;
 import java.io.File;
 
 import com.google.inject.AbstractModule;
+import com.mohaine.brewcontroller.BrewJsonConverterRefection;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerGui;
-import com.mohaine.brewcontroller.ControllerHardware;
-import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
-import com.mohaine.brewcontroller.net.ControllerHardwareJson;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
+import com.mohaine.brewcontroller.client.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
+import com.mohaine.brewcontroller.net.ControllerHardwareJsonUrlRequest;
 import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
 import com.mohaine.brewcontroller.swing.page.OverviewDisplaySwing;
-import com.mohaine.event.bus.EventBus;
 
 public class BrewControllerSwingModule extends AbstractModule {
 
@@ -44,8 +46,10 @@ public class BrewControllerSwingModule extends AbstractModule {
 
 		bind(ConfigurationLoader.class).toInstance(new FileConfigurationLoader(configFile));
 
+		bind(BrewJsonConverter.class).to(BrewJsonConverterRefection.class).asEagerSingleton();
+
 		bind(ControllerGui.class).to(SwingControllerInterface.class).asEagerSingleton();
-		bind(ControllerHardware.class).to(ControllerHardwareJson.class).asEagerSingleton();
+		bind(ControllerHardware.class).to(ControllerHardwareJsonUrlRequest.class).asEagerSingleton();
 
 		bind(OverviewDisplay.class).to(OverviewDisplaySwing.class);
 

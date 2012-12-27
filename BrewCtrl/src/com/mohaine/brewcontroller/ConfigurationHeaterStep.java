@@ -2,7 +2,7 @@ package com.mohaine.brewcontroller;
 
 import java.util.List;
 
-import com.mohaine.brewcontroller.json.ListType;
+import com.mohaine.brewcontroller.shared.json.ListType;
 
 public class ConfigurationHeaterStep {
 	private String name;

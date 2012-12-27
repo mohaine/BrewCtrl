@@ -24,11 +24,11 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mohaine.brewcontroller.bean.ControlStep;
-import com.mohaine.brewcontroller.bean.ControllerStatus;
-import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.net.ControllerHardwareJson;
+import com.mohaine.brewcontroller.client.bean.ControlStep;
+import com.mohaine.brewcontroller.client.bean.ControllerStatus;
+import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.client.bean.TempSensor;
+import com.mohaine.brewcontroller.client.net.ControllerHardwareJson;
 
 public class MockHardwareServer {
 	private boolean run = true;
@@ -49,14 +49,14 @@ public class MockHardwareServer {
 		ControllerStatus status = new ControllerStatus();
 		status.setSteps(new ArrayList<ControlStep>());
 
-		List<HardwareSensor> sensors = new ArrayList<HardwareSensor>();
+		List<TempSensor> sensors = new ArrayList<TempSensor>();
 
-		HardwareSensor sensor1 = new HardwareSensor();
+		TempSensor sensor1 = new TempSensor();
 		sensor1.setAddress("0000000000000001");
 		sensor1.setReading(true);
 		sensor1.setTempatureC(25);
 		sensors.add(sensor1);
-		HardwareSensor sensor2 = new HardwareSensor();
+		TempSensor sensor2 = new TempSensor();
 		sensor2.setAddress("0000000000000002");
 		sensor2.setReading(true);
 		sensor2.setTempatureC(26);

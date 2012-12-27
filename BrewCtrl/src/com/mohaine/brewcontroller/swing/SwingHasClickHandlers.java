@@ -25,9 +25,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
 import com.mohaine.brewcontroller.ClickEvent;
-import com.mohaine.event.ClickHandler;
-import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.HasClickHandlers;
+import com.mohaine.brewcontroller.client.event.ClickHandler;
+import com.mohaine.brewcontroller.client.event.HandlerRegistration;
+import com.mohaine.brewcontroller.client.event.HasClickHandlers;
 
 public class SwingHasClickHandlers extends AbstractAction implements HasClickHandlers {
 	private static final long serialVersionUID = 1L;

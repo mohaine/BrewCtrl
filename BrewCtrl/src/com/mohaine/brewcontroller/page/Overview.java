@@ -19,12 +19,12 @@
 package com.mohaine.brewcontroller.page;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.ControllerHardware;
-import com.mohaine.brewcontroller.event.BreweryLayoutChangeEvent;
-import com.mohaine.brewcontroller.event.BreweryLayoutChangeEventHandler;
-import com.mohaine.brewcontroller.layout.BreweryLayout;
-import com.mohaine.event.ClickHandler;
-import com.mohaine.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.event.BreweryLayoutChangeEvent;
+import com.mohaine.brewcontroller.client.event.BreweryLayoutChangeEventHandler;
+import com.mohaine.brewcontroller.client.event.ClickHandler;
+import com.mohaine.brewcontroller.client.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.layout.BreweryLayout;
 
 public class Overview extends BasePage {
 

@@ -38,20 +38,20 @@ import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.UnitConversion;
-import com.mohaine.brewcontroller.bean.ControllerStatus;
-import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.event.ChangeModeEvent;
-import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
-import com.mohaine.brewcontroller.event.StatusChangeEvent;
-import com.mohaine.brewcontroller.event.StatusChangeEventHandler;
-import com.mohaine.event.AbstractHasValue;
-import com.mohaine.event.ChangeEvent;
-import com.mohaine.event.HandlerRegistration;
-import com.mohaine.event.HasValue;
-import com.mohaine.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.bean.ControllerStatus;
+import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.client.bean.TempSensor;
+import com.mohaine.brewcontroller.client.event.AbstractHasValue;
+import com.mohaine.brewcontroller.client.event.ChangeEvent;
+import com.mohaine.brewcontroller.client.event.ChangeModeEvent;
+import com.mohaine.brewcontroller.client.event.ChangeModeEventHandler;
+import com.mohaine.brewcontroller.client.event.HandlerRegistration;
+import com.mohaine.brewcontroller.client.event.HasValue;
+import com.mohaine.brewcontroller.client.event.StatusChangeEvent;
+import com.mohaine.brewcontroller.client.event.StatusChangeEventHandler;
+import com.mohaine.brewcontroller.client.event.bus.EventBus;
 
 public class StatusDisplay extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -250,7 +250,7 @@ public class StatusDisplay extends JPanel {
 
 	}
 
-	private SensorLabel addTitledSensorLabel(GridBagConstraints gbc, JPanel panel, HardwareSensor tempSensor) {
+	private SensorLabel addTitledSensorLabel(GridBagConstraints gbc, JPanel panel, TempSensor tempSensor) {
 
 		gbc.gridx = 0;
 		gbc.gridy++;
@@ -307,8 +307,8 @@ public class StatusDisplay extends JPanel {
 			}
 		}
 
-		List<HardwareSensor> sensors = controller.getSensors();
-		for (HardwareSensor tempSensor : sensors) {
+		List<TempSensor> sensors = controller.getSensors();
+		for (TempSensor tempSensor : sensors) {
 			boolean found = false;
 			for (SensorLabel sensorLabel : sensorLabels) {
 				if (sensorLabel.sensor.getAddress().equals(tempSensor.getAddress())) {
@@ -328,7 +328,7 @@ public class StatusDisplay extends JPanel {
 	private class SensorLabel {
 		SensorEditor label;
 		JLabel value;
-		HardwareSensor sensor;
+		TempSensor sensor;
 
 		public void update() {
 			label.setValue(sensor);

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import com.mohaine.brewcontroller.util.StreamUtils;
+import com.mohaine.brewcontroller.server.util.StreamUtils;
 
 public class HTTPRequest {
 

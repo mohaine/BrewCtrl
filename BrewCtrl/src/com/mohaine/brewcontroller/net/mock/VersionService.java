@@ -1,9 +1,9 @@
 package com.mohaine.brewcontroller.net.mock;
 
-import com.mohaine.brewcontroller.bean.VersionBean;
-import com.mohaine.brewcontroller.json.JsonObjectConverter;
-import com.mohaine.brewcontroller.json.ReflectionJsonHandler;
+import com.mohaine.brewcontroller.client.bean.VersionBean;
 import com.mohaine.brewcontroller.net.mock.MockHardwareServer.HtmlService;
+import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.shared.json.ReflectionJsonHandler;
 
 public class VersionService implements HtmlService {
 	@Override

@@ -3,7 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/guice-2.0-no_aop.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry exported="true" kind="lib" path="lib/guice-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/guice-assistedinject-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javax.inject.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm-3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cglib-2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

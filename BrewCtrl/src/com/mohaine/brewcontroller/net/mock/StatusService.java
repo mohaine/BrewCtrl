@@ -2,12 +2,12 @@ package com.mohaine.brewcontroller.net.mock;
 
 import java.util.List;
 
-import com.mohaine.brewcontroller.BrewJsonConverter;
-import com.mohaine.brewcontroller.bean.ControllerStatus;
-import com.mohaine.brewcontroller.bean.ControlStep;
-import com.mohaine.brewcontroller.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.BrewJsonConverterRefection;
+import com.mohaine.brewcontroller.client.bean.ControlStep;
+import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.net.mock.MockHardwareServer.HtmlService;
-import com.mohaine.brewcontroller.util.StringUtils;
+import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.shared.util.StringUtils;
 
 public class StatusService implements HtmlService {
 
@@ -25,7 +25,7 @@ public class StatusService implements HtmlService {
 
 	@Override
 	public void process(HTTPRequest request, HTTPResponse response) throws Exception {
-		JsonObjectConverter converter = BrewJsonConverter.getJsonConverter();
+		JsonObjectConverter converter = new BrewJsonConverterRefection().getJsonConverter();
 		response.setContentType("text/json");
 
 		{
@@ -68,5 +68,4 @@ public class StatusService implements HtmlService {
 		byte[] bytes = statusJson.getBytes();
 		response.sendContent(bytes);
 	}
-
 }

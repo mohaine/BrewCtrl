@@ -3,16 +3,16 @@ package com.mohaine.brewcontroller.net.mock;
 import java.util.List;
 import java.util.Random;
 
-import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.ControllerStatus;
-import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.ControlStep;
-import com.mohaine.brewcontroller.layout.BreweryLayout;
-import com.mohaine.brewcontroller.layout.HeatElement;
-import com.mohaine.brewcontroller.layout.Pump;
-import com.mohaine.brewcontroller.layout.Sensor;
-import com.mohaine.brewcontroller.layout.Tank;
+import com.mohaine.brewcontroller.client.bean.ControlPoint;
+import com.mohaine.brewcontroller.client.bean.ControlStep;
+import com.mohaine.brewcontroller.client.bean.ControllerStatus;
+import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.client.bean.TempSensor;
+import com.mohaine.brewcontroller.client.layout.BreweryLayout;
+import com.mohaine.brewcontroller.client.layout.HeatElement;
+import com.mohaine.brewcontroller.client.layout.Pump;
+import com.mohaine.brewcontroller.client.layout.Sensor;
+import com.mohaine.brewcontroller.client.layout.Tank;
 
 public class MockHardware {
 
@@ -82,8 +82,8 @@ public class MockHardware {
 
 				Sensor sensor = tank.getSensor();
 				if (sensor != null) {
-					List<HardwareSensor> sensors = status.getSensors();
-					for (HardwareSensor hardwareSensor : sensors) {
+					List<TempSensor> sensors = status.getSensors();
+					for (TempSensor hardwareSensor : sensors) {
 						if (sensor.getAddress().equals(hardwareSensor.getAddress())) {
 							controlPoint.setAutomaticControl(false);
 							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
@@ -111,8 +111,8 @@ public class MockHardware {
 				ControlStep heaterStep = null;
 
 				if (status != null) {
-					List<HardwareSensor> sensors = status.getSensors();
-					for (HardwareSensor hardwareSensor : sensors) {
+					List<TempSensor> sensors = status.getSensors();
+					for (TempSensor hardwareSensor : sensors) {
 						hardwareSensor.setTempatureC(hardwareSensor.getTempatureC() + (r.nextDouble() - 0.5));
 					}
 

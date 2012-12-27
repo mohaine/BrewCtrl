@@ -23,20 +23,20 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.UnitConversion;
-import com.mohaine.brewcontroller.bd.BreweryComponentDisplay;
-import com.mohaine.brewcontroller.bd.BreweryDisplay.BreweryDisplayDrawer;
-import com.mohaine.brewcontroller.bd.DrawerMouseListener;
-import com.mohaine.brewcontroller.bd.DrawerMouseListener.DrawerMouseEvent;
-import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.ControlStep;
-import com.mohaine.brewcontroller.layout.BreweryComponent;
-import com.mohaine.brewcontroller.layout.HeatElement;
-import com.mohaine.brewcontroller.layout.Pump;
-import com.mohaine.brewcontroller.layout.Sensor;
-import com.mohaine.brewcontroller.layout.Tank;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.bean.ControlPoint;
+import com.mohaine.brewcontroller.client.bean.ControlStep;
+import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay;
+import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
+import com.mohaine.brewcontroller.client.display.DrawerMouseListener;
+import com.mohaine.brewcontroller.client.display.DrawerMouseListener.DrawerMouseEvent;
+import com.mohaine.brewcontroller.client.layout.BreweryComponent;
+import com.mohaine.brewcontroller.client.layout.HeatElement;
+import com.mohaine.brewcontroller.client.layout.Pump;
+import com.mohaine.brewcontroller.client.layout.Sensor;
+import com.mohaine.brewcontroller.client.layout.Tank;
 
 public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayDrawer {
 	private static final int TANK_TOP_HEIGHT = 20;
@@ -58,7 +58,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	@Override
 	public void redrawBreweryComponent(final BreweryComponent componentChanged) {
 		if (SwingUtilities.isEventDispatchThread()) {
-
 			redrawBreweryComponentSwing(componentChanged);
 		} else {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -456,5 +455,11 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		event.setX(e.getX());
 		event.setY(e.getY());
 		return event;
+	}
+
+	@Override
+	public Object getWidget() {
+		// TODO Auto-generated method stub
+		return this;
 	}
 }
