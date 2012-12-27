@@ -197,7 +197,6 @@ public class StatusDisplay extends JPanel {
 		}));
 
 		handlers.add(eventBus.addHandler(ChangeModeEvent.getType(), new ChangeModeEventHandler() {
-
 			@Override
 			public void onChangeMode(final Mode mode) {
 				SwingUtilities.invokeLater(new Runnable() {
@@ -205,7 +204,6 @@ public class StatusDisplay extends JPanel {
 					public void run() {
 						updateMode(mode);
 					}
-
 				});
 			}
 		}));

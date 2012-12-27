@@ -13,13 +13,14 @@ import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.SensorConfiguration;
 import com.mohaine.brewcontroller.bean.ControlPoint;
+import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.bean.ControllerStatus;
 import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.bean.VersionBean;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryLayoutChangeEvent;
+import com.mohaine.brewcontroller.event.ChangeModeEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.StatusChangeEvent;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
@@ -32,6 +33,7 @@ import com.mohaine.brewcontroller.layout.HeatElement;
 import com.mohaine.brewcontroller.layout.Pump;
 import com.mohaine.brewcontroller.layout.Sensor;
 import com.mohaine.brewcontroller.layout.Tank;
+import com.mohaine.event.bus.Event;
 import com.mohaine.event.bus.EventBus;
 
 public class ControllerHardwareJson implements ControllerHardware {
@@ -92,6 +94,8 @@ public class ControllerHardwareJson implements ControllerHardware {
 				forceUpdate = false;
 				updating = true;
 				lastUpdateTime = now;
+
+				List<Event<?>> eventsToFire = new ArrayList<Event<?>>();
 				try {
 
 					URLRequest commandRequest = getCommandRequest("status");
@@ -127,13 +131,17 @@ public class ControllerHardwareJson implements ControllerHardware {
 						ControllerStatus lastStatus = controllerStatus;
 						controllerStatus = converter.decode(response, ControllerStatus.class);
 
-						updateLayoutState(false);
-						eventBus.fireEvent(new StatusChangeEvent());
+						updateLayoutState(false, eventsToFire);
+						eventsToFire.add(new StatusChangeEvent());
+
 						if (controllerStatus != null) {
 							List<ControlStep> newSteps = controllerStatus.getSteps();
 
 							boolean stepsStructureChanged = true;
 							if (lastStatus != null) {
+								if (!lastStatus.getMode().equals(controllerStatus.getMode())) {
+									eventsToFire.add(new ChangeModeEvent(controllerStatus.getMode()));
+								}
 								List<ControlStep> oldSteps = lastStatus.getSteps();
 								if (oldSteps.size() == newSteps.size()) {
 									stepsStructureChanged = false;
@@ -149,32 +157,34 @@ public class ControllerHardwareJson implements ControllerHardware {
 							}
 
 							if (stepsStructureChanged) {
-								eventBus.fireEvent(new StepsModifyEvent());
-								boolean foundSelected = false;
-								if (selectedStep != null) {
-									for (int i = 0; i < newSteps.size(); i++) {
-										ControlStep step = newSteps.get(i);
-										if (step.getId().equals(selectedStep.getId())) {
-											foundSelected = true;
-											break;
-										}
-									}
-								}
-
-								if (!foundSelected && newSteps.size() > 0) {
-									selectedStep = newSteps.get(0);
-									eventBus.fireEvent(new ChangeSelectedStepEvent(selectedStep));
-								}
-
+								eventsToFire.add(new StepsModifyEvent());
 							} else {
 								List<ControlStep> oldSteps = lastStatus.getSteps();
 								for (int i = 0; i < oldSteps.size(); i++) {
 									ControlStep oldStep = oldSteps.get(i);
 									ControlStep newStep = newSteps.get(i);
+
 									if (newStep.isActive() || oldStep.isActive() || !oldStep.equals(newStep)) {
-										eventBus.fireEvent(new StepModifyEvent(newStep, true));
+										eventsToFire.add(new StepModifyEvent(newStep, true));
 									}
 								}
+							}
+
+							boolean foundSelected = false;
+							if (selectedStep != null) {
+								for (int i = 0; i < newSteps.size(); i++) {
+									ControlStep step = newSteps.get(i);
+									if (step.getId().equals(selectedStep.getId())) {
+										foundSelected = true;
+										selectedStep = step;
+										break;
+									}
+								}
+							}
+
+							if (!foundSelected && newSteps.size() > 0) {
+								selectedStep = newSteps.get(0);
+								eventsToFire.add(new ChangeSelectedStepEvent(selectedStep));
 							}
 
 							success = true;
@@ -204,29 +214,28 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 				} finally {
 					updating = false;
+					for (Event<?> event : eventsToFire) {
+						eventBus.fireEvent(event);
+					}
 				}
 			}
 		}
 	}
 
-	private void updateLayoutState(boolean forceDirty) {
+	private void updateLayoutState(boolean forceDirty, List<Event<?>> eventsToFire) {
 
 		if (controllerStatus != null) {
-
 			List<ControlStep> steps = controllerStatus.getSteps();
 			if (steps.size() > 0) {
 				ControlStep heaterStep = steps.get(0);
 				List<ControlPoint> controlPoints = heaterStep.getControlPoints();
-
 				if (controlPoints != null) {
 					for (BrewHardwareControl bhc : brewHardwareControls) {
 						for (ControlPoint controlPoint : controlPoints) {
 							if (controlPoint.getControlPin() == bhc.getPin()) {
 								if (forceDirty || bhc.getDuty() != controlPoint.getDuty()) {
 									bhc.setDuty(controlPoint.getDuty());
-
-									eventBus.fireEvent(new BreweryComponentChangeEvent(bhc));
-
+									eventsToFire.add(new BreweryComponentChangeEvent(bhc));
 								}
 							}
 						}
@@ -261,7 +270,7 @@ public class ControllerHardwareJson implements ControllerHardware {
 
 					boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
 					if (diff) {
-						eventBus.fireEvent(new BreweryComponentChangeEvent(sensor));
+						eventsToFire.add(new BreweryComponentChangeEvent(sensor));
 					}
 
 				}

@@ -24,16 +24,16 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mohaine.brewcontroller.bean.ControllerStatus;
-import com.mohaine.brewcontroller.bean.HardwareSensor;
-import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.ControlStep;
+import com.mohaine.brewcontroller.bean.ControllerStatus;
+import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.bean.HardwareSensor;
 import com.mohaine.brewcontroller.net.ControllerHardwareJson;
 
 public class MockHardwareServer {
+	private boolean run = true;
 
 	private List<HtmlService> services = new ArrayList<HtmlService>();
-	private SocketListener socketListener;
 
 	public interface HtmlService {
 
@@ -48,7 +48,7 @@ public class MockHardwareServer {
 		MockHardware mock = new MockHardware();
 		ControllerStatus status = new ControllerStatus();
 		status.setSteps(new ArrayList<ControlStep>());
-		
+
 		List<HardwareSensor> sensors = new ArrayList<HardwareSensor>();
 
 		HardwareSensor sensor1 = new HardwareSensor();
@@ -73,26 +73,41 @@ public class MockHardwareServer {
 		server.addHtmlService(new StatusService(mock));
 
 		server.listen(ControllerHardwareJson.DEFAULT_PORT);
-		while (true) {
-			try {
-				Thread.sleep(2000000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		
 	}
 
 	public MockHardwareServer() {
 	}
 
 	public boolean listen(int port) {
+		System.out.println("Mock listen on port " + port);
 		try {
-			ServerSocket socket = new ServerSocket(port);
-			socketListener = new SocketListener(socket);
-			Thread thread = new Thread(socketListener);
-			thread.setDaemon(true);
-			thread.setPriority(Thread.MIN_PRIORITY);
-			thread.start();
+			ServerSocket serverSocket = new ServerSocket(port);
+			try {
+
+				while (run) {
+					try {
+
+						Socket socket = serverSocket.accept();
+						try {
+							processConnect(socket);
+						} finally {
+							socket.close();
+						}
+					} catch (SocketException se) {
+						// Ignore
+					} catch (Exception e) {
+						e.printStackTrace();
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e1) {
+						}
+					}
+				}
+			} finally {
+				serverSocket.close();
+			}
+
 		} catch (Throwable t) {
 			return false;
 		}
@@ -100,69 +115,37 @@ public class MockHardwareServer {
 		return true;
 	}
 
-	private class SocketListener implements Runnable {
-		ServerSocket serverSocket = null;
-		boolean run = true;
+	private void processConnect(Socket socket) throws Exception {
 
-		public SocketListener(ServerSocket socket) {
-			this.serverSocket = socket;
-		}
+		HTTPRequest request = new HTTPRequest(socket);
+		HTTPResponse response = new HTTPResponse(socket);
+		try {
+			request.readHeaders();
+			String requestPath = request.getPath();
 
-		public void run() {
+			response.setContentType("text/html");
 
-			while (run) {
-				try {
+			boolean found = false;
 
-					Socket socket = serverSocket.accept();
-					try {
-						processConnect(socket);
-					} finally {
-						socket.close();
-					}
-				} catch (SocketException se) {
-					// Ignore
-				} catch (Exception e) {
-					e.printStackTrace();
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e1) {
+			if (requestPath != null) {
+				for (HtmlService service : services) {
+					if (requestPath.startsWith(service.getPath())) {
+						found = true;
+						service.process(request, response);
+						break;
 					}
 				}
 			}
-		}
+			if (!found) {
+				response.setStatusCode(HttpCodes.NOT_FOUND);
+				response.setStatus("Not Found");
+				response.sendContent("404 Not Found\n");
 
-		private void processConnect(Socket socket) throws Exception {
-
-			HTTPRequest request = new HTTPRequest(socket);
-			HTTPResponse response = new HTTPResponse(socket);
-			try {
-				request.readHeaders();
-				String requestPath = request.getPath();
-
-				response.setContentType("text/html");
-
-				boolean found = false;
-
-				if (requestPath != null) {
-					for (HtmlService service : services) {
-						if (requestPath.startsWith(service.getPath())) {
-							found = true;
-							service.process(request, response);
-							break;
-						}
-					}
-				}
-				if (!found) {
-					response.setStatusCode(HttpCodes.NOT_FOUND);
-					response.setStatus("Not Found");
-					response.sendContent("404 Not Found\n");
-
-				}
-
-			} finally {
-				request.close();
-				response.close();
 			}
+
+		} finally {
+			request.close();
+			response.close();
 		}
 	}
 

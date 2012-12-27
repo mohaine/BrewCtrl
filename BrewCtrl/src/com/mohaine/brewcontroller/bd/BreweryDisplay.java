@@ -8,15 +8,13 @@ import javax.swing.SwingUtilities;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ControllerHardware;
 import com.mohaine.brewcontroller.bean.ControlPoint;
-import com.mohaine.brewcontroller.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.bean.ControlStep;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.event.BreweryComponentChangeEventHandler;
-import com.mohaine.brewcontroller.event.ChangeModeEvent;
-import com.mohaine.brewcontroller.event.ChangeModeEventHandler;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEvent;
 import com.mohaine.brewcontroller.event.ChangeSelectedStepEventHandler;
 import com.mohaine.brewcontroller.event.StepModifyEvent;
+import com.mohaine.brewcontroller.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.layout.BreweryComponent;
 import com.mohaine.brewcontroller.layout.BreweryLayout;
@@ -137,24 +135,19 @@ public class BreweryDisplay {
 		// }
 		// }));
 
-		// eventBus.addHandler(StepModifyEvent.getType(), new
-		// StepModifyEventHandler() {
-		// @Override
-		// public void onStepChange(HeaterStep step) {
-		// BreweryDisplay.this.drawer.redrawAll();
-		// }
-		// });
+		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
+
+			@Override
+			public void onStepChange(ControlStep step, boolean fromServer) {
+
+				BreweryDisplay.this.drawer.redrawAll();
+
+			}
+		});
 
 		handlers.add(eventBus.addHandler(ChangeSelectedStepEvent.getType(), new ChangeSelectedStepEventHandler() {
 			@Override
 			public void onStepChange(ControlStep step) {
-				BreweryDisplay.this.drawer.redrawAll();
-			}
-		}));
-		handlers.add(eventBus.addHandler(ChangeModeEvent.getType(), new ChangeModeEventHandler() {
-
-			@Override
-			public void onChangeMode(Mode mode) {
 				BreweryDisplay.this.drawer.redrawAll();
 			}
 		}));

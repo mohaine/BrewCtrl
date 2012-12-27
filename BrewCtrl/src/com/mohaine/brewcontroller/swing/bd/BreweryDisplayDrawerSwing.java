@@ -86,7 +86,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 	@Override
 	public void redrawAll() {
-
 		if (SwingUtilities.isEventDispatchThread()) {
 			redrawAllSwing();
 		} else {
@@ -193,8 +192,8 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		Color color = Colors.FOREGROUND;
 
 		ControlStep selectedStep = controller.getSelectedStep();
-
 		if (selectedStep != null) {
+
 			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getPin());
 			if (controlPointForPin != null) {
 				int cpDuty = controlPointForPin.getDuty();
@@ -202,6 +201,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 				if (controlPointForPin.isAutomaticControl()) {
 					color = Colors.INACTIVE;
 				}
+
 				if (selectedStep.isActive()) {
 					if (controlPointForPin.isAutomaticControl()) {
 						text = Integer.toString(duty) + "%";
