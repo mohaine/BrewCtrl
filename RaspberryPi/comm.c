@@ -26,12 +26,13 @@
 #define CONTENT_TYPE_SIZE 30
 
 #define SERVICES_COUNT 3
+#define LAYOUT_FILE "BrewControllerConfig.json"
 
 #include "sensor.h"
 #include "comm.h"
-#include "crc8.h"
 #include "control.h"
 
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
@@ -44,9 +45,6 @@
 #include <errno.h>
 #include <pthread.h>
 #include <json.h>
-
-char LAYOUT[BUFFER_SIZE];
-int LAYOUT_SIZE;
 
 typedef struct {
 	char method[METHOD_SIZE];
@@ -129,22 +127,46 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 }
 
 void handleLayoutRequest(Request * request, Response * response) {
-
 	if (request->contentLength > 0) {
-		int paramSize = readParam("layout", request->content, request->contentLength, LAYOUT);
+		char * buffer = malloc(BUFFER_SIZE);
+		int paramSize = readParam("layout", request->content, request->contentLength, buffer);
 		if (paramSize > 0) {
-			LAYOUT_SIZE = paramSize;
+			FILE* f = fopen(LAYOUT_FILE, "wb");
+			if (f) {
+				fwrite(buffer, 1, paramSize, f);
+				fclose(f);
+			}
 		} else {
 			response->statusCode = 400;
 			sprintf(response->status, "Bad Request");
 			sprintf(response->content, "Bad Request");
 			return;
 		}
+		free(buffer);
 	}
 
-	sprintf(response->contentType, "text/json");
-	memcpy(response->content, LAYOUT, LAYOUT_SIZE);
-	response->contentLength = LAYOUT_SIZE;
+	struct stat st;
+	if (stat(LAYOUT_FILE, &st) >= 0) {
+		ssize_t s = st.st_size;
+		if (s > BUFFER_SIZE) {
+			s = BUFFER_SIZE;
+		}
+		FILE* f = fopen(LAYOUT_FILE, "rb");
+		if (f) {
+			int readSize = fread(response->content, 1, s, f);
+			if (readSize == s) {
+				sprintf(response->contentType, "text/json");
+				response->contentLength = s;
+
+			}
+			fclose(f);
+		}
+
+	} else {
+		sprintf(response->contentType, "text/json");
+		response->contentLength = 0;
+	}
+
 }
 
 bool parseJsonStep(json_object *step, ControlStep * cs) {
@@ -439,7 +461,6 @@ void handleStatusRequest(Request * request, Response * response) {
 
 void setupComm() {
 
-	LAYOUT_SIZE = 0;
 	services[0].path = "/cmd/status";
 	services[0].handleRequest = handleStatusRequest;
 
