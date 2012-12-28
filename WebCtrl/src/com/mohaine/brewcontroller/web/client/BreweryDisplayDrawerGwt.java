@@ -9,6 +9,9 @@ import com.google.gwt.canvas.dom.client.TextMetrics;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.bean.ControlPoint;
+import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.client.display.DrawerMouseListener;
@@ -22,7 +25,7 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private static final int TANK_TOP_HEIGHT = 20;
 	private int PADDING = 5;
 	// private UnitConversion conversion;
-	// private ControllerHardware controller;
+	private ControllerHardware controller;
 
 	static final String UPGRADE_MESSAGE = "Your browser does not support the HTML5 Canvas.";
 	private FlowPanel panel = new FlowPanel();
@@ -34,7 +37,8 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private Context2d backBufferContext;
 
 	@Inject
-	public BreweryDisplayDrawerGwt() {
+	public BreweryDisplayDrawerGwt(ControllerHardware controller) {
+		this.controller = controller;
 
 		canvas = Canvas.createIfSupported();
 		if (canvas == null) {
@@ -121,9 +125,57 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		}
 	}
 
-	private void drawHeatElement(Context2d context2d, BreweryComponentDisplay display) {
-		// TODO Auto-generated method stub
+	private void drawHeatElement(Context2d g, BreweryComponentDisplay display) {
+		HeatElement heater = (HeatElement) display.getComponent();
+		int duty = heater.getDuty();
+		String text = null;
+		CssColor color = Colors.FOREGROUND;
 
+		ControlStep selectedStep = controller.getSelectedStep();
+		if (selectedStep != null) {
+
+			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getPin());
+			if (controlPointForPin != null) {
+				int cpDuty = controlPointForPin.getDuty();
+
+				if (controlPointForPin.isAutomaticControl()) {
+					color = Colors.INACTIVE;
+				}
+
+				if (selectedStep.isActive()) {
+					if (controlPointForPin.isAutomaticControl()) {
+						text = Integer.toString(duty) + "%";
+					} else {
+						if (duty != cpDuty) {
+							color = Colors.PENDING;
+						}
+						text = Integer.toString(cpDuty) + "%";
+					}
+
+				} else {
+					if (controlPointForPin.isAutomaticControl()) {
+						text = "Auto";
+					} else {
+						text = Integer.toString(cpDuty) + "%";
+					}
+				}
+			}
+		}
+
+		if (text == null) {
+			text = Integer.toString(duty) + "%";
+		}
+		drawText(g, display, text, color, true);
+	}
+
+	private void drawText(Context2d g, BreweryComponentDisplay display, String tempDisplay, CssColor textColor, boolean alignRight) {
+		drawText(g, tempDisplay, textColor, alignRight, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), display.getHeight(), Colors.TEMP_FONT);
+	}
+
+	private void drawText(Context2d g, String text, CssColor textColor, boolean alignRight, int left, int top, int width, int height, String font) {
+		g.setFont(font);
+		g.setFillStyle(textColor);
+		g.fillText(text, left, top);
 	}
 
 	private void drawSensor(Context2d context2d, BreweryComponentDisplay display) {
@@ -156,54 +208,30 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		int width = display.getWidth();
 		int height = display.getHeight();
 
-		CssColor tankColor = Colors.TANK;
-		CssColor strokePaint = Colors.FOREGROUND;
-
 		int textHeight = 10;
 
 		int boxHeight = height - TANK_TOP_HEIGHT - textHeight - 5;
-		int boxR = boxHeight / 2;
-		// bottom arc
-		// Shape circleBottom = new Ellipse2D.Float(left, top + boxHeight,
-		// width, TANK_TOP_HEIGHT);
-		g.setFillStyle(tankColor);
-		g.setStrokeStyle(strokePaint);
+
+		g.setFillStyle(Colors.TANK);
+		g.setStrokeStyle(Colors.FOREGROUND);
 
 		int boxTopLeft = top + TANK_TOP_HEIGHT / 2;
 
+		// Bottom round
 		drawEllipse(g, left, top + boxHeight, width, TANK_TOP_HEIGHT);
-
+		// Middle
 		g.fillRect(left, boxTopLeft, width, boxHeight);
-
 		g.setFillStyle(Colors.TANK_INSIDE);
-
 		g.beginPath();
 		g.moveTo(left, boxTopLeft);
 		g.lineTo(left, boxTopLeft + boxHeight);
-		g.moveTo( left+ width, boxTopLeft);
-		g.lineTo(left+ width, boxTopLeft + boxHeight);
+		g.moveTo(left + width, boxTopLeft);
+		g.lineTo(left + width, boxTopLeft + boxHeight);
 		g.stroke();
 
+		// Top
 		drawEllipse(g, left, top, width, TANK_TOP_HEIGHT);
 
-		// // Center
-		// int boxTopLeft = top + TANK_TOP_HEIGHT / 2;
-		// Shape square = new Rectangle2D.Double(left, boxTopLeft, width,
-		// boxHeight);
-		// g.setFillStyle(tankColor);
-		// g.fill(square);
-		// g.setFillStyle(strokePaint);
-		// g.drawLine(left, boxTopLeft, left, boxTopLeft + boxHeight);
-		// g.drawLine(left + width, boxTopLeft, left + width, boxTopLeft +
-		// boxHeight);
-		//
-		// // Inside/Top of tank
-		// Shape circleTop = new Ellipse2D.Float(left, top, width,
-		// TANK_TOP_HEIGHT);
-		// g.setFillStyle(Colors.TANK_INSIDE);
-		// g.fill(circleTop);
-		// g.setFillStyle(strokePaint);
-		// g.draw(circleTop);
 	}
 
 	private void drawEllipse(Context2d ctx, int x, int y, int w, int h) {
