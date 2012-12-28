@@ -28,8 +28,8 @@ import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
+import com.mohaine.brewcontroller.client.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.net.ControllerHardwareJsonUrlRequest;
-import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing;
 import com.mohaine.brewcontroller.swing.page.OverviewDisplaySwing;
 

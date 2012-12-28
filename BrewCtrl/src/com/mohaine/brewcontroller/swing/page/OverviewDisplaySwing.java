@@ -29,7 +29,7 @@ import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.display.BreweryDisplay;
 import com.mohaine.brewcontroller.client.event.ClickHandler;
 import com.mohaine.brewcontroller.client.layout.BreweryLayout;
-import com.mohaine.brewcontroller.page.Overview.OverviewDisplay;
+import com.mohaine.brewcontroller.client.page.Overview.OverviewDisplay;
 import com.mohaine.brewcontroller.swing.SwingHasClickHandlers;
 
 public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {

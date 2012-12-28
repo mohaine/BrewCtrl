@@ -10,5 +10,10 @@
 	<entry-point class='com.mohaine.brewcontroller.web.client.WebCtrl' />
 	<source path='client' />
 	<source path='shared' />
+	<generate-with
+		class="com.mohaine.brewcontroller.web.rebind.BrewJsonConverterGwtGenerator">
+		<when-type-assignable
+			class="com.mohaine.brewcontroller.client.net.BrewJsonConverter" />
+	</generate-with>
 
 </module>

@@ -18,6 +18,8 @@
 
 package com.mohaine.brewcontroller;
 
+import com.mohaine.brewcontroller.client.DisplayPage;
+
 public interface ControllerGui {
 
 	void displayPage(DisplayPage page);

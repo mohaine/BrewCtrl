@@ -3,7 +3,7 @@ package com.mohaine.brewcontroller.client.layout;
 public abstract class BrewHardwareControl extends BreweryComponent {
 	private int pin;
 	private int duty;
-	private boolean canPulse;
+	private boolean hasDuty;
 
 	public int getDuty() {
 		return duty;
@@ -22,11 +22,11 @@ public abstract class BrewHardwareControl extends BreweryComponent {
 	}
 
 	public boolean isHasDuty() {
-		return canPulse;
+		return hasDuty;
 	}
 
 	public void setHasDuty(boolean hasDuty) {
-		this.canPulse = hasDuty;
+		this.hasDuty = hasDuty;
 	}
 
 }

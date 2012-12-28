@@ -1,12 +1,17 @@
 package com.mohaine.brewcontroller.web.client.net;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
@@ -33,7 +38,7 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 				e.printStackTrace();
 				setStatus(e.getMessage());
 			}
-			statusTimer.schedule(500);
+			statusTimer.schedule(2000);
 		}
 
 	};
@@ -61,40 +66,68 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 	@Override
 	protected CommandRequest getCommandRequest(String cmd) {
 
-		System.out.println("ControllerHardwareJsonGwt.getCommandRequest(): "
-				+ cmd);
-		return new CommandRequest() {
-
-			@Override
-			public void addParameter(String name, String value) {
-				System.out.println("Parameter: " + name + " = " + value);
-			}
-
-			@Override
-			public void runRequest(Callback<String> callback) {
-				// TODO Auto-generated method stub
-
-			}
-		};
+		// System.out.println("ControllerHardwareJsonGwt.getCommandRequest(): "
+		// + cmd);
+		return new CommandRunner(cmd);
 	}
 
-	private void runReq(String url, String requestData) throws Exception {
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
-		builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
-		builder.sendRequest(requestData, new RequestCallback() {
-			public void onError(Request request, Throwable exception) {
+	private final class CommandRunner implements CommandRequest {
+		private String url;
+		private Map<String, String> params;
 
+		public CommandRunner(String cmd) {
+			this.url = "/cmd/" + cmd;
+		}
+
+		@Override
+		public void addParameter(String name, String value) {
+			if (params == null) {
+				params = new HashMap<String, String>();
 			}
+			params.put(name, value);
+		}
 
-			public void onResponseReceived(Request request, Response response) {
-				if (200 == response.getStatusCode()) {
+		@Override
+		public void runRequest(final Callback<String> callback) {
+			RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
+					url);
+			builder.setHeader("Content-Type",
+					"application/x-www-form-urlencoded");
 
-				} else {
-
+			String requestData = "";
+			if (params != null) {
+				StringBuilder sb = new StringBuilder();
+				Set<Entry<String, String>> entrySet = params.entrySet();
+				for (Entry<String, String> entry : entrySet) {
+					sb.append(URL.encode(entry.getKey()));
+					sb.append("=");
+					sb.append(URL.encode(entry.getValue()));
+					sb.append("\r\n");
 				}
+				requestData = sb.toString();
 			}
-		});
 
+			try {
+				builder.sendRequest(requestData, new RequestCallback() {
+					public void onError(Request request, Throwable exception) {
+						callback.onNotSuccess(exception);
+					}
+
+					public void onResponseReceived(Request request,
+							Response response) {
+
+						if (200 == response.getStatusCode()) {
+							callback.onSuccess(response.getText());
+						} else {
+							callback.onNotSuccess(new Exception("Error Code: "
+									+ response.getStatusCode()));
+						}
+					}
+				});
+			} catch (RequestException e) {
+				callback.onNotSuccess(e);
+			}
+		}
 	}
 
 }

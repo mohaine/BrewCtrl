@@ -18,7 +18,6 @@
 
 package com.mohaine.brewcontroller.client.event;
 
-import com.mohaine.brewcontroller.ClickEvent;
 
 public interface ClickHandler {
 	void onClick(ClickEvent event);

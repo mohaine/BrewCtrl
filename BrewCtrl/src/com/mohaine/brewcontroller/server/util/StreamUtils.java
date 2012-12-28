@@ -27,6 +27,19 @@ public class StreamUtils {
 		return sb.toString();
 	}
 
+	public static byte[] readStream(InputStream is, int lengthToRead) throws IOException {
+		byte[] buffer = new byte[lengthToRead];
+		int index = 0;
+		while (index < lengthToRead) {
+			int read = is.read(buffer, index, lengthToRead - index);
+			if (read < 0) {
+				throw new RuntimeException("Unexpected end of stream");
+			}
+			index += read;
+		}
+		return buffer;
+	}
+
 	public static byte[] readStream(InputStream is) throws IOException {
 		byte[] toByteArray;
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

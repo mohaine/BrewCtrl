@@ -31,7 +31,7 @@ import javax.swing.SwingUtilities;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerGui;
-import com.mohaine.brewcontroller.DisplayPage;
+import com.mohaine.brewcontroller.client.DisplayPage;
 
 public class SwingControllerInterface implements ControllerGui {
 	private JFrame frame = new JFrame();

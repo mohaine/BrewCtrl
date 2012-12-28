@@ -37,9 +37,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.ConfigurationLoader;
-import com.mohaine.brewcontroller.SensorConfiguration;
+import com.mohaine.brewcontroller.client.bean.Configuration;
+import com.mohaine.brewcontroller.client.bean.SensorConfiguration;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
 import com.mohaine.brewcontroller.client.event.ChangeEvent;
 import com.mohaine.brewcontroller.client.event.ChangeHandler;

@@ -131,8 +131,8 @@ public class MockHardware {
 						}
 						if (heaterStep != null) {
 							synchronized (heaterStep) {
-								switch (status.getMode()) {
-								case ON: {
+
+								if (Mode.ON.equals(status.getMode())) {
 									if (!heaterStep.isActive()) {
 										lastOnTime = 0;
 										heaterStep.setActive(true);
@@ -162,18 +162,14 @@ public class MockHardware {
 										lastOnTime = now - onTime;
 									}
 									break;
-								}
-								case HOLD: {
+								} else if (Mode.HOLD.equals(status.getMode())) {
 									lastOnTime = 0;
 									heaterStep.setActive(true);
 									break;
-								}
-								case OFF: {
+								} else if (Mode.OFF.equals(status.getMode())) {
 									lastOnTime = 0;
 									heaterStep.setActive(false);
 									break;
-								}
-								default:
 								}
 
 							}

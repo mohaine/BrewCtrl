@@ -1,7 +1,7 @@
 package com.mohaine.brewcontroller.client.bean;
 
 public class VersionBean {
-	String version;
+	private String version;
 
 	public String getVersion() {
 		return version;

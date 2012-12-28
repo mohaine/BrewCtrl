@@ -114,9 +114,7 @@ public class BreweryDisplay {
 		handlers.add(eventBus.addHandler(BreweryComponentChangeEvent.getType(), new BreweryComponentChangeEventHandler() {
 			@Override
 			public void onStateChange(final BreweryComponent component) {
-
 				BreweryDisplay.this.drawer.redrawBreweryComponent(component);
-
 			}
 		}));
 

@@ -58,9 +58,11 @@ public class JsonConverterConfig {
 
 	@SuppressWarnings("unchecked")
 	public <T> T convertToObject(JsonUnknownObject unknownObject, Class<? extends T> class1) {
-		for (JsonObjectHandler<?> handler : objectHandlers) {
-			if (handler.handlesType(class1)) {
-				return (T) convertToObject(unknownObject, handler);
+		if (objectHandlers != null) {
+			for (JsonObjectHandler<?> handler : objectHandlers) {
+				if (handler.handlesType(class1)) {
+					return (T) convertToObject(unknownObject, handler);
+				}
 			}
 		}
 		return null;

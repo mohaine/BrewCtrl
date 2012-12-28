@@ -38,12 +38,12 @@ import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.mohaine.brewcontroller.ConfigurationHeaterStep;
-import com.mohaine.brewcontroller.ConfigurationHeaterStepControlPoint;
 import com.mohaine.brewcontroller.ConfigurationLoader;
-import com.mohaine.brewcontroller.ConfigurationStepList;
 import com.mohaine.brewcontroller.TimeParser;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.bean.ConfigurationStep;
+import com.mohaine.brewcontroller.client.bean.ConfigurationStepControlPoint;
+import com.mohaine.brewcontroller.client.bean.ConfigurationStepList;
 import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.event.HandlerRegistration;
@@ -191,10 +191,10 @@ public class StepDisplayList extends JPanel {
 		TimeParser tp = new TimeParser();
 
 		ArrayList<ControlStep> heaterSteps = new ArrayList<ControlStep>();
-		for (ConfigurationHeaterStep configurationHeaterStep : stepList.getSteps()) {
+		for (ConfigurationStep configurationHeaterStep : stepList.getSteps()) {
 			ControlStep step = controller.createManualStep(configurationHeaterStep.getName());
 			step.setStepTime(tp.parse(configurationHeaterStep.getTime()));
-			for (ConfigurationHeaterStepControlPoint cfgCp : configurationHeaterStep.getControlPoints()) {
+			for (ConfigurationStepControlPoint cfgCp : configurationHeaterStep.getControlPoints()) {
 				BrewHardwareControl bhc = layout.findBrewHardwareControlByNameOrParentName(cfgCp.getControlName());
 				Sensor sensor = layout.findSensorByNameOrParentName(cfgCp.getTargetName());
 				if (bhc != null && sensor != null) {

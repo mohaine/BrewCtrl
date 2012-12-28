@@ -25,10 +25,14 @@ import com.mohaine.brewcontroller.shared.json.ListType;
 public class ControllerStatus {
 
 	public enum Mode {
-		ON, HOLD, OFF, UNKNOWN
+		ON, HOLD, OFF, UNKNOWN;
+
+		public boolean equals(String s) {
+			return toString().equals(s);
+		}
 	}
 
-	private Mode mode = Mode.UNKNOWN;
+	private String mode = Mode.UNKNOWN.toString();
 
 	@ListType(ControlStep.class)
 	private List<ControlStep> steps;
@@ -36,12 +40,16 @@ public class ControllerStatus {
 	@ListType(TempSensor.class)
 	List<TempSensor> sensors;
 
-	public Mode getMode() {
+	public String getMode() {
 		return mode;
 	}
 
 	public void setMode(Mode mode) {
-		this.mode = mode;
+		this.mode = mode.toString();
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode.toString();
 	}
 
 	public List<ControlStep> getSteps() {

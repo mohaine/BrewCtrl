@@ -49,7 +49,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	private List<ControlStep> pendingSteps;
 	private List<ControlStep> pendingStepEdits = new ArrayList<ControlStep>();;
 
-	private Mode pendingMode;
+	private String pendingMode;
 
 	private long lastUpdateTime;
 
@@ -60,7 +60,6 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	protected abstract CommandRequest getCommandRequest(String cmd);
 
 	public interface CommandRequest {
-
 		void runRequest(Callback<String> callback);
 
 		void addParameter(String name, String value);
@@ -98,10 +97,10 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 				CommandRequest commandRequest = getCommandRequest("status");
 
-				final Mode pendingModeRequest = this.pendingMode;
+				final String pendingModeRequest = this.pendingMode;
 				if (pendingModeRequest != null) {
 					this.pendingMode = null;
-					commandRequest.addParameter("mode", pendingModeRequest.toString());
+					commandRequest.addParameter("mode", pendingModeRequest);
 				}
 				// New List?
 				final List<ControlStep> pendingStepsRequest = new ArrayList<ControlStep>();
@@ -132,7 +131,6 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 						try {
 							ControllerStatus lastStatus = controllerStatus;
 							controllerStatus = converter.decode(response, ControllerStatus.class);
-
 							updateLayoutState(false, eventsToFire);
 							eventsToFire.add(new StatusChangeEvent());
 
@@ -221,7 +219,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 					}
 
 					@Override
-					public void onNotSuccess(Exception e) {
+					public void onNotSuccess(Throwable e) {
 						e.printStackTrace();
 						setStatus(e.getMessage());
 					}
@@ -303,7 +301,9 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			@Override
 			public void onSuccess(String versionString) {
 				version = converter.decode(versionString, VersionBean.class);
+
 				if (version != null) {
+					// System.out.println("  Version: " + version.getVersion());
 					connected = true;
 					setStatus("Connected");
 					if (brewLayout == null) {
@@ -313,7 +313,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			}
 
 			@Override
-			public void onNotSuccess(Exception e) {
+			public void onNotSuccess(Throwable e) {
 				connected = false;
 			}
 		});
@@ -347,7 +347,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			}
 
 			@Override
-			public void onNotSuccess(Exception e) {
+			public void onNotSuccess(Throwable e) {
 				e.printStackTrace();
 				disconnect();
 			}
@@ -370,12 +370,12 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	@Override
-	public Mode getMode() {
-		return controllerStatus != null ? controllerStatus.getMode() : Mode.UNKNOWN;
+	public String getMode() {
+		return controllerStatus != null ? controllerStatus.getMode() : Mode.UNKNOWN.toString();
 	}
 
 	@Override
-	public void changeMode(Mode mode) {
+	public void changeMode(String mode) {
 		this.pendingMode = mode;
 		updateStatusAsap();
 	}

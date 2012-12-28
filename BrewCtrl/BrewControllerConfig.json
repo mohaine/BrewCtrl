@@ -12,7 +12,7 @@
                "name":"HTL Element",
                "pin":9,
                "duty":0,
-               "canPulse":true,
+               "hasDuty":false,
                "fullOnAmps":18
             }
          },
@@ -29,7 +29,7 @@
                "name":"Kettle Element",
                "pin":7,
                "duty":65,
-               "canPulse":true,
+               "hasDuty":false,
                "fullOnAmps":23
             }
          }
@@ -39,7 +39,7 @@
             "name":"HLT Loop",
             "pin":8,
             "duty":0,
-            "canPulse":false
+            "hasDuty":false
          }
       ],
       "maxAmps":25,

@@ -9,8 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.mohaine.brewcontroller.BrewJsonConverterRefection;
-import com.mohaine.brewcontroller.Configuration;
 import com.mohaine.brewcontroller.ConfigurationLoader;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.server.util.FileUtils;
 import com.mohaine.brewcontroller.server.util.StreamUtils;
 import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;

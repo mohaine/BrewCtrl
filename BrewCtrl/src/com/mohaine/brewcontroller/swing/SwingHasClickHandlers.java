@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
-import com.mohaine.brewcontroller.ClickEvent;
+import com.mohaine.brewcontroller.client.event.ClickEvent;
 import com.mohaine.brewcontroller.client.event.ClickHandler;
 import com.mohaine.brewcontroller.client.event.HandlerRegistration;
 import com.mohaine.brewcontroller.client.event.HasClickHandlers;

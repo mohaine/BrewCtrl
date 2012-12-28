@@ -85,27 +85,27 @@ public class StatusDisplay extends JPanel {
 		}
 
 	});
-	private HasValue<Mode> modeHasValue = new AbstractHasValue<Mode>() {
+	private HasValue<String> modeHasValue = new AbstractHasValue<String>() {
 
 		@Override
-		public Mode getValue() {
+		public String getValue() {
 			if (modeOffButton.getModel().isSelected()) {
-				return Mode.OFF;
+				return Mode.OFF.toString();
 			}
 			if (modeHoldButton.getModel().isSelected()) {
-				return Mode.HOLD;
+				return Mode.HOLD.toString();
 			}
 			if (modeOnButton.getModel().isSelected()) {
-				return Mode.ON;
+				return Mode.ON.toString();
 			}
 			return null;
 		}
 
 		@Override
-		public void setValue(Mode value, boolean fireEvents) {
-			modeHoldButton.getModel().setSelected(value == Mode.HOLD);
-			modeOnButton.getModel().setSelected(value == Mode.ON);
-			modeOffButton.getModel().setSelected(value == Mode.OFF);
+		public void setValue(String value, boolean fireEvents) {
+			modeHoldButton.getModel().setSelected(Mode.HOLD.equals(value));
+			modeOnButton.getModel().setSelected(Mode.ON.equals(value));
+			modeOffButton.getModel().setSelected(Mode.OFF.equals(value));
 
 			if (fireEvents) {
 				fireEvent(new ChangeEvent());
@@ -198,7 +198,7 @@ public class StatusDisplay extends JPanel {
 
 		handlers.add(eventBus.addHandler(ChangeModeEvent.getType(), new ChangeModeEventHandler() {
 			@Override
-			public void onChangeMode(final Mode mode) {
+			public void onChangeMode(final String mode) {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -224,11 +224,15 @@ public class StatusDisplay extends JPanel {
 	}
 
 	private void changeMode(Mode newMode) {
+		changeMode(newMode.toString());
+	}
+
+	private void changeMode(String newMode) {
 		modeHasValue.setValue(newMode, true);
 		controller.changeMode(newMode);
 	}
 
-	private void updateMode(Mode mode) {
+	private void updateMode(String mode) {
 		modeHasValue.setValue(mode, false);
 	}
 
@@ -282,28 +286,23 @@ public class StatusDisplay extends JPanel {
 
 		ControllerStatus hardwareStatus = controller.getControllerStatus();
 		if (hardwareStatus != null) {
-			switch (hardwareStatus.getMode()) {
-			case OFF:
+			if (Mode.OFF.equals(hardwareStatus.getMode())) {
 				modeOffButton.setSelected(true);
 				modeOnButton.setSelected(false);
 				modeHoldButton.setSelected(false);
 				mode.setText("Off");
-				break;
-			case ON:
+			} else if (Mode.ON.equals(hardwareStatus.getMode())) {
 				modeOffButton.setSelected(false);
 				modeOnButton.setSelected(true);
 				modeHoldButton.setSelected(false);
 				mode.setText("On");
-				break;
-			case HOLD:
+			} else if (Mode.HOLD.equals(hardwareStatus.getMode())) {
 				modeOffButton.setSelected(false);
 				modeOnButton.setSelected(false);
 				modeHoldButton.setSelected(true);
 				mode.setText("Hold");
-				break;
-			default:
+			} else {
 				mode.setText("???????");
-				break;
 			}
 		}
 

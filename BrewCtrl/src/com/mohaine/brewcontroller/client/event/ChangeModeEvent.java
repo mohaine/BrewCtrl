@@ -18,7 +18,6 @@
 
 package com.mohaine.brewcontroller.client.event;
 
-import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.client.event.bus.Event;
 
 public class ChangeModeEvent extends Event<ChangeModeEventHandler> {
@@ -28,9 +27,9 @@ public class ChangeModeEvent extends Event<ChangeModeEventHandler> {
 		return TYPE != null ? TYPE : (TYPE = new Type<ChangeModeEventHandler>());
 	}
 
-	private final Mode mode;
+	private final String mode;
 
-	public ChangeModeEvent(Mode mode) {
+	public ChangeModeEvent(String mode) {
 		super();
 		this.mode = mode;
 	}
