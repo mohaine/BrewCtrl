@@ -106,7 +106,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				// New List?
 				final List<ControlStep> pendingStepsRequest = new ArrayList<ControlStep>();
 				if (this.pendingSteps != null) {
-					pendingStepsRequest.addAll(pendingStepsRequest);
+					pendingStepsRequest.addAll(this.pendingSteps);
 					this.pendingSteps = null;
 					String encode = converter.encode(pendingStepsRequest);
 					commandRequest.addParameter("steps", encode);
@@ -116,6 +116,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				final List<ControlStep> modifySteps = new ArrayList<ControlStep>();
 				synchronized (pendingStepEdits) {
 					if (pendingStepEdits.size() > 0) {
+						modifySteps.addAll(pendingStepEdits);
 						pendingStepEdits.clear();
 						String encode = converter.encode(modifySteps);
 						commandRequest.addParameter("modifySteps", encode);
@@ -125,6 +126,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				commandRequest.runRequest(new Callback<String>() {
 					@Override
 					public void onSuccess(String response) {
+
 						boolean success = false;
 						List<Event<?>> eventsToFire = new ArrayList<Event<?>>();
 						try {
@@ -136,7 +138,6 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 							if (controllerStatus != null) {
 								List<ControlStep> newSteps = controllerStatus.getSteps();
-
 								boolean stepsStructureChanged = true;
 								if (lastStatus != null) {
 									if (!lastStatus.getMode().equals(controllerStatus.getMode())) {
