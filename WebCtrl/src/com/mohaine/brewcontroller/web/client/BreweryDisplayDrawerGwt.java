@@ -1,11 +1,5 @@
 package com.mohaine.brewcontroller.web.client;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import com.google.gwt.canvas.client.Canvas;
@@ -22,8 +16,6 @@ import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MouseListener;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.Converter;
@@ -32,8 +24,8 @@ import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
-import com.mohaine.brewcontroller.client.display.DrawerMouseListener.DrawerMouseEvent;
 import com.mohaine.brewcontroller.client.display.DrawerMouseListener;
+import com.mohaine.brewcontroller.client.display.DrawerMouseListener.DrawerMouseEvent;
 import com.mohaine.brewcontroller.client.layout.BreweryComponent;
 import com.mohaine.brewcontroller.client.layout.HeatElement;
 import com.mohaine.brewcontroller.client.layout.Pump;
@@ -42,7 +34,6 @@ import com.mohaine.brewcontroller.client.layout.Tank;
 
 public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private static final int TANK_TOP_HEIGHT = 20;
-	private int PADDING = 5;
 
 	private UnitConversion conversion;
 	private ControllerHardware controller;
@@ -56,6 +47,8 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private List<BreweryComponentDisplay> displays;
 	private Context2d context;
 	private Context2d backBufferContext;
+	private int width = 10;
+	private int height = 10;
 
 	@Inject
 	public BreweryDisplayDrawerGwt(ControllerHardware controller, UnitConversion conversion) {
@@ -69,6 +62,15 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		}
 		backBuffer = Canvas.createIfSupported();
 
+		updateWidths();
+
+		panel.add(canvas);
+		context = canvas.getContext2d();
+		backBufferContext = backBuffer.getContext2d();
+
+	}
+
+	private void updateWidths() {
 		// init the canvases
 		int width = getWidth();
 		int height = getHeight();
@@ -79,23 +81,22 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		canvas.setCoordinateSpaceHeight(height);
 		backBuffer.setCoordinateSpaceWidth(width);
 		backBuffer.setCoordinateSpaceHeight(height);
-
-		panel.add(canvas);
-		context = canvas.getContext2d();
-		backBufferContext = backBuffer.getContext2d();
-
 	}
 
 	private int getHeight() {
-		return 800;
+
+		return height;
 	}
 
 	private int getWidth() {
-		return 800;
+		return width;
 	}
 
 	@Override
-	public void setDisplays(List<BreweryComponentDisplay> displays) {
+	public void setDisplays(List<BreweryComponentDisplay> displays, int width, int height) {
+		this.width = width;
+		this.height = height;
+		updateWidths();
 		this.displays = displays;
 	}
 

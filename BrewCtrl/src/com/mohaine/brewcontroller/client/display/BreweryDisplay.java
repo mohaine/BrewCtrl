@@ -29,7 +29,7 @@ public class BreweryDisplay {
 
 	public interface BreweryDisplayDrawer {
 
-		void setDisplays(List<BreweryComponentDisplay> displays);
+		void setDisplays(List<BreweryComponentDisplay> displays, int width, int height);
 
 		void redrawBreweryComponent(BreweryComponent component);
 
@@ -239,6 +239,7 @@ public class BreweryDisplay {
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
 		displays.clear();
+
 		List<Tank> tanks = brewLayout.getTanks();
 
 		for (Tank tank : tanks) {
@@ -257,13 +258,13 @@ public class BreweryDisplay {
 				bcd.setLeft(2);
 				bcd.setParent(tankBcd);
 			}
+
 		}
 
 		List<Pump> pumps = brewLayout.getPumps();
 		for (Pump pump : pumps) {
 			createBcd(pump, 100, 100);
 		}
-		drawer.setDisplays(displays);
 
 		layoutDisplays();
 	}
@@ -276,7 +277,8 @@ public class BreweryDisplay {
 	}
 
 	public void layoutDisplays() {
-
+		int width = 0;
+		int height = 0;
 		int left = 5;
 		int top = 5;
 
@@ -285,6 +287,10 @@ public class BreweryDisplay {
 			tank.setTop(top);
 			left += tank.getHeight();
 			left += 5;
+
+			width = Math.max(width, left);
+			height = Math.max(height, top + tank.getHeight() + 5);
+
 		}
 
 		left = 5;
@@ -295,7 +301,12 @@ public class BreweryDisplay {
 			pump.setTop(top);
 			left += pump.getHeight();
 			left += 5;
+
+			width = Math.max(width, left);
+			height = Math.max(height, top + pump.getHeight() + 5);
+
 		}
+		drawer.setDisplays(displays, width, height);
 
 	}
 

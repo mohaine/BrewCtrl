@@ -42,7 +42,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	private static final int TANK_TOP_HEIGHT = 20;
 	private static final long serialVersionUID = 1L;
 	private List<BreweryComponentDisplay> displays;
-	private int PADDING = 5;
 	private NumberFormat numberFormat = new DecimalFormat("0.0");
 	private NumberFormat numberFormatWhole = new DecimalFormat("0");
 	private UnitConversion conversion;
@@ -385,25 +384,28 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	@Override
-	public void setDisplays(List<BreweryComponentDisplay> displays) {
+	public void setDisplays(List<BreweryComponentDisplay> displays, int width, int height) {
 		invalidate();
+
+		setPreferredSize(new Dimension(width, height));
+
 		this.displays = new ArrayList<BreweryComponentDisplay>(displays);
 	}
 
-	@Override
-	public Dimension getPreferredSize() {
-		Dimension preferredSize = super.getPreferredSize();
-
-		int maxX = 0;
-		int maxY = 0;
-		for (BreweryComponentDisplay display : displays) {
-			maxX = Math.max(maxX, display.getLeft() + display.getWidth());
-			maxY = Math.max(maxY, display.getTop() + display.getHeight());
-		}
-		preferredSize.setSize(maxX + PADDING, maxY + PADDING);
-
-		return preferredSize;
-	}
+	// @Override
+	// public Dimension getPreferredSize() {
+	// Dimension preferredSize = super.getPreferredSize();
+	//
+	// int maxX = 0;
+	// int maxY = 0;
+	// for (BreweryComponentDisplay display : displays) {
+	// maxX = Math.max(maxX, display.getLeft() + display.getWidth());
+	// maxY = Math.max(maxY, display.getTop() + display.getHeight());
+	// }
+	// preferredSize.setSize(maxX + PADDING, maxY + PADDING);
+	//
+	// return preferredSize;
+	// }
 
 	@Override
 	public void addMouseListener(final DrawerMouseListener drawerMouseListener) {
@@ -456,7 +458,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 
 	@Override
 	public Object getWidget() {
-		// TODO Auto-generated method stub
 		return this;
 	}
 }
