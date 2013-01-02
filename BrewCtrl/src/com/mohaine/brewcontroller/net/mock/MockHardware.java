@@ -15,7 +15,6 @@ import com.mohaine.brewcontroller.client.layout.Sensor;
 import com.mohaine.brewcontroller.client.layout.Tank;
 
 public class MockHardware {
-
 	private ControllerStatus status;
 	private BreweryLayout layout;
 
@@ -29,7 +28,6 @@ public class MockHardware {
 
 	public void setLayout(BreweryLayout layout) {
 		this.layout = layout;
-
 	}
 
 	public ControllerStatus getStatus() {
@@ -103,86 +101,87 @@ public class MockHardware {
 
 		@Override
 		public void run() {
-			long lastOnTime = 0;
 
+			long lastOnTime = 0;
 			Random r = new Random();
 			while (true) {
+				try {
+					lastOnTime = updateLoop(lastOnTime, r);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		}
 
-				ControlStep heaterStep = null;
+		private long updateLoop(long lastOnTime, Random r) {
+			ControlStep heaterStep = null;
+			if (status != null) {
+				List<TempSensor> sensors = status.getSensors();
+				for (TempSensor hardwareSensor : sensors) {
+					hardwareSensor.setTempatureC(hardwareSensor.getTempatureC() + (r.nextDouble() - 0.5));
+				}
 
-				if (status != null) {
-					List<TempSensor> sensors = status.getSensors();
-					for (TempSensor hardwareSensor : sensors) {
-						hardwareSensor.setTempatureC(hardwareSensor.getTempatureC() + (r.nextDouble() - 0.5));
-					}
-
-					List<ControlStep> steps = status.getSteps();
-					if (steps != null) {
-
-						synchronized (steps) {
-
-							if (layout != null && steps.size() == 0) {
-								steps.add(createManualStep("Default"));
-							}
-
-							if (steps.size() > 0) {
-								heaterStep = steps.get(0);
-							}
+				List<ControlStep> steps = status.getSteps();
+				if (steps != null) {
+					synchronized (steps) {
+						if (layout != null && steps.size() == 0) {
+							steps.add(createManualStep("Default"));
 						}
-						if (heaterStep != null) {
-							synchronized (heaterStep) {
 
-								if (Mode.ON.equals(status.getMode())) {
-									if (!heaterStep.isActive()) {
-										lastOnTime = 0;
-										heaterStep.setActive(true);
-									}
-									int stepTime = heaterStep.getStepTime();
-									if (stepTime > 0) {
-										long now = System.currentTimeMillis();
-										long onTime = 0;
-										if (lastOnTime > 0) {
-											onTime = now - lastOnTime;
+						if (steps.size() > 0) {
+							heaterStep = steps.get(0);
+						}
+					}
+					if (heaterStep != null) {
+						synchronized (heaterStep) {
 
-											while (onTime > 1000) {
-												int newStepTime = stepTime - 1;
-												onTime -= 1000;
-												if (newStepTime <= 0) {
-													synchronized (steps) {
-														status.getSteps().remove(heaterStep);
-													}
-													break;
-												} else {
-													heaterStep.setStepTime(newStepTime);
-												}
-											}
-
-										}
-										// Put extra back into lastOnTime;
-										lastOnTime = now - onTime;
-									}
-									break;
-								} else if (Mode.HOLD.equals(status.getMode())) {
+							if (Mode.ON.equals(status.getMode())) {
+								if (!heaterStep.isActive()) {
 									lastOnTime = 0;
 									heaterStep.setActive(true);
-									break;
-								} else if (Mode.OFF.equals(status.getMode())) {
-									lastOnTime = 0;
-									heaterStep.setActive(false);
-									break;
 								}
+								int stepTime = heaterStep.getStepTime();
+								if (stepTime > 0) {
+									long now = System.currentTimeMillis();
+									long onTime = 0;
+									if (lastOnTime > 0) {
+										onTime = now - lastOnTime;
 
+										while (onTime > 1000) {
+											int newStepTime = stepTime - 1;
+											onTime -= 1000;
+											if (newStepTime <= 0) {
+												synchronized (steps) {
+													status.getSteps().remove(heaterStep);
+												}
+												break;
+											} else {
+												heaterStep.setStepTime(newStepTime);
+											}
+										}
+
+									}
+									// Put extra back into lastOnTime;
+									lastOnTime = now - onTime;
+								}
+							} else if (Mode.HOLD.equals(status.getMode())) {
+								lastOnTime = 0;
+								heaterStep.setActive(true);
+							} else if (Mode.OFF.equals(status.getMode())) {
+								lastOnTime = 0;
+								heaterStep.setActive(false);
 							}
+
 						}
 					}
 				}
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-
 			}
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+			return lastOnTime;
 		}
 	}
 

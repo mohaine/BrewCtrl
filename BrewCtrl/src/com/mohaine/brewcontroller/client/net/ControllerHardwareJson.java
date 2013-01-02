@@ -68,13 +68,8 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	@Inject
 	public ControllerHardwareJson(EventBus eventBusp, BrewJsonConverter converter) throws Exception {
 		super();
-
 		this.converter = converter.getJsonConverter();
 		this.eventBus = eventBusp;
-
-		// brewLayout = new BreweryLayout();
-		// brewLayout.setTanks(new ArrayList<Tank>());
-		// brewLayout.setPumps(new ArrayList<Pump>());
 
 		// Listen for step mods, update remote if there is a change
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
@@ -131,6 +126,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 						try {
 							ControllerStatus lastStatus = controllerStatus;
 							controllerStatus = converter.decode(response, ControllerStatus.class);
+
 							updateLayoutState(false, eventsToFire);
 							eventsToFire.add(new StatusChangeEvent());
 
@@ -254,7 +250,6 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			for (Tank tank : tanks) {
 				Sensor sensor = tank.getSensor();
 				if (sensor != null) {
-
 					TempSensor tankTs = null;
 					List<TempSensor> sensors = controllerStatus.getSensors();
 					for (TempSensor tempSensor : sensors) {
@@ -270,9 +265,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 					Double temp = sensor.getTempatureC();
 					boolean reading = sensor.isReading();
-					sensor.setAddress(tankTs.getAddress());
-					sensor.setReading(tankTs.isReading());
-					sensor.setTempatureC(tankTs.getTempatureC());
+					sensor.setSensor(tankTs);
 
 					boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
 					if (diff) {

@@ -239,34 +239,35 @@ public class BreweryDisplay {
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
 		displays.clear();
+		if (brewLayout != null) {
+			List<Tank> tanks = brewLayout.getTanks();
 
-		List<Tank> tanks = brewLayout.getTanks();
+			for (Tank tank : tanks) {
+				BreweryComponentDisplay tankBcd = createBcd(tank, 200, 200);
 
-		for (Tank tank : tanks) {
-			BreweryComponentDisplay tankBcd = createBcd(tank, 200, 200);
+				if (tank.getHeater() != null) {
+					BreweryComponentDisplay bcd = createBcd(tank.getHeater(), 98, 30);
+					bcd.setTop(25);
+					bcd.setLeft(102);
+					bcd.setParent(tankBcd);
+				}
 
-			if (tank.getHeater() != null) {
-				BreweryComponentDisplay bcd = createBcd(tank.getHeater(), 98, 30);
-				bcd.setTop(25);
-				bcd.setLeft(102);
-				bcd.setParent(tankBcd);
+				if (tank.getSensor() != null) {
+					BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 98, 60);
+					bcd.setTop(25);
+					bcd.setLeft(2);
+					bcd.setParent(tankBcd);
+				}
+
 			}
 
-			if (tank.getSensor() != null) {
-				BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 98, 60);
-				bcd.setTop(25);
-				bcd.setLeft(2);
-				bcd.setParent(tankBcd);
+			List<Pump> pumps = brewLayout.getPumps();
+			for (Pump pump : pumps) {
+				createBcd(pump, 100, 100);
 			}
 
+			layoutDisplays();
 		}
-
-		List<Pump> pumps = brewLayout.getPumps();
-		for (Pump pump : pumps) {
-			createBcd(pump, 100, 100);
-		}
-
-		layoutDisplays();
 	}
 
 	private BreweryComponentDisplay createBcd(BreweryComponent comp, int width, int height) {

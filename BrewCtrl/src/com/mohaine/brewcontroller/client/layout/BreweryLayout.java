@@ -12,7 +12,6 @@ public class BreweryLayout {
 	private List<Pump> pumps = new ArrayList<Pump>();
 
 	private int maxAmps = 25;
-	private boolean turnOffOnCommLoss = false;
 
 	public int getMaxAmps() {
 		return maxAmps;
@@ -20,14 +19,6 @@ public class BreweryLayout {
 
 	public void setMaxAmps(int maxAmps) {
 		this.maxAmps = maxAmps;
-	}
-
-	public boolean isTurnOffOnCommLoss() {
-		return turnOffOnCommLoss;
-	}
-
-	public void setTurnOffOnCommLoss(boolean turnOffOnCommLoss) {
-		this.turnOffOnCommLoss = turnOffOnCommLoss;
 	}
 
 	public void setTanks(List<Tank> tanks) {

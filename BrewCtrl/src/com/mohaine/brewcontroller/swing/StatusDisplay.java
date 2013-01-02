@@ -190,6 +190,7 @@ public class StatusDisplay extends JPanel {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
+
 						updateState();
 					}
 				});
@@ -311,6 +312,7 @@ public class StatusDisplay extends JPanel {
 			boolean found = false;
 			for (SensorLabel sensorLabel : sensorLabels) {
 				if (sensorLabel.sensor.getAddress().equals(tempSensor.getAddress())) {
+					sensorLabel.sensor = tempSensor;
 					sensorLabel.update();
 					found = true;
 					break;

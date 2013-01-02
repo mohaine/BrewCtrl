@@ -71,7 +71,6 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 	@Override
 	public void cleanup() {
 		breweryDisplay.cleanup();
-
 	}
 
 }

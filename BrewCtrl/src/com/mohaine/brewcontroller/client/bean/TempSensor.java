@@ -19,8 +19,7 @@
 package com.mohaine.brewcontroller.client.bean;
 
 public class TempSensor {
-
-	private String address;
+	private String address = "";
 	private double tempatureC;
 	private boolean reading = false;
 

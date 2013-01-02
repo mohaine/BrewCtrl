@@ -43,18 +43,12 @@ public class BrewControllerSwingModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-
 		bind(ConfigurationLoader.class).toInstance(new FileConfigurationLoader(configFile));
-
 		bind(BrewJsonConverter.class).to(BrewJsonConverterRefection.class).asEagerSingleton();
-
 		bind(ControllerGui.class).to(SwingControllerInterface.class).asEagerSingleton();
 		bind(ControllerHardware.class).to(ControllerHardwareJsonUrlRequest.class).asEagerSingleton();
-
 		bind(OverviewDisplay.class).to(OverviewDisplaySwing.class);
-
 		bind(EventBus.class).asEagerSingleton();
-
 		bind(BreweryDisplayDrawer.class).to(BreweryDisplayDrawerSwing.class);
 
 	}

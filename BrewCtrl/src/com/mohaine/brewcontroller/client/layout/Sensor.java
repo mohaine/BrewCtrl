@@ -1,11 +1,12 @@
 package com.mohaine.brewcontroller.client.layout;
 
+import com.mohaine.brewcontroller.client.bean.TempSensor;
+
 public class Sensor extends BreweryComponent {
 
 	public static final String TYPE = "Sensor";
-	private boolean reading;
-	private Double tempatureC;
-	private String address;
+
+	private TempSensor sensor;
 
 	@Override
 	public String getType() {
@@ -13,27 +14,24 @@ public class Sensor extends BreweryComponent {
 	}
 
 	public boolean isReading() {
-		return reading;
-	}
-
-	public void setReading(boolean reading) {
-		this.reading = reading;
+		return sensor != null ? sensor.isReading() : false;
 	}
 
 	public Double getTempatureC() {
-		return tempatureC;
-	}
+		return sensor != null ? sensor.getTempatureC() : null;
 
-	public void setTempatureC(Double temp) {
-		this.tempatureC = temp;
 	}
 
 	public String getAddress() {
-		return address;
+		return sensor != null ? sensor.getAddress() : "";
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public TempSensor getSensor() {
+		return sensor;
+	}
+
+	public void setSensor(TempSensor sensor) {
+		this.sensor = sensor;
 	}
 
 }

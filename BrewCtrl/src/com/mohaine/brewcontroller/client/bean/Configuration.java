@@ -39,9 +39,7 @@ public class Configuration {
 	}
 
 	public SensorConfiguration updateSensor(String address, String name, String locationName) {
-
 		SensorConfiguration sensor = findSensor(address);
-
 		if (sensor == null) {
 			if (sensors == null) {
 				sensors = new ArrayList<SensorConfiguration>();
@@ -50,12 +48,9 @@ public class Configuration {
 			sensor.setAddress(address);
 			sensors.add(sensor);
 		}
-
 		sensor.setName(name);
 		sensor.setLocation(locationName);
-
 		return sensor;
-
 	}
 
 	public SensorConfiguration findSensor(String address) {

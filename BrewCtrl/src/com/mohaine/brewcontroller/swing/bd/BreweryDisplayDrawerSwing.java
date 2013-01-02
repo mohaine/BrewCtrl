@@ -114,9 +114,10 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setColor(Colors.BACKGROUND);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-
-		for (BreweryComponentDisplay display : displays) {
-			drawComponent(g2, display, true);
+		if (displays != null) {
+			for (BreweryComponentDisplay display : displays) {
+				drawComponent(g2, display, true);
+			}
 		}
 	}
 
