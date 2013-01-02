@@ -23,9 +23,9 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Converter;
-import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.Converter;
+import com.mohaine.brewcontroller.client.UnitConversion;
 import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay;
@@ -365,7 +365,6 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 			int subSize = (int) (cirRadius * 0.7f);
 			Shape circle2 = new Ellipse2D.Float(cirRadius - subSize / 2, cirRadius - subSize / 2, subSize, subSize);
 			drawG.fill(circle2);
-			// c.drawCircle(cirCenterX, cirMidY, cirSize / 2, strokePaint);
 		}
 
 		g.drawImage(image, left, top, null);

@@ -1,15 +1,24 @@
 package com.mohaine.brewcontroller.web.client;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.Converter;
+import com.mohaine.brewcontroller.client.UnitConversion;
 import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay;
@@ -24,9 +33,11 @@ import com.mohaine.brewcontroller.client.layout.Tank;
 public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private static final int TANK_TOP_HEIGHT = 20;
 	private int PADDING = 5;
-	// private UnitConversion conversion;
-	private ControllerHardware controller;
 
+	private UnitConversion conversion;
+	private ControllerHardware controller;
+	private NumberFormat numberFormat = NumberFormat.getFormat("0.0");
+	private NumberFormat numberFormatWhole = NumberFormat.getFormat("0");
 	static final String UPGRADE_MESSAGE = "Your browser does not support the HTML5 Canvas.";
 	private FlowPanel panel = new FlowPanel();
 
@@ -37,8 +48,9 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private Context2d backBufferContext;
 
 	@Inject
-	public BreweryDisplayDrawerGwt(ControllerHardware controller) {
+	public BreweryDisplayDrawerGwt(ControllerHardware controller, UnitConversion conversion) {
 		this.controller = controller;
+		this.conversion = conversion;
 
 		canvas = Canvas.createIfSupported();
 		if (canvas == null) {
@@ -79,8 +91,13 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 
 	@Override
 	public void redrawBreweryComponent(BreweryComponent component) {
-		// TODO Auto-generated method stub
-		System.out.println("BreweryDisplayDrawerGwt.redrawBreweryComponent()");
+		for (BreweryComponentDisplay display : displays) {
+			BreweryComponent displayComponent = display.getComponent();
+			if (displayComponent == component) {
+				drawComponent(backBufferContext, display, true);
+				context.drawImage(backBufferContext.getCanvas(), 0, 0);
+			}
+		}
 	}
 
 	@Override
@@ -111,9 +128,6 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 			}
 		} else if (Pump.TYPE.equals(component.getType())) {
 			drawPump(context2d, display);
-			if (full) {
-				drawName(context2d, display);
-			}
 		} else if (Sensor.TYPE.equals(component.getType())) {
 			drawSensor(context2d, display);
 		} else if (HeatElement.TYPE.equals(component.getType())) {
@@ -175,12 +189,44 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private void drawText(Context2d g, String text, CssColor textColor, boolean alignRight, int left, int top, int width, int height, String font) {
 		g.setFont(font);
 		g.setFillStyle(textColor);
-		g.fillText(text, left, top);
+		g.fillText(text, left, top + height);
 	}
 
-	private void drawSensor(Context2d context2d, BreweryComponentDisplay display) {
-		// TODO Auto-generated method stub
+	private void drawSensor(Context2d g, BreweryComponentDisplay display) {
+		Sensor sensor = (Sensor) display.getComponent();
+		Double tempatureC = sensor.getTempatureC();
+		if (tempatureC != null) {
+			final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
+			String tempDisplay = numberFormat.format(tempDisplayConveter.convertFrom(tempatureC)) + "\u00B0";
 
+			CssColor textColor;
+			if (sensor.isReading()) {
+				textColor = Colors.FOREGROUND;
+			} else {
+				textColor = Colors.ERROR;
+			}
+			drawText(g, tempDisplay, textColor, false, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, Colors.TEMP_FONT);
+
+			boolean clearText = true;
+			ControlStep selectedStep = controller.getSelectedStep();
+			if (selectedStep != null) {
+				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
+				if (cp != null && cp.isAutomaticControl()) {
+					// if (selectedStep.isActive()) {
+					// if (cp.getTargetTemp() != sensor.getTargetTemp()) {
+					// textColor = Colors.PENDING;
+					// }
+					// }
+					clearText = false;
+					tempDisplay = numberFormatWhole.format(tempDisplayConveter.convertFrom(cp.getTargetTemp())) + "\u00B0";
+					drawText(g, "(" + tempDisplay + ")", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
+				}
+			}
+
+			if (clearText) {
+				drawText(g, "", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
+			}
+		}
 	}
 
 	private void drawName(Context2d g, BreweryComponentDisplay display) {
@@ -195,8 +241,76 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		}
 	}
 
-	private void drawPump(Context2d context2d, BreweryComponentDisplay display) {
-		// TODO Auto-generated method stub
+	private void drawPump(Context2d g, BreweryComponentDisplay display) {
+		g.setFont(Colors.TEXT_FONT);
+		drawName(g, display);
+
+		int top = display.getTop();
+		int left = display.getLeft();
+		int width = display.getWidth();
+		int height = display.getHeight() - 15;
+
+		// drawG.setColor(Colors.BACKGROUND);
+		// drawG.fillRect(0, 0, width, height);
+
+		Pump pump = (Pump) display.getComponent();
+		boolean on = pump.isOn();
+
+		CssColor backPaint = null;
+
+		ControlStep selectedStep = controller.getSelectedStep();
+		if (selectedStep != null) {
+			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(pump.getPin());
+			if (controlPointForPin != null) {
+				int cpDuty = controlPointForPin.getDuty();
+
+				if (controlPointForPin.isAutomaticControl()) {
+					backPaint = Colors.INACTIVE;
+				}
+
+				if (selectedStep.isActive()) {
+
+					if (controlPointForPin.isAutomaticControl()) {
+
+					} else {
+						if (on != cpDuty > 0) {
+							on = cpDuty > 0;
+							backPaint = Colors.PENDING;
+						}
+					}
+				} else {
+					on = cpDuty > 0;
+				}
+			}
+		}
+
+		if (backPaint == null) {
+			backPaint = (on ? Colors.PUMP_ON : Colors.PUMP_OFF);
+		}
+
+		CssColor strokePaint = Colors.FOREGROUND;
+
+		int cirSize = (int) (Math.min(width, height) - 1);
+
+		int cirRadius = cirSize / 2;
+//		g.strokeRect(display.getLeft(), display.getTop(), display.getWidth(), display.getHeight());
+
+		g.translate(left, top);
+
+		g.setStrokeStyle(strokePaint);
+		g.setFillStyle(backPaint);
+		g.fillRect(cirRadius, 0, width - cirRadius - 1, cirRadius * 0.67);
+		g.strokeRect(cirRadius, 0, width - cirRadius - 1, cirRadius * 0.67);
+
+		drawEllipse(g, 0, 0, cirSize, cirSize);
+
+		if (!on) {
+			int subSize = (int) (cirRadius * 0.7f);
+			g.setFillStyle(strokePaint);
+			drawEllipse(g, cirRadius - subSize / 2, cirRadius - subSize / 2, subSize, subSize);
+		}
+
+		g.translate(0, 0);
 
 	}
 

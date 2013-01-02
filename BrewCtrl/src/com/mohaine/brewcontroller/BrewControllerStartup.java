@@ -21,6 +21,7 @@ package com.mohaine.brewcontroller;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.DisplayPage;
+import com.mohaine.brewcontroller.client.UnitConversion;
 import com.mohaine.brewcontroller.client.page.Overview;
 
 public class BrewControllerStartup {

@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import com.mohaine.brewcontroller.Converter;
+import com.mohaine.brewcontroller.client.Converter;
 import com.mohaine.brewcontroller.client.event.ChangeEvent;
 import com.mohaine.brewcontroller.client.event.ChangeHandler;
 import com.mohaine.brewcontroller.client.event.HandlerRegistration;

@@ -16,12 +16,11 @@
  
  */
 
-package com.mohaine.brewcontroller;
+package com.mohaine.brewcontroller.client;
 
-public interface Converter<T, F> {
 
-	F convertFrom(T value);
-
-	T convertTo(F value);
-
+public class UnitConversion {
+	public Converter<Double, Double> getTempDisplayConveter() {
+		return new TempFConverter();
+	}
 }

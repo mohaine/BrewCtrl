@@ -33,9 +33,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.Converter;
 import com.mohaine.brewcontroller.TimeParser;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.Converter;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.event.ChangeEvent;
 import com.mohaine.brewcontroller.client.event.ChangeHandler;

@@ -38,8 +38,8 @@ import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.mohaine.brewcontroller.UnitConversion;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.UnitConversion;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.client.bean.TempSensor;

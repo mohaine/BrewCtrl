@@ -16,7 +16,8 @@
  
  */
 
-package com.mohaine.brewcontroller;
+package com.mohaine.brewcontroller.client;
+
 
 public class TempFConverter implements Converter<Double, Double> {
 
