@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
@@ -38,7 +39,8 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	private ControllerStatus controllerStatus;
 	private String status;
 	private ControlStep selectedStep;
-	private BreweryLayout brewLayout;
+
+	private Configuration configuration;
 	private EventBus eventBus;
 	private VersionBean version;
 	public boolean connected = false;
@@ -55,7 +57,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 	private final JsonObjectConverter converter;
 
-	protected abstract BreweryLayout loadDefaultLayout();
+	protected abstract Configuration loadDefaultConfiguration();
 
 	protected abstract CommandRequest getCommandRequest(String cmd);
 
@@ -246,7 +248,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				}
 			}
 
-			List<Tank> tanks = brewLayout.getTanks();
+			List<Tank> tanks = configuration.getBrewLayout().getTanks();
 			for (Tank tank : tanks) {
 				Sensor sensor = tank.getSensor();
 				if (sensor != null) {
@@ -299,9 +301,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 					// System.out.println("  Version: " + version.getVersion());
 					connected = true;
 					setStatus("Connected");
-					if (brewLayout == null) {
-						loadLayout(null);
-					}
+					loadConfiguration(null);
 				}
 			}
 
@@ -313,27 +313,27 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 	}
 
-	protected void loadLayout(BreweryLayout uploadLayout) {
-		CommandRequest layoutRequest = getCommandRequest("layout");
+	protected void loadConfiguration(Configuration uploadLayout) {
+		CommandRequest layoutRequest = getCommandRequest("configuration");
 		if (uploadLayout != null) {
-			layoutRequest.addParameter("layout", converter.encode(loadDefaultLayout()));
+			layoutRequest.addParameter("configuration", converter.encode(loadDefaultConfiguration()));
 		}
 		layoutRequest.runRequest(new Callback<String>() {
 			@Override
 			public void onSuccess(String layoutJson) {
 				try {
-					brewLayout = converter.decode(layoutJson, BreweryLayout.class);
-					if (brewLayout == null) {
-						loadLayout(loadDefaultLayout());
+					configuration = converter.decode(layoutJson, Configuration.class);
+					if (configuration == null) {
+						loadConfiguration(loadDefaultConfiguration());
 						return;
 					}
 
-					if (brewLayout != null) {
+					if (configuration != null) {
 						initLayout();
-						eventBus.fireEvent(new BreweryLayoutChangeEvent(brewLayout));
+						eventBus.fireEvent(new BreweryLayoutChangeEvent(configuration.getBrewLayout()));
 					}
 				} catch (Exception e) {
-					brewLayout = null;
+					configuration = null;
 					disconnect();
 					e.printStackTrace();
 				}
@@ -387,7 +387,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	private void initLayout() throws Exception {
-
+		BreweryLayout brewLayout = configuration.getBrewLayout();
 		List<Pump> pumps = brewLayout.getPumps();
 		for (Pump pump : pumps) {
 			brewHardwareControls.add(pump);
@@ -411,7 +411,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 	@Override
 	public BreweryLayout getBreweryLayout() {
-		return brewLayout;
+		return configuration != null ? configuration.getBrewLayout() : null;
 	}
 
 	@Override
@@ -440,7 +440,8 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 		step.setName(name);
 		List<ControlPoint> controlPoints = step.getControlPoints();
 
-		List<Pump> pumps = brewLayout.getPumps();
+		BreweryLayout breweryLayout = getBreweryLayout();
+		List<Pump> pumps = breweryLayout.getPumps();
 		for (Pump pump : pumps) {
 			ControlPoint controlPoint = new ControlPoint();
 			controlPoint.setAutomaticControl(false);
@@ -449,7 +450,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			controlPoints.add(controlPoint);
 		}
 
-		List<Tank> tanks = brewLayout.getTanks();
+		List<Tank> tanks = breweryLayout.getTanks();
 		for (Tank tank : tanks) {
 			HeatElement heater = tank.getHeater();
 			if (heater != null) {

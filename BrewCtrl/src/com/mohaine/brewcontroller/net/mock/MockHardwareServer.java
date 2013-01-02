@@ -69,7 +69,7 @@ public class MockHardwareServer {
 
 		MockHardwareServer server = new MockHardwareServer();
 		server.addHtmlService(new VersionService());
-		server.addHtmlService(new LayoutService(mock));
+		server.addHtmlService(new ConfigurationService(mock));
 		server.addHtmlService(new StatusService(mock));
 
 		server.listen(ControllerHardwareJson.DEFAULT_PORT);

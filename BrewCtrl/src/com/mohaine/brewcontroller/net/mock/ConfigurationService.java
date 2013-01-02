@@ -1,23 +1,23 @@
 package com.mohaine.brewcontroller.net.mock;
 
 import com.mohaine.brewcontroller.BrewJsonConverterRefection;
-import com.mohaine.brewcontroller.client.layout.BreweryLayout;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.net.mock.MockHardwareServer.HtmlService;
 import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
 import com.mohaine.brewcontroller.shared.util.StringUtils;
 
-public class LayoutService implements HtmlService {
+public class ConfigurationService implements HtmlService {
 
 	public MockHardware mock;
 
-	public LayoutService(MockHardware mock) {
+	public ConfigurationService(MockHardware mock) {
 		super();
 		this.mock = mock;
 	}
 
 	@Override
 	public String getPath() {
-		return "/cmd/layout";
+		return "/cmd/configuration";
 	}
 
 	@Override
@@ -25,19 +25,21 @@ public class LayoutService implements HtmlService {
 		JsonObjectConverter converter = new BrewJsonConverterRefection().getJsonConverter();
 		response.setContentType("text/json");
 
-		String layoutParam = request.getParameter("layout");
+		String configParam = request.getParameter("configuration");
 
-		if (StringUtils.hasLength(layoutParam)) {
-			BreweryLayout layout = converter.decode(layoutParam, BreweryLayout.class);
-			if (layout != null) {
-				mock.setLayout(layout);
+		if (StringUtils.hasLength(configParam)) {
+			Configuration configuration = converter.decode(configParam, Configuration.class);
+			if (configuration != null) {
+				mock.setConfiguration(configuration);
 			} else {
 				response.setStatusCode(HttpCodes.BAD_REQUEST);
 				return;
 			}
 		}
 
-		byte[] bytes = converter.encode(mock.getLayout()).getBytes();
+		String encode = converter.encode(mock.getConfiguration());
+		System.out.println("encode: " + encode);
+		byte[] bytes = encode.getBytes();
 		response.sendContent(bytes);
 	}
 }

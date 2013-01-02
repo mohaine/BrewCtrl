@@ -37,10 +37,8 @@
             "hasDuty":false
          }
       ],
-      "maxAmps":25,
-      "turnOffOnCommLoss":true
+      "maxAmps":25
    },
-   "commPorts":"",
    "logMessages":false,
    "sensors":[
       {

@@ -9,7 +9,6 @@ import com.mohaine.brewcontroller.shared.json.ListType;
 public class Configuration {
 
 	private BreweryLayout brewLayout;
-	private String commPorts;
 	private boolean logMessages;
 
 	@ListType(SensorConfiguration.class)
@@ -73,14 +72,6 @@ public class Configuration {
 	public void setStepLists(List<ConfigurationStepList> stepLists) {
 		System.out.println("Configuration.setStepLists()" + stepLists);
 		this.stepLists = stepLists;
-	}
-
-	public String getCommPorts() {
-		return commPorts;
-	}
-
-	public void setCommPorts(String commPorts) {
-		this.commPorts = commPorts;
 	}
 
 	public boolean isLogMessages() {

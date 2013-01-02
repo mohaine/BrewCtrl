@@ -14,8 +14,8 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
-import com.mohaine.brewcontroller.client.layout.BreweryLayout;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
 import com.mohaine.brewcontroller.client.net.Callback;
 import com.mohaine.brewcontroller.client.net.ControllerHardwareJson;
@@ -59,7 +59,7 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 	}
 
 	@Override
-	protected BreweryLayout loadDefaultLayout() {
+	protected Configuration loadDefaultConfiguration() {
 		return null;
 	}
 

@@ -6,8 +6,8 @@ import java.net.URL;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ConfigurationLoader;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
-import com.mohaine.brewcontroller.client.layout.BreweryLayout;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
 import com.mohaine.brewcontroller.client.net.Callback;
 import com.mohaine.brewcontroller.client.net.ControllerHardwareJson;
@@ -60,8 +60,8 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 	}
 
 	@Override
-	protected BreweryLayout loadDefaultLayout() {
-		return configurationLoader.getConfiguration().getBrewLayout();
+	protected Configuration loadDefaultConfiguration() {
+		return configurationLoader.getConfiguration();
 	}
 
 	protected CommandRequest getCommandRequest(String cmd) {

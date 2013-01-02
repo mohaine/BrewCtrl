@@ -3,31 +3,26 @@ package com.mohaine.brewcontroller.net.mock;
 import java.util.List;
 import java.util.Random;
 
-import com.mohaine.brewcontroller.client.bean.ControlPoint;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
-import com.mohaine.brewcontroller.client.layout.BreweryLayout;
-import com.mohaine.brewcontroller.client.layout.HeatElement;
-import com.mohaine.brewcontroller.client.layout.Pump;
-import com.mohaine.brewcontroller.client.layout.Sensor;
-import com.mohaine.brewcontroller.client.layout.Tank;
 
 public class MockHardware {
 	private ControllerStatus status;
-	private BreweryLayout layout;
+	private Configuration configuration;
 
 	public MockHardware() {
 		new Thread(new Monitor()).start();
 	}
 
-	public BreweryLayout getLayout() {
-		return layout;
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 
-	public void setLayout(BreweryLayout layout) {
-		this.layout = layout;
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 
 	public ControllerStatus getStatus() {
@@ -52,49 +47,6 @@ public class MockHardware {
 
 	public void setSteps(List<ControlStep> steps) {
 		status.setSteps(steps);
-	}
-
-	public ControlStep createManualStep(String name) {
-		ControlStep step = new ControlStep();
-		step.setName(name);
-		List<ControlPoint> controlPoints = step.getControlPoints();
-
-		List<Pump> pumps = layout.getPumps();
-		for (Pump pump : pumps) {
-			ControlPoint controlPoint = new ControlPoint();
-			controlPoint.setAutomaticControl(false);
-			controlPoint.setControlPin(pump.getPin());
-			controlPoint.setHasDuty(pump.isHasDuty());
-			controlPoints.add(controlPoint);
-		}
-
-		List<Tank> tanks = layout.getTanks();
-		for (Tank tank : tanks) {
-			HeatElement heater = tank.getHeater();
-			if (heater != null) {
-				ControlPoint controlPoint = new ControlPoint();
-				controlPoint.setAutomaticControl(false);
-				controlPoint.setControlPin(heater.getPin());
-				controlPoint.setHasDuty(heater.isHasDuty());
-				controlPoint.setFullOnAmps(heater.getFullOnAmps());
-
-				Sensor sensor = tank.getSensor();
-				if (sensor != null) {
-					List<TempSensor> sensors = status.getSensors();
-					for (TempSensor hardwareSensor : sensors) {
-						if (sensor.getAddress().equals(hardwareSensor.getAddress())) {
-							controlPoint.setAutomaticControl(false);
-							controlPoint.setTempSensorAddress(hardwareSensor.getAddress());
-							break;
-						}
-					}
-				}
-
-				controlPoints.add(controlPoint);
-			}
-		}
-
-		return step;
 	}
 
 	private class Monitor implements Runnable {
@@ -124,10 +76,6 @@ public class MockHardware {
 				List<ControlStep> steps = status.getSteps();
 				if (steps != null) {
 					synchronized (steps) {
-						if (layout != null && steps.size() == 0) {
-							steps.add(createManualStep("Default"));
-						}
-
 						if (steps.size() > 0) {
 							heaterStep = steps.get(0);
 						}
