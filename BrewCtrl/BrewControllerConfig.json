@@ -1,4 +1,5 @@
 {
+   "version":0,
    "brewLayout":{
       "tanks":[
          {
@@ -44,12 +45,12 @@
       {
          "address":"0000000000000001",
          "name":"",
-         "location":"HLT"
+         "location":"TUN"
       },
       {
          "address":"0000000000000002",
          "name":"",
-         "location":"TUN"
+         "location":"HLT"
       },
       {
          "address":"289c167d02000048",

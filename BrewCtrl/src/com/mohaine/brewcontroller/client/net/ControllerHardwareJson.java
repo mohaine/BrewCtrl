@@ -129,6 +129,11 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 							ControllerStatus lastStatus = controllerStatus;
 							controllerStatus = converter.decode(response, ControllerStatus.class);
 
+							if (controllerStatus.getConfigurationVersion() != configuration.getVersion()) {
+								loadConfiguration(null);
+								return;
+							}
+
 							updateLayoutState(false, eventsToFire);
 							eventsToFire.add(new StatusChangeEvent());
 

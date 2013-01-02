@@ -61,7 +61,9 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 
 	@Override
 	protected Configuration loadDefaultConfiguration() {
-		return configurationLoader.getConfiguration();
+		Configuration configuration = configurationLoader.getConfiguration();
+		configuration.setVersion(0);
+		return configuration;
 	}
 
 	protected CommandRequest getCommandRequest(String cmd) {
