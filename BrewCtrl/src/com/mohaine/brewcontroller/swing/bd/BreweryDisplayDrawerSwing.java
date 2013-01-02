@@ -450,9 +450,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 	}
 
 	private DrawerMouseEvent createEvent(MouseEvent e) {
-		DrawerMouseEvent event = new DrawerMouseEvent();
-		event.setX(e.getX());
-		event.setY(e.getY());
+		DrawerMouseEvent event = new DrawerMouseEvent(e.getX(), e.getY());
 		return event;
 	}
 

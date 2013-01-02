@@ -12,9 +12,18 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.MouseListener;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.Converter;
@@ -23,6 +32,7 @@ import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay;
 import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
+import com.mohaine.brewcontroller.client.display.DrawerMouseListener.DrawerMouseEvent;
 import com.mohaine.brewcontroller.client.display.DrawerMouseListener;
 import com.mohaine.brewcontroller.client.layout.BreweryComponent;
 import com.mohaine.brewcontroller.client.layout.HeatElement;
@@ -101,21 +111,38 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	}
 
 	@Override
-	public void addMouseListener(DrawerMouseListener drawerMouseListener) {
-		// TODO Auto-generated method stub
-		System.out.println("BreweryDisplayDrawerGwt.addMouseListener()");
+	public void addMouseListener(final DrawerMouseListener drawerMouseListener) {
+		canvas.addMouseDownHandler(new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent e) {
+				drawerMouseListener.mouseDown(new DrawerMouseEvent(e.getX(), e.getY()));
+			}
+		});
+		canvas.addMouseUpHandler(new MouseUpHandler() {
+			@Override
+			public void onMouseUp(MouseUpEvent e) {
+				drawerMouseListener.mouseUp(new DrawerMouseEvent(e.getX(), e.getY()));
+			}
+		});
+
+		canvas.addMouseMoveHandler(new MouseMoveHandler() {
+			@Override
+			public void onMouseMove(MouseMoveEvent e) {
+				if (e.getNativeButton() == NativeEvent.BUTTON_LEFT) {
+					drawerMouseListener.mouseDragged(new DrawerMouseEvent(e.getX(), e.getY()));
+				}
+			}
+		});
+
 	}
 
 	@Override
 	public void redrawAll() {
-
 		backBufferContext.setFillStyle(Colors.BACKGROUND);
 		backBufferContext.fillRect(0, 0, getWidth(), getHeight());
-
 		for (BreweryComponentDisplay display : displays) {
 			drawComponent(backBufferContext, display, true);
 		}
-
 		context.drawImage(backBufferContext.getCanvas(), 0, 0);
 
 	}
@@ -293,8 +320,9 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		int cirSize = (int) (Math.min(width, height) - 1);
 
 		int cirRadius = cirSize / 2;
-//		g.strokeRect(display.getLeft(), display.getTop(), display.getWidth(), display.getHeight());
-
+		// g.strokeRect(display.getLeft(), display.getTop(), display.getWidth(),
+		// display.getHeight());
+		g.save();
 		g.translate(left, top);
 
 		g.setStrokeStyle(strokePaint);
@@ -310,7 +338,7 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 			drawEllipse(g, cirRadius - subSize / 2, cirRadius - subSize / 2, subSize, subSize);
 		}
 
-		g.translate(0, 0);
+		g.restore();
 
 	}
 
