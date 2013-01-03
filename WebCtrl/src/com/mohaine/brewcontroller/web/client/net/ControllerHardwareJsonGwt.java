@@ -50,11 +50,15 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 	}
 
 	@Inject
-	public ControllerHardwareJsonGwt(EventBus eventBusp,
-			BrewJsonConverter converter) throws Exception {
+	public ControllerHardwareJsonGwt(EventBus eventBusp, BrewJsonConverter converter) throws Exception {
 		super(eventBusp, converter);
 
 		statusTimer.schedule(500);
+
+	}
+
+	@Override
+	protected void saveDefaultConfiguration() throws Exception {
 
 	}
 
@@ -89,10 +93,8 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 
 		@Override
 		public void runRequest(final Callback<String> callback) {
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
-					url);
-			builder.setHeader("Content-Type",
-					"application/x-www-form-urlencoded");
+			RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
+			builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
 			String requestData = "";
 			if (params != null) {
@@ -113,14 +115,12 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 						callback.onNotSuccess(exception);
 					}
 
-					public void onResponseReceived(Request request,
-							Response response) {
+					public void onResponseReceived(Request request, Response response) {
 
 						if (200 == response.getStatusCode()) {
 							callback.onSuccess(response.getText());
 						} else {
-							callback.onNotSuccess(new Exception("Error Code: "
-									+ response.getStatusCode()));
+							callback.onNotSuccess(new Exception("Error Code: " + response.getStatusCode()));
 						}
 					}
 				});

@@ -7,7 +7,7 @@ import com.mohaine.brewcontroller.client.layout.BreweryLayout;
 import com.mohaine.brewcontroller.shared.json.ListType;
 
 public class Configuration {
-	private int version;
+	private String version;
 	private BreweryLayout brewLayout;
 	private boolean logMessages;
 
@@ -21,11 +21,11 @@ public class Configuration {
 
 	}
 
-	public int getVersion() {
+	public String getVersion() {
 		return version;
 	}
 
-	public void setVersion(int version) {
+	public void setVersion(String version) {
 		this.version = version;
 	}
 

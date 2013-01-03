@@ -62,8 +62,13 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 	@Override
 	protected Configuration loadDefaultConfiguration() {
 		Configuration configuration = configurationLoader.getConfiguration();
-		configuration.setVersion(0);
 		return configuration;
+	}
+
+	@Override
+	protected void saveDefaultConfiguration() throws Exception {
+		configurationLoader.saveConfiguration();
+
 	}
 
 	protected CommandRequest getCommandRequest(String cmd) {
@@ -105,4 +110,5 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 		String baseUrl = "http://localhost:" + DEFAULT_PORT + "/cmd/";
 		return baseUrl;
 	}
+
 }

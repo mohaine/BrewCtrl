@@ -33,7 +33,7 @@ public class ControllerStatus {
 	}
 
 	private String mode = Mode.UNKNOWN.toString();
-	private int configurationVersion;
+	private String configurationVersion;
 
 	@ListType(ControlStep.class)
 	private List<ControlStep> steps;
@@ -69,11 +69,11 @@ public class ControllerStatus {
 		this.sensors = sensors;
 	}
 
-	public int getConfigurationVersion() {
+	public String getConfigurationVersion() {
 		return configurationVersion;
 	}
 
-	public void setConfigurationVersion(int configurationVersion) {
+	public void setConfigurationVersion(String configurationVersion) {
 		this.configurationVersion = configurationVersion;
 	}
 
@@ -81,7 +81,7 @@ public class ControllerStatus {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + configurationVersion;
+		result = prime * result + ((configurationVersion == null) ? 0 : configurationVersion.hashCode());
 		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
 		result = prime * result + ((sensors == null) ? 0 : sensors.hashCode());
 		result = prime * result + ((steps == null) ? 0 : steps.hashCode());
@@ -97,7 +97,10 @@ public class ControllerStatus {
 		if (getClass() != obj.getClass())
 			return false;
 		ControllerStatus other = (ControllerStatus) obj;
-		if (configurationVersion != other.configurationVersion)
+		if (configurationVersion == null) {
+			if (other.configurationVersion != null)
+				return false;
+		} else if (!configurationVersion.equals(other.configurationVersion))
 			return false;
 		if (mode == null) {
 			if (other.mode != null)

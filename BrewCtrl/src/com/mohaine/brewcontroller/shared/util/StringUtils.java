@@ -51,4 +51,12 @@ public class StringUtils {
 
 	}
 
+	public static String generateRandomId() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 16; i++) {
+			sb.append((char) (0x41 + Math.floor(Math.random() * 26)));
+		}
+		return sb.toString();
+	}
+
 }

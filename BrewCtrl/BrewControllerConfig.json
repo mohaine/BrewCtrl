@@ -1,5 +1,4 @@
 {
-   "version":0,
    "brewLayout":{
       "tanks":[
          {
@@ -45,12 +44,12 @@
       {
          "address":"0000000000000001",
          "name":"",
-         "location":"TUN"
+         "location":"HLT"
       },
       {
          "address":"0000000000000002",
          "name":"",
-         "location":"HLT"
+         "location":"TUN"
       },
       {
          "address":"289c167d02000048",
@@ -64,7 +63,7 @@
          "steps":[
             {
                "name":"Mash In",
-               "time":"10",
+               "time":"0",
                "controlPoints":[
                   {
                      "targetTemp":79.4444444,
@@ -80,7 +79,7 @@
             },
             {
                "name":"Mash",
-               "time":"10",
+               "time":"60:00",
                "controlPoints":[
                   {
                      "targetTemp":72.7777778,
@@ -96,7 +95,7 @@
             },
             {
                "name":"Mash Out",
-               "time":"10",
+               "time":"0",
                "controlPoints":[
                   {
                      "targetTemp":82.2222222,

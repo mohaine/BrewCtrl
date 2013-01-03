@@ -7,7 +7,11 @@ import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
+import com.mohaine.brewcontroller.client.bean.SensorConfiguration;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
+import com.mohaine.brewcontroller.client.layout.BreweryLayout;
+import com.mohaine.brewcontroller.client.layout.Tank;
+import com.mohaine.brewcontroller.shared.util.StringUtils;
 
 public class MockHardware {
 	private ControllerStatus status;
@@ -23,6 +27,13 @@ public class MockHardware {
 
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
+		updateStatusConfigVersion();
+	}
+
+	private void updateStatusConfigVersion() {
+		if (status != null && configuration != null) {
+			status.setConfigurationVersion(configuration.getVersion());
+		}
 	}
 
 	public ControllerStatus getStatus() {
@@ -31,6 +42,7 @@ public class MockHardware {
 
 	public void setStatus(ControllerStatus status) {
 		this.status = status;
+		updateStatusConfigVersion();
 	}
 
 	public void setMode(String modeParam) {
@@ -72,7 +84,46 @@ public class MockHardware {
 				for (TempSensor hardwareSensor : sensors) {
 					hardwareSensor.setTempatureC(hardwareSensor.getTempatureC() + (r.nextDouble() - 0.5));
 				}
+				if (configuration != null) {
+					BreweryLayout layout = configuration.getBrewLayout();
+					if (layout != null) {
+						List<Tank> tanks = layout.getTanks();
+						if (tanks != null) {
+							for (Tank tank : tanks) {
+								if (tank.getSensor() != null) {
+									// TODO Switch to reading sensor
+									boolean found = false;
+									for (TempSensor hardwareSensor : sensors) {
+										if (hardwareSensor.isReading() && hardwareSensor.getAddress().equals(tank.getSensor().getAddress())) {
+											found = true;
+											break;
+										}
+									}
 
+									if (!found) {
+
+										System.out.println("Missing Sensor for " + tank.getName());
+										for (SensorConfiguration sensorConfig : configuration.getSensors()) {
+											if (StringUtils.valueOf(sensorConfig.getLocation()).equals(tank.getName())) {
+												for (TempSensor hardwareSensor : sensors) {
+													if (hardwareSensor.isReading() && hardwareSensor.getAddress().equals(sensorConfig.getAddress())) {
+														// Found it
+														tank.getSensor().setSensor(hardwareSensor);
+
+														configuration.setVersion(StringUtils.generateRandomId());
+														updateStatusConfigVersion();
+														break;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+
+					}
+				}
 				List<ControlStep> steps = status.getSteps();
 				if (steps != null) {
 					synchronized (steps) {
@@ -125,7 +176,7 @@ public class MockHardware {
 				}
 			}
 			try {
-				Thread.sleep(100);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// ignore
 			}

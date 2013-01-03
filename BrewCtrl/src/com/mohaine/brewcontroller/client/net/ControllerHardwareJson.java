@@ -29,6 +29,7 @@ import com.mohaine.brewcontroller.client.layout.Pump;
 import com.mohaine.brewcontroller.client.layout.Sensor;
 import com.mohaine.brewcontroller.client.layout.Tank;
 import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
+import com.mohaine.brewcontroller.shared.util.StringUtils;
 
 public abstract class ControllerHardwareJson implements ControllerHardware {
 
@@ -58,6 +59,8 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	private final JsonObjectConverter converter;
 
 	protected abstract Configuration loadDefaultConfiguration();
+
+	protected abstract void saveDefaultConfiguration() throws Exception;
 
 	protected abstract CommandRequest getCommandRequest(String cmd);
 
@@ -128,8 +131,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 						try {
 							ControllerStatus lastStatus = controllerStatus;
 							controllerStatus = converter.decode(response, ControllerStatus.class);
-
-							if (controllerStatus.getConfigurationVersion() != configuration.getVersion()) {
+							if (!StringUtils.valueOf(controllerStatus.getConfigurationVersion()).equals(configuration.getVersion())) {
 								loadConfiguration(null);
 								return;
 							}
@@ -325,15 +327,18 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 		}
 		layoutRequest.runRequest(new Callback<String>() {
 			@Override
-			public void onSuccess(String layoutJson) {
+			public void onSuccess(String responseJson) {
+
 				try {
-					configuration = converter.decode(layoutJson, Configuration.class);
+					configuration = converter.decode(responseJson, Configuration.class);
 					if (configuration == null) {
 						loadConfiguration(loadDefaultConfiguration());
 						return;
 					}
 
 					if (configuration != null) {
+
+						saveDefaultConfiguration();
 						initLayout();
 						eventBus.fireEvent(new BreweryLayoutChangeEvent(configuration.getBrewLayout()));
 					}

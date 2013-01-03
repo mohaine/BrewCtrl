@@ -22,18 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mohaine.brewcontroller.shared.json.ListType;
+import com.mohaine.brewcontroller.shared.util.StringUtils;
 
 public class ControlStep {
 	private String name;
-	private String id = generateRandomId();
-
-	public static String generateRandomId() {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 16; i++) {
-			sb.append((char) (0x41 + Math.floor(Math.random() * 26)));
-		}
-		return sb.toString();
-	}
+	private String id = StringUtils.generateRandomId();
 
 	@ListType(ControlPoint.class)
 	private List<ControlPoint> controlPoints = new ArrayList<ControlPoint>();
