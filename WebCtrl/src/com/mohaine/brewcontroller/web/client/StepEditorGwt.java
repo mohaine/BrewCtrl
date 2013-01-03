@@ -16,22 +16,13 @@
  
  */
 
-package com.mohaine.brewcontroller.swing;
+package com.mohaine.brewcontroller.web.client;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.Converter;
@@ -46,13 +37,11 @@ import com.mohaine.brewcontroller.client.event.StepModifyEvent;
 import com.mohaine.brewcontroller.client.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 
-public class StepEditorSwing extends JPanel {
+public class StepEditorGwt extends Composite {
 
 	private static final int HEIGHT = 20;
 
-	private static final long serialVersionUID = 1L;
-
-	private ClickEditorSwing<String> nameValue = new ClickEditorSwing<String>(new Converter<String, String>() {
+	private ClickEditorGwt<String> nameValue = new ClickEditorGwt<String>(new Converter<String, String>() {
 
 		@Override
 		public String convertFrom(String value) {
@@ -65,7 +54,7 @@ public class StepEditorSwing extends JPanel {
 		}
 
 	});
-	private ClickEditorSwing<Integer> timeValue = new ClickEditorSwing<Integer>(new Converter<Integer, String>() {
+	private ClickEditorGwt<Integer> timeValue = new ClickEditorGwt<Integer>(new Converter<Integer, String>() {
 		TimeParser tp = new TimeParser();
 
 		{
@@ -91,34 +80,22 @@ public class StepEditorSwing extends JPanel {
 
 	private ControllerHardware controller;
 
-	private JPanel edit;
+	private FlowPanel edit;
 
 	@Inject
-	public StepEditorSwing(EventBus eventBus, ControllerHardware controller) {
+	public StepEditorGwt(EventBus eventBus, ControllerHardware controller) {
 		super();
 		this.eventBus = eventBus;
 		this.controller = controller;
-		JPanel mainPanel = this;
+		FlowPanel mainPanel = new FlowPanel();
 
-		mainPanel.setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
+		mainPanel.add(nameValue);
+		// nameValue.setPreferredSize(new Dimension(200, HEIGHT));
+		// nameValue.setMinimumSize(new Dimension(200, HEIGHT));
 
-		gbc.gridx = 0;
-		gbc.gridheight = 1;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-
-		mainPanel.add(nameValue, gbc);
-		nameValue.setPreferredSize(new Dimension(200, HEIGHT));
-		nameValue.setMinimumSize(new Dimension(200, HEIGHT));
-
-		gbc.gridx++;
-		gbc.weightx = 0;
-
-		mainPanel.add(timeValue, gbc);
-		timeValue.setPreferredSize(new Dimension(70, HEIGHT));
-		timeValue.setMinimumSize(new Dimension(70, HEIGHT));
+		mainPanel.add(timeValue);
+		// timeValue.setPreferredSize(new Dimension(70, HEIGHT));
+		// timeValue.setMinimumSize(new Dimension(70, HEIGHT));
 
 		nameValue.addChangeHandler(new ChangeHandler() {
 			@Override
@@ -141,39 +118,37 @@ public class StepEditorSwing extends JPanel {
 			}
 		});
 
-		gbc.gridx++;
+		FlowPanel controlPanel = new FlowPanel();
+		mainPanel.add(controlPanel);
 
-		JPanel controlPanel = new JPanel();
-		controlPanel.setLayout(new FlowLayout());
-		gbc.weightx = 0;
-		mainPanel.add(controlPanel, gbc);
-
-		JLabel delete = new JLabel("X");
-		delete.addMouseListener(new MouseListenerAbstract() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				deleteStep();
-			}
-		});
+		Label delete = new Label("X");
+		// delete.addMouseListener(new MouseListenerAbstract() {
+		// @Override
+		// public void mouseClicked(MouseEvent arg0) {
+		// deleteStep();
+		// }
+		// });
 		controlPanel.add(delete);
 
-		edit = new JPanel();
-		edit.setMinimumSize(new Dimension(20, HEIGHT));
-		edit.setPreferredSize(new Dimension(20, HEIGHT));
-		edit.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black));
-		edit.addMouseListener(new MouseListenerAbstract() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				selectStep();
-			}
-		});
+		edit = new FlowPanel();
+		// edit.setMinimumSize(new Dimension(20, HEIGHT));
+		// edit.setPreferredSize(new Dimension(20, HEIGHT));
+		// edit.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
+		// Color.black));
+		// edit.addMouseListener(new MouseListenerAbstract() {
+		// @Override
+		// public void mouseClicked(MouseEvent arg0) {
+		// selectStep();
+		// }
+		// });
 		controlPanel.add(edit);
 
+		initWidget(mainPanel);
 	}
 
 	@Override
-	public void addNotify() {
-		super.addNotify();
+	protected void onAttach() {
+		super.onAttach();
 		removeHandlers();
 		handlers.add(eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
 
@@ -196,9 +171,10 @@ public class StepEditorSwing extends JPanel {
 	}
 
 	@Override
-	public void removeNotify() {
-		super.removeNotify();
+	protected void onDetach() {
+		super.onDetach();
 		removeHandlers();
+
 	}
 
 	private void removeHandlers() {
@@ -232,12 +208,7 @@ public class StepEditorSwing extends JPanel {
 	}
 
 	private void updateSelected(boolean selected) {
-		if (selected) {
-			edit.setBackground(Color.black);
-		} else {
-			edit.setBackground(getBackground());
-		}
-
+		edit.getElement().getStyle().setBackgroundColor(selected ? "black" : "");
 	}
 
 	private void selectStep() {
@@ -245,18 +216,22 @@ public class StepEditorSwing extends JPanel {
 	}
 
 	private void deleteStep() {
-		if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this, "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete", JOptionPane.OK_CANCEL_OPTION)) {
-			List<ControlStep> steps = new ArrayList<ControlStep>(controller.getSteps());
-
-			for (int i = 0; i < steps.size(); i++) {
-				ControlStep s = steps.get(i);
-				if (s.getId().equals(heaterStep.getId())) {
-					steps.remove(i);
-					break;
-				}
-			}
-
-			controller.changeSteps(steps);
-		}
+		// TODO
+		// if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this,
+		// "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete",
+		// JOptionPane.OK_CANCEL_OPTION)) {
+		// List<ControlStep> steps = new
+		// ArrayList<ControlStep>(controller.getSteps());
+		//
+		// for (int i = 0; i < steps.size(); i++) {
+		// ControlStep s = steps.get(i);
+		// if (s.getId().equals(heaterStep.getId())) {
+		// steps.remove(i);
+		// break;
+		// }
+		// }
+		//
+		// controller.changeSteps(steps);
+		// }
 	}
 }

@@ -16,31 +16,23 @@
  
  */
 
-package com.mohaine.brewcontroller.swing;
+package com.mohaine.brewcontroller.web.client;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.mohaine.brewcontroller.ConfigurationLoader;
-import com.mohaine.brewcontroller.TimeParser;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.TimeParser;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.bean.ConfigurationStep;
 import com.mohaine.brewcontroller.client.bean.ConfigurationStepControlPoint;
 import com.mohaine.brewcontroller.client.bean.ConfigurationStepList;
@@ -54,136 +46,73 @@ import com.mohaine.brewcontroller.client.layout.BrewHardwareControl;
 import com.mohaine.brewcontroller.client.layout.BreweryLayout;
 import com.mohaine.brewcontroller.client.layout.Sensor;
 
-public class StepDisplayList extends JPanel {
-	private static final long serialVersionUID = 1L;
+public class StepDisplayListGwt extends Composite {
 
 	private ControllerHardware controller;
 	private EventBus eventBus;
 	private ArrayList<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 
-	private ArrayList<StepEditorSwing> editors = new ArrayList<StepEditorSwing>();
+	private ArrayList<StepEditorGwt> editors = new ArrayList<StepEditorGwt>();
 
-	private JPanel editorsPanel;
+	private FlowPanel editorsPanel;
 
-	private Provider<StepEditorSwing> providerStepEditorSwing;
+	private Provider<StepEditorGwt> providerStepEditor;
 
 	@Inject
-	public StepDisplayList(ControllerHardware controllerp, EventBus eventBusp, Provider<StepEditorSwing> providerStepEditorSwing, ConfigurationLoader configLoader) {
+	public StepDisplayListGwt(ControllerHardware controllerp, EventBus eventBusp, Provider<StepEditorGwt> providerStepEditor) {
 		super();
-		this.providerStepEditorSwing = providerStepEditorSwing;
+		this.providerStepEditor = providerStepEditor;
 		this.eventBus = eventBusp;
 		this.controller = controllerp;
 
-		setPreferredSize(new Dimension(200, 200));
-		setLayout(new GridBagLayout());
+		FlowPanel panel = new FlowPanel();
+		editorsPanel = new FlowPanel();
+		panel.add(editorsPanel);
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 1;
-		gbc.weighty = 0;
+		FlowPanel controlPanel = new FlowPanel();
 
-		editorsPanel = new JPanel();
-		editorsPanel.setLayout(new GridLayout(0, 1));
-		add(editorsPanel, gbc);
+		panel.add(controlPanel);
 
-		gbc.gridx = 0;
-		gbc.gridy++;
-		JPanel controlPanel = new JPanel();
-		controlPanel.setLayout(new BorderLayout());
-
-		add(controlPanel, gbc);
-
-		JLabel addNewLabel = new JLabel("+ Add New Step");
-		addNewLabel.addMouseListener(new MouseListener() {
+		Label addNewLabel = new Label("+ Add New Step");
+		addNewLabel.addClickHandler(new ClickHandler() {
 
 			@Override
-			public void mouseReleased(MouseEvent e) {
-
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
+			public void onClick(ClickEvent event) {
 				addNewStep();
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
 
 			}
 		});
-		controlPanel.add(addNewLabel, BorderLayout.WEST);
+		controlPanel.add(addNewLabel);
 
-		List<ConfigurationStepList> stepLists = configLoader.getConfiguration().getStepLists();
-		if (stepLists != null && stepLists.size() > 0) {
-			final JLabel listLabel = new JLabel("List");
+		Configuration configuration = controllerp.getConfiguration();
+		if (configuration != null) {
+			List<ConfigurationStepList> stepLists = configuration.getStepLists();
+			if (stepLists != null && stepLists.size() > 0) {
+				final Label listLabel = new Label("List");
 
-			controlPanel.add(listLabel, BorderLayout.EAST);
-
-			final JPopupMenu popup = new JPopupMenu();
-
-			for (final ConfigurationStepList stepList : stepLists) {
-				popup.add(new JMenuItem(new AbstractAction(stepList.getName()) {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						launchList(stepList);
-					}
-				}));
+				controlPanel.add(listLabel);
+				// TODO
+				/*
+				 * final JPopupMenu popup = new JPopupMenu();
+				 * 
+				 * for (final ConfigurationStepList stepList : stepLists) {
+				 * popup.add(new JMenuItem(new
+				 * AbstractAction(stepList.getName()) { private static final
+				 * long serialVersionUID = 1L;
+				 * 
+				 * @Override public void actionPerformed(ActionEvent arg0) {
+				 * launchList(stepList); } })); } listLabel.addClickHandler(new
+				 * ClickHandler() {
+				 * 
+				 * @Override public void onClick(ClickEvent e) {
+				 * popup.show(listLabel, e.getX(), e.getY());
+				 * 
+				 * } });
+				 */
 			}
-			listLabel.addMouseListener(new MouseListener() {
-
-				@Override
-				public void mouseReleased(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mousePressed(MouseEvent e) {
-					// TODO Locate better
-					popup.show(listLabel, e.getX(), e.getY());
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseEntered(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseClicked(MouseEvent e) {
-
-				}
-			});
-
 		}
-
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridx = 0;
-		gbc.gridy++;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-
-		JPanel extraPanel = new JPanel();
-		add(extraPanel, gbc);
-
 		
+		initWidget(panel);
 	}
 
 	protected void launchList(ConfigurationStepList stepList) {
@@ -213,16 +142,15 @@ public class StepDisplayList extends JPanel {
 	}
 
 	@Override
-	public void addNotify() {
-		super.addNotify();
-
+	protected void onAttach() {
 		removeHandlers();
 		handlers.add(eventBus.addHandler(StepsModifyEvent.getType(), new StepsModifyEventHandler() {
 			@Override
 			public void onStepsChange() {
-				SwingUtilities.invokeLater(new Runnable() {
+
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 					@Override
-					public void run() {
+					public void execute() {
 						updateSteps();
 					}
 				});
@@ -230,13 +158,12 @@ public class StepDisplayList extends JPanel {
 			}
 		}));
 		updateSteps();
-
 	}
 
 	@Override
-	public void removeNotify() {
-		super.removeNotify();
+	protected void onDetach() {
 		removeHandlers();
+
 	}
 
 	private void removeHandlers() {
@@ -251,11 +178,11 @@ public class StepDisplayList extends JPanel {
 		List<ControlStep> steps = controller.getSteps();
 		int index = 0;
 		for (ControlStep heaterStep : steps) {
-			StepEditorSwing stepEditor;
+			StepEditorGwt stepEditor;
 			if (index < editors.size()) {
 				stepEditor = editors.get(index);
 			} else {
-				stepEditor = providerStepEditorSwing.get();
+				stepEditor = providerStepEditor.get();
 				editors.add(stepEditor);
 				editorsPanel.add(stepEditor);
 			}
@@ -263,11 +190,10 @@ public class StepDisplayList extends JPanel {
 			index++;
 		}
 		while (editors.size() > steps.size()) {
-			StepEditorSwing extra = editors.remove(steps.size());
+			StepEditorGwt extra = editors.remove(steps.size());
 			editorsPanel.remove(extra);
 		}
 
-		editorsPanel.repaint();
 	}
 
 	private void addNewStep() {

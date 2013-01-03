@@ -2,6 +2,7 @@ package com.mohaine.brewcontroller.client;
 
 import java.util.List;
 
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
@@ -32,4 +33,8 @@ public interface ControllerHardware {
 	public Double getSensorTemp(String tunSensor);
 
 	public List<TempSensor> getSensors();
+
+	public Configuration getConfiguration();
+
+	public void setConfiguration(Configuration config);
 }

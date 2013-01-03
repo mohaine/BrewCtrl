@@ -131,10 +131,10 @@ public class StatusDisplay extends JPanel {
 
 	private Color normalStatusForeground;
 
-	private Provider<SensorEditor> providerSensorEditor;
+	private Provider<SensorEditorSwing> providerSensorEditor;
 
 	@Inject
-	public StatusDisplay(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayList stepDisplay, Provider<SensorEditor> providerSensorEditor) {
+	public StatusDisplay(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayListSwing stepDisplay, Provider<SensorEditorSwing> providerSensorEditor) {
 		super();
 		this.conversion = conversion;
 		this.controller = controller;
@@ -261,7 +261,7 @@ public class StatusDisplay extends JPanel {
 		gbc.gridy++;
 		gbc.weightx = 2;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		SensorEditor label = providerSensorEditor.get();
+		SensorEditorSwing label = providerSensorEditor.get();
 		panel.add(label, gbc);
 
 		gbc.weightx = 1;
@@ -327,7 +327,7 @@ public class StatusDisplay extends JPanel {
 	}
 
 	private class SensorLabel {
-		SensorEditor label;
+		SensorEditorSwing label;
 		JLabel value;
 		TempSensor sensor;
 

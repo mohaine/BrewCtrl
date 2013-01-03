@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.ConfigurationLoader;
+import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.bean.SensorConfiguration;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
@@ -49,17 +49,17 @@ import com.mohaine.brewcontroller.client.layout.Tank;
 import com.mohaine.brewcontroller.server.util.Timeout;
 import com.mohaine.brewcontroller.shared.util.StringUtils;
 
-public class SensorEditor extends JPanel implements HasValue<TempSensor> {
+public class SensorEditorSwing extends JPanel implements HasValue<TempSensor> {
 	private static final long serialVersionUID = 1L;
 
 	private JLabel label = new JLabel();
 
-	private Configuration config;
+	private ControllerHardware controller;
 
 	@Inject
-	public SensorEditor(ConfigurationLoader configLoader) {
+	public SensorEditorSwing(ControllerHardware controller) {
 		super();
-		this.config = configLoader.getConfiguration();
+		this.controller = controller;
 		setLayout(new BorderLayout());
 		label.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
 
@@ -158,7 +158,9 @@ public class SensorEditor extends JPanel implements HasValue<TempSensor> {
 	}
 
 	private SensorConfiguration getSensorConfig(TempSensor value) {
-		SensorConfiguration sConfig = config.findSensor(value.getAddress());
+
+		Configuration configuration = controller.getConfiguration();
+		SensorConfiguration sConfig = configuration.findSensor(value.getAddress());
 		if (sConfig == null) {
 			sConfig = new SensorConfiguration();
 			sConfig.setName(value.getAddress());
@@ -233,6 +235,7 @@ public class SensorEditor extends JPanel implements HasValue<TempSensor> {
 					}
 				}
 			});
+			Configuration config = controller.getConfiguration();
 
 			List<Tank> tanks = config.getBrewLayout().getTanks();
 
@@ -318,7 +321,10 @@ public class SensorEditor extends JPanel implements HasValue<TempSensor> {
 				locationName = tank.getName();
 			}
 			String name = editField.getText();
+
+			Configuration config = controller.getConfiguration();
 			config.updateSensor(value.getAddress(), name, locationName);
+			controller.setConfiguration(config);
 			stopEditing();
 		}
 	}

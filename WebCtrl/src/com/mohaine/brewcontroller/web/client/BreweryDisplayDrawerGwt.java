@@ -62,11 +62,7 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		}
 		backBuffer = Canvas.createIfSupported();
 
-		updateWidths();
-
 		panel.add(canvas);
-		context = canvas.getContext2d();
-		backBufferContext = backBuffer.getContext2d();
 
 	}
 
@@ -75,16 +71,21 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		int width = getWidth();
 		int height = getHeight();
 
+		System.out.println("Size: " + width + "," + height);
+
 		canvas.setWidth(width + "px");
 		canvas.setHeight(height + "px");
 		canvas.setCoordinateSpaceWidth(width);
 		canvas.setCoordinateSpaceHeight(height);
 		backBuffer.setCoordinateSpaceWidth(width);
 		backBuffer.setCoordinateSpaceHeight(height);
+
+		context = canvas.getContext2d();
+		backBufferContext = backBuffer.getContext2d();
+
 	}
 
 	private int getHeight() {
-
 		return height;
 	}
 
@@ -98,6 +99,7 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		this.height = height;
 		updateWidths();
 		this.displays = displays;
+		redrawAll();
 	}
 
 	@Override
@@ -139,6 +141,7 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 
 	@Override
 	public void redrawAll() {
+
 		backBufferContext.setFillStyle(Colors.BACKGROUND);
 		backBufferContext.fillRect(0, 0, getWidth(), getHeight());
 		for (BreweryComponentDisplay display : displays) {

@@ -1,4 +1,4 @@
-package com.mohaine.brewcontroller;
+package com.mohaine.brewcontroller.client;
 
 public class TimeParser {
 

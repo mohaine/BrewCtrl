@@ -510,4 +510,16 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			pendingStepEdits.add(step);
 		}
 	}
+
+	@Override
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	@Override
+	public void setConfiguration(Configuration config) {
+		config.setVersion(StringUtils.generateRandomId());
+		loadConfiguration(config);
+	}
+
 }

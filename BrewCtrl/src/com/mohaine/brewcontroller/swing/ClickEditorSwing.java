@@ -37,13 +37,13 @@ import com.mohaine.brewcontroller.client.event.ChangeHandler;
 import com.mohaine.brewcontroller.client.event.HandlerRegistration;
 import com.mohaine.brewcontroller.client.event.HasValue;
 
-public class ClickEditor<T> extends JPanel implements HasValue<T> {
+public class ClickEditorSwing<T> extends JPanel implements HasValue<T> {
 	private static final long serialVersionUID = 1L;
 
 	private JLabel label = new JLabel();
 	private final Converter<T, String> converter;
 
-	public ClickEditor(Converter<T, String> converter) {
+	public ClickEditorSwing(Converter<T, String> converter) {
 		super();
 		this.converter = converter;
 		setLayout(new BorderLayout());

@@ -5,4 +5,7 @@ import com.mohaine.brewcontroller.client.page.Overview;
 
 public interface WebCtrlInjector extends Ginjector {
 	Overview getOverview();
+
+	StatusPanel getStatusPanel();
+
 }
