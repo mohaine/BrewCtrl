@@ -125,7 +125,7 @@ void updateDuty() {
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
 			int controlPointCount = step->controlPointCount;
-			for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
+			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				setupControlPoint(cp);
 				if (cp->automaticControl) {
@@ -165,7 +165,7 @@ void updatePinsForSetDuty() {
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
 			int controlPointCount = step->controlPointCount;
-			for (byte cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
+			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				setupControlPoint(cp);
 				int duty = cp->duty;

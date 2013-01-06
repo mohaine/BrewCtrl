@@ -20,12 +20,11 @@
 #ifndef BREWCTRL_H_
 #define BREWCTRL_H_
 
-
 #define bool _Bool
 #define false 0
 #define true 1
 
-#define byte unsigned char
+#define byte  char
 
 #define MODE_OFF 0
 #define MODE_ON 1
@@ -35,25 +34,19 @@
 #define HIGH 1
 #define OUTPUT 0
 
-
 #ifndef NULL
 #define NULL 0
 #endif
-
 
 #ifdef MOCK
 #define SYS_PATH "mock/sys"
 #endif
 
-
 #ifndef SYS_PATH
 #define SYS_PATH "/sys"
 #endif
 
-
 long millis();
-
-
 
 #endif
 

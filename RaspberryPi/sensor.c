@@ -23,7 +23,7 @@ void readSensors() {
 
 	char data[200];
 
-	for (byte sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
+	for (int sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
 		TempSensor *sensor = &sensors[sensorIndex];
 		bool successfulRead = false;
 		sprintf(tmp, "%s/%s", sensor->sysfile, "w1_slave");
@@ -118,7 +118,7 @@ void searchForTempSensors() {
 }
 
 TempSensor* getSensor(byte* address) {
-	for (byte sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
+	for (int sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
 		TempSensor *sensor = &sensors[sensorIndex];
 		bool same = true;
 		for (int j = 0; same && j < 8; j++) {

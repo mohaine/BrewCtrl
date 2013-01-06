@@ -23,11 +23,31 @@
 #include "brewctrl.h"
 
 typedef struct {
+	int count;byte* data;
+} Array;
+
+typedef struct {
+	char* address;
+} Sensor;
+
+typedef struct {
+	char* name;
+	int pin;bool hasDuty;
+	int maxAmps;
+} HeatElement;
+
+typedef struct {
+	char* name;
+	Sensor* sensor;
+	HeatElement* heater;
 } Tank;
 typedef struct {
+	char* name;
 } Pump;
+
 typedef struct {
 	int maxAmps;
+	Array tanks;
 } BreweryLayout;
 
 typedef struct {
@@ -44,7 +64,7 @@ Configuration * getConfiguration();
 void setConfiguration(Configuration * config);
 bool initConfiguration();
 
-char* formatJsonConfiguration(Configuration * cfg);
+byte* formatJsonConfiguration(Configuration * cfg);
 Configuration * parseJsonConfiguration(byte *data);
 #endif
 

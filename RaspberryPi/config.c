@@ -40,9 +40,38 @@ Configuration * config = NULL;
 
 void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 	json_object *layout = json_object_new_object();
-	json_object_object_add(config, "brewLayout",layout);
+	json_object_object_add(config, "brewLayout", layout);
+
 	json_object_object_add(layout, "maxAmps", json_object_new_int(bl->maxAmps));
 
+	json_object *tanks = json_object_new_array();
+
+	json_object_object_add(layout, "tanks", tanks);
+
+	Tank * tA = (Tank *) bl->tanks.data;
+	for (int i = 0; i < bl->tanks.count; i++) {
+		json_object *tank = json_object_new_object();
+		json_object_array_add(tanks, tank);
+		Tank * t = &tA[i];
+		json_object_object_add(tank, "name", json_object_new_string(t->name));
+
+		if (t->sensor != NULL) {
+			json_object *sensor = json_object_new_object();
+			json_object_object_add(tank, "sensor", sensor);
+
+			json_object_object_add(sensor, "address", json_object_new_string(t->sensor->address));
+		}
+		if (t->heater != NULL) {
+			json_object *heater = json_object_new_object();
+			json_object_object_add(tank, "heater", heater);
+
+			json_object_object_add(heater, "name", json_object_new_string(t->heater->name));
+			json_object_object_add(heater, "pin", json_object_new_int(t->heater->pin));
+			json_object_object_add(heater, "hasDuty", json_object_new_boolean(t->heater->hasDuty));
+
+		}
+
+	}
 
 }
 
@@ -54,7 +83,7 @@ char* formatJsonConfiguration(Configuration * cfg) {
 
 	appendBrewLayout(config, cfg->brewLayout);
 
-	char * tmp = json_object_get_string(config);
+	const char * tmp = json_object_get_string(config);
 	int length = strlen(tmp);
 
 	char * buffer = malloc(length + 1);
@@ -67,9 +96,77 @@ char* formatJsonConfiguration(Configuration * cfg) {
 	return buffer;
 }
 
+char* mallocString(json_object *obj) {
+	const char * tmp;
+	tmp = json_object_get_string(obj);
+	int length = strlen(tmp);
+	char * returnValue = malloc(length + 1);
+	if (returnValue == NULL) {
+		exit(-1);
+	}
+	memcpy(returnValue, tmp, length + 1);
+	return returnValue;
+}
+
+HeatElement * parseHeatElement(json_object *layout) {
+	boolean valid = false;
+	HeatElement * s = malloc(sizeof(HeatElement));
+
+	if (json_object_get_type(layout) == json_type_object) {
+		valid = true;
+		json_object * value;
+		value = json_object_object_get(layout, "name");
+		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+			s->name = mallocString(value);
+		} else {
+			valid = false;
+		}
+		value = json_object_object_get(layout, "pin");
+		if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+			s->pin = json_object_get_int(value);
+		} else {
+			valid = false;
+		}
+		value = json_object_object_get(layout, "hasDuty");
+		if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
+			s->hasDuty = json_object_get_boolean(value);
+		} else {
+			valid = false;
+		}
+
+	}
+	if (!valid) {
+		free(s);
+		s = NULL;
+	}
+	return s;
+}
+
+Sensor * parseSensor(json_object *layout) {
+	boolean valid = false;
+	Sensor * s = malloc(sizeof(Sensor));
+
+	if (json_object_get_type(layout) == json_type_object) {
+		valid = true;
+		json_object * value;
+		value = json_object_object_get(layout, "address");
+		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+			s->address = mallocString(value);
+		} else {
+			valid = false;
+		}
+
+	}
+	if (!valid) {
+		free(s);
+		s = NULL;
+	}
+	return s;
+}
+
 BreweryLayout * parseBrewLayout(json_object *layout) {
 	boolean valid = false;
-	BreweryLayout * br = malloc(sizeof(BreweryLayout));
+	BreweryLayout * bl = malloc(sizeof(BreweryLayout));
 
 	if (json_object_get_type(layout) == json_type_object) {
 		valid = true;
@@ -77,16 +174,67 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 
 		value = json_object_object_get(layout, "maxAmps");
 		if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
-			br->maxAmps = json_object_get_int(value);
+			bl->maxAmps = json_object_get_int(value);
 		} else {
 			valid = false;
 		}
+
+		value = json_object_object_get(layout, "tanks");
+		if (valid && value != NULL && json_object_get_type(value) == json_type_array) {
+			json_object * tanks = value;
+
+			bl->tanks.count = json_object_array_length(tanks);
+			bl->tanks.data = malloc(sizeof(Tank) * bl->tanks.count);
+			Tank * tA = (Tank *) bl->tanks.data;
+
+			for (int i = 0; i < bl->tanks.count; i++) {
+
+				Tank * t = &tA[i];
+
+				json_object *tank = json_object_array_get_idx(tanks, i);
+				value = json_object_object_get(tank, "name");
+				if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+					t->name = mallocString(value);
+				} else {
+					valid = false;
+					break;
+				}
+
+				value = json_object_object_get(tank, "sensor");
+				if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
+					t->sensor = parseSensor(value);
+				} else {
+					t->sensor = NULL;
+				}
+
+				value = json_object_object_get(tank, "heater");
+				if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
+					t->heater = parseHeatElement(value);
+				} else {
+					t->heater = NULL;
+				}
+
+			}
+
+		} else {
+			valid = false;
+		}
+
 	}
+
+//	printf("11l->tanks.data: %d,%d\n", bl->tanks.count, bl->tanks.data);
+//	Tank * data = (Tank *) bl->tanks.data;
+//	for (int i = 0; i < bl->tanks.count; i++) {
+//		Tank t = data[i];
+//		printf("%d %s\n", &t, t.name);
+//	}
+
 	if (!valid) {
-		free(br);
-		br = NULL;
+		free(bl);
+		bl = NULL;
 	}
-	return br;
+
+	return bl;
 }
 
 Configuration * parseJsonConfiguration(byte *data) {
@@ -95,19 +243,12 @@ Configuration * parseJsonConfiguration(byte *data) {
 
 	json_object *config = json_tokener_parse(data);
 	if (config != NULL) {
-		char * tmp;
 
 		if (json_object_get_type(config) == json_type_object) {
 			valid = true;
 			json_object * value = json_object_object_get(config, "version");
 			if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-				tmp = json_object_get_string(value);
-				int length = strlen(tmp);
-				cfg->version = malloc(length + 1);
-				if (cfg->version == NULL) {
-					exit(-1);
-				}
-				memcpy(cfg->version, tmp, length + 1);
+				cfg->version = mallocString(value);
 			} else {
 				valid = false;
 			}
