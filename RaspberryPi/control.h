@@ -14,7 +14,7 @@
 #define MODE_HOLD 2
 
 typedef struct {
-	int mode;byte maxAmps;
+	int mode;
 } Control;
 
 typedef struct {

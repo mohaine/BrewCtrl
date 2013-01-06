@@ -30,6 +30,7 @@
 
 #include "sensor.h"
 #include "comm.h"
+#include "config.h"
 #include "control.h"
 
 #include <sys/stat.h>
@@ -126,10 +127,10 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 	return paramSize;
 }
 
-void handleLayoutRequest(Request * request, Response * response) {
+void handleConfigRequest(Request * request, Response * response) {
 	if (request->contentLength > 0) {
 		char * buffer = malloc(BUFFER_SIZE);
-		int paramSize = readParam("layout", request->content, request->contentLength, buffer);
+		int paramSize = readParam("configuration", request->content, request->contentLength, buffer);
 		if (paramSize > 0) {
 			FILE* f = fopen(LAYOUT_FILE, "wb");
 			if (f) {
@@ -389,6 +390,11 @@ void handleStatusRequest(Request * request, Response * response) {
 
 	status = json_object_new_object();
 
+	Configuration* config = getConfiguration();
+	if (config != NULL && config->version != NULL) {
+		json_object_object_add(status, "version", json_object_new_string(config->version));
+	}
+
 	if (getControl()->mode == MODE_OFF) {
 		json_object_object_add(status, "mode", json_object_new_string("OFF"));
 	} else if (getControl()->mode == MODE_ON) {
@@ -464,8 +470,8 @@ void setupComm() {
 	services[0].path = "/cmd/status";
 	services[0].handleRequest = handleStatusRequest;
 
-	services[1].path = "/cmd/layout";
-	services[1].handleRequest = handleLayoutRequest;
+	services[1].path = "/cmd/configuration";
+	services[1].handleRequest = handleConfigRequest;
 
 	services[2].path = "/cmd/version";
 	services[2].handleRequest = handleVersionRequest;

@@ -22,11 +22,7 @@ int main() {
 	searchForTempSensors();
 	readSensors();
 
-	char data[20];
-
 	listSensors();
-
-
 
 	return 0;
 

@@ -1,5 +1,6 @@
 #include "control.h"
 #include "comm.h"
+#include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -168,7 +169,15 @@ void updatePinsForSetDuty() {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				setupControlPoint(cp);
 				int duty = cp->duty;
-				if (currentAmps + cp->fullOnAmps > control->maxAmps) {
+
+				int maxAmps = 0;
+
+				Configuration* configuration = getConfiguration();
+				if (configuration != NULL && configuration->brewLayout != NULL) {
+					maxAmps = configuration->brewLayout->maxAmps;
+				}
+
+				if (currentAmps + cp->fullOnAmps > maxAmps) {
 					duty = 0;
 				}
 
