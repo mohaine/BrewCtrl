@@ -39,7 +39,17 @@ public class TimeParser {
 		int minutes = (int) (time / 60);
 		int seconds = (int) time - (minutes * 60);
 
-		return String.format("%d:%02d", minutes, seconds);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(minutes);
+		sb.append(':');
+
+		if (seconds < 10) {
+			sb.append('0');
+		}
+		sb.append(seconds);
+
+		return sb.toString();
 	}
 
 	public void setZeroDescription(String negativeDescription) {

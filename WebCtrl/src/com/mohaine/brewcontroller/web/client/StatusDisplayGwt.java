@@ -9,7 +9,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -31,7 +32,7 @@ import com.mohaine.brewcontroller.client.event.StatusChangeEvent;
 import com.mohaine.brewcontroller.client.event.StatusChangeEventHandler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 
-public class StatusPanel extends Composite {
+public class StatusDisplayGwt extends Composite {
 
 	private ToggleButton modeOnButton = new ToggleButton("Go", new ClickHandler() {
 
@@ -98,12 +99,12 @@ public class StatusPanel extends Composite {
 
 	private EventBus eventBus;
 
-	private FlowPanel statusPanel;
+	private VerticalPanel statusPanel;
 
 	private Provider<SensorEditorGwt> providerSensorEditor;
 
 	@Inject
-	public StatusPanel(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayListGwt stepDisplay, Provider<SensorEditorGwt> providerSensorEditor) {
+	public StatusDisplayGwt(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayListGwt stepDisplay, Provider<SensorEditorGwt> providerSensorEditor) {
 		super();
 		this.conversion = conversion;
 		this.controller = controller;
@@ -111,13 +112,15 @@ public class StatusPanel extends Composite {
 		this.providerSensorEditor = providerSensorEditor;
 		VerticalPanel panel = new VerticalPanel();
 
-		FlowPanel modePanel = createTitledPanel("Mode");
+		panel.add(new HTML("Mode"));
+
+		HorizontalPanel modePanel = new HorizontalPanel();
 		modePanel.add(modeOnButton);
 		modePanel.add(modeHoldButton);
 		modePanel.add(modeOffButton);
 		panel.add(modePanel);
 
-		statusPanel = new FlowPanel();
+		statusPanel = new VerticalPanel();
 		panel.add(statusPanel);
 
 		status = addTitledLabel(statusPanel, "Status:");
@@ -129,14 +132,6 @@ public class StatusPanel extends Composite {
 
 		initWidget(panel);
 
-	}
-
-	private FlowPanel createTitledPanel(String name) {
-		FlowPanel namePanel = new FlowPanel();
-
-		// TODO
-		namePanel.setTitle(name);
-		return namePanel;
 	}
 
 	@Override
@@ -199,21 +194,24 @@ public class StatusPanel extends Composite {
 	}
 
 	private Label addTitledLabel(Panel panel, String title) {
-
-		panel.add(new Label(title));
+		HorizontalPanel hp = new HorizontalPanel();
+		panel.add(hp);
+		hp.add(new Label(title));
 		Label value = new Label();
-		panel.add(value);
+		hp.add(value);
 		return value;
 
 	}
 
 	private SensorLabelGwt addTitledSensorLabel(Panel panel, TempSensor tempSensor) {
+		HorizontalPanel hp = new HorizontalPanel();
 
+		panel.add(hp);
 		SensorEditorGwt label = providerSensorEditor.get();
-		panel.add(label);
+		hp.add(label);
 
 		Label value = new Label();
-		panel.add(value);
+		hp.add(value);
 
 		SensorLabelGwt sensorLabel = new SensorLabelGwt();
 		sensorLabel.value = value;

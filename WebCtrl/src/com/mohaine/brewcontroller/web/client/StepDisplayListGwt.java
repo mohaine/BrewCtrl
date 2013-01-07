@@ -28,6 +28,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.mohaine.brewcontroller.client.ControllerHardware;
@@ -69,13 +70,12 @@ public class StepDisplayListGwt extends Composite {
 		editorsPanel = new FlowPanel();
 		panel.add(editorsPanel);
 
-		FlowPanel controlPanel = new FlowPanel();
+		VerticalPanel controlPanel = new VerticalPanel();
 
 		panel.add(controlPanel);
 
 		Label addNewLabel = new Label("+ Add New Step");
 		addNewLabel.addClickHandler(new ClickHandler() {
-
 			@Override
 			public void onClick(ClickEvent event) {
 				addNewStep();

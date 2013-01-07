@@ -38,13 +38,14 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 				e.printStackTrace();
 				setStatus(e.getMessage());
 			}
-			statusTimer.schedule(2000);
+			statusTimer.schedule(500);
 		}
 
 	};
 
 	protected void updateStatusAsap() {
 		super.updateStatusAsap();
+
 		statusTimer.cancel();
 		statusTimer.schedule(10);
 	}
@@ -52,9 +53,7 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 	@Inject
 	public ControllerHardwareJsonGwt(EventBus eventBusp, BrewJsonConverter converter) throws Exception {
 		super(eventBusp, converter);
-
 		statusTimer.schedule(500);
-
 	}
 
 	@Override
@@ -101,15 +100,19 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 				StringBuilder sb = new StringBuilder();
 				Set<Entry<String, String>> entrySet = params.entrySet();
 				for (Entry<String, String> entry : entrySet) {
+
+					if (sb.length() > 0) {
+						sb.append("\r\n");
+					}
 					sb.append(URL.encode(entry.getKey()));
 					sb.append("=");
 					sb.append(URL.encode(entry.getValue()));
-					sb.append("\r\n");
 				}
 				requestData = sb.toString();
 			}
 
 			try {
+
 				builder.sendRequest(requestData, new RequestCallback() {
 					public void onError(Request request, Throwable exception) {
 						callback.onNotSuccess(exception);

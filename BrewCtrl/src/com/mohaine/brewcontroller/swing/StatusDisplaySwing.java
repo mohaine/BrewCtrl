@@ -53,7 +53,7 @@ import com.mohaine.brewcontroller.client.event.StatusChangeEvent;
 import com.mohaine.brewcontroller.client.event.StatusChangeEventHandler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 
-public class StatusDisplay extends JPanel {
+public class StatusDisplaySwing extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JToggleButton modeOnButton = new JToggleButton(new AbstractAction("Go") {
@@ -134,7 +134,7 @@ public class StatusDisplay extends JPanel {
 	private Provider<SensorEditorSwing> providerSensorEditor;
 
 	@Inject
-	public StatusDisplay(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayListSwing stepDisplay, Provider<SensorEditorSwing> providerSensorEditor) {
+	public StatusDisplaySwing(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayListSwing stepDisplay, Provider<SensorEditorSwing> providerSensorEditor) {
 		super();
 		this.conversion = conversion;
 		this.controller = controller;

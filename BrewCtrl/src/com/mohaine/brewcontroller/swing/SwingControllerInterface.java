@@ -38,11 +38,11 @@ public class SwingControllerInterface implements ControllerGui {
 	private JPanel mainPanel = new JPanel();
 
 	DisplayPage currentPage;
-	private StatusDisplay statusDisplay;
+	private StatusDisplaySwing statusDisplay;
 	private ConfigurationLoader configurationLoader;
 
 	@Inject
-	public SwingControllerInterface(StatusDisplay statusDisplay, ConfigurationLoader configurationLoader) {
+	public SwingControllerInterface(StatusDisplaySwing statusDisplay, ConfigurationLoader configurationLoader) {
 		super();
 		this.configurationLoader = configurationLoader;
 		this.statusDisplay = statusDisplay;

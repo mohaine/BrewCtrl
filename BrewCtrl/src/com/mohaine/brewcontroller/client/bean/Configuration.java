@@ -78,7 +78,6 @@ public class Configuration {
 	}
 
 	public void setStepLists(List<ConfigurationStepList> stepLists) {
-		System.out.println("Configuration.setStepLists()" + stepLists);
 		this.stepLists = stepLists;
 	}
 

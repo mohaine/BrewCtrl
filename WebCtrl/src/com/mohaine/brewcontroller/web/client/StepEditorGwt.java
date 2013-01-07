@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
@@ -87,7 +88,7 @@ public class StepEditorGwt extends Composite {
 		super();
 		this.eventBus = eventBus;
 		this.controller = controller;
-		FlowPanel mainPanel = new FlowPanel();
+		HorizontalPanel mainPanel = new HorizontalPanel();
 
 		mainPanel.add(nameValue);
 		// nameValue.setPreferredSize(new Dimension(200, HEIGHT));

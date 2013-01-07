@@ -1,5 +1,6 @@
 package com.mohaine.brewcontroller.web.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.canvas.client.Canvas;
@@ -49,6 +50,7 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 	private Context2d backBufferContext;
 	private int width = 10;
 	private int height = 10;
+	private MouseAdaptor mouseAdaptor = new MouseAdaptor();
 
 	@Inject
 	public BreweryDisplayDrawerGwt(ControllerHardware controller, UnitConversion conversion) {
@@ -61,6 +63,9 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 			return;
 		}
 		backBuffer = Canvas.createIfSupported();
+		canvas.addMouseDownHandler(mouseAdaptor);
+		canvas.addMouseUpHandler(mouseAdaptor);
+		canvas.addMouseMoveHandler(mouseAdaptor);
 
 		panel.add(canvas);
 
@@ -70,8 +75,6 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		// init the canvases
 		int width = getWidth();
 		int height = getHeight();
-
-		System.out.println("Size: " + width + "," + height);
 
 		canvas.setWidth(width + "px");
 		canvas.setHeight(height + "px");
@@ -113,30 +116,43 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		}
 	}
 
-	@Override
-	public void addMouseListener(final DrawerMouseListener drawerMouseListener) {
-		canvas.addMouseDownHandler(new MouseDownHandler() {
-			@Override
-			public void onMouseDown(MouseDownEvent e) {
-				drawerMouseListener.mouseDown(new DrawerMouseEvent(e.getX(), e.getY()));
-			}
-		});
-		canvas.addMouseUpHandler(new MouseUpHandler() {
-			@Override
-			public void onMouseUp(MouseUpEvent e) {
-				drawerMouseListener.mouseUp(new DrawerMouseEvent(e.getX(), e.getY()));
-			}
-		});
+	private class MouseAdaptor implements MouseDownHandler, MouseUpHandler, MouseMoveHandler {
 
-		canvas.addMouseMoveHandler(new MouseMoveHandler() {
-			@Override
-			public void onMouseMove(MouseMoveEvent e) {
-				if (e.getNativeButton() == NativeEvent.BUTTON_LEFT) {
+		List<DrawerMouseListener> listeners = new ArrayList<DrawerMouseListener>();
+		private boolean leftDown;
+
+		@Override
+		public void onMouseDown(MouseDownEvent e) {
+			if (e.getNativeButton() == NativeEvent.BUTTON_LEFT) {
+				leftDown = true;
+				for (DrawerMouseListener drawerMouseListener : listeners) {
+					drawerMouseListener.mouseDown(new DrawerMouseEvent(e.getX(), e.getY()));
+				}
+			}
+		}
+
+		@Override
+		public void onMouseUp(MouseUpEvent e) {
+			if (e.getNativeButton() == NativeEvent.BUTTON_LEFT) {
+				leftDown = false;
+				for (DrawerMouseListener drawerMouseListener : listeners) {
+					drawerMouseListener.mouseUp(new DrawerMouseEvent(e.getX(), e.getY()));
+				}
+			}
+		}
+
+		public void onMouseMove(MouseMoveEvent e) {
+			for (DrawerMouseListener drawerMouseListener : listeners) {
+				if (leftDown) {
 					drawerMouseListener.mouseDragged(new DrawerMouseEvent(e.getX(), e.getY()));
 				}
 			}
-		});
+		}
+	}
 
+	@Override
+	public void addMouseListener(final DrawerMouseListener drawerMouseListener) {
+		mouseAdaptor.listeners.add(drawerMouseListener);
 	}
 
 	@Override
@@ -210,14 +226,16 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 		if (text == null) {
 			text = Integer.toString(duty) + "%";
 		}
-		drawText(g, display, text, color, true);
+		drawText(g, display, text, color, Colors.TANK, true);
 	}
 
-	private void drawText(Context2d g, BreweryComponentDisplay display, String tempDisplay, CssColor textColor, boolean alignRight) {
-		drawText(g, tempDisplay, textColor, alignRight, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), display.getHeight(), Colors.TEMP_FONT);
+	private void drawText(Context2d g, BreweryComponentDisplay display, String tempDisplay, CssColor textColor, CssColor bgColor, boolean alignRight) {
+		drawText(g, tempDisplay, textColor, bgColor, alignRight, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), display.getHeight(), Colors.TEMP_FONT);
 	}
 
-	private void drawText(Context2d g, String text, CssColor textColor, boolean alignRight, int left, int top, int width, int height, String font) {
+	private void drawText(Context2d g, String text, CssColor textColor, CssColor bgColor, boolean alignRight, int left, int top, int width, int height, String font) {
+		g.setFillStyle(bgColor);
+		g.fillRect(left, top, width, height);
 		g.setFont(font);
 		g.setFillStyle(textColor);
 		g.fillText(text, left, top + height);
@@ -236,7 +254,7 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 			} else {
 				textColor = Colors.ERROR;
 			}
-			drawText(g, tempDisplay, textColor, false, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, Colors.TEMP_FONT);
+			drawText(g, tempDisplay, textColor, Colors.TANK, false, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, Colors.TEMP_FONT);
 
 			boolean clearText = true;
 			ControlStep selectedStep = controller.getSelectedStep();
@@ -250,12 +268,12 @@ public class BreweryDisplayDrawerGwt implements BreweryDisplayDrawer {
 					// }
 					clearText = false;
 					tempDisplay = numberFormatWhole.format(tempDisplayConveter.convertFrom(cp.getTargetTemp())) + "\u00B0";
-					drawText(g, "(" + tempDisplay + ")", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
+					drawText(g, "(" + tempDisplay + ")", textColor, Colors.TANK, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
 				}
 			}
 
 			if (clearText) {
-				drawText(g, "", textColor, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
+				drawText(g, "", textColor, Colors.TANK, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, Colors.TEMP_TARGET_FONT);
 			}
 		}
 	}
