@@ -80,8 +80,44 @@ char* formatJsonConfiguration(Configuration * cfg) {
 
 	json_object_object_add(config, "version", json_object_new_string(cfg->version));
 	json_object_object_add(config, "logMessages", json_object_new_boolean(cfg->logMessages));
-
 	appendBrewLayout(config, cfg->brewLayout);
+
+	json_object *sensors = json_object_new_array();
+	json_object_object_add(config, "sensors", sensors);
+
+	SensorConfig * tA = (SensorConfig *) cfg->sensors.data;
+	for (int i = 0; i < cfg->sensors.count; i++) {
+		json_object *sensor = json_object_new_object();
+		json_object_array_add(sensors, sensor);
+		SensorConfig * t = &tA[i];
+		json_object_object_add(sensor, "name", json_object_new_string(t->name));
+		json_object_object_add(sensor, "location", json_object_new_string(t->location));
+		json_object_object_add(sensor, "address", json_object_new_string(t->address));
+	}
+
+	json_object *stepLists = json_object_new_array();
+	json_object_object_add(config, "stepLists", stepLists);
+
+	StepList * stA = (StepList *) cfg->stepLists.data;
+	for (int slI = 0; slI < cfg->stepLists.count; slI++) {
+		json_object *stepList = json_object_new_object();
+		json_object_array_add(stepLists, stepList);
+		StepList * t = &stA[slI];
+		json_object_object_add(stepList, "name", json_object_new_string(t->name));
+
+		json_object *steps = json_object_new_array();
+		json_object_object_add(stepList, "steps", steps);
+
+		Step * slsA = (Step *) t->steps.data;
+		for (int slsI = 0; slsI < t->steps.count; slsI++) {
+			json_object *step = json_object_new_object();
+			json_object_array_add(steps, step);
+			Step * s = &slsA[slsI];
+			json_object_object_add(step, "name", json_object_new_string(s->name));
+			json_object_object_add(step, "time", json_object_new_string(s->time));
+		}
+
+	}
 
 	const char * tmp = json_object_get_string(config);
 	int length = strlen(tmp);
@@ -164,10 +200,90 @@ Sensor * parseSensor(json_object *layout) {
 	return s;
 }
 
+void freeIfNotNull(void* p) {
+	if (p != NULL) {
+		free(p);
+	}
+
+}
+void freeSensor(Sensor * s) {
+	if (s != NULL) {
+		freeIfNotNull(s->address);
+	}
+	freeIfNotNull(s);
+}
+void freeHeater(HeatElement * h) {
+	if (h != NULL) {
+		freeIfNotNull(h->name);
+	}
+	freeIfNotNull(h);
+}
+
+void freeTankChildren(Tank * t) {
+	freeHeater(t->heater);
+	freeSensor(t->sensor);
+	freeIfNotNull(t->name);
+}
+
+void freeBrewLayout(BreweryLayout * bl) {
+	if (bl->tanks.data != NULL) {
+
+		Tank * tA = (Tank *) bl->tanks.data;
+		for (int i = 0; i < bl->tanks.count; i++) {
+			Tank * t = &tA[i];
+
+			freeTankChildren(t);
+		}
+
+		free(bl->tanks.data);
+	}
+	free(bl);
+}
+
+void freeStepChildren(Step * s) {
+	freeIfNotNull(s->name);
+	freeIfNotNull(s->time);
+
+}
+void freeStepList(StepList * sl) {
+	freeIfNotNull(sl->name);
+	if (sl->steps.data != NULL) {
+
+		Step * tA = (Step*) sl->steps.data;
+		for (int i = 0; i < sl->steps.count; i++) {
+			Step * t = &tA[i];
+
+			freeStepChildren(t);
+		}
+
+		free(sl->steps.data);
+	}
+	free(sl);
+}
+
+void freeConfiguration(Configuration * c) {
+	if (c->brewLayout != NULL) {
+		freeBrewLayout(c->brewLayout);
+	}
+	if (c->sensors.data != NULL) {
+
+		SensorConfig * tA = (SensorConfig *) c->sensors.data;
+		for (int i = 0; i < c->sensors.count; i++) {
+			SensorConfig * t = &tA[i];
+
+			freeIfNotNull(t->address);
+			freeIfNotNull(t->name);
+			freeIfNotNull(t->location);
+		}
+
+		free(c->sensors.data);
+	}
+
+}
 BreweryLayout * parseBrewLayout(json_object *layout) {
 	boolean valid = false;
 	BreweryLayout * bl = malloc(sizeof(BreweryLayout));
-
+	bl->tanks.data = NULL;
 	if (json_object_get_type(layout) == json_type_object) {
 		valid = true;
 		json_object * value;
@@ -190,6 +306,10 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 			for (int i = 0; i < bl->tanks.count; i++) {
 
 				Tank * t = &tA[i];
+
+				t->name = NULL;
+				t->sensor = NULL;
+				t->heater = NULL;
 
 				json_object *tank = json_object_array_get_idx(tanks, i);
 				value = json_object_object_get(tank, "name");
@@ -230,7 +350,7 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 //	}
 
 	if (!valid) {
-		free(bl);
+		freeBrewLayout(bl);
 		bl = NULL;
 	}
 
@@ -263,6 +383,113 @@ Configuration * parseJsonConfiguration(byte *data) {
 			if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
 				cfg->brewLayout = parseBrewLayout(value);
 				valid = cfg->brewLayout != NULL;
+			} else {
+				valid = false;
+			}
+			value = json_object_object_get(config, "sensors");
+			if (valid && value != NULL && json_object_get_type(value) == json_type_array) {
+				json_object * tanks = value;
+
+				cfg->sensors.count = json_object_array_length(tanks);
+				cfg->sensors.data = malloc(sizeof(SensorConfig) * cfg->sensors.count);
+				SensorConfig * tA = (SensorConfig *) cfg->sensors.data;
+
+				for (int i = 0; i < cfg->sensors.count; i++) {
+
+					SensorConfig * sc = &tA[i];
+
+					sc->name = NULL;
+					sc->location = NULL;
+					sc->address = NULL;
+
+					json_object *sensor = json_object_array_get_idx(tanks, i);
+					value = json_object_object_get(sensor, "name");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+						sc->name = mallocString(value);
+					} else {
+						valid = false;
+						break;
+					}
+
+					value = json_object_object_get(sensor, "location");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+						sc->location = mallocString(value);
+					} else {
+						valid = false;
+						break;
+					}
+
+					value = json_object_object_get(sensor, "address");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+						sc->address = mallocString(value);
+					} else {
+						valid = false;
+						break;
+					}
+
+				}
+
+			} else {
+				valid = false;
+			}
+			value = json_object_object_get(config, "stepLists");
+			if (valid && value != NULL && json_object_get_type(value) == json_type_array) {
+				json_object * stepLists = value;
+
+				cfg->stepLists.count = json_object_array_length(stepLists);
+				cfg->stepLists.data = malloc(sizeof(StepList) * cfg->stepLists.count);
+				StepList * slA = (StepList *) cfg->stepLists.data;
+
+				for (int slI = 0; slI < cfg->stepLists.count; slI++) {
+
+					StepList * sl = &slA[slI];
+
+					sl->name = NULL;
+
+					json_object *stepList = json_object_array_get_idx(stepLists, slI);
+					value = json_object_object_get(stepList, "name");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+						sl->name = mallocString(value);
+					} else {
+						valid = false;
+						break;
+					}
+					value = json_object_object_get(stepList, "steps");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_array) {
+						json_object * steps = value;
+
+						sl->steps.count = json_object_array_length(steps);
+						sl->steps.data = malloc(sizeof(Step) * sl->steps.count);
+						Step * slA = (Step *) sl->steps.data;
+
+						for (int slsI = 0; slsI < sl->steps.count; slsI++) {
+
+							Step * sl = &slA[slsI];
+
+							sl->name = NULL;
+
+							json_object *step = json_object_array_get_idx(steps, slsI);
+							value = json_object_object_get(step, "name");
+							if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+								sl->name = mallocString(value);
+							} else {
+								valid = false;
+								break;
+							}
+							value = json_object_object_get(step, "time");
+							if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+								sl->time = mallocString(value);
+							} else {
+								valid = false;
+								break;
+							}
+
+						}
+
+					} else {
+						valid = false;
+					}
+				}
 
 			} else {
 				valid = false;
@@ -274,7 +501,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 	}
 
 	if (!valid) {
-		free(cfg);
+		freeConfiguration(cfg);
 		cfg = NULL;
 	}
 	return cfg;

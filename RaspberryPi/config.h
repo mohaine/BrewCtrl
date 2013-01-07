@@ -32,6 +32,12 @@ typedef struct {
 
 typedef struct {
 	char* name;
+	char* address;
+	char* location;
+} SensorConfig;
+
+typedef struct {
+	char* name;
 	int pin;bool hasDuty;
 	int maxAmps;
 } HeatElement;
@@ -51,13 +57,20 @@ typedef struct {
 } BreweryLayout;
 
 typedef struct {
-} SensorConfiguration;
+	char* name;
+	char* time;
+} Step;
+
+typedef struct {
+	char* name;
+	Array steps;
+} StepList;
 
 typedef struct {
 	char* version;bool logMessages;
 	BreweryLayout * brewLayout;
-	SensorConfiguration * sensors;
-
+	Array sensors;
+	Array stepLists;
 } Configuration;
 
 Configuration * getConfiguration();
