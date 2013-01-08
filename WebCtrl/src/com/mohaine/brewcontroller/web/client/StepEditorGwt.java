@@ -20,6 +20,10 @@ package com.mohaine.brewcontroller.web.client;
 
 import java.util.ArrayList;
 
+import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -123,25 +127,33 @@ public class StepEditorGwt extends Composite {
 		mainPanel.add(controlPanel);
 
 		Label delete = new Label("X");
-		// delete.addMouseListener(new MouseListenerAbstract() {
-		// @Override
-		// public void mouseClicked(MouseEvent arg0) {
-		// deleteStep();
-		// }
-		// });
-		controlPanel.add(delete);
+		delete.addMouseDownHandler(new MouseDownHandler() {	
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				deleteStep();
+			}
+		});
+		
+	
+		
+		delete.getElement().getStyle().setCursor(Cursor.POINTER);
 
+	
+		controlPanel.add(delete);
 		edit = new FlowPanel();
-		// edit.setMinimumSize(new Dimension(20, HEIGHT));
-		// edit.setPreferredSize(new Dimension(20, HEIGHT));
-		// edit.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,
-		// Color.black));
-		// edit.addMouseListener(new MouseListenerAbstract() {
-		// @Override
-		// public void mouseClicked(MouseEvent arg0) {
-		// selectStep();
-		// }
-		// });
+		edit.getElement().getStyle().setCursor(Cursor.POINTER);
+		edit.getElement().getStyle().setWidth(20, Unit.PX);
+		edit.getElement().getStyle().setHeight(20, Unit.PX);
+		edit.getElement().getStyle().setProperty("block", "inline");
+		edit.getElement().getStyle().setProperty("border", "1px solid black");
+		edit.addDomHandler(new MouseDownHandler() {	
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				System.out.println("StepEditorGwt.StepEditorGwt(...).new MouseDownHandler() {...}.onMouseDown()");
+				selectStep();
+			}
+		},MouseDownEvent.getType());
+		
 		controlPanel.add(edit);
 
 		initWidget(mainPanel);
@@ -217,6 +229,7 @@ public class StepEditorGwt extends Composite {
 	}
 
 	private void deleteStep() {
+		System.out.println("StepEditorGwt.deleteStep()");
 		// TODO
 		// if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this,
 		// "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete",

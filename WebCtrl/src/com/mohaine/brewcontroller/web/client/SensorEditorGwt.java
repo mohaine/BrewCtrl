@@ -21,11 +21,18 @@ package com.mohaine.brewcontroller.web.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -147,6 +154,7 @@ public class SensorEditorGwt extends Composite implements HasValue<TempSensor> {
 	}
 
 	private void stopEditing() {
+
 		if (editing) {
 			editing = false;
 			removeAll();
@@ -179,7 +187,6 @@ public class SensorEditorGwt extends Composite implements HasValue<TempSensor> {
 
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private class Editor {
 		private Panel panel;
 		private TextBox editField;
@@ -196,8 +203,27 @@ public class SensorEditorGwt extends Composite implements HasValue<TempSensor> {
 			}
 
 			editField.setText(editName);
-			editField.addKeyDownHandler(new KeyDownHandler() {
+			
+			Configuration configuration = controller.getConfiguration();
 
+			List<Tank> tanks = configuration.getBrewLayout().getTanks();
+
+			locationCombo = new ListBox();
+			locationCombo.addItem(null);
+			int index = 1;
+			for (Tank tank : tanks) {
+
+				if (tank.getSensor() == null) {
+					continue;
+				}
+
+				locationCombo.addItem(tank.getName());
+				if (sConfig != null && tank.getName().equals(sConfig.getLocation())) {
+					locationCombo.setSelectedIndex(index);
+				}
+				index++;
+			}
+			KeyDownHandler keyHandler = new KeyDownHandler() {
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -206,94 +232,60 @@ public class SensorEditorGwt extends Composite implements HasValue<TempSensor> {
 						stopEditing();
 					}
 				}
-			});
-			Configuration configuration = controller.getConfiguration();
-
-			List<Tank> tanks = configuration.getBrewLayout().getTanks();
-
-			locationCombo = new ListBox();
-			// locationCombo.addItem(null);
-			// for (Tank tank : tanks) {
-			//
-			// if (tank.getSensor() == null) {
-			// continue;
-			// }
-			//
-			// locationCombo.addItem(tank);
-			// if (sConfig != null &&
-			// tank.getName().equals(sConfig.getLocation())) {
-			// locationCombo.setSelectedItem(tank);
-			// }
-			// }
-			// locationCombo.addKeyListener(new KeyListener() {
-			//
-			// @Override
-			// public void keyTyped(KeyEvent paramKeyEvent) {
-			// }
-			//
-			// @Override
-			// public void keyReleased(KeyEvent paramKeyEvent) {
-			// }
-			//
-			// @Override
-			// public void keyPressed(KeyEvent paramKeyEvent) {
-			// if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
-			// if (!locationCombo.isPopupVisible()) {
-			// stopEditingSave();
-			// }
-			// } else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			// stopEditing();
-			// }
-			// }
-			// });
+			};
+			locationCombo.addKeyDownHandler(keyHandler);
+			editField.addKeyDownHandler(keyHandler);
 			panel = new HorizontalPanel();
 
 			panel.add(locationCombo);
 			panel.add(editField);
 
-			// FocusHandler focusListener = new FocusHandler() {
-			// Timeout timeout = new Timeout();
-			//
-			// @Override
-			// public void focusLost(FocusEvent paramFocusEvent) {
-			// timeout.start(250, new Runnable() {
-			// @Override
-			// public void run() {
-			// stopEditingSave();
-			// }
-			// });
-			// }
-			//
-			// @Override
-			// public void focusGained(FocusEvent paramFocusEvent) {
-			// timeout.cancel();
-			// }
-			//
-			// @Override
-			// public void onBlur(BlurEvent event) {
-			//
-			// }
-			//
-			// @Override
-			// public void onFocus(com.google.gwt.event.dom.client.FocusEvent
-			// event) {
-			// timeout.cancel();
-			//
-			// }
-			// };
-			// editField.addFocusHandler(focusListener);
-			// locationCombo.addFocusHandler(focusListener);
+	
+			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				
+				@Override
+				public void execute() {
+					locationCombo.setFocus(true);
+
+					FocusBlurHandler focusListener = new FocusBlurHandler();
+					editField.addFocusHandler(focusListener);
+					editField.addBlurHandler(focusListener);
+					
+					locationCombo.addFocusHandler(focusListener);
+					locationCombo.addBlurHandler(focusListener);					
+				}
+			});
+
+			
+
+		}
+
+		private class FocusBlurHandler implements BlurHandler, FocusHandler {
+			Timer timeout = new Timer() {
+				@Override
+				public void run() {
+					stopEditingSave();
+				}
+			};
+
+			@Override
+			public void onFocus(FocusEvent event) {
+				timeout.cancel();
+
+			}
+
+			@Override
+			public void onBlur(BlurEvent event) {
+				timeout.schedule(250);
+			}
+
 		}
 
 		protected void stopEditingSave() {
-			// String locationName = null;
-			// Tank tank = (Tank) locationCombo.getSelectedItem();
-			// if (tank != null) {
-			// locationName = tank.getName();
-			// }
-			// String name = editField.getText();
-			// config.updateSensor(value.getAddress(), name, locationName);
-			// controller.setConfiguration(config);
+			String locationName = locationCombo.getValue(locationCombo.getSelectedIndex());
+			Configuration config = controller.getConfiguration();
+			config.updateSensor(value.getAddress(), editField.getText(), locationName);
+			controller.setConfiguration(config);
 
 			stopEditing();
 		}

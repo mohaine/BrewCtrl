@@ -111,8 +111,7 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 				requestData = sb.toString();
 			}
 
-			try {
-
+			try { 
 				builder.sendRequest(requestData, new RequestCallback() {
 					public void onError(Request request, Throwable exception) {
 						callback.onNotSuccess(exception);

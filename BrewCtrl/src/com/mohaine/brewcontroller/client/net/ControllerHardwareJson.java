@@ -320,10 +320,10 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 	}
 
-	protected void loadConfiguration(Configuration uploadLayout) {
+	protected void loadConfiguration(Configuration uploadCfg) {
 		CommandRequest layoutRequest = getCommandRequest("configuration");
-		if (uploadLayout != null) {
-			layoutRequest.addParameter("configuration", converter.encode(loadDefaultConfiguration()));
+		if (uploadCfg != null) {
+			layoutRequest.addParameter("configuration", converter.encode(uploadCfg));
 		}
 		layoutRequest.runRequest(new Callback<String>() {
 			@Override
@@ -337,7 +337,6 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 					}
 
 					if (configuration != null) {
-
 						saveDefaultConfiguration();
 						initLayout();
 						eventBus.fireEvent(new BreweryLayoutChangeEvent(configuration.getBrewLayout()));

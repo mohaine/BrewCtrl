@@ -20,6 +20,7 @@ package com.mohaine.brewcontroller.web.client;
 
 import java.util.ArrayList;
 
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -47,6 +48,7 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 		super();
 		this.converter = converter;
 		panel.add(label);
+		label.getElement().getStyle().setCursor(Cursor.POINTER);
 
 		label.addMouseDownHandler(new MouseDownHandler() {
 			@Override
