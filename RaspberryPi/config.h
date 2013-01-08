@@ -57,8 +57,15 @@ typedef struct {
 } BreweryLayout;
 
 typedef struct {
+	double targetTemp;
+	char* targetName;
+	char* controlName;
+} StepControlPoint;
+
+typedef struct {
 	char* name;
 	char* time;
+	Array controlPoints;
 } Step;
 
 typedef struct {

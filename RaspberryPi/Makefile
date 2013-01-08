@@ -1,11 +1,12 @@
 CC=gcc 
 CFLAGSD=  
  
-CFLAGSD+= -DMOCK  
+CFLAGSD+= -DMOCK
+#CFLAGSD+= -D__DEBUG
 
 CFLAGS=-c -Wall -std=c99 $(CFLAGSD) 
 LDFLAGS=-lpthread  
-SOURCES= pid.c duty.c brewctrl.c comm.c  loop.c control.c sensor.c config.c
+SOURCES= pid.c duty.c brewctrl.c comm.c  loop.c control.c sensor.c config.c logger.c
 OBJECTS=$(SOURCES:.c=.o) 
 BREWCTRL=brewctrl
 LISTSENSORS=listsensors

@@ -18,6 +18,7 @@
 
 #include "sensor.h"
 #include "config.h"
+#include "logger.h"
 
 #include <sys/stat.h>
 #include <sys/socket.h>
@@ -113,8 +114,24 @@ char* formatJsonConfiguration(Configuration * cfg) {
 			json_object *step = json_object_new_object();
 			json_object_array_add(steps, step);
 			Step * s = &slsA[slsI];
+
 			json_object_object_add(step, "name", json_object_new_string(s->name));
 			json_object_object_add(step, "time", json_object_new_string(s->time));
+
+			json_object *controlPoints = json_object_new_array();
+			json_object_object_add(step, "controlPoints", controlPoints);
+
+			StepControlPoint * stCpA = (StepControlPoint *) s->controlPoints.data;
+			for (int sCpI = 0; sCpI < s->controlPoints.count; sCpI++) {
+				json_object *controlPoint = json_object_new_object();
+				json_object_array_add(controlPoints, controlPoint);
+				StepControlPoint * cp = &stCpA[sCpI];
+				json_object_object_add(controlPoint, "controlName", json_object_new_string(cp->controlName));
+				json_object_object_add(controlPoint, "targetName", json_object_new_string(cp->targetName));
+				json_object_object_add(controlPoint, "targetTemp", json_object_new_double(cp->targetTemp));
+
+			}
+
 		}
 
 	}
@@ -224,6 +241,10 @@ void freeTankChildren(Tank * t) {
 	freeSensor(t->sensor);
 	freeIfNotNull(t->name);
 }
+void freeStepControlPointChildren(StepControlPoint * t) {
+	freeIfNotNull(t->controlName);
+	freeIfNotNull(t->targetName);
+}
 
 void freeBrewLayout(BreweryLayout * bl) {
 	if (bl->tanks.data != NULL) {
@@ -236,6 +257,7 @@ void freeBrewLayout(BreweryLayout * bl) {
 		}
 
 		free(bl->tanks.data);
+		bl->tanks.data = NULL;
 	}
 	free(bl);
 }
@@ -243,22 +265,28 @@ void freeBrewLayout(BreweryLayout * bl) {
 void freeStepChildren(Step * s) {
 	freeIfNotNull(s->name);
 	freeIfNotNull(s->time);
+	if (s->controlPoints.data != NULL) {
+		StepControlPoint * tA = (StepControlPoint*) s->controlPoints.data;
+		for (int i = 0; i < s->controlPoints.count; i++) {
+			StepControlPoint * t = &tA[i];
+
+			freeStepControlPointChildren(t);
+		}
+		free(s->controlPoints.data);
+	}
 
 }
-void freeStepList(StepList * sl) {
-	freeIfNotNull(sl->name);
-	if (sl->steps.data != NULL) {
-
-		Step * tA = (Step*) sl->steps.data;
-		for (int i = 0; i < sl->steps.count; i++) {
+void freeStepListChildren(StepList * s) {
+	freeIfNotNull(s->name);
+	if (s->steps.data != NULL) {
+		Step * tA = (Step*) s->steps.data;
+		for (int i = 0; i < s->steps.count; i++) {
 			Step * t = &tA[i];
-
 			freeStepChildren(t);
 		}
-
-		free(sl->steps.data);
+		free(s->steps.data);
 	}
-	free(sl);
+
 }
 
 void freeConfiguration(Configuration * c) {
@@ -266,7 +294,6 @@ void freeConfiguration(Configuration * c) {
 		freeBrewLayout(c->brewLayout);
 	}
 	if (c->sensors.data != NULL) {
-
 		SensorConfig * tA = (SensorConfig *) c->sensors.data;
 		for (int i = 0; i < c->sensors.count; i++) {
 			SensorConfig * t = &tA[i];
@@ -279,8 +306,55 @@ void freeConfiguration(Configuration * c) {
 		free(c->sensors.data);
 	}
 
+	//TODO
+	if (c->stepLists.data != NULL) {
+		StepList * tA = (StepList *) c->stepLists.data;
+		for (int i = 0; i < c->stepLists.count; i++) {
+			StepList * t = &tA[i];
+			freeStepListChildren(t);
+		}
+
+		free(c->stepLists.data);
+	}
+	freeIfNotNull(c->version);
+
+	free(c);
+
+}
+bool parseStepControlPoint(StepControlPoint * cp, json_object *controlPoint) {
+	bool valid = true;
+	json_object * value;
+
+	cp->targetName = NULL;
+	cp->controlName = NULL;
+
+	value = json_object_object_get(controlPoint, "targetName");
+	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+		cp->targetName = mallocString(value);
+	} else {
+		DBG("parseJsonConfiguration ControlPoint Missing targetName\n");
+		valid = false;
+	}
+	value = json_object_object_get(controlPoint, "controlName");
+	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+		cp->controlName = mallocString(value);
+	} else {
+		DBG("parseJsonConfiguration ControlPoint Missing controlName\n");
+		valid = false;
+	}
+	value = json_object_object_get(controlPoint, "targetTemp");
+	if (valid && value != NULL && json_object_get_type(value) == json_type_double) {
+		cp->targetTemp = json_object_get_double(value);
+	} else {
+		DBG("parseJsonConfiguration ControlPoint Missing targetTemp\n");
+		valid = false;
+	}
+	return valid;
 }
 BreweryLayout * parseBrewLayout(json_object *layout) {
+
+	DBG("parseBrewLayout\n");
+
 	boolean valid = false;
 	BreweryLayout * bl = malloc(sizeof(BreweryLayout));
 	bl->tanks.data = NULL;
@@ -350,6 +424,9 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 //	}
 
 	if (!valid) {
+
+		DBG("Invalid BrewLayout\n");
+
 		freeBrewLayout(bl);
 		bl = NULL;
 	}
@@ -358,11 +435,23 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 }
 
 Configuration * parseJsonConfiguration(byte *data) {
+
+	DBG("parseJsonConfiguration Entry\n");
+
 	boolean valid = false;
 	Configuration * cfg = malloc(sizeof(Configuration));
 
+	cfg->version = NULL;
+	cfg->sensors.count = 0;
+	cfg->sensors.data = NULL;
+	cfg->stepLists.count = 0;
+	cfg->stepLists.data = NULL;
+	cfg->brewLayout = NULL;
+
 	json_object *config = json_tokener_parse(data);
 	if (config != NULL) {
+
+		DBG("parseJsonConfiguration JSON Valid\n");
 
 		if (json_object_get_type(config) == json_type_object) {
 			valid = true;
@@ -407,6 +496,8 @@ Configuration * parseJsonConfiguration(byte *data) {
 					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 						sc->name = mallocString(value);
 					} else {
+						DBG("parseJsonConfiguration SensorConfig Missing Name\n");
+
 						valid = false;
 						break;
 					}
@@ -415,6 +506,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 						sc->location = mallocString(value);
 					} else {
+						DBG("parseJsonConfiguration SensorConfig Missing Location\n");
 						valid = false;
 						break;
 					}
@@ -423,6 +515,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 						sc->address = mallocString(value);
 					} else {
+						DBG("parseJsonConfiguration SensorConfig Missing Address\n");
 						valid = false;
 						break;
 					}
@@ -430,6 +523,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 				}
 
 			} else {
+				DBG("parseJsonConfiguration Missing Sensors\n");
 				valid = false;
 			}
 			value = json_object_object_get(config, "stepLists");
@@ -445,6 +539,8 @@ Configuration * parseJsonConfiguration(byte *data) {
 					StepList * sl = &slA[slI];
 
 					sl->name = NULL;
+					sl->steps.count = 0;
+					sl->steps.data = NULL;
 
 					json_object *stepList = json_object_array_get_idx(stepLists, slI);
 					value = json_object_object_get(stepList, "name");
@@ -464,34 +560,62 @@ Configuration * parseJsonConfiguration(byte *data) {
 
 						for (int slsI = 0; slsI < sl->steps.count; slsI++) {
 
-							Step * sl = &slA[slsI];
+							Step * s = &slA[slsI];
 
-							sl->name = NULL;
+							s->name = NULL;
+							s->controlPoints.count = 0;
+							s->controlPoints.data = NULL;
+							s->time = NULL;
 
 							json_object *step = json_object_array_get_idx(steps, slsI);
 							value = json_object_object_get(step, "name");
 							if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-								sl->name = mallocString(value);
+								s->name = mallocString(value);
 							} else {
 								valid = false;
 								break;
 							}
 							value = json_object_object_get(step, "time");
 							if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-								sl->time = mallocString(value);
+								s->time = mallocString(value);
 							} else {
 								valid = false;
 								break;
 							}
 
-						}
+							value = json_object_object_get(step, "controlPoints");
+							if (valid && value != NULL && json_object_get_type(value) == json_type_array) {
+								json_object * controlPoints = value;
 
+								s->controlPoints.count = json_object_array_length(controlPoints);
+								s->controlPoints.data = malloc(sizeof(StepControlPoint) * s->controlPoints.count);
+								StepControlPoint * slCpA = (StepControlPoint *) s->controlPoints.data;
+
+								for (int slcpI = 0; slcpI < s->controlPoints.count; slcpI++) {
+
+									StepControlPoint * cp = &slCpA[slcpI];
+									json_object *controlPoint = json_object_array_get_idx(controlPoints, slcpI);
+
+									valid = parseStepControlPoint(cp, controlPoint);
+									if (!valid) {
+										break;
+									}
+
+								}
+							} else {
+								DBG("parseJsonConfiguration Step Missing controlPoints\n");
+								valid = false;
+							}
+						}
 					} else {
+						DBG("parseJsonConfiguration StepLists Missing Steps\n");
+
 						valid = false;
 					}
 				}
 
 			} else {
+				DBG("parseJsonConfiguration Config Missing StepLists\n");
 				valid = false;
 			}
 
@@ -514,26 +638,26 @@ bool initConfiguration() {
 	struct stat st;
 	if (stat(CONFIG_FILE, &st) >= 0) {
 
-		char* tmp = malloc(BUFFER_SIZE);
+		ssize_t s = st.st_size;
+		if (s > BUFFER_SIZE - 1) {
+			s = BUFFER_SIZE - 1;
+		}
+		char* tmp = malloc(s + 12);
 		if (tmp == NULL) {
 			exit(-1);
 		}
-		ssize_t s = st.st_size;
-		if (s > BUFFER_SIZE) {
-			s = BUFFER_SIZE;
-		}
+
 		FILE* f = fopen(CONFIG_FILE, "rb");
 		if (f) {
 			int readSize = fread(tmp, 1, s, f);
 			if (readSize == s) {
-				//TODO PARSE
-
-				printf("Read in file\n");
+				tmp[s] = '\0';
+				DBG("Parse file %s size: %d\n", CONFIG_FILE,s);
 
 				Configuration * newCfg = parseJsonConfiguration(tmp);
 
 				if (newCfg != NULL) {
-					config = newCfg;
+					setConfiguration(newCfg);
 					valid = true;
 				}
 			}
@@ -544,6 +668,12 @@ bool initConfiguration() {
 	return valid;
 }
 void setConfiguration(Configuration * newConfig) {
+
+	if (config != NULL) {
+		freeConfiguration(config);
+		config = NULL;
+	}
+
 	config = newConfig;
 }
 Configuration * getConfiguration() {
