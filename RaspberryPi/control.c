@@ -62,7 +62,61 @@ void setupControlPoint(ControlPoint *cp) {
 
 void selectReadingSensors() {
 	Configuration * cfg = getConfiguration();
+
+	if (cfg != NULL) {
+		// Make sure all found sensors have a SensorConfig entry
+		for (int tsI = 0; tsI < getSensorCount(); tsI++) {
+			TempSensor * s = getSensorByIndex(tsI);
+
+			bool found = false;
+			for (int tsI = 0; tsI < getSensorCount(); tsI++) {
+				if (cfg->sensors.data != NULL && cfg->sensors.count > 0) {
+					SensorConfig * sA = (SensorConfig *) cfg->sensors.data;
+					for (int scI = 0; scI < cfg->sensors.count; scI++) {
+						SensorConfig * sc = &sA[scI];
+						if (strcmp(sc->address, s->addressPtr) == 0) {
+							found = true;
+							break;
+						}
+					}
+				}
+			}
+
+			if (!found) {
+				int count = cfg->sensors.count;
+				SensorConfig * oldData = (SensorConfig *) cfg->sensors.data;
+				SensorConfig * data = (SensorConfig *) malloc(sizeof(SensorConfig) * (count + 1));
+				memcpy(data, oldData, sizeof(SensorConfig) * count);
+
+				SensorConfig * sc = &data[count];
+
+				int addressLength = strlen(s->addressPtr) + 1;
+				char * addressCopy = malloc(addressLength);
+				if (addressCopy == NULL) {
+					ERR("Malloc Failed\n");
+					exit(-1);
+				}
+				memcpy(addressCopy, s->addressPtr, addressLength);
+
+				sc->name = NULL;
+				sc->location = NULL;
+				sc->address = addressCopy;
+
+				cfg->sensors.data = data;
+				cfg->sensors.count = count + 1;
+
+				free(oldData);
+
+				changeConfigVersion(cfg);
+				writeConfiguration(cfg);
+
+			}
+		}
+	}
+
+// Update Tank selected Sensors
 	if (cfg != NULL && cfg->sensors.data != NULL && cfg->sensors.count > 0) {
+
 		BreweryLayout * bl = cfg->brewLayout;
 		if (bl != NULL && bl->tanks.data != NULL) {
 			Tank * tA = (Tank *) bl->tanks.data;

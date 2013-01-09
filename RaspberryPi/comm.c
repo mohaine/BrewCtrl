@@ -31,6 +31,7 @@
 #include "sensor.h"
 #include "comm.h"
 #include "config.h"
+#include "logger.h"
 #include "control.h"
 
 #include <sys/stat.h>
@@ -164,6 +165,8 @@ void handleConfigRequest(Request * request, Response * response) {
 }
 
 bool parseJsonStep(json_object *step, ControlStep * cs) {
+	DBG("Parse Step\n");
+
 	bool valid = true;
 	json_object * value = json_object_object_get(step, "id");
 	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
@@ -194,6 +197,8 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	}
 
 	if (valid) {
+		DBG("Parse Step %s\n", cs->name);
+
 		json_object * controlPoints = json_object_object_get(step, "controlPoints");
 
 		if (controlPoints != NULL && json_object_get_type(controlPoints) == json_type_array) {
@@ -213,6 +218,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					cp->controlPin = json_object_get_int(value);
 				} else {
 					valid = false;
+					break;
 				}
 
 				value = json_object_object_get(controlPoint, "duty");
@@ -220,27 +226,32 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					cp->duty = json_object_get_int(value);
 				} else {
 					valid = false;
+					break;
 				}
 
 				value = json_object_object_get(controlPoint, "fullOnAmps");
 				if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->fullOnAmps = json_object_get_int(value);
 				} else {
-					cp->fullOnAmps = 0;
+					valid = false;
+					break;
 				}
 
 				value = json_object_object_get(controlPoint, "tempSensorAddress");
 				if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 					sprintf(cp->tempSensorAddressPtr, "%s", json_object_get_string(value));
 				} else {
-					cp->tempSensorAddressPtr[0] = 0;
+					valid = false;
+					break;
 				}
 
 				value = json_object_object_get(controlPoint, "targetTemp");
 				if (valid && value != NULL && json_object_get_type(value) == json_type_double) {
 					cp->targetTemp = json_object_get_double(value);
+
 				} else {
 					valid = false;
+					break;
 				}
 
 				value = json_object_object_get(controlPoint, "hasDuty");
@@ -248,6 +259,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					cp->hasDuty = json_object_get_boolean(value);
 				} else {
 					valid = false;
+					break;
 				}
 
 				value = json_object_object_get(controlPoint, "automaticControl");
@@ -255,6 +267,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					cp->automaticControl = json_object_get_boolean(value);
 				} else {
 					valid = false;
+					break;
 				}
 			}
 

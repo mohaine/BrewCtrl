@@ -635,8 +635,6 @@ Configuration * parseJsonConfiguration(byte *data) {
 						value = json_object_object_get(sensor, "address");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 							sc->address = mallocString(value);
-							DBG("sc->address %s\n", sc->address );
-
 						} else {
 							DBG("parseJsonConfiguration SensorConfig Missing Address\n");
 							valid = false;
