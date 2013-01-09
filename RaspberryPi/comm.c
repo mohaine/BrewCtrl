@@ -129,14 +129,17 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 
 void handleConfigRequest(Request * request, Response * response) {
 	if (request->contentLength > 0) {
-		char * buffer = malloc(BUFFER_SIZE);
+		char * buffer = malloc(request->contentLength + 1);
 		int paramSize = readParam("configuration", request->content, request->contentLength, buffer);
 		if (paramSize > 0) {
-			FILE* f = fopen(LAYOUT_FILE, "wb");
-			if (f) {
-				fwrite(buffer, 1, paramSize, f);
-				fclose(f);
+
+			Configuration * cfg = parseJsonConfiguration(buffer);
+
+			if (cfg != NULL) {
+				setConfiguration(cfg);
+				writeConfiguration(cfg);
 			}
+
 		} else {
 			response->statusCode = 400;
 			sprintf(response->status, "Bad Request");
@@ -146,23 +149,13 @@ void handleConfigRequest(Request * request, Response * response) {
 		free(buffer);
 	}
 
-	struct stat st;
-	if (stat(LAYOUT_FILE, &st) >= 0) {
-		ssize_t s = st.st_size;
-		if (s > BUFFER_SIZE) {
-			s = BUFFER_SIZE;
-		}
-		FILE* f = fopen(LAYOUT_FILE, "rb");
-		if (f) {
-			int readSize = fread(response->content, 1, s, f);
-			if (readSize == s) {
-				sprintf(response->contentType, "text/json");
-				response->contentLength = s;
-
-			}
-			fclose(f);
-		}
-
+	Configuration* configuration = getConfiguration();
+	if (configuration != NULL) {
+		char * json = formatJsonConfiguration(configuration);
+		sprintf(response->contentType, "text/json");
+		sprintf(response->content, "%s", json);
+		response->contentLength = strlen(response->content);
+		free(json);
 	} else {
 		sprintf(response->contentType, "text/json");
 		response->contentLength = 0;

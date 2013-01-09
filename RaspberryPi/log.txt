@@ -1,400 +1,204 @@
-15204	Parse file BrewControllerConfig.json size: 2286
-39017	parseJsonConfiguration Entry
-121529	parseJsonConfiguration JSON Valid
-127113	parseBrewLayout
-214747	Parse file BrewControllerConfig.json size: 2286
-214966	parseJsonConfiguration Entry
-222542	parseJsonConfiguration JSON Valid
-222777	parseBrewLayout
-241200	Parse file BrewControllerConfig.json size: 2286
-241337	parseJsonConfiguration Entry
-246019	parseJsonConfiguration JSON Valid
-246254	parseBrewLayout
-263827	Parse file BrewControllerConfig.json size: 2286
-264039	parseJsonConfiguration Entry
-271610	parseJsonConfiguration JSON Valid
-271834	parseBrewLayout
-284505	Parse file BrewControllerConfig.json size: 2286
-284649	parseJsonConfiguration Entry
-289298	parseJsonConfiguration JSON Valid
-289462	parseBrewLayout
-300433	Parse file BrewControllerConfig.json size: 2286
-300580	parseJsonConfiguration Entry
-306908	parseJsonConfiguration JSON Valid
-307130	parseBrewLayout
-326415	Parse file BrewControllerConfig.json size: 2286
-326629	parseJsonConfiguration Entry
-332265	parseJsonConfiguration JSON Valid
-332409	parseBrewLayout
-343658	Parse file BrewControllerConfig.json size: 2286
-343814	parseJsonConfiguration Entry
-348513	parseJsonConfiguration JSON Valid
-348674	parseBrewLayout
-366270	Parse file BrewControllerConfig.json size: 2286
-366483	parseJsonConfiguration Entry
-374115	parseJsonConfiguration JSON Valid
-374341	parseBrewLayout
-387341	Parse file BrewControllerConfig.json size: 2286
-387506	parseJsonConfiguration Entry
-392149	parseJsonConfiguration JSON Valid
-392312	parseBrewLayout
-404351	Parse file BrewControllerConfig.json size: 2286
-404558	parseJsonConfiguration Entry
-412205	parseJsonConfiguration JSON Valid
-412434	parseBrewLayout
-430279	Parse file BrewControllerConfig.json size: 2286
-430422	parseJsonConfiguration Entry
-435213	parseJsonConfiguration JSON Valid
-435366	parseBrewLayout
-446590	Parse file BrewControllerConfig.json size: 2286
-446728	parseJsonConfiguration Entry
-451268	parseJsonConfiguration JSON Valid
-451398	parseBrewLayout
-467635	Parse file BrewControllerConfig.json size: 2286
-467881	parseJsonConfiguration Entry
-475509	parseJsonConfiguration JSON Valid
-475727	parseBrewLayout
-489346	Parse file BrewControllerConfig.json size: 2286
-489512	parseJsonConfiguration Entry
-494306	parseJsonConfiguration JSON Valid
-494447	parseBrewLayout
-506954	Parse file BrewControllerConfig.json size: 2286
-507170	parseJsonConfiguration Entry
-514688	parseJsonConfiguration JSON Valid
-514911	parseBrewLayout
-532533	Parse file BrewControllerConfig.json size: 2286
-532674	parseJsonConfiguration Entry
-537281	parseJsonConfiguration JSON Valid
-537457	parseBrewLayout
-548681	Parse file BrewControllerConfig.json size: 2286
-548828	parseJsonConfiguration Entry
-553360	parseJsonConfiguration JSON Valid
-553509	parseBrewLayout
-572643	Parse file BrewControllerConfig.json size: 2286
-572876	parseJsonConfiguration Entry
-580426	parseJsonConfiguration JSON Valid
-580669	parseBrewLayout
-592213	Parse file BrewControllerConfig.json size: 2286
-592376	parseJsonConfiguration Entry
-597044	parseJsonConfiguration JSON Valid
-597223	parseBrewLayout
-608227	Parse file BrewControllerConfig.json size: 2286
-608377	parseJsonConfiguration Entry
-615991	parseJsonConfiguration JSON Valid
-616213	parseBrewLayout
-635293	Parse file BrewControllerConfig.json size: 2286
-635447	parseJsonConfiguration Entry
-640194	parseJsonConfiguration JSON Valid
-640376	parseBrewLayout
-651748	Parse file BrewControllerConfig.json size: 2286
-651892	parseJsonConfiguration Entry
-656539	parseJsonConfiguration JSON Valid
-656673	parseBrewLayout
-675226	Parse file BrewControllerConfig.json size: 2286
-675439	parseJsonConfiguration Entry
-683096	parseJsonConfiguration JSON Valid
-683317	parseBrewLayout
-694855	Parse file BrewControllerConfig.json size: 2286
-695037	parseJsonConfiguration Entry
-699550	parseJsonConfiguration JSON Valid
-699668	parseBrewLayout
-714011	Parse file BrewControllerConfig.json size: 2286
-714226	parseJsonConfiguration Entry
-721762	parseJsonConfiguration JSON Valid
-722000	parseBrewLayout
-737982	Parse file BrewControllerConfig.json size: 2286
-738130	parseJsonConfiguration Entry
-742914	parseJsonConfiguration JSON Valid
-743061	parseBrewLayout
-754263	Parse file BrewControllerConfig.json size: 2286
-754417	parseJsonConfiguration Entry
-759067	parseJsonConfiguration JSON Valid
-759202	parseBrewLayout
-777407	Parse file BrewControllerConfig.json size: 2286
-777633	parseJsonConfiguration Entry
-785258	parseJsonConfiguration JSON Valid
-785489	parseBrewLayout
-797721	Parse file BrewControllerConfig.json size: 2286
-797872	parseJsonConfiguration Entry
-802699	parseJsonConfiguration JSON Valid
-802897	parseBrewLayout
-816444	Parse file BrewControllerConfig.json size: 2286
-816665	parseJsonConfiguration Entry
-824247	parseJsonConfiguration JSON Valid
-824468	parseBrewLayout
-840990	Parse file BrewControllerConfig.json size: 2286
-841166	parseJsonConfiguration Entry
-845837	parseJsonConfiguration JSON Valid
-845978	parseBrewLayout
-857098	Parse file BrewControllerConfig.json size: 2286
-857243	parseJsonConfiguration Entry
-863429	parseJsonConfiguration JSON Valid
-863660	parseBrewLayout
-883029	Parse file BrewControllerConfig.json size: 2286
-883246	parseJsonConfiguration Entry
-889487	parseJsonConfiguration JSON Valid
-889645	parseBrewLayout
-901050	Parse file BrewControllerConfig.json size: 2286
-901198	parseJsonConfiguration Entry
-905880	parseJsonConfiguration JSON Valid
-906050	parseBrewLayout
-919023	Parse file BrewControllerConfig.json size: 2286
-919241	parseJsonConfiguration Entry
-926927	parseJsonConfiguration JSON Valid
-927149	parseBrewLayout
-944487	Parse file BrewControllerConfig.json size: 2286
-944639	parseJsonConfiguration Entry
-949436	parseJsonConfiguration JSON Valid
-949624	parseBrewLayout
-961011	Parse file BrewControllerConfig.json size: 2286
-961167	parseJsonConfiguration Entry
-966795	parseJsonConfiguration JSON Valid
-967017	parseBrewLayout
-986343	Parse file BrewControllerConfig.json size: 2286
-986566	parseJsonConfiguration Entry
-993283	parseJsonConfiguration JSON Valid
-993439	parseBrewLayout
-1004721	Parse file BrewControllerConfig.json size: 2286
-1004857	parseJsonConfiguration Entry
-1009451	parseJsonConfiguration JSON Valid
-1009614	parseBrewLayout
-1025510	Parse file BrewControllerConfig.json size: 2286
-1025732	parseJsonConfiguration Entry
-1034100	parseJsonConfiguration JSON Valid
-1034320	parseBrewLayout
-1048307	Parse file BrewControllerConfig.json size: 2286
-1048449	parseJsonConfiguration Entry
-1053224	parseJsonConfiguration JSON Valid
-1053383	parseBrewLayout
-1064460	Parse file BrewControllerConfig.json size: 2286
-1064607	parseJsonConfiguration Entry
-1069662	parseJsonConfiguration JSON Valid
-1069880	parseBrewLayout
-1089234	Parse file BrewControllerConfig.json size: 2286
-1089453	parseJsonConfiguration Entry
-1096463	parseJsonConfiguration JSON Valid
-1096645	parseBrewLayout
-1108121	Parse file BrewControllerConfig.json size: 2286
-1108272	parseJsonConfiguration Entry
-1113015	parseJsonConfiguration JSON Valid
-1113160	parseBrewLayout
-1124807	Parse file BrewControllerConfig.json size: 2286
-1125018	parseJsonConfiguration Entry
-1132580	parseJsonConfiguration JSON Valid
-1132799	parseBrewLayout
-1150955	Parse file BrewControllerConfig.json size: 2286
-1151105	parseJsonConfiguration Entry
-1155887	parseJsonConfiguration JSON Valid
-1156039	parseBrewLayout
-1167163	Parse file BrewControllerConfig.json size: 2286
-1167318	parseJsonConfiguration Entry
-1172291	parseJsonConfiguration JSON Valid
-1172515	parseBrewLayout
-1191722	Parse file BrewControllerConfig.json size: 2286
-1191940	parseJsonConfiguration Entry
-1198531	parseJsonConfiguration JSON Valid
-1198709	parseBrewLayout
-1210103	Parse file BrewControllerConfig.json size: 2286
-1210254	parseJsonConfiguration Entry
-1214902	parseJsonConfiguration JSON Valid
-1215058	parseBrewLayout
-1227779	Parse file BrewControllerConfig.json size: 2286
-1227999	parseJsonConfiguration Entry
-1235664	parseJsonConfiguration JSON Valid
-1235885	parseBrewLayout
-1253104	Parse file BrewControllerConfig.json size: 2286
-1253267	parseJsonConfiguration Entry
-1258034	parseJsonConfiguration JSON Valid
-1258176	parseBrewLayout
-1269307	Parse file BrewControllerConfig.json size: 2286
-1269444	parseJsonConfiguration Entry
-1273980	parseJsonConfiguration JSON Valid
-1274110	parseBrewLayout
-1291026	Parse file BrewControllerConfig.json size: 2286
-1291285	parseJsonConfiguration Entry
-1298951	parseJsonConfiguration JSON Valid
-1299169	parseBrewLayout
-1312737	Parse file BrewControllerConfig.json size: 2286
-1312899	parseJsonConfiguration Entry
-1317559	parseJsonConfiguration JSON Valid
-1317701	parseBrewLayout
-1330092	Parse file BrewControllerConfig.json size: 2286
-1330304	parseJsonConfiguration Entry
-1337936	parseJsonConfiguration JSON Valid
-1338162	parseBrewLayout
-1355850	Parse file BrewControllerConfig.json size: 2286
-1355989	parseJsonConfiguration Entry
-1360761	parseJsonConfiguration JSON Valid
-1360906	parseBrewLayout
-1372044	Parse file BrewControllerConfig.json size: 2286
-1372192	parseJsonConfiguration Entry
-1376981	parseJsonConfiguration JSON Valid
-1377210	parseBrewLayout
-1396558	Parse file BrewControllerConfig.json size: 2286
-1396777	parseJsonConfiguration Entry
-1404045	parseJsonConfiguration JSON Valid
-1404193	parseBrewLayout
-1415693	Parse file BrewControllerConfig.json size: 2286
-1415830	parseJsonConfiguration Entry
-1420522	parseJsonConfiguration JSON Valid
-1420668	parseBrewLayout
-1432383	Parse file BrewControllerConfig.json size: 2286
-1432597	parseJsonConfiguration Entry
-1440206	parseJsonConfiguration JSON Valid
-1440424	parseBrewLayout
-1458949	Parse file BrewControllerConfig.json size: 2286
-1459094	parseJsonConfiguration Entry
-1463854	parseJsonConfiguration JSON Valid
-1463998	parseBrewLayout
-1475307	Parse file BrewControllerConfig.json size: 2286
-1475452	parseJsonConfiguration Entry
-1480135	parseJsonConfiguration JSON Valid
-1480332	parseBrewLayout
-1499679	Parse file BrewControllerConfig.json size: 2286
-1499899	parseJsonConfiguration Entry
-1507703	parseJsonConfiguration JSON Valid
-1507868	parseBrewLayout
-1519304	Parse file BrewControllerConfig.json size: 2286
-1519479	parseJsonConfiguration Entry
-1524235	parseJsonConfiguration JSON Valid
-1524353	parseBrewLayout
-1539089	Parse file BrewControllerConfig.json size: 2286
-1539304	parseJsonConfiguration Entry
-1546999	parseJsonConfiguration JSON Valid
-1547227	parseBrewLayout
-1562373	Parse file BrewControllerConfig.json size: 2286
-1562514	parseJsonConfiguration Entry
-1567330	parseJsonConfiguration JSON Valid
-1567478	parseBrewLayout
-1578570	Parse file BrewControllerConfig.json size: 2286
-1578719	parseJsonConfiguration Entry
-1583367	parseJsonConfiguration JSON Valid
-1583508	parseBrewLayout
-1602135	Parse file BrewControllerConfig.json size: 2286
-1602353	parseJsonConfiguration Entry
-1609925	parseJsonConfiguration JSON Valid
-1610199	parseBrewLayout
-1621847	Parse file BrewControllerConfig.json size: 2286
-1622009	parseJsonConfiguration Entry
-1626744	parseJsonConfiguration JSON Valid
-1626901	parseBrewLayout
-1641782	Parse file BrewControllerConfig.json size: 2286
-1642004	parseJsonConfiguration Entry
-1649688	parseJsonConfiguration JSON Valid
-1649915	parseBrewLayout
-1665418	Parse file BrewControllerConfig.json size: 2286
-1665573	parseJsonConfiguration Entry
-1670320	parseJsonConfiguration JSON Valid
-1670464	parseBrewLayout
-1681588	Parse file BrewControllerConfig.json size: 2286
-1681730	parseJsonConfiguration Entry
-1688305	parseJsonConfiguration JSON Valid
-1688538	parseBrewLayout
-1707987	Parse file BrewControllerConfig.json size: 2286
-1708208	parseJsonConfiguration Entry
-1713652	parseJsonConfiguration JSON Valid
-1713811	parseBrewLayout
-1725210	Parse file BrewControllerConfig.json size: 2286
-1725365	parseJsonConfiguration Entry
-1730092	parseJsonConfiguration JSON Valid
-1730226	parseBrewLayout
-1744021	Parse file BrewControllerConfig.json size: 2286
-1744234	parseJsonConfiguration Entry
-1751850	parseJsonConfiguration JSON Valid
-1752082	parseBrewLayout
-1768443	Parse file BrewControllerConfig.json size: 2286
-1768606	parseJsonConfiguration Entry
-1773769	parseJsonConfiguration JSON Valid
-1773933	parseBrewLayout
-1786107	Parse file BrewControllerConfig.json size: 2286
-1786262	parseJsonConfiguration Entry
-1793649	parseJsonConfiguration JSON Valid
-1793885	parseBrewLayout
-1813601	Parse file BrewControllerConfig.json size: 2286
-1813821	parseJsonConfiguration Entry
-1818727	parseJsonConfiguration JSON Valid
-1818875	parseBrewLayout
-1830254	Parse file BrewControllerConfig.json size: 2286
-1830396	parseJsonConfiguration Entry
-1835135	parseJsonConfiguration JSON Valid
-1835256	parseBrewLayout
-1853384	Parse file BrewControllerConfig.json size: 2286
-1853598	parseJsonConfiguration Entry
-1861196	parseJsonConfiguration JSON Valid
-1861424	parseBrewLayout
-1873500	Parse file BrewControllerConfig.json size: 2286
-1873660	parseJsonConfiguration Entry
-1879020	parseJsonConfiguration JSON Valid
-1879203	parseBrewLayout
-1890320	Parse file BrewControllerConfig.json size: 2286
-1890461	parseJsonConfiguration Entry
-1897910	parseJsonConfiguration JSON Valid
-1898131	parseBrewLayout
-1917465	Parse file BrewControllerConfig.json size: 2286
-1917621	parseJsonConfiguration Entry
-1922520	parseJsonConfiguration JSON Valid
-1922677	parseBrewLayout
-1934343	Parse file BrewControllerConfig.json size: 2286
-1934481	parseJsonConfiguration Entry
-1939229	parseJsonConfiguration JSON Valid
-1939365	parseBrewLayout
-1958082	Parse file BrewControllerConfig.json size: 2286
-1958297	parseJsonConfiguration Entry
-1966322	parseJsonConfiguration JSON Valid
-1966556	parseBrewLayout
-1978437	Parse file BrewControllerConfig.json size: 2286
-1978586	parseJsonConfiguration Entry
-1983469	parseJsonConfiguration JSON Valid
-1983592	parseBrewLayout
-1998825	Parse file BrewControllerConfig.json size: 2286
-1999038	parseJsonConfiguration Entry
-2006635	parseJsonConfiguration JSON Valid
-2006848	parseBrewLayout
-2022163	Parse file BrewControllerConfig.json size: 2286
-2022309	parseJsonConfiguration Entry
-2027338	parseJsonConfiguration JSON Valid
-2027488	parseBrewLayout
-2039117	Parse file BrewControllerConfig.json size: 2286
-2039263	parseJsonConfiguration Entry
-2044095	parseJsonConfiguration JSON Valid
-2044235	parseBrewLayout
-2063501	Parse file BrewControllerConfig.json size: 2286
-2063710	parseJsonConfiguration Entry
-2071313	parseJsonConfiguration JSON Valid
-2071565	parseBrewLayout
-2083530	Parse file BrewControllerConfig.json size: 2286
-2083737	parseJsonConfiguration Entry
-2088737	parseJsonConfiguration JSON Valid
-2088884	parseBrewLayout
-2103819	Parse file BrewControllerConfig.json size: 2286
-2104035	parseJsonConfiguration Entry
-2111589	parseJsonConfiguration JSON Valid
-2111799	parseBrewLayout
-2127240	Parse file BrewControllerConfig.json size: 2286
-2127397	parseJsonConfiguration Entry
-2132159	parseJsonConfiguration JSON Valid
-2132350	parseBrewLayout
-2143541	Parse file BrewControllerConfig.json size: 2286
-2143769	parseJsonConfiguration Entry
-2151372	parseJsonConfiguration JSON Valid
-2151589	parseBrewLayout
-2171118	Parse file BrewControllerConfig.json size: 2286
-2171276	parseJsonConfiguration Entry
-2176313	parseJsonConfiguration JSON Valid
-2176482	parseBrewLayout
-2188298	Parse file BrewControllerConfig.json size: 2286
-2188444	parseJsonConfiguration Entry
-2193278	parseJsonConfiguration JSON Valid
-2193398	parseBrewLayout
-2208966	Parse file BrewControllerConfig.json size: 2286
-2209185	parseJsonConfiguration Entry
-2216754	parseJsonConfiguration JSON Valid
-2216977	parseBrewLayout
-2231858	Parse file BrewControllerConfig.json size: 2286
-2232011	parseJsonConfiguration Entry
-2236890	parseJsonConfiguration JSON Valid
-2237049	parseBrewLayout
-2248361	Parse file BrewControllerConfig.json size: 2286
-2248503	parseJsonConfiguration Entry
-2253603	parseJsonConfiguration JSON Valid
-2253819	parseBrewLayout
+90	Parse file BrewControllerConfig.json size: 5267
+135	parseJsonConfiguration Entry  {
+   "brewLayout":{
+      "tanks":[
+         {
+            "name":"HLT",
+            "sensor":{
+            },
+            "heater":{
+               "name":"HTL Element",
+               "pin":9,
+               "duty":0,
+               "hasDuty":false,
+               "fullOnAmps":18
+            }
+         },
+         {
+            "name":"TUN",
+            "sensor":{
+            }
+         },
+         {
+            "name":"Kettle",
+            "heater":{
+               "name":"Kettle Element",
+               "pin":7,
+               "duty":65,
+               "hasDuty":false,
+               "fullOnAmps":23
+            }
+         }
+      ],
+      "pumps":[ 
+         {
+            "name":"HLT Loop",
+            "pin":8,
+            "duty":0,
+            "hasDuty":false
+         }
+      ],
+      "maxAmps":25
+   },
+   "logMessages":false,
+   "sensors":[
+      {
+         "address":"0000000000000001",
+         "name":"",
+         "location":"HLT"
+      },
+      {
+         "address":"0000000000000002",
+         "name":"",
+         "location":"TUN"
+      },
+      {
+         "address":"289c167d02000048",
+         "name":"",
+         "location":"HLT"
+      }
+   ],
+   "stepLists":[
+      {
+         "name":"1 Step Mash",
+         "steps":[
+            {
+               "name":"Mash In",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":79.4444444,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":73.8888889,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash",
+               "time":"60:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":72.7777778,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":67.2222222,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash Out",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":82.2222222,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":76.6666667,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            }
+         ]
+      },
+      {
+         "name":"3 Step Mash",
+         "steps":[
+            {
+               "name":"Mash In",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":48.3333333,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":43.3333333,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash Step 1",
+               "time":"30:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":45.5555556,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":40.0,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash Step 2",
+               "time":"30:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":55.5555556,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":50.0,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash Step 3",
+               "time":"30:00",
+               "controlPoints":[
+                  {
+                     "targetTemp":73.5555556,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":68.0,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            },
+            {
+               "name":"Mash Out",
+               "time":"0",
+               "controlPoints":[
+                  {
+                     "targetTemp":82.2222222,
+                     "targetName":"HLT",
+                     "controlName":"HTL Element"
+                  },
+                  {
+                     "targetTemp":76.6666667,
+                     "targetName":"TUN",
+                     "controlName":"HLT Loop"
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+}
+1421	parseJsonConfiguration JSON Valid
+1442	parseBrewLayout
+1485	Valid Config

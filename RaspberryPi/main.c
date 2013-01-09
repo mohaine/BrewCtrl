@@ -5,6 +5,7 @@
 #include <execinfo.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <linux/types.h>
 
 #include "duty.h"
 #include "loop.h"
@@ -31,25 +32,33 @@ int main() {
 	signal(SIGSEGV, handler);
 
 	initLogFile();
+	initConfiguration();
 
-	for (int i = 0; i < 1000; i++) {
-		initConfiguration();
-		Configuration* configuration = getConfiguration();
-		if (configuration != NULL) {
-			char * json = formatJsonConfiguration(configuration);
-			//printf("%s\n", json);
+	Configuration* configuration = getConfiguration();
 
-			free(json);
-		}
+	if (configuration != NULL) {
 
+		printf("writeConfiguration\n");
+		writeConfiguration(configuration);
 	}
 
+//	for (int i = 0; i < 1000; i++) {
+//		initConfiguration();
+//		Configuration* configuration = getConfiguration();
+//		if (configuration != NULL) {
+//			char * json = formatJsonConfiguration(configuration);
+//			//printf("%s\n", json);
+//
+//			free(json);
+//		}
+//
+//	}
+
+//	printf("Start Comm\n");
+//	startComm();
+//	printf("Start Loop\n");
+//	loop();
+
 	closeLogFile();
-
-	//printf("Start Comm\n");
-	//startComm();
-	//printf("Start Loop\n");
-	//loop();
-
 }
 

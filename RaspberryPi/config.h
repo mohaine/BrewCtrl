@@ -83,6 +83,7 @@ typedef struct {
 Configuration * getConfiguration();
 void setConfiguration(Configuration * config);
 bool initConfiguration();
+void writeConfiguration(Configuration * config);
 
 byte* formatJsonConfiguration(Configuration * cfg);
 Configuration * parseJsonConfiguration(byte *data);
