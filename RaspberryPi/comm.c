@@ -385,7 +385,7 @@ void handleStatusRequest(Request * request, Response * response) {
 
 	Configuration* config = getConfiguration();
 	if (config != NULL && config->version != NULL) {
-		json_object_object_add(status, "version", json_object_new_string(config->version));
+		json_object_object_add(status, "configurationVersion", json_object_new_string(config->version));
 	}
 
 	if (getControl()->mode == MODE_OFF) {

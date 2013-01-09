@@ -33,13 +33,11 @@ int main() {
 
 	initLogFile();
 	initConfiguration();
-
-	Configuration* configuration = getConfiguration();
-	if (configuration != NULL) {
-
-		writeConfiguration(configuration);
-	}
-
+//	Configuration* configuration = getConfiguration();
+//	if (configuration != NULL) {
+//
+//		writeConfiguration(configuration);
+//	}
 //	for (int i = 0; i < 100; i++) {
 //		initConfiguration();
 //		Configuration* configuration = getConfiguration();
@@ -52,11 +50,11 @@ int main() {
 //
 //	}
 
-//	printf("Start Comm\n");
-//	startComm();
-//	printf("Start Loop\n");
-//	loop();
-//
-//	closeLogFile();
+	printf("Start Comm\n");
+	startComm();
+	printf("Start Loop\n");
+	loop();
+
+	closeLogFile();
 }
 

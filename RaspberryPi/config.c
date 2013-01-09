@@ -238,7 +238,8 @@ Sensor * parseSensor(json_object *layout) {
 		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 			s->address = mallocString(value);
 		} else {
-			valid = false;
+			s->address = malloc(1);
+			s->address[0] = 0;
 		}
 
 	}
@@ -798,13 +799,11 @@ void writeConfiguration(Configuration * config) {
 	if (config != NULL) {
 		char * json = formatJsonConfiguration(config);
 
-		fprintf(stdout, "%s\n", json);
-//		FILE* f = fopen(CONFIG_FILE, "wb");
-//		if (f) {
-//			fprintf(f, "%s\n", json);
-//			fclose(f);
-//		}
-
+		FILE* f = fopen(CONFIG_FILE, "wb");
+		if (f) {
+			fprintf(f, "%s\n", json);
+			fclose(f);
+		}
 		free(json);
 	}
 }
