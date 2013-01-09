@@ -39,7 +39,7 @@ typedef struct {
 typedef struct {
 	char* name;
 	int pin;bool hasDuty;
-	int maxAmps;
+	int fullOnAmps;
 } HeatElement;
 
 typedef struct {
@@ -49,11 +49,13 @@ typedef struct {
 } Tank;
 typedef struct {
 	char* name;
+	int pin;bool hasDuty;
 } Pump;
 
 typedef struct {
 	int maxAmps;
 	Array tanks;
+	Array pumps;
 } BreweryLayout;
 
 typedef struct {

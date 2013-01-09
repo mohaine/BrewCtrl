@@ -35,14 +35,12 @@ int main() {
 	initConfiguration();
 
 	Configuration* configuration = getConfiguration();
-
 	if (configuration != NULL) {
 
-		printf("writeConfiguration\n");
 		writeConfiguration(configuration);
 	}
 
-//	for (int i = 0; i < 1000; i++) {
+//	for (int i = 0; i < 100; i++) {
 //		initConfiguration();
 //		Configuration* configuration = getConfiguration();
 //		if (configuration != NULL) {
@@ -58,7 +56,7 @@ int main() {
 //	startComm();
 //	printf("Start Loop\n");
 //	loop();
-
-	closeLogFile();
+//
+//	closeLogFile();
 }
 

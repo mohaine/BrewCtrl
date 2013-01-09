@@ -47,7 +47,6 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 	json_object_object_add(layout, "maxAmps", json_object_new_int(bl->maxAmps));
 
 	json_object *tanks = json_object_new_array();
-
 	json_object_object_add(layout, "tanks", tanks);
 
 	Tank * tA = (Tank *) bl->tanks.data;
@@ -70,8 +69,21 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 			json_object_object_add(heater, "name", json_object_new_string(t->heater->name));
 			json_object_object_add(heater, "pin", json_object_new_int(t->heater->pin));
 			json_object_object_add(heater, "hasDuty", json_object_new_boolean(t->heater->hasDuty));
+			json_object_object_add(heater, "fullOnAmps", json_object_new_int(t->heater->fullOnAmps));
 
 		}
+	}
+	json_object *pumps = json_object_new_array();
+	json_object_object_add(layout, "pumps", pumps);
+
+	Pump * pA = (Pump *) bl->pumps.data;
+	for (int i = 0; i < bl->pumps.count; i++) {
+		json_object *pump = json_object_new_object();
+		json_object_array_add(pumps, pump);
+		Pump * t = &pA[i];
+		json_object_object_add(pump, "name", json_object_new_string(t->name));
+		json_object_object_add(pump, "pin", json_object_new_int(t->pin));
+		json_object_object_add(pump, "hasDuty", json_object_new_boolean(t->hasDuty));
 
 	}
 
@@ -175,6 +187,7 @@ char* mallocString(json_object *obj) {
 HeatElement * parseHeatElement(json_object *layout) {
 	boolean valid = false;
 	HeatElement * s = malloc(sizeof(HeatElement));
+	s->name = NULL;
 
 	if (json_object_get_type(layout) == json_type_object) {
 		valid = true;
@@ -197,9 +210,17 @@ HeatElement * parseHeatElement(json_object *layout) {
 		} else {
 			valid = false;
 		}
+		value = json_object_object_get(layout, "fullOnAmps");
+		if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+			s->fullOnAmps = json_object_get_int(value);
+		} else {
+			valid = false;
+		}
 
 	}
 	if (!valid) {
+		freeIfNotNull(s->name);
+
 		free(s);
 		s = NULL;
 	}
@@ -246,7 +267,9 @@ void freeHeater(HeatElement * h) {
 	}
 	freeIfNotNull(h);
 }
-
+void freePumpChildren(Pump * t) {
+	freeIfNotNull(t->name);
+}
 void freeTankChildren(Tank * t) {
 	freeHeater(t->heater);
 	freeSensor(t->sensor);
@@ -259,15 +282,23 @@ void freeStepControlPointChildren(StepControlPoint * t) {
 
 void freeBrewLayout(BreweryLayout * bl) {
 	if (bl->tanks.data != NULL) {
-
 		Tank * tA = (Tank *) bl->tanks.data;
 		for (int i = 0; i < bl->tanks.count; i++) {
 			Tank * t = &tA[i];
-
 			freeTankChildren(t);
 		}
 
 		free(bl->tanks.data);
+		bl->tanks.data = NULL;
+	}
+	if (bl->pumps.data != NULL) {
+		Pump * tA = (Pump *) bl->pumps.data;
+		for (int i = 0; i < bl->pumps.count; i++) {
+			Pump * t = &tA[i];
+			freePumpChildren(t);
+		}
+
+		free(bl->pumps.data);
 		bl->tanks.data = NULL;
 	}
 	free(bl);
@@ -317,7 +348,6 @@ void freeConfiguration(Configuration * c) {
 		free(c->sensors.data);
 	}
 
-	//TODO
 	if (c->stepLists.data != NULL) {
 		StepList * tA = (StepList *) c->stepLists.data;
 		for (int i = 0; i < c->stepLists.count; i++) {
@@ -373,58 +403,117 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 		valid = true;
 		json_object * value;
 
+		bl->tanks.count = 0;
+		bl->tanks.data = NULL;
+		bl->pumps.count = 0;
+		bl->pumps.data = NULL;
+
 		value = json_object_object_get(layout, "maxAmps");
-		if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+		if (value != NULL && json_object_get_type(value) == json_type_int) {
 			bl->maxAmps = json_object_get_int(value);
 		} else {
+			DBG("parseBrewLayout missing maxAmps");
 			valid = false;
 		}
 
-		value = json_object_object_get(layout, "tanks");
-		if (valid && value != NULL && json_object_get_type(value) == json_type_array) {
-			json_object * tanks = value;
+		if (valid) {
+			value = json_object_object_get(layout, "tanks");
+			if (value != NULL && json_object_get_type(value) == json_type_array) {
+				json_object * tanks = value;
+				bl->tanks.count = json_object_array_length(tanks);
+				bl->tanks.data = malloc(sizeof(Tank) * bl->tanks.count);
+				Tank * tA = (Tank *) bl->tanks.data;
 
-			bl->tanks.count = json_object_array_length(tanks);
-			bl->tanks.data = malloc(sizeof(Tank) * bl->tanks.count);
-			Tank * tA = (Tank *) bl->tanks.data;
+				for (int i = 0; i < bl->tanks.count; i++) {
+					json_object *tank = json_object_array_get_idx(tanks, i);
 
-			for (int i = 0; i < bl->tanks.count; i++) {
+					Tank * t = &tA[i];
 
-				Tank * t = &tA[i];
-
-				t->name = NULL;
-				t->sensor = NULL;
-				t->heater = NULL;
-
-				json_object *tank = json_object_array_get_idx(tanks, i);
-				value = json_object_object_get(tank, "name");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-					t->name = mallocString(value);
-				} else {
-					valid = false;
-					break;
-				}
-
-				value = json_object_object_get(tank, "sensor");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
-					t->sensor = parseSensor(value);
-				} else {
+					t->name = NULL;
 					t->sensor = NULL;
-				}
-
-				value = json_object_object_get(tank, "heater");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
-					t->heater = parseHeatElement(value);
-				} else {
 					t->heater = NULL;
+
+					value = json_object_object_get(tank, "name");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+						t->name = mallocString(value);
+					} else {
+
+						DBG("parseBrewLayout tank missing name");
+
+						valid = false;
+						break;
+					}
+
+					value = json_object_object_get(tank, "sensor");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
+						t->sensor = parseSensor(value);
+					} else {
+						t->sensor = NULL;
+					}
+
+					value = json_object_object_get(tank, "heater");
+					if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
+						t->heater = parseHeatElement(value);
+					} else {
+						t->heater = NULL;
+					}
+
 				}
 
+			} else {
+				DBG("parseBrewLayout missing tanks");
+				valid = false;
 			}
-
-		} else {
-			valid = false;
 		}
+		if (valid) {
+			value = json_object_object_get(layout, "pumps");
+			if (&value != NULL && json_object_get_type(value) == json_type_array) {
+				json_object * pumps = value;
+				bl->pumps.count = json_object_array_length(pumps);
+				bl->pumps.data = malloc(sizeof(Pump) * bl->pumps.count);
+				Pump * pA = (Pump *) bl->pumps.data;
 
+				for (int i = 0; i < bl->pumps.count; i++) {
+					json_object *pump = json_object_array_get_idx(pumps, i);
+
+					Pump * s = &pA[i];
+					s->name = NULL;
+
+					if (json_object_get_type(pump) == json_type_object) {
+						valid = true;
+						json_object * value;
+						value = json_object_object_get(pump, "name");
+						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+							s->name = mallocString(value);
+						} else {
+							DBG("parseBrewLayout pump missing name\n");
+							valid = false;
+							break;
+						}
+						value = json_object_object_get(pump, "pin");
+						if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+							s->pin = json_object_get_int(value);
+						} else {
+							DBG("parseBrewLayout pump missing pin\n");
+							valid = false;
+							break;
+						}
+						value = json_object_object_get(pump, "hasDuty");
+						if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
+							s->hasDuty = json_object_get_boolean(value);
+						} else {
+							DBG("parseBrewLayout pump missing hasDuty\n");
+							valid = false;
+							break;
+						}
+					}
+				}
+
+			} else {
+				DBG("parseBrewLayout missing pumps");
+				valid = false;
+			}
+		}
 	}
 
 //	printf("11l->tanks.data: %d,%d\n", bl->tanks.count, bl->tanks.data);
@@ -446,7 +535,7 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 }
 
 char * generateRandomId() {
-	char * data = malloc(16);
+	char * data = malloc(17);
 
 	if (data == NULL) {
 		ERR("generateRandomId Malloc Failed\n");
@@ -458,6 +547,7 @@ char * generateRandomId() {
 
 		data[i] = ((char) (0x41 + floor(x * 26.0)));
 	}
+	data[16] = 0;
 	return data;
 }
 

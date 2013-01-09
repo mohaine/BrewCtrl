@@ -2,3 +2,4 @@ brewctrl
 *.o
 
 listsensors
+log.txt
