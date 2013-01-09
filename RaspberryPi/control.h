@@ -21,7 +21,8 @@ typedef struct {
 	bool initComplete;
 	int controlPin;
 	int duty;
-	int fullOnAmps;byte tempSensorAddress[8];
+	int fullOnAmps;
+	char tempSensorAddressPtr[17];
 	double targetTemp;bool hasDuty;bool automaticControl;
 	DutyController dutyController;
 	Pid pid;
@@ -49,5 +50,6 @@ void updatePinsForSetDuty();
 void lockSteps();
 void unlockSteps();
 void updateStepTimer();
+void selectReadingSensors();
 
 #endif

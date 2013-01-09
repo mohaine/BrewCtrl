@@ -84,7 +84,6 @@ void test(void) {
 }
 
 void loop(void) {
-
 	setupControl();
 	turnOff();
 	searchForTempSensors();
@@ -93,6 +92,7 @@ void loop(void) {
 	startLoopFunction(100, updatePinsForSetDuty);
 	startLoopFunction(250, updateStepTimer);
 	startLoopFunction(10000, searchForTempSensors);
+	startLoopFunction(1000, selectReadingSensors);
 
 	while (true) {
 		sleep(100000);

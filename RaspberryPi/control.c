@@ -1,6 +1,7 @@
 #include "control.h"
 #include "comm.h"
 #include "config.h"
+#include "logger.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -56,6 +57,55 @@ void setupControlPoint(ControlPoint *cp) {
 			setupDutyController(&cp->dutyController, cp->controlPin);
 		}
 		cp->initComplete = true;
+	}
+}
+
+void selectReadingSensors() {
+	Configuration * cfg = getConfiguration();
+	if (cfg != NULL && cfg->sensors.data != NULL && cfg->sensors.count > 0) {
+		BreweryLayout * bl = cfg->brewLayout;
+		if (bl != NULL && bl->tanks.data != NULL) {
+			Tank * tA = (Tank *) bl->tanks.data;
+			for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
+				Tank * t = &tA[tankIndex];
+				if (t->sensor != NULL) {
+					bool found = false;
+
+					if (t->sensor->address != NULL) {
+						TempSensor * s = getSensorByAddress(t->sensor->address);
+						found = s != NULL && s->reading;
+					}
+
+					if (!found) {
+//						DBG("Missing Sensor for %s\n", t->name);
+						SensorConfig * sA = (SensorConfig *) cfg->sensors.data;
+						for (int scI = 0; scI < cfg->sensors.count; scI++) {
+							SensorConfig * sc = &sA[scI];
+							if (strcmp(sc->location, t->name) == 0) {
+								TempSensor * s = getSensorByAddress(sc->address);
+								if (s != NULL && s->reading) {
+									char * newAddressString = malloc(17);
+									sprintf(newAddressString, "%s", sc->address);
+
+									char * oldAddress = t->sensor->address;
+
+									t->sensor->address = newAddressString;
+									changeConfigVersion(cfg);
+
+									DBG("Changed tank %s sensor to %s\n", t->name, t->sensor->address);
+
+									if (oldAddress != NULL) {
+										free(oldAddress);
+									}
+
+									writeConfiguration(cfg);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -129,7 +179,7 @@ void updateDuty() {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				setupControlPoint(cp);
 				if (cp->automaticControl) {
-					TempSensor* sensor = getSensor(cp->tempSensorAddress);
+					TempSensor* sensor = getSensorByAddress(cp->tempSensorAddressPtr);
 					if (sensor != NULL) {
 						if (sensor->reading) {
 							if (cp->hasDuty) {

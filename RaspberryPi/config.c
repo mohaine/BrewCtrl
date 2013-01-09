@@ -238,7 +238,7 @@ Sensor * parseSensor(json_object *layout) {
 		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 			s->address = mallocString(value);
 		} else {
-			s->address = malloc(1);
+			s->address = malloc(8);
 			s->address[0] = 0;
 		}
 
@@ -635,6 +635,8 @@ Configuration * parseJsonConfiguration(byte *data) {
 						value = json_object_object_get(sensor, "address");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 							sc->address = mallocString(value);
+							DBG("sc->address %s\n", sc->address );
+
 						} else {
 							DBG("parseJsonConfiguration SensorConfig Missing Address\n");
 							valid = false;
@@ -807,14 +809,19 @@ void writeConfiguration(Configuration * config) {
 		free(json);
 	}
 }
+void changeConfigVersion(Configuration * newConfig) {
+	char * oldVersion = newConfig->version;
+	newConfig->version = generateRandomId();
+	if (oldVersion != NULL) {
+		free(oldVersion);
+	}
+}
 
 void setConfiguration(Configuration * newConfig) {
-
 	if (config != NULL) {
 		freeConfiguration(config);
 		config = NULL;
 	}
-
 	config = newConfig;
 }
 Configuration * getConfiguration() {

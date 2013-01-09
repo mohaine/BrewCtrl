@@ -24,13 +24,13 @@
 #include <linux/limits.h>
 
 typedef struct {
-	byte address[8];
+	char * addressPtr;
 	double lastTemp;bool reading;char * restrict sysfile;
 } TempSensor;
 
 void readSensors();
 void searchForTempSensors();
-TempSensor* getSensor(byte* address);
+TempSensor* getSensorByAddress(char* address);
 TempSensor* getSensorByIndex(int i);
 int getSensorCount();
 void listSensors();

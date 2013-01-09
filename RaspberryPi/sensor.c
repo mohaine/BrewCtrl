@@ -1,4 +1,5 @@
 #include "sensor.h"
+#include "logger.h"
 
 #define _GNU_SOURCE
 
@@ -73,6 +74,7 @@ void readSensors() {
 void searchForTempSensors() {
 	DIR *dp;
 	struct dirent *ep;
+	byte address[8];
 
 	dp = opendir(W1_ROOT);
 	if (dp != NULL) {
@@ -89,9 +91,15 @@ void searchForTempSensors() {
 					sprintf(tmp, "%s/%s", sensor->sysfile, "id");
 					FILE* f = fopen(tmp, "rb");
 					if (f) {
-						int readSize = fread(&sensor->address, 1, 8, f);
+						int readSize = fread(&address, 1, 8, f);
 						if (readSize == 8) {
-							if (getSensor(sensor->address) == NULL) {
+							char * addressStr = malloc(17);
+							sprintf(addressStr, "%02x%02x%02x%02x%02x%02x%02x%02x", address[0] & 0xff, address[1] & 0xff, address[2] & 0xff, address[3] & 0xff, address[4] & 0xff, address[5] & 0xff,
+									address[6] & 0xff, address[7] & 0xff);
+
+							if (getSensorByAddress(addressStr) == NULL) {
+								DBG("Found New Sensor: %s\n", addressStr);
+								sensor->addressPtr = addressStr;
 								sensor->reading = false;
 								sensorCount++;
 								valid = true;
@@ -117,13 +125,13 @@ void searchForTempSensors() {
 
 }
 
-TempSensor* getSensor(byte* address) {
+TempSensor* getSensorByAddress(char* address) {
+
 	for (int sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
 		TempSensor *sensor = &sensors[sensorIndex];
-		bool same = true;
-		for (int j = 0; same && j < 8; j++) {
-			same = sensor->address[j] == address[j];
-		}
+
+		bool same = strcmp(sensor->addressPtr, address) == 0;
+
 		if (same) {
 			return sensor;
 		}
@@ -158,11 +166,7 @@ void listSensors() {
 	for (int i = 0; i < sensorCount; i++) {
 		TempSensor *sensor = getSensorByIndex(i);
 
-		printf("Sensor %d ", i);
-
-		for (int j = 0; j < 8; j++) {
-			printf("%02x", sensor->address[j]);
-		}
+		printf("Sensor %d %s\n", i, sensor->addressPtr);
 
 		if (sensor->reading) {
 			printf(" Temp: %0.3f", sensor->lastTemp);

@@ -89,5 +89,6 @@ void writeConfiguration(Configuration * config);
 
 byte* formatJsonConfiguration(Configuration * cfg);
 Configuration * parseJsonConfiguration(byte *data);
+void changeConfigVersion(Configuration * cfg);
 #endif
 

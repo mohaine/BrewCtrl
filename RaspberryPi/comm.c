@@ -231,16 +231,9 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 
 				value = json_object_object_get(controlPoint, "tempSensorAddress");
 				if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-					int intData[8];
-					sscanf(json_object_get_string(value), "%02x%02x%02x%02x%02x%02x%02x%02x", &intData[0], &intData[1], &intData[2], &intData[3], &intData[4], &intData[5], &intData[6], &intData[7]);
-					for (int j = 0; j < 8; j++) {
-						cp->tempSensorAddress[j] = intData[j] & 0xff;
-					}
+					sprintf(cp->tempSensorAddressPtr, "%s", json_object_get_string(value));
 				} else {
-
-					for (int j = 0; j < 8; j++) {
-						cp->tempSensorAddress[j] = 0;
-					}
+					cp->tempSensorAddressPtr[0] = 0;
 				}
 
 				value = json_object_object_get(controlPoint, "targetTemp");
@@ -424,11 +417,7 @@ void handleStatusRequest(Request * request, Response * response) {
 			json_object_object_add(controlPoint, "controlPin", json_object_new_int(cp->controlPin));
 			json_object_object_add(controlPoint, "duty", json_object_new_int(cp->duty));
 			json_object_object_add(controlPoint, "fullOnAmps", json_object_new_int(cp->fullOnAmps));
-
-			sprintf(tmp, "%02x%02x%02x%02x%02x%02x%02x%02x", cp->tempSensorAddress[0], cp->tempSensorAddress[1], cp->tempSensorAddress[2], cp->tempSensorAddress[3], cp->tempSensorAddress[4],
-					cp->tempSensorAddress[5], cp->tempSensorAddress[6], cp->tempSensorAddress[7]);
-			json_object_object_add(controlPoint, "tempSensorAddress", json_object_new_string(tmp));
-
+			json_object_object_add(controlPoint, "tempSensorAddress", json_object_new_string(cp->tempSensorAddressPtr));
 			json_object_object_add(controlPoint, "targetTemp", json_object_new_double(cp->targetTemp));
 			json_object_object_add(controlPoint, "hasDuty", json_object_new_boolean(cp->hasDuty));
 			json_object_object_add(controlPoint, "automaticControl", json_object_new_boolean(cp->automaticControl));
@@ -443,9 +432,7 @@ void handleStatusRequest(Request * request, Response * response) {
 		sensor = json_object_new_object();
 		json_object_array_add(sensors, sensor);
 
-		sprintf(tmp, "%02x%02x%02x%02x%02x%02x%02x%02x", ts->address[0], ts->address[1], ts->address[2], ts->address[3], ts->address[4], ts->address[5], ts->address[6], ts->address[7]);
-
-		json_object_object_add(sensor, "address", json_object_new_string(tmp));
+		json_object_object_add(sensor, "address", json_object_new_string(ts->addressPtr));
 
 		json_object_object_add(sensor, "tempatureC", json_object_new_double(ts->lastTemp));
 		json_object_object_add(sensor, "reading", json_object_new_boolean(ts->reading));
