@@ -18,11 +18,14 @@
 
 package com.mohaine.brewcontroller.shared.json;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.mohaine.brewcontroller.server.util.FileUtils;
 
 public class JsonPrettyPrint {
 
@@ -31,6 +34,17 @@ public class JsonPrettyPrint {
 	private boolean stripNullAttributes;
 	private int depth = 0;
 	private boolean escapeSpecials = true;
+
+	public static void main(String[] args) throws Exception {
+
+		File file = new File("../RaspberryPi", "BrewControllerConfig.json");
+
+		String json = FileUtils.readFromFile(file);
+
+		json = new JsonPrettyPrint().prettyPrint(json);
+		FileUtils.writeToFile(json, file);
+
+	}
 
 	public String prettyPrint(String json) {
 		depth = 0;

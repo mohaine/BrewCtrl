@@ -1,9 +1,13 @@
 {
+   "version":"VKUUXFITHOMQJNYX",
    "brewLayout":{
       "tanks":[
          {
             "name":"HLT",
             "sensor":{
+               "address":"289c167d02000048",
+               "tempatureC":0.0,
+               "reading":false
             },
             "heater":{
                "name":"HTL Element",
@@ -16,6 +20,9 @@
          {
             "name":"TUN",
             "sensor":{
+               "address":"289e167d02000048",
+               "tempatureC":0.0,
+               "reading":false
             }
          },
          {
@@ -23,7 +30,7 @@
             "heater":{
                "name":"Kettle Element",
                "pin":7,
-               "duty":65,
+               "duty":0,
                "hasDuty":false,
                "fullOnAmps":23
             }
@@ -55,6 +62,11 @@
          "address":"289c167d02000048",
          "name":"",
          "location":"HLT"
+      },
+      {
+         "address":"289e167d02000048",
+         "name":"",
+         "location":"TUN"
       }
    ],
    "stepLists":[
@@ -66,12 +78,12 @@
                "time":"0",
                "controlPoints":[
                   {
-                     "targetTemp":79.4444444,
+                     "targetTemp":79.444444,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
                   {
-                     "targetTemp":73.8888889,
+                     "targetTemp":73.888889,
                      "targetName":"TUN",
                      "controlName":"HLT Loop"
                   }
@@ -82,12 +94,12 @@
                "time":"60:00",
                "controlPoints":[
                   {
-                     "targetTemp":72.7777778,
+                     "targetTemp":72.777778,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
                   {
-                     "targetTemp":67.2222222,
+                     "targetTemp":67.222222,
                      "targetName":"TUN",
                      "controlName":"HLT Loop"
                   }
@@ -98,12 +110,12 @@
                "time":"0",
                "controlPoints":[
                   {
-                     "targetTemp":82.2222222,
+                     "targetTemp":82.222222,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
                   {
-                     "targetTemp":76.6666667,
+                     "targetTemp":76.666667,
                      "targetName":"TUN",
                      "controlName":"HLT Loop"
                   }
@@ -119,12 +131,12 @@
                "time":"0",
                "controlPoints":[
                   {
-                     "targetTemp":48.3333333,
+                     "targetTemp":48.333333,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
                   {
-                     "targetTemp":43.3333333,
+                     "targetTemp":43.333333,
                      "targetName":"TUN",
                      "controlName":"HLT Loop"
                   }
@@ -135,7 +147,7 @@
                "time":"30:00",
                "controlPoints":[
                   {
-                     "targetTemp":45.5555556,
+                     "targetTemp":45.555556,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
@@ -151,7 +163,7 @@
                "time":"30:00",
                "controlPoints":[
                   {
-                     "targetTemp":55.5555556,
+                     "targetTemp":55.555556,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
@@ -167,7 +179,7 @@
                "time":"30:00",
                "controlPoints":[
                   {
-                     "targetTemp":73.5555556,
+                     "targetTemp":73.555556,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
@@ -183,12 +195,12 @@
                "time":"0",
                "controlPoints":[
                   {
-                     "targetTemp":82.2222222,
+                     "targetTemp":82.222222,
                      "targetName":"HLT",
                      "controlName":"HTL Element"
                   },
                   {
-                     "targetTemp":76.6666667,
+                     "targetTemp":76.666667,
                      "targetName":"TUN",
                      "controlName":"HLT Loop"
                   }

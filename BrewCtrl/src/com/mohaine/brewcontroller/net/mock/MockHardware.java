@@ -91,7 +91,6 @@ public class MockHardware {
 						if (tanks != null) {
 							for (Tank tank : tanks) {
 								if (tank.getSensor() != null) {
-									// TODO Switch to reading sensor
 									boolean found = false;
 									for (TempSensor hardwareSensor : sensors) {
 										if (hardwareSensor.isReading() && hardwareSensor.getAddress().equals(tank.getSensor().getAddress())) {
@@ -101,15 +100,13 @@ public class MockHardware {
 									}
 
 									if (!found) {
-
 										System.out.println("Missing Sensor for " + tank.getName());
 										for (SensorConfiguration sensorConfig : configuration.getSensors()) {
 											if (StringUtils.valueOf(sensorConfig.getLocation()).equals(tank.getName())) {
 												for (TempSensor hardwareSensor : sensors) {
 													if (hardwareSensor.isReading() && hardwareSensor.getAddress().equals(sensorConfig.getAddress())) {
 														// Found it
-														tank.getSensor().setSensor(hardwareSensor);
-
+														tank.getSensor().setAddress(hardwareSensor.getAddress());
 														configuration.setVersion(StringUtils.generateRandomId());
 														updateStatusConfigVersion();
 														break;

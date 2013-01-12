@@ -33,8 +33,6 @@ import com.mohaine.brewcontroller.shared.util.StringUtils;
 
 public abstract class ControllerHardwareJson implements ControllerHardware {
 
-	public static int DEFAULT_PORT = 2739;
-
 	private List<BrewHardwareControl> brewHardwareControls = new ArrayList<BrewHardwareControl>();
 
 	private ControllerStatus controllerStatus;
@@ -102,12 +100,15 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 					this.pendingMode = null;
 					commandRequest.addParameter("mode", pendingModeRequest);
 				}
-				// New List?
 				final List<ControlStep> pendingStepsRequest = new ArrayList<ControlStep>();
+
 				if (this.pendingSteps != null) {
+
 					pendingStepsRequest.addAll(this.pendingSteps);
 					this.pendingSteps = null;
 					String encode = converter.encode(pendingStepsRequest);
+
+					System.out.println("encode: " + encode);
 					commandRequest.addParameter("steps", encode);
 				}
 
@@ -167,6 +168,19 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 									for (int i = 0; i < oldSteps.size(); i++) {
 										ControlStep oldStep = oldSteps.get(i);
 										ControlStep newStep = newSteps.get(i);
+
+										// ControlStep controlStep = newStep;
+										// System.out.println("Step " +
+										// controlStep.getName() + " " +
+										// controlStep.getId());
+										// List<ControlPoint> controlPoints =
+										// controlStep.getControlPoints();
+										// for (ControlPoint controlPoint :
+										// controlPoints) {
+										// System.out.println("     CP: " +
+										// controlPoint.getControlPin() + " " +
+										// controlPoint.getTargetTemp());
+										// }
 
 										if (newStep.isActive() || oldStep.isActive() || !oldStep.equals(newStep)) {
 											eventsToFire.add(new StepModifyEvent(newStep, true));
@@ -259,6 +273,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			for (Tank tank : tanks) {
 				Sensor sensor = tank.getSensor();
 				if (sensor != null) {
+
 					TempSensor tankTs = null;
 					List<TempSensor> sensors = controllerStatus.getSensors();
 					for (TempSensor tempSensor : sensors) {
@@ -272,11 +287,11 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 						tankTs = new TempSensor();
 					}
 
-					Double temp = sensor.getTempatureC();
-					boolean reading = sensor.isReading();
-					sensor.setSensor(tankTs);
+					Double oldTemp = sensor.getTempatureC();
+					boolean oldReding = sensor.isReading();
+					sensor.updateFrom(tankTs);
 
-					boolean diff = forceDirty || !equals(temp, sensor.getTempatureC()) || reading != sensor.isReading();
+					boolean diff = forceDirty || !equals(oldTemp, sensor.getTempatureC()) || oldReding != sensor.isReading();
 					if (diff) {
 						eventsToFire.add(new BreweryComponentChangeEvent(sensor));
 					}
@@ -305,7 +320,6 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				version = converter.decode(versionString, VersionBean.class);
 
 				if (version != null) {
-					// System.out.println("  Version: " + version.getVersion());
 					connected = true;
 					setStatus("Connected");
 					loadConfiguration(null);
@@ -315,6 +329,11 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			@Override
 			public void onNotSuccess(Throwable e) {
 				connected = false;
+
+				String message = "Connection failed: " + e.getMessage();
+				System.out.println("Message: " + message);
+				setStatus(message);
+
 			}
 		});
 

@@ -6,5 +6,5 @@ public interface ConfigurationLoader {
 
 	public Configuration getConfiguration();
 
-	public void saveConfiguration() throws Exception;
+	public void saveConfiguration(Configuration cfg) throws Exception;
 }

@@ -21,31 +21,41 @@ package com.mohaine.brewcontroller.swing;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerGui;
+import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.client.DisplayPage;
 
 public class SwingControllerInterface implements ControllerGui {
 	private JFrame frame = new JFrame();
 	private JPanel mainPanel = new JPanel();
+	private JPanel urlPanel = new JPanel();
 
 	DisplayPage currentPage;
 	private StatusDisplaySwing statusDisplay;
 	private ConfigurationLoader configurationLoader;
+	private ControllerUrlLoader urlLoader;
 
 	@Inject
-	public SwingControllerInterface(StatusDisplaySwing statusDisplay, ConfigurationLoader configurationLoader) {
+	public SwingControllerInterface(ControllerUrlLoader urlLoader, StatusDisplaySwing statusDisplay, ConfigurationLoader configurationLoader) {
 		super();
 		this.configurationLoader = configurationLoader;
 		this.statusDisplay = statusDisplay;
+
+		this.urlLoader = urlLoader;
 		mainPanel.setLayout(new BorderLayout());
 	}
 
@@ -61,6 +71,7 @@ public class SwingControllerInterface implements ControllerGui {
 				}
 				currentPage = page;
 				page.showPage();
+
 				mainPanel.add((Component) page.getWidget());
 				mainPanel.invalidate();
 				mainPanel.repaint();
@@ -74,44 +85,49 @@ public class SwingControllerInterface implements ControllerGui {
 	@Override
 	public void init() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.addWindowListener(new WindowListener() {
+
+		urlPanel.setLayout(new BorderLayout());
+		urlPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+		urlPanel.add(new JLabel("URL:"), BorderLayout.WEST);
+		final JTextField urlTextField = new JTextField();
+		urlTextField.setText(urlLoader.getUrl());
+
+		urlTextField.addKeyListener(new KeyListener() {
 
 			@Override
-			public void windowOpened(WindowEvent arg0) {
+			public void keyTyped(KeyEvent arg0) {
 			}
 
 			@Override
-			public void windowIconified(WindowEvent arg0) {
+			public void keyReleased(KeyEvent arg0) {
 			}
 
 			@Override
-			public void windowDeiconified(WindowEvent arg0) {
-			}
-
-			@Override
-			public void windowDeactivated(WindowEvent arg0) {
-			}
-
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				try {
-					configurationLoader.saveConfiguration();
-				} catch (Exception e) {
-					e.printStackTrace();
+			public void keyPressed(KeyEvent paramKeyEvent) {
+				if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
+					urlLoader.setUrl(urlTextField.getText());
+				} else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					urlTextField.setText(urlLoader.getUrl());
 				}
 			}
+		});
+		urlTextField.addFocusListener(new FocusListener() {
 
 			@Override
-			public void windowClosed(WindowEvent arg0) {
+			public void focusLost(FocusEvent arg0) {
+				urlLoader.setUrl(urlTextField.getText());
 			}
 
 			@Override
-			public void windowActivated(WindowEvent arg0) {
+			public void focusGained(FocusEvent arg0) {
 			}
 		});
 
+		urlPanel.add(urlTextField, BorderLayout.CENTER);
+
 		Container cp = frame.getContentPane();
 		cp.setLayout(new BorderLayout());
+		cp.add(urlPanel, BorderLayout.NORTH);
 		cp.add(mainPanel, BorderLayout.CENTER);
 		cp.add(statusDisplay, BorderLayout.EAST);
 
@@ -119,5 +135,4 @@ public class SwingControllerInterface implements ControllerGui {
 		frame.pack();
 		frame.setVisible(true);
 	}
-
 }

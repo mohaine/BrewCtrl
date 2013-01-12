@@ -45,7 +45,6 @@
       "maxAmps":25,
       "turnOffOnCommLoss":true
    },
-   "commPorts":"",
    "sensors":[
       {
          "address":"0000000000000001",

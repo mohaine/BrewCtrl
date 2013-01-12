@@ -24,6 +24,7 @@ import com.google.inject.AbstractModule;
 import com.mohaine.brewcontroller.BrewJsonConverterRefection;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerGui;
+import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
@@ -43,6 +44,7 @@ public class BrewControllerSwingModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		bind(ControllerUrlLoader.class).toInstance(new ControllerUrlLoader());
 		bind(ConfigurationLoader.class).toInstance(new FileConfigurationLoader(configFile));
 		bind(BrewJsonConverter.class).to(BrewJsonConverterRefection.class).asEagerSingleton();
 		bind(ControllerGui.class).to(SwingControllerInterface.class).asEagerSingleton();

@@ -46,10 +46,4 @@ public class TempSensor {
 	public void setReading(boolean reading) {
 		this.reading = reading;
 	}
-
-	@Override
-	public String toString() {
-		return address;
-	}
-
 }

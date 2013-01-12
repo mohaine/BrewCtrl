@@ -247,6 +247,8 @@ public class BreweryDisplayDrawerSwing extends Canvas implements BreweryDisplayD
 			ControlStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
 				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
+				// System.out.println("   Sensor CP: " + cp.getControlPin());
+
 				if (cp != null && cp.isAutomaticControl()) {
 					// if (selectedStep.isActive()) {
 					// if (cp.getTargetTemp() != sensor.getTargetTemp()) {

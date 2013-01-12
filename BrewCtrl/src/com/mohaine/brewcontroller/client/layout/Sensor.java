@@ -6,32 +6,43 @@ public class Sensor extends BreweryComponent {
 
 	public static final String TYPE = "Sensor";
 
-	private TempSensor sensor;
+	private String address = "";
+	private double tempatureC;
+	private boolean reading = false;
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public double getTempatureC() {
+		return tempatureC;
+	}
+
+	public void setTempatureC(double tempatureC) {
+		this.tempatureC = tempatureC;
+	}
+
+	public boolean isReading() {
+		return reading;
+	}
+
+	public void setReading(boolean reading) {
+		this.reading = reading;
+	}
 
 	@Override
 	public String getType() {
 		return TYPE;
 	}
 
-	public boolean isReading() {
-		return sensor != null ? sensor.isReading() : false;
-	}
-
-	public Double getTempatureC() {
-		return sensor != null ? sensor.getTempatureC() : null;
-
-	}
-
-	public String getAddress() {
-		return sensor != null ? sensor.getAddress() : "";
-	}
-
-	public TempSensor getSensor() {
-		return sensor;
-	}
-
-	public void setSensor(TempSensor sensor) {
-		this.sensor = sensor;
+	public void updateFrom(TempSensor tankTs) {
+		this.address = tankTs.getAddress();
+		this.reading = tankTs.isReading();
+		this.tempatureC = tankTs.getTempatureC();
 	}
 
 }

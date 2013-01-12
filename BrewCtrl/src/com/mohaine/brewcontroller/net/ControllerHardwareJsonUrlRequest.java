@@ -6,6 +6,7 @@ import java.net.URL;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ConfigurationLoader;
+import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
@@ -16,11 +17,12 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 
 	private ConfigurationLoader configurationLoader;
 	private Thread statusThread;
+	private ControllerUrlLoader controllerUrlLoader;
 
 	@Inject
-	public ControllerHardwareJsonUrlRequest(EventBus eventBusp, BrewJsonConverter converter, ConfigurationLoader configurationLoader) throws Exception {
+	public ControllerHardwareJsonUrlRequest(EventBus eventBusp, BrewJsonConverter converter, ConfigurationLoader configurationLoader, ControllerUrlLoader controllerUrlLoader) throws Exception {
 		super(eventBusp, converter);
-
+		this.controllerUrlLoader = controllerUrlLoader;
 		this.configurationLoader = configurationLoader;
 
 		statusThread = new Thread(new CommThread());
@@ -67,7 +69,7 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 
 	@Override
 	protected void saveDefaultConfiguration() throws Exception {
-		configurationLoader.saveConfiguration();
+		configurationLoader.saveConfiguration(getConfiguration());
 
 	}
 
@@ -107,8 +109,12 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 	}
 
 	private String getBaseCmdUrl() {
-		String baseUrl = "http://localhost:" + DEFAULT_PORT + "/cmd/";
-		return baseUrl;
+		StringBuilder sb = new StringBuilder();
+		sb.append(controllerUrlLoader.getUrl());
+		if (sb.charAt(sb.length() - 1) != '/') {
+			sb.append('/');
+		}
+		sb.append("cmd/");
+		return sb.toString();
 	}
-
 }

@@ -24,11 +24,11 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
-import com.mohaine.brewcontroller.client.net.ControllerHardwareJson;
 
 public class MockHardwareServer {
 	private boolean run = true;
@@ -72,8 +72,8 @@ public class MockHardwareServer {
 		server.addHtmlService(new ConfigurationService(mock));
 		server.addHtmlService(new StatusService(mock));
 
-		server.listen(ControllerHardwareJson.DEFAULT_PORT);
-		
+		server.listen(ControllerUrlLoader.DEFAULT_PORT);
+
 	}
 
 	public MockHardwareServer() {
