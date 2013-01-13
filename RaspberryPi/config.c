@@ -191,7 +191,7 @@ char* mallocString(json_object *obj) {
 }
 
 HeatElement * parseHeatElement(json_object *layout) {
-	boolean valid = false;
+	bool valid = false;
 	HeatElement * s = malloc(sizeof(HeatElement));
 	s->name = NULL;
 
@@ -233,7 +233,7 @@ HeatElement * parseHeatElement(json_object *layout) {
 }
 
 Sensor * parseSensor(json_object *layout) {
-	boolean valid = false;
+	bool valid = false;
 	Sensor * s = malloc(sizeof(Sensor));
 
 	if (json_object_get_type(layout) == json_type_object) {
@@ -396,7 +396,7 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 
 	DBG("parseBrewLayout\n");
 
-	boolean valid = false;
+	bool valid = false;
 	BreweryLayout * bl = malloc(sizeof(BreweryLayout));
 	bl->tanks.data = NULL;
 	if (json_object_get_type(layout) == json_type_object) {
@@ -555,7 +555,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 
 	DBG("parseJsonConfiguration Entry  %s\n",data);
 
-	boolean valid = false;
+	bool valid = false;
 	Configuration * cfg = malloc(sizeof(Configuration));
 
 	cfg->version = NULL;
