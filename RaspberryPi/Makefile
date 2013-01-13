@@ -11,7 +11,7 @@ LISTSENSORS=listsensors
 
 #LDFLAGS += -g -O0
 #CFLAGS += -g -O0
-#CFLAGSD+= -DMOCK
+CFLAGSD+= -DMOCK
 #CFLAGSD+= -D__DEBUG
 
 CFLAGS += -O2
