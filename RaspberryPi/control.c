@@ -221,9 +221,17 @@ void updateStepTimer() {
 }
 
 void updateDuty() {
+	DBG("updateDuty Update Duty\n")
+
 	readSensors();
+
+	DBG("updateDuty Sensors Read\n")
+
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
+
+		DBG("updateDuty Sensors Read\n")
+
 		lockSteps();
 
 		if (stepCount > 0) {
@@ -261,9 +269,13 @@ void updateDuty() {
 }
 
 void updatePinsForSetDuty() {
+
+	DBG("updatePinsForSetDuty Enter\n")
+
 	Control* control = getControl();
 
 	if (control->mode == MODE_ON) {
+		DBG("updatePinsForSetDuty ON\n")
 		int currentAmps = 0;
 		lockSteps();
 		if (stepCount > 0) {

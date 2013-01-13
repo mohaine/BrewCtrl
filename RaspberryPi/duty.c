@@ -112,6 +112,8 @@ void resetDutyState(DutyController * hs) {
 }
 
 void updateForPinState(DutyController * hs, bool newHeatPinState) {
+
+
 	newHeatPinState = newHeatPinState & hs->on;
 	if (newHeatPinState != hs->pinState) {
 		hs->dutyOnOffLastChange = millis();

@@ -33,6 +33,7 @@ int main() {
 
 	initLogFile();
 	initConfiguration();
+
 //	Configuration* configuration = getConfiguration();
 //	if (configuration != NULL) {
 //

@@ -269,6 +269,10 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					valid = false;
 					break;
 				}
+
+				if (valid) {
+					setupControlPoint(cp);
+				}
 			}
 
 		} else {
