@@ -120,7 +120,7 @@ void searchForTempSensors() {
 		(void) closedir(dp);
 
 	} else {
-		perror("Couldn't open the directory");
+		ERR("Couldn't One Wire directory: %s\n", W1_ROOT);
 	}
 
 }

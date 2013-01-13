@@ -52,10 +52,7 @@ void setupControlPoint(ControlPoint *cp) {
 			cp->duty = 0;
 			setupPid(&cp->pid);
 		}
-
-		if (cp->hasDuty) {
-			setupDutyController(&cp->dutyController, cp->controlPin);
-		}
+		setupDutyController(&cp->dutyController, cp->controlPin);
 		cp->initComplete = true;
 	}
 }
