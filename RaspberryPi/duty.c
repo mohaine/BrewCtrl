@@ -26,7 +26,7 @@
 #include <linux/limits.h>
 #include <limits.h>
 
-#define GPIO_ROOT SYS_PATH"/class/gpio/"
+#define GPIO_ROOT SYS_PATH"/class/gpio"
 
 void pinMode(int pin, bool inout) {
 #ifdef MOCK
