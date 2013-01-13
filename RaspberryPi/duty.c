@@ -34,14 +34,15 @@ void pinMode(int pin, bool inout) {
 	char tmp[10];
 	char path[PATH_MAX];
 	sprintf(path, "%s/export", GPIO_ROOT);
+	DBG("Export Path: %s\m", path);
+
 	FILE* f = fopen(path, "wb");
 	if (f) {
 		sprintf(tmp, "%d", pin);
 		fwrite(tmp, 1, strlen(tmp), f);
 		fclose(f);
 	} else {
-		fprintf(stderr, "Failed export pin %d In/Out to %s\n", pin,
-				inout ? "In" : "Out");
+		fprintf(stderr, "Failed export pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
 	}
 	sprintf(path, "%s/gpio%d/direction", GPIO_ROOT, pin);
 	f = fopen(path, "wb");
@@ -50,8 +51,7 @@ void pinMode(int pin, bool inout) {
 		fwrite(tmp, 1, strlen(tmp), f);
 		fclose(f);
 	} else {
-		fprintf(stderr, "Failed to set direction on pin %d In/Out to %s\n", pin,
-				inout ? "In" : "Out");
+		fprintf(stderr, "Failed to set direction on pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
 	}
 #endif
 }
@@ -85,8 +85,7 @@ void digitalWrite(int pin, bool hilow) {
 		fwrite(tmp, 1, strlen(tmp), f);
 		fclose(f);
 	} else {
-		fprintf(stderr, "Failed to set output on pin %d to %s\n", pin,
-				hilow ? "On" : "Off");
+		fprintf(stderr, "Failed to set output on pin %d to %s\n", pin, hilow ? "On" : "Off");
 	}
 #endif
 
@@ -112,7 +111,6 @@ void resetDutyState(DutyController * hs) {
 }
 
 void updateForPinState(DutyController * hs, bool newHeatPinState) {
-
 
 	newHeatPinState = newHeatPinState & hs->on;
 	if (newHeatPinState != hs->pinState) {
@@ -149,8 +147,7 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 		} else if (hs->duty == 0) {
 			newHeatPinState = false;
 		} else {
-			int percentOn = ((double) hs->timeOn / (hs->timeOn + hs->timeOff))
-					* 1000;
+			int percentOn = ((double) hs->timeOn / (hs->timeOn + hs->timeOff)) * 1000;
 			if (percentOn >= hs->duty * 10) {
 				newHeatPinState = false;
 			} else {
