@@ -40,6 +40,12 @@
 
 Configuration * config = NULL;
 
+void freeIfNotNull(void* p) {
+	if (p != NULL) {
+		free(p);
+	}
+}
+
 void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 	json_object *layout = json_object_new_object();
 	json_object_object_add(config, "brewLayout", layout);
@@ -220,7 +226,6 @@ HeatElement * parseHeatElement(json_object *layout) {
 	}
 	if (!valid) {
 		freeIfNotNull(s->name);
-
 		free(s);
 		s = NULL;
 	}
@@ -250,12 +255,6 @@ Sensor * parseSensor(json_object *layout) {
 	return s;
 }
 
-void freeIfNotNull(void* p) {
-	if (p != NULL) {
-		free(p);
-	}
-
-}
 void freeSensor(Sensor * s) {
 	if (s != NULL) {
 		freeIfNotNull(s->address);
@@ -468,7 +467,7 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 		}
 		if (valid) {
 			value = json_object_object_get(layout, "pumps");
-			if (&value != NULL && json_object_get_type(value) == json_type_array) {
+			if (value != NULL && json_object_get_type(value) == json_type_array) {
 				json_object * pumps = value;
 				bl->pumps.count = json_object_array_length(pumps);
 				bl->pumps.data = malloc(sizeof(Pump) * bl->pumps.count);

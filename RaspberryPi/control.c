@@ -102,7 +102,7 @@ void selectReadingSensors() {
 				sc->location = NULL;
 				sc->address = addressCopy;
 
-				cfg->sensors.data = data;
+				cfg->sensors.data = (void*) data;
 				cfg->sensors.count = count + 1;
 
 				free(oldData);

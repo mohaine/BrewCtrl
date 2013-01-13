@@ -23,7 +23,7 @@
 #include "brewctrl.h"
 
 typedef struct {
-	int count;byte* data;
+	int count;void* data;
 } Array;
 
 typedef struct {
