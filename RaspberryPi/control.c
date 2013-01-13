@@ -236,7 +236,7 @@ void updateDuty() {
 			int controlPointCount = step->controlPointCount;
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
-				cp->dutyController->on = true;
+				cp->dutyController.on = true;
 				setupControlPoint(cp);
 				if (cp->automaticControl) {
 					TempSensor* sensor = getSensorByAddress(cp->tempSensorAddressPtr);
