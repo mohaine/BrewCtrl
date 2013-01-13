@@ -35,7 +35,7 @@ void pinMode(int pin, bool inout) {
 	char tmp[10];
 	char path[PATH_MAX];
 	sprintf(path, "%s/export", GPIO_ROOT);
-	DBG("Export Path: %s\m", path);
+	DBG("Export Path: %s\n", path);
 
 	FILE* f = fopen(path, "wb");
 	if (f) {
