@@ -236,6 +236,7 @@ void updateDuty() {
 			int controlPointCount = step->controlPointCount;
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
+				cp->dutyController->on = true;
 				setupControlPoint(cp);
 				if (cp->automaticControl) {
 					TempSensor* sensor = getSensorByAddress(cp->tempSensorAddressPtr);
@@ -313,12 +314,16 @@ void turnOff(void) {
 	Control* control = getControl();
 
 	control->mode = MODE_OFF;
-	/*
-	 for (int cpIndex = 0; cpIndex < controlPointCount && cpIndex < MAX_CP_COUNT;
-	 cpIndex++) {
-	 controlPoints[cpIndex].duty = 0;
-	 setHeatOn(&controlPoints[cpIndex].dutyController, false);
-	 }
-	 */
+
+	lockSteps();
+	for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
+		ControlStep * cs = getControlStep(csIndex);
+		for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
+			cs->controlPoints[cpIndex].duty = 0;
+			setHeatOn(&cs->controlPoints[cpIndex].dutyController, false);
+		}
+	}
+	unlockSteps();
+
 }
 
