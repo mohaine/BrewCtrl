@@ -1,0 +1,5 @@
+CFLAGS += -g -O0
+LDFLAGS += -g -O0
+ 
+CFLAGSD+= -DMOCK
+CFLAGSD+= -D__DEBUG
