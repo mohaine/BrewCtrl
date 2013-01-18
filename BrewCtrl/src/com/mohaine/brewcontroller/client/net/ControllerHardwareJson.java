@@ -127,6 +127,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 					@Override
 					public void onSuccess(String response) {
 
+						setStatus("OK");
 						boolean success = false;
 						List<Event<?>> eventsToFire = new ArrayList<Event<?>>();
 						try {
@@ -239,8 +240,11 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 					@Override
 					public void onNotSuccess(Throwable e) {
+
+						updating = false;
 						e.printStackTrace();
 						setStatus(e.getMessage());
+						disconnect();
 					}
 				});
 
@@ -509,6 +513,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 	public void disconnect() {
 		connected = false;
+		updating = false;
 	}
 
 	public void setStatus(String message) {

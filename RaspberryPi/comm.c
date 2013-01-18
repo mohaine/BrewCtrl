@@ -271,6 +271,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				}
 
 				if (valid) {
+					cp->initComplete = false;
 					setupControlPoint(cp);
 				}
 			}

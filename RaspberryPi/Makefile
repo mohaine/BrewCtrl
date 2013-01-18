@@ -9,13 +9,13 @@ OBJECTS=$(SOURCES:.c=.o)
 BREWCTRL=brewctrl
 LISTSENSORS=listsensors
 
-#LDFLAGS += -g -O0
-#CFLAGS += -g -O0
+LDFLAGS += -g -O0
+CFLAGS += -g -O0
 CFLAGSD+= -DMOCK
-#CFLAGSD+= -D__DEBUG
+CFLAGSD+= -D__DEBUG
 
-CFLAGS += -O2
-LDFLAGS += -O2
+#CFLAGS += -O2
+#LDFLAGS += -O2
 
 CFLAGS += $(shell pkg-config --cflags json)
 LDFLAGS += $(shell pkg-config --libs json)

@@ -11,16 +11,16 @@
             },
             "heater":{
                "name":"HTL Element",
-               "pin":9,
+               "pin":11,
                "duty":0,
-               "hasDuty":false,
+               "hasDuty":true,
                "fullOnAmps":18
             }
          },
          {
             "name":"TUN",
             "sensor":{
-               "address":"289e167d02000048",
+               "address":"289b167d02400048",
                "tempatureC":0.0,
                "reading":false
             }
@@ -29,9 +29,9 @@
             "name":"Kettle",
             "heater":{
                "name":"Kettle Element",
-               "pin":7,
+               "pin":10,
                "duty":0,
-               "hasDuty":false,
+               "hasDuty":true,
                "fullOnAmps":23
             }
          }
@@ -39,6 +39,12 @@
       "pumps":[
          {
             "name":"HLT Loop",
+            "pin":7,
+            "duty":0,
+            "hasDuty":false
+         },
+         {
+            "name":"Main",
             "pin":8,
             "duty":0,
             "hasDuty":false
@@ -65,6 +71,11 @@
       },
       {
          "address":"289e167d02000048",
+         "name":"",
+         "location":"TUN"
+      },
+      {
+         "address":"289b167d02400048",
          "name":"",
          "location":"TUN"
       }

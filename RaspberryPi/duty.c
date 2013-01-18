@@ -134,7 +134,11 @@ void setHeatOn(DutyController * hs, bool newState) {
 void updateHeatForStateAndDuty(DutyController * hs) {
 	unsigned long now = millis();
 	bool newHeatPinState = false;
+
+//	DBG("                 ON  : %d\n", hs->on);
+
 	if (hs->on) {
+//		DBG("                    hs->pinState  : %d\n", hs->pinState);
 		if (hs->pinState) {
 			hs->timeOn += (now - hs->dutyLastCheckTime);
 		} else {

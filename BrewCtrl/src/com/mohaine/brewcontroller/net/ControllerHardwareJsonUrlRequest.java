@@ -38,18 +38,31 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 					if (!connected) {
 						connect();
 					}
-					updateStatus();
+					if (connected) {
+						updateStatus();
+					}
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						// ignore
 					}
 				} catch (IOException e) {
-					disconnect();
 					setStatus(e.getMessage());
+					try {
+						disconnect();
+					} catch (Exception e1) {
+						// Ignore
+					}
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					setStatus(e.getMessage());
+
+					try {
+						disconnect();
+					} catch (Exception e1) {
+						// Ignore
+					}
 				}
 
 			}
@@ -104,6 +117,8 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 				callback.onSuccess(result);
 			} catch (IOException e) {
 				callback.onNotSuccess(e);
+			} finally {
+				r.close();
 			}
 		}
 	}

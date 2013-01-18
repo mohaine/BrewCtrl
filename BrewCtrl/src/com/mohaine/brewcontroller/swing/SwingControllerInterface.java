@@ -21,23 +21,31 @@ package com.mohaine.brewcontroller.swing;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
 import com.google.inject.Inject;
-import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerUrlLoader;
+import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.DisplayPage;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 
 public class SwingControllerInterface implements ControllerGui {
 	private JFrame frame = new JFrame();
@@ -46,15 +54,14 @@ public class SwingControllerInterface implements ControllerGui {
 
 	DisplayPage currentPage;
 	private StatusDisplaySwing statusDisplay;
-	private ConfigurationLoader configurationLoader;
 	private ControllerUrlLoader urlLoader;
+	private ControllerHardware hardware;
 
 	@Inject
-	public SwingControllerInterface(ControllerUrlLoader urlLoader, StatusDisplaySwing statusDisplay, ConfigurationLoader configurationLoader) {
+	public SwingControllerInterface(ControllerUrlLoader urlLoader, StatusDisplaySwing statusDisplay, ControllerHardware hardware) {
 		super();
-		this.configurationLoader = configurationLoader;
 		this.statusDisplay = statusDisplay;
-
+		this.hardware = hardware;
 		this.urlLoader = urlLoader;
 		mainPanel.setLayout(new BorderLayout());
 	}
@@ -124,6 +131,45 @@ public class SwingControllerInterface implements ControllerGui {
 		});
 
 		urlPanel.add(urlTextField, BorderLayout.CENTER);
+		urlPanel.add(new JButton(new AbstractAction("Load Configuration") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChoose = new JFileChooser(new File(System.getProperty("user.dir")));
+				fileChoose.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fileChoose.setFileFilter(new FileFilter() {
+
+					@Override
+					public String getDescription() {
+						return "JSON files";
+					}
+
+					@Override
+					public boolean accept(File file) {
+						return file.getName().toLowerCase().endsWith(".json");
+					}
+				});
+
+				fileChoose.showDialog(frame, "Select Configuration");
+				File selectedFile = fileChoose.getSelectedFile();
+				if (selectedFile != null && selectedFile.exists() && selectedFile.isFile()) {
+					try {
+						Configuration configuration = new FileConfigurationLoader(selectedFile).getConfiguration();
+						if (configuration == null) {
+							JOptionPane.showInternalMessageDialog(frame.getContentPane(), "Invalid Configuration File");
+						} else {
+							hardware.setConfiguration(configuration);
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						JOptionPane.showInternalMessageDialog(frame.getContentPane(), "Invalid Configuration File");
+					}
+
+				}
+
+			}
+		}), BorderLayout.EAST);
 
 		Container cp = frame.getContentPane();
 		cp.setLayout(new BorderLayout());

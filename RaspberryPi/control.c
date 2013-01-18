@@ -229,7 +229,6 @@ void updateDuty() {
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				cp->dutyController.on = true;
-				setupControlPoint(cp);
 				if (cp->automaticControl) {
 					TempSensor* sensor = getSensorByAddress(cp->tempSensorAddressPtr);
 					if (sensor != NULL) {
@@ -260,18 +259,23 @@ void updateDuty() {
 
 void updatePinsForSetDuty() {
 
-
 	Control* control = getControl();
+//	DBG("updatePinsForSetDuty() Mode : %d\n",control->mode);
 
-	if (control->mode == MODE_ON) {
+	if (control->mode == MODE_ON || control->mode == MODE_HOLD) {
+
 		int currentAmps = 0;
 		lockSteps();
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
+
+//			DBG("       step: %s\n", step->name);
+
 			int controlPointCount = step->controlPointCount;
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				setupControlPoint(cp);
+
 				int duty = cp->duty;
 
 				int maxAmps = 0;
