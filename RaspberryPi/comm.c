@@ -143,6 +143,7 @@ void handleConfigRequest(Request * request, Response * response) {
 				}
 				cfg->version = generateRandomId();
 
+				turnOff();
 				setConfiguration(cfg);
 				writeConfiguration(cfg);
 			}
