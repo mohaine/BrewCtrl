@@ -166,7 +166,6 @@ void updateStepTimer() {
 
 	if (stepCount > 0) {
 		ControlStep * step = &controlSteps[0];
-
 		if (control->mode == MODE_ON) {
 
 			if (!step->active) {
@@ -184,7 +183,6 @@ void updateStepTimer() {
 						onTime -= 1000;
 						if (newStepTime <= 0) {
 							stepCount--;
-
 							if (stepCount == 0) {
 								turnOff();
 							} else {
@@ -211,6 +209,57 @@ void updateStepTimer() {
 		} else if (control->mode == MODE_OFF) {
 			lastOnTime = 0;
 			step->active = false;
+		}
+	}
+	if (stepCount == 0) {
+		DBG("Create new Manual Step\n");
+		ControlStep * step = &controlSteps[0];
+		step->stepTime = 0;
+		step->active = false;
+		sprintf(step->name, "Manual Step");
+
+		char * stepId = generateRandomId();
+		sprintf(step->id, "%s", stepId);
+		free(stepId);
+
+		step->controlPointCount = 0;
+
+		Configuration * cfg = getConfiguration();
+		if (cfg != NULL) {
+
+			BreweryLayout * bl = cfg->brewLayout;
+			if (bl != NULL && bl->tanks.data != NULL) {
+				Tank * tA = (Tank *) bl->tanks.data;
+				for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
+					Tank * t = &tA[tankIndex];
+					if (t->heater != NULL) {
+						ControlPoint * cp = &step->controlPoints[step->controlPointCount];
+						cp->controlPin = t->heater->pin;
+						cp->automaticControl = false;
+						cp->duty = 0;
+						cp->fullOnAmps = t->heater->fullOnAmps;
+						cp->hasDuty = t->heater->hasDuty;
+						cp->initComplete = false;
+						setupControlPoint(cp);
+						step->controlPointCount++;
+					}
+				}
+
+				Pump * pA = (Pump *) bl->pumps.data;
+				for (int pumpIndex = 0; pumpIndex < bl->pumps.count; pumpIndex++) {
+					Pump * p = &pA[pumpIndex];
+					ControlPoint * cp = &step->controlPoints[step->controlPointCount];
+					cp->controlPin = p->pin;
+					cp->automaticControl = false;
+					cp->duty = 0;
+					cp->fullOnAmps = 0;
+					cp->hasDuty = p->hasDuty;
+					cp->initComplete = false;
+					setupControlPoint(cp);
+					step->controlPointCount++;
+				}
+			}
+			stepCount = 1;
 		}
 
 	}

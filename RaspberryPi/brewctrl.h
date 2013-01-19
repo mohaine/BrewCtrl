@@ -47,6 +47,6 @@
 #endif
 
 long millis();
-
+char * generateRandomId();
 #endif
 

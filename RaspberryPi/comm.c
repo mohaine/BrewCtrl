@@ -137,6 +137,12 @@ void handleConfigRequest(Request * request, Response * response) {
 			Configuration * cfg = parseJsonConfiguration(buffer);
 
 			if (cfg != NULL) {
+
+				if (cfg->version != NULL) {
+					free(cfg->version);
+				}
+				cfg->version = generateRandomId();
+
 				setConfiguration(cfg);
 				writeConfiguration(cfg);
 			}

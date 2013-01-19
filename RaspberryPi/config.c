@@ -33,7 +33,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <json.h>
-#include <math.h>
+
 #define BUFFER_SIZE 1024*200
 
 #define CONFIG_FILE "BrewControllerConfig.json"
@@ -534,22 +534,6 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 	return bl;
 }
 
-char * generateRandomId() {
-	char * data = malloc(17);
-
-	if (data == NULL) {
-		ERR("generateRandomId Malloc Failed\n");
-		exit(-1);
-	}
-
-	for (int i = 0; i < 16; i++) {
-		double x = ((double) rand() / (double) RAND_MAX);
-
-		data[i] = ((char) (0x41 + floor(x * 26.0)));
-	}
-	data[16] = 0;
-	return data;
-}
 
 Configuration * parseJsonConfiguration(byte *data) {
 
