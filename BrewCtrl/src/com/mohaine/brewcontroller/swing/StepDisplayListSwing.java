@@ -125,11 +125,51 @@ public class StepDisplayListSwing extends JPanel {
 		});
 		controlPanel.add(addNewLabel, BorderLayout.WEST);
 
-		List<ConfigurationStepList> stepLists = configLoader.getConfiguration().getStepLists();
-		if (stepLists != null && stepLists.size() > 0) {
-			final JLabel listLabel = new JLabel("List");
+		final JLabel listLabel = new JLabel("List");
 
-			controlPanel.add(listLabel, BorderLayout.EAST);
+		controlPanel.add(listLabel, BorderLayout.EAST);
+		listLabel.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				showStepListPopup(listLabel);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+			}
+		});
+
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = 0;
+		gbc.gridy++;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+
+		JPanel extraPanel = new JPanel();
+		add(extraPanel, gbc);
+
+	}
+
+	private void showStepListPopup(final JLabel listLabel) {
+		List<ConfigurationStepList> stepLists = controller.getConfiguration().getStepLists();
+		if (stepLists != null && stepLists.size() > 0) {
 
 			final JPopupMenu popup = new JPopupMenu();
 
@@ -143,47 +183,9 @@ public class StepDisplayListSwing extends JPanel {
 					}
 				}));
 			}
-			listLabel.addMouseListener(new MouseListener() {
-
-				@Override
-				public void mouseReleased(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mousePressed(MouseEvent e) {
-					// TODO Locate better
-					popup.show(listLabel, e.getX(), e.getY());
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseEntered(MouseEvent e) {
-
-				}
-
-				@Override
-				public void mouseClicked(MouseEvent e) {
-
-				}
-			});
+			popup.show(listLabel, 0, listLabel.getHeight());
 
 		}
-
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridx = 0;
-		gbc.gridy++;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-
-		JPanel extraPanel = new JPanel();
-		add(extraPanel, gbc);
-
-		
 	}
 
 	protected void launchList(ConfigurationStepList stepList) {
