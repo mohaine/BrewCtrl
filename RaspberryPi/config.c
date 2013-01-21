@@ -552,7 +552,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 	json_object *config = json_tokener_parse(data);
 	if (config != NULL) {
 
-		DBG("parseJsonConfiguration JSON Valid\n");
+		DBG("parseJsonConfiguration RAW JSON Valid\n");
 
 		if (json_object_get_type(config) == json_type_object) {
 			valid = true;
@@ -579,11 +579,14 @@ Configuration * parseJsonConfiguration(byte *data) {
 				valid = false;
 			}
 			if (valid) {
+
+				DBG("parseJsonConfiguration Parse Sensors\n");
+
 				value = json_object_object_get(config, "sensors");
 				if (value != NULL && json_object_get_type(value) == json_type_array) {
-					json_object * tanks = value;
+					json_object * sensorsJsonArray = value;
 
-					cfg->sensors.count = json_object_array_length(tanks);
+					cfg->sensors.count = json_object_array_length(sensorsJsonArray);
 					cfg->sensors.data = malloc(sizeof(SensorConfig) * cfg->sensors.count);
 					SensorConfig * tA = (SensorConfig *) cfg->sensors.data;
 
@@ -595,7 +598,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 						sc->location = NULL;
 						sc->address = NULL;
 
-						json_object *sensor = json_object_array_get_idx(tanks, i);
+						json_object *sensor = json_object_array_get_idx(sensorsJsonArray, i);
 						value = json_object_object_get(sensor, "name");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 							sc->name = mallocString(value);
@@ -627,10 +630,10 @@ Configuration * parseJsonConfiguration(byte *data) {
 					}
 
 				} else {
-
 					DBG("parseJsonConfiguration Missing Sensors\n");
 					valid = false;
 				}
+				DBG("parse Sensors Complete\n");
 			}
 			if (valid) {
 				value = json_object_object_get(config, "stepLists");
