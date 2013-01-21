@@ -7,7 +7,7 @@ public class ControllerUrlLoader {
 
 	public static int DEFAULT_PORT = 2739;
 
-	private String url = getPrefs().get(BREW_CTRL_URL, "http://brewctrl:" + DEFAULT_PORT + "/cmd/");
+	private String url = getPrefs().get(BREW_CTRL_URL, "http://raspberrypi:" + DEFAULT_PORT + "/");
 
 	private Preferences getPrefs() {
 		return Preferences.userNodeForPackage(getClass());
