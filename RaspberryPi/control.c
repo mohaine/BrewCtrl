@@ -125,6 +125,20 @@ void selectReadingSensors() {
 					if (t->sensor->address != NULL) {
 						TempSensor * s = getSensorByAddress(t->sensor->address);
 						found = s != NULL && s->reading;
+
+						if (found) {
+							// Make sure sensors is set to be in this tank
+
+							SensorConfig * sA = (SensorConfig *) cfg->sensors.data;
+							for (int scI = 0; scI < cfg->sensors.count; scI++) {
+								SensorConfig * sc = &sA[scI];
+								if (strcmp(sc->address, t->sensor->address) == 0) {
+									found = strcmp(sc->location, t->name) == 0;
+								}
+							}
+
+						}
+
 					}
 
 					if (!found) {
