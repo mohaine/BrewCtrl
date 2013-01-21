@@ -602,7 +602,12 @@ void* handleClientThread(void *ptr) {
 							request->content[i] = 0;
 						}
 
+						DBG("Read: %d \n",request->contentLength);
+
 						readSize = recv(clntSocket, request->content, request->contentLength, 0);
+
+						DBG("Actual Read: %d\n",readSize);
+
 						if (readSize == 0) {
 							break;
 						}
