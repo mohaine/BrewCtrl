@@ -604,7 +604,7 @@ void* handleClientThread(void *ptr) {
 
 						DBG("Read: %d \n",request->contentLength);
 
-						readSize = recv(clntSocket, request->content, request->contentLength, 0);
+						readSize = recv(clntSocket, request->content, request->contentLength, MSG_WAITALL);
 
 						DBG("Actual Read: %d\n",readSize);
 
