@@ -642,7 +642,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 				} else {
 					DBG("parseJsonConfiguration Missing Sensors\n");
 					valid = false;
-				} DBG("parse Sensors Complete\n");
+				}DBG("parse Sensors Complete\n");
 			}
 			if (valid) {
 				value = json_object_object_get(config, "stepLists");
@@ -744,10 +744,16 @@ Configuration * parseJsonConfiguration(byte *data) {
 		json_object_put(config);
 	}
 
+	DBG("parseJsonConfiguration Valid? %d\n",valid);
+
 	if (!valid) {
+
+		DBG("parseJsonConfiguration freeConfiguration\n");
+
 		freeConfiguration(cfg);
 		cfg = NULL;
 	}
+	DBG("parseJsonConfiguration RETURN\n");
 	return cfg;
 
 }
