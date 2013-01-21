@@ -534,7 +534,6 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 	return bl;
 }
 
-
 Configuration * parseJsonConfiguration(byte *data) {
 
 	DBG("parseJsonConfiguration Entry  %s\n",data);
@@ -555,6 +554,9 @@ Configuration * parseJsonConfiguration(byte *data) {
 		DBG("parseJsonConfiguration RAW JSON Valid\n");
 
 		if (json_object_get_type(config) == json_type_object) {
+
+			DBG("parseJsonConfiguration Parse Config\n");
+
 			valid = true;
 			json_object * value;
 
@@ -585,7 +587,6 @@ Configuration * parseJsonConfiguration(byte *data) {
 			}
 
 			DBG("parseJsonConfiguration brewLayout OK\n");
-
 
 			if (valid) {
 
@@ -641,8 +642,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 				} else {
 					DBG("parseJsonConfiguration Missing Sensors\n");
 					valid = false;
-				}
-				DBG("parse Sensors Complete\n");
+				} DBG("parse Sensors Complete\n");
 			}
 			if (valid) {
 				value = json_object_object_get(config, "stepLists");
