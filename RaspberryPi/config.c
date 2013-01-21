@@ -565,12 +565,17 @@ Configuration * parseJsonConfiguration(byte *data) {
 				cfg->version = generateRandomId();
 			}
 
+			DBG("parseJsonConfiguration version OK\n");
+
 			value = json_object_object_get(config, "logMessages");
 			if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
 				cfg->logMessages = json_object_get_boolean(value);
 			} else {
 				cfg->logMessages = false;
 			}
+
+			DBG("parseJsonConfiguration logMessages OK\n");
+
 			value = json_object_object_get(config, "brewLayout");
 			if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
 				cfg->brewLayout = parseBrewLayout(value);
@@ -578,6 +583,10 @@ Configuration * parseJsonConfiguration(byte *data) {
 			} else {
 				valid = false;
 			}
+
+			DBG("parseJsonConfiguration brewLayout OK\n");
+
+
 			if (valid) {
 
 				DBG("parseJsonConfiguration Parse Sensors\n");
