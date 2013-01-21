@@ -9,9 +9,10 @@ OBJECTS=$(SOURCES:.c=.o)
 BREWCTRL=brewctrl
 LISTSENSORS=listsensors
 
-LDFLAGS += -g -O0
-CFLAGS += -g -O0
-CFLAGSD+= -DMOCK
+LDFLAGS += -g -rdynamic
+CFLAGS += -g -rdynamic
+
+#CFLAGSD+= -DMOCK
 CFLAGSD+= -D__DEBUG
 
 #CFLAGS += -O2
