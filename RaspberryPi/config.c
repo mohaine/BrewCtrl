@@ -739,6 +739,8 @@ Configuration * parseJsonConfiguration(byte *data) {
 				}
 			}
 
+		} else {
+			DBG("parseJsonConfiguration Invalid Type for type node %d\n",json_object_get_type(config));
 		}
 
 		json_object_put(config);
@@ -752,8 +754,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 
 		freeConfiguration(cfg);
 		cfg = NULL;
-	}
-	DBG("parseJsonConfiguration RETURN\n");
+	}DBG("parseJsonConfiguration RETURN\n");
 	return cfg;
 
 }
