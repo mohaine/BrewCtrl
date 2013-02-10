@@ -20,14 +20,19 @@ package com.mohaine.brewcontroller.web.client;
 
 import java.util.ArrayList;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -39,7 +44,7 @@ import com.mohaine.brewcontroller.client.event.HandlerRegistration;
 import com.mohaine.brewcontroller.client.event.HasValue;
 
 public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
-	private FlowPanel panel = new FlowPanel();
+	private final FlowPanel panel = new FlowPanel();
 
 	private Label label = new Label();
 	private final Converter<T, String> converter;
@@ -49,7 +54,6 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 		this.converter = converter;
 		panel.add(label);
 		label.getElement().getStyle().setCursor(Cursor.POINTER);
-
 		label.addMouseDownHandler(new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
@@ -124,6 +128,7 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 
 	private void stopEditing() {
 		if (editing) {
+			System.out.println("ClickEditorGwt.stopEditing()");
 			editing = false;
 			panel.clear();
 			panel.add(label);
@@ -136,9 +141,16 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 			editing = true;
 			panel.clear();
 			final Editor editor = new Editor();
-
 			panel.add(editor.editField);
-			editor.editField.setFocus(true);
+
+			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				@Override
+				public void execute() {
+					editor.editField.setFocus(true);
+
+				}
+			});
+
 		}
 
 	}
@@ -161,19 +173,34 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 					}
 				}
 			});
-			editField.addBlurHandler(new BlurHandler() {
+			FocusBlurHandler handler = new FocusBlurHandler();
+			editField.addBlurHandler(handler);
+			editField.addFocusHandler(handler);
+
+		
+
+		}
+
+		private class FocusBlurHandler implements BlurHandler, FocusHandler {
+			Timer timeout = new Timer() {
 				@Override
-				public void onBlur(BlurEvent event) {
+				public void run() {
 					stopEditing(editField.getText());
 				}
-			});
+			};
 
-			// SwingUtilities.invokeLater(new Runnable() {
-			// @Override
-			// public void run() {
-			// editField.requestFocus();
-			// }
-			// });
+			@Override
+			public void onFocus(FocusEvent event) {
+				timeout.cancel();
+
+			}
+
+			@Override
+			public void onBlur(BlurEvent event) {
+				timeout.schedule(250);
+			}
+
 		}
 	}
+
 }

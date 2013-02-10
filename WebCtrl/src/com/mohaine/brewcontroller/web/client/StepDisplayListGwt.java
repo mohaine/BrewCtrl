@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
@@ -79,16 +80,16 @@ public class StepDisplayListGwt extends Composite {
 			@Override
 			public void onClick(ClickEvent event) {
 				addNewStep();
-
 			}
 		});
+
 		controlPanel.add(addNewLabel);
 
 		Configuration configuration = controllerp.getConfiguration();
 		if (configuration != null) {
 			List<ConfigurationStepList> stepLists = configuration.getStepLists();
 			if (stepLists != null && stepLists.size() > 0) {
-				final Label listLabel = new Label("List");
+				final Label listLabel = new Label("List >");
 
 				controlPanel.add(listLabel);
 				// TODO
@@ -111,8 +112,12 @@ public class StepDisplayListGwt extends Composite {
 				 */
 			}
 		}
-		
+
 		initWidget(panel);
+
+		System.out.println("StepDisplayListGwt.StepDisplayListGwt()");
+		addNewLabel.getElement().getStyle().setCursor(Cursor.POINTER);
+
 	}
 
 	protected void launchList(ConfigurationStepList stepList) {
@@ -143,18 +148,17 @@ public class StepDisplayListGwt extends Composite {
 
 	@Override
 	protected void onAttach() {
+		super.onAttach();
 		removeHandlers();
 		handlers.add(eventBus.addHandler(StepsModifyEvent.getType(), new StepsModifyEventHandler() {
 			@Override
 			public void onStepsChange() {
-
 				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 					@Override
 					public void execute() {
 						updateSteps();
 					}
 				});
-
 			}
 		}));
 		updateSteps();
@@ -162,8 +166,8 @@ public class StepDisplayListGwt extends Composite {
 
 	@Override
 	protected void onDetach() {
+		super.onDetach();
 		removeHandlers();
-
 	}
 
 	private void removeHandlers() {

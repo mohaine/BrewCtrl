@@ -1,6 +1,7 @@
 package com.mohaine.brewcontroller.net.mock;
 
 import com.mohaine.brewcontroller.BrewJsonConverterRefection;
+import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.net.mock.MockHardwareServer.HtmlService;
 import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
@@ -9,10 +10,14 @@ import com.mohaine.brewcontroller.shared.util.StringUtils;
 public class ConfigurationService implements HtmlService {
 
 	public MockHardware mock;
+	private ConfigurationLoader configurationLoader;
 
-	public ConfigurationService(MockHardware mock) {
+	public ConfigurationService(MockHardware mock, ConfigurationLoader cl) {
 		super();
 		this.mock = mock;
+		this.configurationLoader = cl;
+		mock.setConfiguration(cl.getConfiguration());
+
 	}
 
 	@Override
@@ -31,6 +36,7 @@ public class ConfigurationService implements HtmlService {
 			Configuration configuration = converter.decode(configParam, Configuration.class);
 			if (configuration != null) {
 				mock.setConfiguration(configuration);
+				configurationLoader.saveConfiguration(configuration);
 			} else {
 				response.setStatusCode(HttpCodes.BAD_REQUEST);
 				return;
@@ -38,7 +44,6 @@ public class ConfigurationService implements HtmlService {
 		}
 
 		String encode = converter.encode(mock.getConfiguration());
-		System.out.println("encode: " + encode);
 		byte[] bytes = encode.getBytes();
 		response.sendContent(bytes);
 	}

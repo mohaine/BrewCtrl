@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mohaine.brewcontroller.client.net.ControllerHardwareJson;
+import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.net.URLRequest;
 import com.mohaine.brewcontroller.server.util.StreamUtils;
 
@@ -16,8 +16,7 @@ public class MockServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		URL url = new URL(getBaseCmdUrl() + request.getPathInfo());
 
@@ -25,8 +24,7 @@ public class MockServlet extends HttpServlet {
 
 		int contentLength = request.getContentLength();
 		if (contentLength > 0) {
-			byte[] postData = StreamUtils.readStream(request.getInputStream(),
-					contentLength);
+			byte[] postData = StreamUtils.readStream(request.getInputStream(), contentLength);
 			r.setPostData(postData);
 		}
 
@@ -39,8 +37,7 @@ public class MockServlet extends HttpServlet {
 	}
 
 	private String getBaseCmdUrl() {
-		String baseUrl = "http://localhost:"
-				+ ControllerHardwareJson.DEFAULT_PORT + "/cmd";
+		String baseUrl = "http://localhost:" + ControllerUrlLoader.DEFAULT_PORT + "/cmd";
 		return baseUrl;
 	}
 }

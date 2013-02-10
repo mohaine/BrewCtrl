@@ -18,6 +18,7 @@
 
 package com.mohaine.brewcontroller.net.mock;
 
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -29,6 +30,7 @@ import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
+import com.mohaine.brewcontroller.swing.FileConfigurationLoader;
 
 public class MockHardwareServer {
 	private boolean run = true;
@@ -69,7 +71,9 @@ public class MockHardwareServer {
 
 		MockHardwareServer server = new MockHardwareServer();
 		server.addHtmlService(new VersionService());
-		server.addHtmlService(new ConfigurationService(mock));
+
+		File configFile = new File("BrewControllerConfig.json");
+		server.addHtmlService(new ConfigurationService(mock, new FileConfigurationLoader(configFile)));
 		server.addHtmlService(new StatusService(mock));
 
 		server.listen(ControllerUrlLoader.DEFAULT_PORT);

@@ -149,7 +149,6 @@ public class StepEditorGwt extends Composite {
 		edit.addDomHandler(new MouseDownHandler() {	
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
-				System.out.println("StepEditorGwt.StepEditorGwt(...).new MouseDownHandler() {...}.onMouseDown()");
 				selectStep();
 			}
 		},MouseDownEvent.getType());
