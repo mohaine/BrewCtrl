@@ -124,7 +124,7 @@ void selectReadingSensors() {
 
 					if (t->sensor->address != NULL) {
 						TempSensor * s = getSensorByAddress(t->sensor->address);
-						found = s != NULL && s->reading;
+						found = s != NULL && hasVaildTemp(s);
 
 						if (found) {
 							// Make sure sensors is set to be in this tank
@@ -148,7 +148,7 @@ void selectReadingSensors() {
 							SensorConfig * sc = &sA[scI];
 							if (strcmp(sc->location, t->name) == 0) {
 								TempSensor * s = getSensorByAddress(sc->address);
-								if (s != NULL && s->reading) {
+								if (s != NULL && hasVaildTemp(s)) {
 									char * newAddressString = malloc(17);
 									sprintf(newAddressString, "%s", sc->address);
 
@@ -295,7 +295,7 @@ void updateDuty() {
 				if (cp->automaticControl) {
 					TempSensor* sensor = getSensorByAddress(cp->tempSensorAddressPtr);
 					if (sensor != NULL) {
-						if (sensor->reading) {
+						if (hasVaildTemp(sensor)) {
 							if (cp->hasDuty) {
 								cp->duty = getDutyFromAdjuster(&cp->pid, cp->targetTemp, sensor->lastTemp);
 							} else {

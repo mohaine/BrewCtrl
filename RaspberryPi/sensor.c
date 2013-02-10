@@ -26,7 +26,6 @@ void readSensors() {
 
 	for (int sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
 		TempSensor *sensor = &sensors[sensorIndex];
-		bool successfulRead = false;
 		sprintf(tmp, "%s/%s", sensor->sysfile, "w1_slave");
 		FILE* f = fopen(tmp, "rb");
 
@@ -54,8 +53,20 @@ void readSensors() {
 									}
 								}
 								int milliCs = atoi(tIndex);
-								sensor->lastTemp = ((double) milliCs) / 1000;
-								successfulRead = true;
+
+								double tempC = ((double) milliCs) / 1000;
+
+								// 85 is the chips start up temp.  It reads as a valid temp so......
+								if (!hasVaildTemp(sensor) && (tempC == 85 || tempC == 0)) {
+								} else if ((sensor->lastTemp < 84 || sensor->lastTemp > 86) && tempC == 85) {
+									// Was reading temp ouside of 85+-1 and have temp = 85.0 assume it is startup temp
+								} else if ((sensor->lastTemp < -1 || sensor->lastTemp > 1) && tempC == 0) {
+									// Was reading temp ouside of 0+-1 and have temp = 0.0 assume it is startup temp
+								} else {
+									sensor->lastTemp = tempC;
+									sensor->lastReadMillis = millis();
+								}
+
 							}
 						}
 					}
@@ -65,10 +76,17 @@ void readSensors() {
 
 			fclose(f);
 		}
-		sensor->reading = successfulRead;
 
 	}
+}
 
+bool hasVaildTemp(TempSensor* sensor) {
+
+	if (sensor->lastReadMillis > 0) {
+       return millis() - sensor->lastReadMillis < 2000;
+	}
+
+	return false;
 }
 
 void searchForTempSensors() {
@@ -100,7 +118,7 @@ void searchForTempSensors() {
 							if (getSensorByAddress(addressStr) == NULL) {
 								DBG("Found New Sensor: %s\n", addressStr);
 								sensor->addressPtr = addressStr;
-								sensor->reading = false;
+								sensor->lastReadMillis = -1;
 								sensorCount++;
 								valid = true;
 							}
@@ -168,7 +186,7 @@ void listSensors() {
 
 		printf("Sensor %d %s\n", i, sensor->addressPtr);
 
-		if (sensor->reading) {
+		if (hasVaildTemp(sensor)) {
 			printf(" Temp: %0.3f", sensor->lastTemp);
 
 		}
