@@ -84,8 +84,7 @@ bool hasVaildTemp(TempSensor* sensor) {
 //printf("%u %u\n",millis(), millis() - sensor->lastReadMillis);
 	if (sensor->lastReadMillis > 0) {
 
-
-            return millis() - sensor->lastReadMillis < 2000;
+		return millis() - sensor->lastReadMillis < 2000;
 	}
 
 	return false;
