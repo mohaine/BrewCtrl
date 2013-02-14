@@ -26,7 +26,7 @@
 typedef struct {
 	char * addressPtr;
 	double lastTemp;
-	long lastReadMillis;
+unsigned	long lastReadMillis;
 	char * restrict sysfile;
 
 } TempSensor;
