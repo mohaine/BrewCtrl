@@ -45,7 +45,7 @@ void updateHeatForStateAndDuty(DutyController * hs);
 void updateForPinState(DutyController * hs, bool newHeatPinState);
 void setHeatDuty(DutyController * hs, int duty);
 void resetDutyState(DutyController * hs);
-void setupDutyController(DutyController * hs, byte pin);
+void setupDutyController(DutyController * hs, int pin);
 
 #endif
 

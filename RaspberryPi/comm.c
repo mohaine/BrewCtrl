@@ -277,10 +277,6 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				if (valid) {
-					cp->initComplete = false;
-					setupControlPoint(cp);
-				}
 			}
 
 		} else {
@@ -327,12 +323,12 @@ void handleStatusRequest(Request * request, Response * response) {
 				}
 
 				lockSteps();
+
 				for (int i = 0; valid && i < stepCount; i++) {
 					json_object *step = json_object_array_get_idx(steps, i);
 					ControlStep *cs = getControlStep(i);
 					cs->active = false;
 					valid = parseJsonStep(step, cs);
-
 					//Init Steps
 					if (valid) {
 						for (int cpI = 0; valid && cpI < cs->controlPointCount; cpI++) {

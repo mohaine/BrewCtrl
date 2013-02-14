@@ -44,7 +44,7 @@ int getControlStepCount();
 void setControlStepCount(int count);
 ControlStep * getControlStep(int index);
 
-void setupControlPoint();
+void setupControlPoint(ControlPoint *cp);
 
 void updateDuty();
 void updatePinsForSetDuty();

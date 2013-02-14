@@ -56,24 +56,16 @@ void pinMode(int pin, bool inout) {
 #endif
 }
 
-long lastChange = 0;
-;
-
 void digitalWrite(int pin, bool hilow) {
-#ifdef MOCK
-//	printf("Pin %d set to %s\n", pin, hilow ? "On" : "Off");
 
-	long now = millis();
-	if(lastChange > 0) {
-		int timeAtState = now - lastChange;
-		if(hilow) {
-			printf("          %lu,%d,0\n", now,timeAtState);
-		} else {
-			printf("          %lu,0,%d\n", now,timeAtState);
-		}
+	if (hilow) {
+		DBG("   %d -> ON\n", pin);
+	} else {
+		DBG("   %d -> OFF\n", pin);
 	}
 
-	lastChange = now;
+#ifdef MOCK
+//	printf("Pin %d set to %s\n", pin, hilow ? "On" : "Off");
 
 #else
 	char tmp[10];
@@ -91,7 +83,9 @@ void digitalWrite(int pin, bool hilow) {
 
 }
 
-void setupDutyController(DutyController * hs, byte pin) {
+void setupDutyController(DutyController * hs, int pin) {
+	DBG("setupDutyController %d\n",pin);
+
 	pinMode(pin, OUTPUT);
 	digitalWrite(pin, LOW);
 	hs->controlPin = pin;
