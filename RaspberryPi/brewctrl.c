@@ -29,10 +29,12 @@ long millis() {
 	struct timeval time;
 
 	gettimeofday(&time, NULL);
-
-	return ((time.tv_sec) * 1000 + time.tv_usec / 1000.0) + 0.5;
+	double millisInMicrosonds = time.tv_usec / 1000.0;
+	__time_t millisInSeononds = time.tv_sec * 1000;
+	double totalMilliseconds = millisInSeononds + millisInMicrosonds;
+	double totalMillisecondsRoundUp = totalMilliseconds + 0.5;
+	return (long) (totalMillisecondsRoundUp);
 }
-
 
 char * generateRandomId() {
 	char * data = malloc(17);
