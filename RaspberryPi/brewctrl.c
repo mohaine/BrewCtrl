@@ -30,8 +30,8 @@ long millis() {
 
 	gettimeofday(&time, NULL);
 	double millisInMicrosonds = time.tv_usec / 1000.0;
-	__time_t millisInSeononds = time.tv_sec * 1000;
-	double totalMilliseconds = millisInSeononds + millisInMicrosonds;
+	double millisInSeconds = time.tv_sec * 1000;
+	double totalMilliseconds = millisInSeconds + millisInMicrosonds;
 	double totalMillisecondsRoundUp = totalMilliseconds + 0.5;
 	return (long) (totalMillisecondsRoundUp);
 }
