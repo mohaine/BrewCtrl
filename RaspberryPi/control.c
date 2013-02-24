@@ -371,7 +371,7 @@ void updatePinsForSetDuty() {
 	}
 }
 
-void turnOff(void) {
+void turnOff() {
 	Control* control = getControl();
 	control->mode = MODE_OFF;
 	lockSteps();
@@ -385,7 +385,7 @@ void turnOff(void) {
 	unlockSteps();
 }
 
-void turnOffHeat(void) {
+void turnHeatOff() {
 	Control* control = getControl();
 	control->mode = MODE_HEAT_OFF;
 
@@ -404,10 +404,10 @@ void turnOffHeat(void) {
 					for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
 						ControlStep * cs = getControlStep(csIndex);
 						for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
-							ControlPoint cpIndex = cs->controlPoints[cpIndex];
-							if (cpIndex.controlPin == t->heater->pin) {
-								cpIndex.duty = 0;
-								setHeatOn(&cpIndex.dutyController, false);
+							ControlPoint * cp = &cs->controlPoints[cpIndex];
+							if (cp->controlPin == t->heater->pin) {
+								cp->duty = 0;
+								setHeatOn(&cp->dutyController, false);
 							}
 						}
 					}

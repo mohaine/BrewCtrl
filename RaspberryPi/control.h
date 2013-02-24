@@ -37,8 +37,10 @@ typedef struct {
 	int controlPointCount;
 } ControlStep;
 
-void turnOff(void);
-void turnHeatOff(void);
+void turnOff();
+void turnHeatOff();
+
+
 void setupControl();
 Control* getControl();
 
