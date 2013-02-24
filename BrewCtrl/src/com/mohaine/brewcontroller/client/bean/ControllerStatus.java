@@ -25,7 +25,7 @@ import com.mohaine.brewcontroller.shared.json.ListType;
 public class ControllerStatus {
 
 	public enum Mode {
-		ON, HOLD, OFF, UNKNOWN;
+		ON, HOLD, OFF, HEAT_OFF, UNKNOWN;
 
 		public boolean equals(String s) {
 			return toString().equals(s);

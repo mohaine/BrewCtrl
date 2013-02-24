@@ -75,13 +75,23 @@ public class StatusDisplaySwing extends JPanel {
 		}
 
 	});
-	private JToggleButton modeOffButton = new JToggleButton(new AbstractAction("Off") {
+	private JToggleButton modeOffButton = new JToggleButton(new AbstractAction("Stop") {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			changeMode(Mode.OFF);
+		}
+
+	});
+	private JToggleButton modeHeatOffButton = new JToggleButton(new AbstractAction("Heat Off") {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			changeMode(Mode.HEAT_OFF);
 		}
 
 	});
@@ -98,6 +108,9 @@ public class StatusDisplaySwing extends JPanel {
 			if (modeOnButton.getModel().isSelected()) {
 				return Mode.ON.toString();
 			}
+			if (modeHeatOffButton.getModel().isSelected()) {
+				return Mode.HEAT_OFF.toString();
+			}
 			return null;
 		}
 
@@ -106,6 +119,7 @@ public class StatusDisplaySwing extends JPanel {
 			modeHoldButton.getModel().setSelected(Mode.HOLD.equals(value));
 			modeOnButton.getModel().setSelected(Mode.ON.equals(value));
 			modeOffButton.getModel().setSelected(Mode.OFF.equals(value));
+			modeHeatOffButton.getModel().setSelected(Mode.HEAT_OFF.equals(value));
 
 			if (fireEvents) {
 				fireEvent(new ChangeEvent());
@@ -146,6 +160,7 @@ public class StatusDisplaySwing extends JPanel {
 		modePanel.setLayout(new FlowLayout());
 		modePanel.add(modeOnButton);
 		modePanel.add(modeHoldButton);
+		modePanel.add(modeHeatOffButton);
 		modePanel.add(modeOffButton);
 		add(modePanel, BorderLayout.NORTH);
 
@@ -291,17 +306,26 @@ public class StatusDisplaySwing extends JPanel {
 				modeOffButton.setSelected(true);
 				modeOnButton.setSelected(false);
 				modeHoldButton.setSelected(false);
+				modeHeatOffButton.setSelected(false);
 				mode.setText("Off");
 			} else if (Mode.ON.equals(hardwareStatus.getMode())) {
 				modeOffButton.setSelected(false);
 				modeOnButton.setSelected(true);
 				modeHoldButton.setSelected(false);
+				modeHeatOffButton.setSelected(false);
 				mode.setText("On");
 			} else if (Mode.HOLD.equals(hardwareStatus.getMode())) {
 				modeOffButton.setSelected(false);
 				modeOnButton.setSelected(false);
 				modeHoldButton.setSelected(true);
+				modeHeatOffButton.setSelected(false);
 				mode.setText("Hold");
+			} else if (Mode.HEAT_OFF.equals(hardwareStatus.getMode())) {
+				modeOffButton.setSelected(false);
+				modeOnButton.setSelected(false);
+				modeHoldButton.setSelected(false);
+				modeHeatOffButton.setSelected(true);
+				mode.setText("Heat Off");
 			} else {
 				mode.setText("???????");
 			}
