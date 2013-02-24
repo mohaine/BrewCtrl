@@ -280,6 +280,10 @@ void updateStepTimer() {
 	unlockSteps();
 }
 
+/*
+ * Updates the set duty vi the PID
+ *
+ */
 void updateDuty() {
 	readSensors();
 	Control* control = getControl();
@@ -320,19 +324,19 @@ void updateDuty() {
 	}
 }
 
+/*
+ * Toggles the control PIN so we get the correct on/off times for the set duty
+ * Also makes sure we don't every exceed our max amps
+ *
+ */
 void updatePinsForSetDuty() {
-
 	Control* control = getControl();
-//	DBG("updatePinsForSetDuty() Mode : %d\n",control->mode);
-
-	if (control->mode == MODE_ON || control->mode == MODE_HOLD) {
+	if (control->mode != MODE_OFF) {
 
 		int currentAmps = 0;
 		lockSteps();
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
-
-//			DBG("       step: %s\n", step->name);
 
 			int controlPointCount = step->controlPointCount;
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
@@ -369,9 +373,7 @@ void updatePinsForSetDuty() {
 
 void turnOff(void) {
 	Control* control = getControl();
-
 	control->mode = MODE_OFF;
-
 	lockSteps();
 	for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
 		ControlStep * cs = getControlStep(csIndex);
@@ -381,6 +383,40 @@ void turnOff(void) {
 		}
 	}
 	unlockSteps();
+}
+
+void turnOffHeat(void) {
+	Control* control = getControl();
+	control->mode = MODE_HEAT_OFF;
+
+	Configuration * cfg = getConfiguration();
+	if (cfg != NULL) {
+
+		BreweryLayout * bl = cfg->brewLayout;
+		if (bl != NULL && bl->tanks.data != NULL) {
+			Tank * tA = (Tank *) bl->tanks.data;
+			for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
+				Tank * t = &tA[tankIndex];
+				if (t->heater != NULL) {
+
+					lockSteps();
+					// Found a heater element. Turn it off.
+					for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
+						ControlStep * cs = getControlStep(csIndex);
+						for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
+							ControlPoint cpIndex = cs->controlPoints[cpIndex];
+							if (cpIndex.controlPin == t->heater->pin) {
+								cpIndex.duty = 0;
+								setHeatOn(&cpIndex.dutyController, false);
+							}
+						}
+					}
+					unlockSteps();
+
+				}
+			}
+		}
+	}
 
 }
 

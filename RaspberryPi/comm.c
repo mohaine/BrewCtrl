@@ -299,6 +299,9 @@ void handleStatusRequest(Request * request, Response * response) {
 			if (strcmp(tmp, "OFF") == 0) {
 				getControl()->mode = MODE_OFF;
 				turnOff();
+			} else if (strcmp(tmp, "HEAT_OFF") == 0) {
+				getControl()->mode = MODE_HEAT_OFF;
+				turnHeatOff();
 			} else if (strcmp(tmp, "ON") == 0) {
 				getControl()->mode = MODE_ON;
 			} else if (strcmp(tmp, "HOLD") == 0) {

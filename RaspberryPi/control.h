@@ -12,6 +12,7 @@
 #define MODE_OFF 0
 #define MODE_ON 1
 #define MODE_HOLD 2
+#define MODE_HEAT_OFF 3
 
 typedef struct {
 	int mode;
@@ -37,6 +38,7 @@ typedef struct {
 } ControlStep;
 
 void turnOff(void);
+void turnHeatOff(void);
 void setupControl();
 Control* getControl();
 
