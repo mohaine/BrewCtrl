@@ -5,20 +5,25 @@ import java.util.List;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.UnitConversion;
+import com.mohaine.brewcontroller.client.bean.Configuration;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
@@ -31,6 +36,7 @@ import com.mohaine.brewcontroller.client.event.HasValue;
 import com.mohaine.brewcontroller.client.event.StatusChangeEvent;
 import com.mohaine.brewcontroller.client.event.StatusChangeEventHandler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
+import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
 
 public class StatusDisplayGwt extends Composite {
 
@@ -115,17 +121,60 @@ public class StatusDisplayGwt extends Composite {
 	private VerticalPanel statusPanel;
 
 	private Provider<SensorEditorGwt> providerSensorEditor;
+	private BrewJsonConverter brewJsonConverter;
+	private PopupPanel loadCfgPopup;
 
 	@Inject
-	public StatusDisplayGwt(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayListGwt stepDisplay, Provider<SensorEditorGwt> providerSensorEditor) {
+	public StatusDisplayGwt(UnitConversion conversion, ControllerHardware controller, EventBus eventBus, StepDisplayListGwt stepDisplay, Provider<SensorEditorGwt> providerSensorEditor,
+			BrewJsonConverter brewJsonConverter) {
 		super();
 		this.conversion = conversion;
 		this.controller = controller;
 		this.eventBus = eventBus;
 		this.providerSensorEditor = providerSensorEditor;
+		this.brewJsonConverter = brewJsonConverter;
 		VerticalPanel panel = new VerticalPanel();
 
-		panel.add(new HTML("Mode"));
+		final Label loadCfgLabel = new Label("Load Configuration");
+		loadCfgLabel.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+
+				if (loadCfgPopup != null) {
+					loadCfgPopup.hide();
+					loadCfgPopup = null;
+				}
+
+				loadCfgPopup = new PopupPanel();
+				loadCfgPopup.setAnimationEnabled(false);
+				loadCfgPopup.setAutoHideEnabled(true);
+				VerticalPanel w = new VerticalPanel();
+
+				HorizontalPanel hp = new HorizontalPanel();
+
+				hp.add(new Label("Configuration:"));
+				hp.add(new HTML("<input type=\"file\" id=\"configFileUpload\" name=\"configFileUpload\"  />"));
+
+				FormPanel fp = new FormPanel();
+
+				hp.add(fp);
+				w.add(hp);
+				loadCfgPopup.setWidget(w);
+				loadCfgPopup.showRelativeTo(w);
+
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+
+					@Override
+					public void execute() {
+						captureFileInputChange(StatusDisplayGwt.this, "configFileUpload");
+					}
+				});
+
+			}
+		});
+		loadCfgLabel.getElement().getStyle().setCursor(Cursor.POINTER);
+		panel.add(loadCfgLabel);
 
 		HorizontalPanel modePanel = new HorizontalPanel();
 		modePanel.add(modeOnButton);
@@ -147,6 +196,52 @@ public class StatusDisplayGwt extends Composite {
 		initWidget(panel);
 
 	}
+
+	public void uploadConfig(String configuration) {
+		try {
+			Configuration cfg = brewJsonConverter.getJsonConverter().decode(configuration, Configuration.class);
+			if (cfg != null) {
+				controller.setConfiguration(cfg);
+				if (loadCfgPopup != null) {
+					loadCfgPopup.hide();
+					loadCfgPopup = null;
+				}
+			} else {
+				Window.alert("Invalid Configuration");
+			}
+		} catch (Exception e) {
+			Window.alert("Invalid Configuration : " + e.getMessage());
+		}
+
+	}
+
+	public native void captureFileInputChange(StatusDisplayGwt sdg, String id) /*-{
+
+		function handleFileSelect(evt) {
+			var files = evt.target.files; // FileList object
+
+			if (files.length > 0) {
+				var f = files[0];
+				var reader = new FileReader();
+
+				// Closure to capture the file information.
+				reader.onload = (function(theFile) {
+					return function(e) {
+
+						var text = e.target.result;
+						sdg.@com.mohaine.brewcontroller.web.client.StatusDisplayGwt::uploadConfig(Ljava/lang/String;)(text);
+					};
+				})(f);
+
+				reader.readAsText(f);
+
+			}
+		}
+
+		$wnd.document.getElementById(id).addEventListener('change',
+				handleFileSelect, false);
+
+	}-*/;
 
 	@Override
 	protected void onAttach() {
