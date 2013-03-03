@@ -24,12 +24,16 @@ import java.util.List;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Cursor;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.mohaine.brewcontroller.client.ControllerHardware;
@@ -71,7 +75,7 @@ public class StepDisplayListGwt extends Composite {
 		editorsPanel = new FlowPanel();
 		panel.add(editorsPanel);
 
-		VerticalPanel controlPanel = new VerticalPanel();
+		HorizontalPanel controlPanel = new HorizontalPanel();
 
 		panel.add(controlPanel);
 
@@ -85,39 +89,53 @@ public class StepDisplayListGwt extends Composite {
 
 		controlPanel.add(addNewLabel);
 
-		Configuration configuration = controllerp.getConfiguration();
-		if (configuration != null) {
-			List<ConfigurationStepList> stepLists = configuration.getStepLists();
-			if (stepLists != null && stepLists.size() > 0) {
-				final Label listLabel = new Label("List >");
+		final Label listLabel = new Label("List >");
+		listLabel.getElement().getStyle().setPaddingLeft(20, Unit.PX);
+		controlPanel.add(listLabel);
 
-				controlPanel.add(listLabel);
-				// TODO
-				/*
-				 * final JPopupMenu popup = new JPopupMenu();
-				 * 
-				 * for (final ConfigurationStepList stepList : stepLists) {
-				 * popup.add(new JMenuItem(new
-				 * AbstractAction(stepList.getName()) { private static final
-				 * long serialVersionUID = 1L;
-				 * 
-				 * @Override public void actionPerformed(ActionEvent arg0) {
-				 * launchList(stepList); } })); } listLabel.addClickHandler(new
-				 * ClickHandler() {
-				 * 
-				 * @Override public void onClick(ClickEvent e) {
-				 * popup.show(listLabel, e.getX(), e.getY());
-				 * 
-				 * } });
-				 */
+		listLabel.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				selectStepList(listLabel);
 			}
-		}
+
+		});
 
 		initWidget(panel);
 
-		System.out.println("StepDisplayListGwt.StepDisplayListGwt()");
 		addNewLabel.getElement().getStyle().setCursor(Cursor.POINTER);
+		listLabel.getElement().getStyle().setCursor(Cursor.POINTER);
+	}
 
+	private void selectStepList(Widget showBy) {
+		Configuration configuration = controller.getConfiguration();
+		if (configuration != null) {
+			List<ConfigurationStepList> stepLists = configuration.getStepLists();
+			if (stepLists != null && stepLists.size() > 0) {
+
+				final PopupPanel popup = new PopupPanel();
+				popup.setAnimationEnabled(false);
+				popup.setAutoHideEnabled(true);
+				VerticalPanel w = new VerticalPanel();
+				popup.setWidget(w);
+
+				for (final ConfigurationStepList stepList : stepLists) {
+					final Label listentry = new Label(stepList.getName());
+					listentry.getElement().getStyle().setCursor(Cursor.POINTER);
+
+					w.add(listentry);
+					listentry.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							launchList(stepList);
+							popup.hide();
+						}
+					});
+
+				}
+				popup.showRelativeTo(showBy);
+			}
+		}
 	}
 
 	protected void launchList(ConfigurationStepList stepList) {

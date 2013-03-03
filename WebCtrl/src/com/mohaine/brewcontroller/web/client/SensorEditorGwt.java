@@ -209,7 +209,7 @@ public class SensorEditorGwt extends Composite implements HasValue<TempSensor> {
 			List<Tank> tanks = configuration.getBrewLayout().getTanks();
 
 			locationCombo = new ListBox();
-			locationCombo.addItem(null);
+			locationCombo.addItem("");
 			int index = 1;
 			for (Tank tank : tanks) {
 

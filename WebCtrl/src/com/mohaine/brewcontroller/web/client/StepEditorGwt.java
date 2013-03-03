@@ -19,15 +19,27 @@
 package com.mohaine.brewcontroller.web.client;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DecoratedPopupPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.Converter;
@@ -43,8 +55,6 @@ import com.mohaine.brewcontroller.client.event.StepModifyEventHandler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 
 public class StepEditorGwt extends Composite {
-
-	private static final int HEIGHT = 20;
 
 	private ClickEditorGwt<String> nameValue = new ClickEditorGwt<String>(new Converter<String, String>() {
 
@@ -75,7 +85,12 @@ public class StepEditorGwt extends Composite {
 		public Integer convertTo(String value) {
 			return tp.parse(value);
 		}
-	});
+	}) {
+		@Override
+		protected void styleEditor(TextBox editField) {
+			editField.setWidth("3em");
+		}
+	};
 
 	private ControlStep heaterStep;
 
@@ -95,12 +110,12 @@ public class StepEditorGwt extends Composite {
 		HorizontalPanel mainPanel = new HorizontalPanel();
 
 		mainPanel.add(nameValue);
-		// nameValue.setPreferredSize(new Dimension(200, HEIGHT));
-		// nameValue.setMinimumSize(new Dimension(200, HEIGHT));
+
+		nameValue.getElement().getStyle().setProperty("minWidth", "10em");
 
 		mainPanel.add(timeValue);
-		// timeValue.setPreferredSize(new Dimension(70, HEIGHT));
-		// timeValue.setMinimumSize(new Dimension(70, HEIGHT));
+
+		timeValue.getElement().getStyle().setProperty("minWidth", "5em");
 
 		nameValue.addChangeHandler(new ChangeHandler() {
 			@Override
@@ -123,36 +138,35 @@ public class StepEditorGwt extends Composite {
 			}
 		});
 
-		FlowPanel controlPanel = new FlowPanel();
+		HorizontalPanel controlPanel = new HorizontalPanel();
+
 		mainPanel.add(controlPanel);
 
-		Label delete = new Label("X");
-		delete.addMouseDownHandler(new MouseDownHandler() {	
+		final Label delete = new Label("X");
+		delete.addMouseDownHandler(new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
-				deleteStep();
+				deleteStep(delete);
 			}
 		});
-		
-	
-		
+
 		delete.getElement().getStyle().setCursor(Cursor.POINTER);
 
-	
 		controlPanel.add(delete);
 		edit = new FlowPanel();
+		edit.getElement().getStyle().setMargin(2, Unit.PX);
 		edit.getElement().getStyle().setCursor(Cursor.POINTER);
-		edit.getElement().getStyle().setWidth(20, Unit.PX);
-		edit.getElement().getStyle().setHeight(20, Unit.PX);
+		edit.getElement().getStyle().setWidth(12, Unit.PX);
+		edit.getElement().getStyle().setHeight(12, Unit.PX);
 		edit.getElement().getStyle().setProperty("block", "inline");
 		edit.getElement().getStyle().setProperty("border", "1px solid black");
-		edit.addDomHandler(new MouseDownHandler() {	
+		edit.addDomHandler(new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event) {
 				selectStep();
 			}
-		},MouseDownEvent.getType());
-		
+		}, MouseDownEvent.getType());
+
 		controlPanel.add(edit);
 
 		initWidget(mainPanel);
@@ -227,24 +241,59 @@ public class StepEditorGwt extends Composite {
 		controller.setSelectedStep(heaterStep);
 	}
 
-	private void deleteStep() {
-		System.out.println("StepEditorGwt.deleteStep()");
-		// TODO
-		// if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this,
-		// "Delete step \"" + heaterStep.getName() + "\"?", "Confirm Delete",
-		// JOptionPane.OK_CANCEL_OPTION)) {
-		// List<ControlStep> steps = new
-		// ArrayList<ControlStep>(controller.getSteps());
-		//
-		// for (int i = 0; i < steps.size(); i++) {
-		// ControlStep s = steps.get(i);
-		// if (s.getId().equals(heaterStep.getId())) {
-		// steps.remove(i);
-		// break;
-		// }
-		// }
-		//
-		// controller.changeSteps(steps);
-		// }
+	private void deleteStep(Widget showBy) {
+
+		PopupPanel panel = confirmPanel("Confirm Delete", "Delete step \"" + heaterStep.getName() + "\"?", new Command() {
+			@Override
+			public void execute() {
+				List<ControlStep> steps = new ArrayList<ControlStep>(controller.getSteps());
+
+				for (int i = 0; i < steps.size(); i++) {
+					ControlStep s = steps.get(i);
+					if (s.getId().equals(heaterStep.getId())) {
+						steps.remove(i);
+						break;
+					}
+				}
+
+				controller.changeSteps(steps);
+			}
+		});
+		panel.showRelativeTo(showBy);
+
+	}
+
+	public static PopupPanel confirmPanel(final String title, final String content, final Command cmd) {
+		final DecoratedPopupPanel box = new DecoratedPopupPanel();
+		box.setModal(true);
+		box.setGlassEnabled(true);
+
+		final VerticalPanel panel = new VerticalPanel();
+
+		panel.add(new HTML(content));
+		final HorizontalPanel buttonPanel = new HorizontalPanel();
+		panel.add(buttonPanel);
+		panel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
+		if (cmd != null) {
+			final Button okButton = new Button("OK", new ClickHandler() {
+				@Override
+				public void onClick(final ClickEvent event) {
+					cmd.execute();
+					box.hide();
+				}
+			});
+			buttonPanel.add(okButton);
+		}
+
+		final Button buttonClose = new Button("Close", new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				box.hide();
+			}
+		});
+		buttonPanel.add(buttonClose);
+		box.add(panel);
+		return box;
 	}
 }

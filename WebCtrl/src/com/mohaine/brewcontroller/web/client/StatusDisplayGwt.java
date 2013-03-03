@@ -56,6 +56,15 @@ public class StatusDisplayGwt extends Composite {
 		}
 	});
 
+	private ToggleButton modeHeatOffButton = new ToggleButton("Heat Off", new ClickHandler() {
+
+		@Override
+		public void onClick(ClickEvent event) {
+			changeMode(Mode.HEAT_OFF);
+		}
+
+	});
+
 	private HasValue<String> modeHasValue = new AbstractHasValue<String>() {
 
 		@Override
@@ -69,6 +78,9 @@ public class StatusDisplayGwt extends Composite {
 			if (modeOnButton.getValue()) {
 				return Mode.ON.toString();
 			}
+			if (modeHeatOffButton.getValue()) {
+				return Mode.HEAT_OFF.toString();
+			}
 			return null;
 		}
 
@@ -77,6 +89,7 @@ public class StatusDisplayGwt extends Composite {
 			modeHoldButton.setValue(Mode.HOLD.equals(value));
 			modeOnButton.setValue(Mode.ON.equals(value));
 			modeOffButton.setValue(Mode.OFF.equals(value));
+			modeHeatOffButton.setValue(Mode.HEAT_OFF.equals(value));
 
 			if (fireEvents) {
 				fireEvent(new ChangeEvent());
@@ -117,6 +130,7 @@ public class StatusDisplayGwt extends Composite {
 		HorizontalPanel modePanel = new HorizontalPanel();
 		modePanel.add(modeOnButton);
 		modePanel.add(modeHoldButton);
+		modePanel.add(modeHeatOffButton);
 		modePanel.add(modeOffButton);
 		panel.add(modePanel);
 
@@ -234,16 +248,25 @@ public class StatusDisplayGwt extends Composite {
 				modeOffButton.setValue(true);
 				modeOnButton.setValue(false);
 				modeHoldButton.setValue(false);
+				modeHeatOffButton.setValue(false);
 				mode.setText("Off");
 			} else if (Mode.ON.equals(hardwareStatus.getMode())) {
 				modeOffButton.setValue(false);
 				modeOnButton.setValue(true);
 				modeHoldButton.setValue(false);
+				modeHeatOffButton.setValue(false);
 				mode.setText("On");
 			} else if (Mode.HOLD.equals(hardwareStatus.getMode())) {
 				modeOffButton.setValue(false);
 				modeOnButton.setValue(false);
 				modeHoldButton.setValue(true);
+				modeHeatOffButton.setValue(false);
+				mode.setText("Hold");
+			} else if (Mode.HEAT_OFF.equals(hardwareStatus.getMode())) {
+				modeOffButton.setValue(false);
+				modeOnButton.setValue(false);
+				modeHoldButton.setValue(false);
+				modeHeatOffButton.setValue(true);
 				mode.setText("Hold");
 			} else {
 				mode.setText("???????");

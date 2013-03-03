@@ -128,7 +128,6 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 
 	private void stopEditing() {
 		if (editing) {
-			System.out.println("ClickEditorGwt.stopEditing()");
 			editing = false;
 			panel.clear();
 			panel.add(label);
@@ -142,6 +141,8 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 			panel.clear();
 			final Editor editor = new Editor();
 			panel.add(editor.editField);
+			
+			styleEditor(editor.editField);
 
 			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 				@Override
@@ -153,6 +154,10 @@ public class ClickEditorGwt<T> extends Composite implements HasValue<T> {
 
 		}
 
+	}
+
+	protected void styleEditor(TextBox editField) {
+		
 	}
 
 	private class Editor {

@@ -86,13 +86,9 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 	while (index < paramDataLength) {
 
 		if (paramData[index + nameLenght] == '=' && strncmp(name, paramData + index, nameLenght) == 0) {
-
 			index = index + nameLenght + 1;
-
 			int length = 0;
-
 			while (index < paramDataLength && paramData[index] != '\r' && paramData[index] != '\n') {
-
 				if (paramData[index] == '%' && index < paramDataLength + 2) {
 					index++;
 					unsigned int data;
@@ -519,6 +515,9 @@ void* handleClientThread(void *ptr) {
 	request->path[0] = 0;
 	request->contentLength = 0;
 
+
+
+
 	int bufferOffset = 0;
 
 	int headerLine = 0;
@@ -599,7 +598,7 @@ void* handleClientThread(void *ptr) {
 						response->contentLength = strlen(response->content);
 					} else {
 
-						for (int i = 0; i < request->contentLength; i++) {
+						for (int i = 0; i < BUFFER_SIZE; i++) {
 							request->content[i] = 0;
 						}
 
