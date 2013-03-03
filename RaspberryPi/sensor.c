@@ -122,6 +122,8 @@ void searchForTempSensors() {
 								sensor->lastReadMillis = -1;
 								sensorCount++;
 								valid = true;
+							} else {
+								free(addressStr);
 							}
 						}
 						fclose(f);
