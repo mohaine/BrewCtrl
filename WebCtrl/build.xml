@@ -1,0 +1,99 @@
+<project name="WebCtrl" default="" basedir=".">
+
+	<property file="${user.home}/home.properties" />
+	<property file="build.properties" />
+
+	<property environment="env" />
+
+	<property name="app.name" value="${ant.project.name}" />
+	<property name="app.version" value="1.0" />
+	<property name="build.home" value="build" />
+
+	<property name="web.home" value="${build.home}/web" />
+	<property name="jar.home" value="${build.home}/jar" />
+	<property name="brewctrl" value="../BrewCtrl" />
+
+
+	<path id="compile.classpath">
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${brewctrl}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="gwt.compile.classpath">
+		<path refid="compile.classpath" />
+		<fileset dir="${gwt.lib}">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="${jar.home}" />
+		<dirset dir="src" />
+		<dirset dir="${brewctrl}/src" />
+	</path>
+
+	<path id="run.classpath">
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="${build.home}/classes">
+		</dirset>
+	</path>
+
+
+	<target name="clean" description="Delete old build and dist directories">
+		<delete dir="${build.home}" />
+	</target>
+
+
+	<target name="gwt-compile" depends="">
+		<property name="gwt.compile.library" value="com.mohaine.brewcontroller.web.WebCtrl" />
+		<mkdir dir="${jar.home}" />
+		<mkdir dir="${web.home}" />
+
+
+		<javac srcdir="src;${brewctrl}/src" destdir="${jar.home}" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}" target="1.5">
+			<classpath refid="gwt.compile.classpath" />
+			<exclude name="**/**_UT.java" />
+		</javac>
+
+		<echo>Gwt Compile Module: ${gwt.compile.library}</echo>
+
+		<gwtCompile module="${gwt.compile.library}" output="${web.home}" />
+
+		<copy todir="${web.home}">
+			<fileset dir="war">
+				<include name="**/*" />
+				<exclude name="**/webctrl*/**" />
+				<exclude name="**/core.*.dmp" />
+				<exclude name="/WEB-INF/deploy/**" />
+				<exclude name="/WEB-INF/classes/**" />
+				<exclude name="/WEB-INF/lib/*.zip" />
+				<exclude name="**/gwt-servlet.jar" />
+			</fileset>
+		</copy>
+
+	</target>
+
+
+	<macrodef name="gwtCompile">
+		<attribute name="module" />
+		<attribute name="classpathref" default="gwt.compile.classpath" />
+		<attribute name="output" />
+		<sequential>
+			<java classpathref="@{classpathref}" classname="com.google.gwt.dev.Compiler" fork="true" failonerror="true">
+				<arg value="-war" />
+				<arg value="@{output}" />
+				<arg value="@{module}" />
+				<arg value="-localWorkers" />
+				<arg value="3" />
+				<jvmarg value="-Xmx1024m" />
+				<jvmarg value="-Xss4024k" />
+			</java>
+		</sequential>
+	</macrodef>
+
+
+
+</project>
