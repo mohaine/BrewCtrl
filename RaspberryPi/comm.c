@@ -19,7 +19,7 @@
 #define ONE_WIRE_PIN 4
 #define DEFAULT_PORT 2739
 
-#define BUFFER_SIZE 1024*20
+#define BUFFER_SIZE 1024*512
 #define PATH_SIZE 1024
 #define METHOD_SIZE 10
 #define STATUS_SIZE 30
@@ -70,6 +70,99 @@ typedef struct {
 } HttpService;
 
 HttpService services[SERVICES_COUNT];
+
+int checkSuffix(const char *str, const char *suffix) {
+	if (!str || !suffix)
+		return 0;
+	size_t lenstr = strlen(str);
+	size_t lensuffix = strlen(suffix);
+	if (lensuffix > lenstr)
+		return 0;
+	return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
+}
+
+void handleOtherRequest(Request * request, Response * response) {
+	DBG("Request Path: '%s'\n", request->path);
+
+	char fileName[PATH_SIZE];
+	int length = strlen(request->path);
+
+	if (length > PATH_SIZE) {
+		length = PATH_MAX;
+	}
+	int offset = 0;
+	fileName[offset++] = 'w';
+	fileName[offset++] = 'e';
+	fileName[offset++] = 'b';
+	fileName[offset++] = '/';
+
+	if (length == 1) {
+		fileName[offset++] = 'W';
+		fileName[offset++] = 'e';
+		fileName[offset++] = 'b';
+		fileName[offset++] = 'C';
+		fileName[offset++] = 't';
+		fileName[offset++] = 'r';
+		fileName[offset++] = 'l';
+		fileName[offset++] = '.';
+		fileName[offset++] = 'h';
+		fileName[offset++] = 't';
+		fileName[offset++] = 'm';
+		fileName[offset++] = 'l';
+	} else {
+		for (int i = 1; i < length; i++) {
+			char charAt = request->path[i];
+			fileName[offset++] = charAt;
+			//TODO CLEAN
+		}
+	}
+	fileName[offset] = 0;
+
+	DBG("Map to File %s\n", fileName);
+
+	struct stat st;
+	if (stat(fileName, &st) >= 0) {
+		DBG("Send File %s\n", fileName);
+
+		ssize_t s = st.st_size;
+		if (s > BUFFER_SIZE) {
+			s = BUFFER_SIZE;
+		}
+		FILE* f = fopen(fileName, "rb");
+		if (f) {
+			int readSize = fread(response->content, 1, s, f);
+			if (readSize == s) {
+
+				if (checkSuffix(fileName, ".html")) {
+					sprintf(response->contentType, "text/html");
+				} else if (checkSuffix(fileName, ".js")) {
+					sprintf(response->contentType, "text/javascript");
+				} else if (checkSuffix(fileName, ".css")) {
+					sprintf(response->contentType, "text/css");
+				} else if (checkSuffix(fileName, ".gif")) {
+					sprintf(response->contentType, "image/gif");
+				} else if (checkSuffix(fileName, ".png")) {
+					sprintf(response->contentType, "image/png");
+				} else if (checkSuffix(fileName, ".ico")) {
+					sprintf(response->contentType, "image/icon");
+				} else {
+					DBG("Unhandled file type %s\n", fileName);
+
+				}
+				response->contentLength = s;
+			}
+			fclose(f);
+		}
+
+	} else {
+		DBG("404 File %s\n", fileName);
+
+		sprintf(response->status, "Not Found");
+		response->statusCode = 404;
+		sprintf(response->content, "Not Found");
+		response->contentLength = strlen(response->content);
+	}
+}
 
 void handleVersionRequest(Request * request, Response * response) {
 	sprintf(response->contentType, "text/json");
@@ -129,22 +222,19 @@ void handleConfigRequest(Request * request, Response * response) {
 		char * buffer = malloc(request->contentLength + 1);
 		int paramSize = readParam("configuration", request->content, request->contentLength, buffer);
 		if (paramSize > 0) {
-
 			Configuration * cfg = parseJsonConfiguration(buffer);
-
 			if (cfg != NULL) {
-
 				if (cfg->version != NULL) {
 					free(cfg->version);
 				}
 				cfg->version = generateRandomId();
-
 				turnOff();
 				setConfiguration(cfg);
 				writeConfiguration(cfg);
 			}
 
 		} else {
+			DBG("400 for handleConfigRequest\n");
 			response->statusCode = 400;
 			sprintf(response->status, "Bad Request");
 			sprintf(response->content, "Bad Request");
@@ -175,6 +265,9 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 		sprintf(cs->id, "%s", json_object_get_string(value));
 	} else {
+
+		DBG("Invalid Step: No Id\n");
+
 		valid = false;
 	}
 
@@ -182,6 +275,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 		sprintf(cs->name, "%s", json_object_get_string(value));
 	} else {
+		DBG("Invalid Step: No Name\n");
 		valid = false;
 	}
 
@@ -189,6 +283,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
 		cs->stepTime = json_object_get_int(value);
 	} else {
+		DBG("Invalid Step: No Step Time\n");
 		valid = false;
 	}
 
@@ -217,58 +312,66 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				ControlPoint *cp = &cs->controlPoints[cpI];
 
 				value = json_object_object_get(controlPoint, "controlPin");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->controlPin = json_object_get_int(value);
 				} else {
+					DBG("Invalid Control Point: No controlPin\n");
 					valid = false;
 					break;
 				}
 
 				value = json_object_object_get(controlPoint, "duty");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->duty = json_object_get_int(value);
 				} else {
+					DBG("Invalid Control Point: No duty\n");
 					valid = false;
 					break;
 				}
 
 				value = json_object_object_get(controlPoint, "fullOnAmps");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->fullOnAmps = json_object_get_int(value);
 				} else {
+					DBG("Invalid Control Point: No fullOnAmps\n");
 					valid = false;
 					break;
 				}
 
 				value = json_object_object_get(controlPoint, "tempSensorAddress");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+				if (value != NULL && json_object_get_type(value) == json_type_string) {
 					sprintf(cp->tempSensorAddressPtr, "%s", json_object_get_string(value));
 				} else {
+					DBG("Invalid Control Point: No tempSensorAddress\n");
 					valid = false;
 					break;
 				}
 
 				value = json_object_object_get(controlPoint, "targetTemp");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_double) {
+				if (value != NULL && json_object_get_type(value) == json_type_double) {
 					cp->targetTemp = json_object_get_double(value);
-
+				} else if (value != NULL && json_object_get_type(value) == json_type_int) {
+					cp->targetTemp = json_object_get_int(value);
 				} else {
+					DBG("Invalid Control Point: No targetTemp\n");
 					valid = false;
 					break;
 				}
 
 				value = json_object_object_get(controlPoint, "hasDuty");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
+				if (value != NULL && json_object_get_type(value) == json_type_boolean) {
 					cp->hasDuty = json_object_get_boolean(value);
 				} else {
+					DBG("Invalid Control Point: No hasDuty\n");
 					valid = false;
 					break;
 				}
 
 				value = json_object_object_get(controlPoint, "automaticControl");
-				if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
+				if (value != NULL && json_object_get_type(value) == json_type_boolean) {
 					cp->automaticControl = json_object_get_boolean(value);
 				} else {
+					DBG("Invalid Control Point: No automaticControl\n");
 					valid = false;
 					break;
 				}
@@ -292,6 +395,7 @@ void handleStatusRequest(Request * request, Response * response) {
 
 		int paramSize = readParam("mode", request->content, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
+			DBG("handleStatusRequest: mode\n");
 			if (strcmp(tmp, "OFF") == 0) {
 				getControl()->mode = MODE_OFF;
 				turnOff();
@@ -307,9 +411,10 @@ void handleStatusRequest(Request * request, Response * response) {
 			}
 		}
 		paramSize = readParam("steps", request->content, request->contentLength, tmp);
+
 		if (valid && paramSize > 0) {
 
-			printf("Change steps\n");
+			DBG("handleStatusRequest: steps\n");
 
 			json_object *steps = json_tokener_parse(tmp);
 
@@ -334,6 +439,8 @@ void handleStatusRequest(Request * request, Response * response) {
 							ControlPoint *cp = &cs->controlPoints[cpI];
 							cp->initComplete = false;
 						}
+					} else {
+						DBG("Invalid Step\n");
 					}
 				}
 				if (valid) {
@@ -348,8 +455,12 @@ void handleStatusRequest(Request * request, Response * response) {
 				json_object_put(steps);
 			}
 		}
+
 		paramSize = readParam("modifySteps", request->content, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
+
+			DBG("handleStatusRequest: modifySteps\n");
+
 			json_object *steps = json_tokener_parse(tmp);
 
 			if (steps == NULL || json_object_get_type(steps) != json_type_array) {
@@ -383,6 +494,7 @@ void handleStatusRequest(Request * request, Response * response) {
 			}
 		}
 		if (!valid) {
+			DBG("400 for handleStatusRequest\n");
 			response->statusCode = 400;
 			sprintf(response->status, "Bad Request");
 			sprintf(response->content, "Bad Request");
@@ -502,7 +614,7 @@ void sendHttpResponse(int clntSocket, Response *response) {
 	free(buffer);
 }
 
-void* handleClientThread(void *ptr) {
+void handleClientThread(void *ptr) {
 
 	HandleClientParmas * params = (HandleClientParmas *) ptr;
 	int clntSocket = params->clntSocket;
@@ -514,9 +626,6 @@ void* handleClientThread(void *ptr) {
 	request->method[0] = 0;
 	request->path[0] = 0;
 	request->contentLength = 0;
-
-
-
 
 	int bufferOffset = 0;
 
@@ -592,6 +701,7 @@ void* handleClientThread(void *ptr) {
 
 					if (request->contentLength > BUFFER_SIZE) {
 						handled = true;
+						DBG("400 for Post Size %d\n",request->contentLength);
 						response->statusCode = 400;
 						sprintf(response->status, "Bad Request");
 						sprintf(response->content, "Bad Request");
@@ -611,6 +721,9 @@ void* handleClientThread(void *ptr) {
 						if (readSize == 0) {
 							break;
 						}
+						request->content[readSize + 1] = 0;
+						DBG("Data: %s\n",request->content);
+
 					}
 
 				}
@@ -626,10 +739,7 @@ void* handleClientThread(void *ptr) {
 				}
 
 				if (!handled) {
-					sprintf(response->status, "Not Found");
-					response->statusCode = 404;
-					sprintf(response->content, "Not Found");
-					response->contentLength = strlen(response->content);
+					handleOtherRequest(request, response);
 				}
 				sendHttpResponse(clntSocket, response);
 
@@ -655,10 +765,10 @@ void* handleClientThread(void *ptr) {
 	free(response);
 	free(buffer);
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
-void* listenThread(void *ptr) {
+void listenThread(void *ptr) {
 
 	int sock;
 	int setSockOp = 1;
@@ -669,12 +779,12 @@ void* listenThread(void *ptr) {
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		perror("Socket");
-		return NULL;
+		pthread_exit(NULL);
 	}
 
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &setSockOp, sizeof(int)) == -1) {
 		perror("Setsockopt");
-		return NULL;
+		pthread_exit(NULL);
 	}
 
 	server_addr.sin_family = AF_INET;
@@ -684,12 +794,12 @@ void* listenThread(void *ptr) {
 
 	if (bind(sock, (struct sockaddr *) &server_addr, sizeof(struct sockaddr)) == -1) {
 		perror("Unable to bind");
-		return NULL;
+		pthread_exit(NULL);
 	}
 
 	if (listen(sock, 5) == -1) {
 		perror("Listen");
-		return NULL;
+		pthread_exit(NULL);
 	}
 
 	printf("Waiting for client on port %d\n", DEFAULT_PORT);
@@ -706,7 +816,7 @@ void* listenThread(void *ptr) {
 		pthread_create(&thread, NULL, handleClientThread, (void*) params);
 	}
 
-	return NULL;
+	pthread_exit(NULL);
 }
 void startComm() {
 	setupComm();
