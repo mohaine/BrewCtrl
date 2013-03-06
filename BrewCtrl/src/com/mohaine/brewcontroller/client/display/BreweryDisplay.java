@@ -246,14 +246,14 @@ public class BreweryDisplay {
 				BreweryComponentDisplay tankBcd = createBcd(tank, 200, 200);
 
 				if (tank.getHeater() != null) {
-					BreweryComponentDisplay bcd = createBcd(tank.getHeater(), 98, 30);
+					BreweryComponentDisplay bcd = createBcd(tank.getHeater(), 97, 30);
 					bcd.setTop(25);
 					bcd.setLeft(102);
 					bcd.setParent(tankBcd);
 				}
 
 				if (tank.getSensor() != null) {
-					BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 98, 60);
+					BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 97, 60);
 					bcd.setTop(25);
 					bcd.setLeft(2);
 					bcd.setParent(tankBcd);
