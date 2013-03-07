@@ -25,7 +25,7 @@ case "$1" in
     killall brewctrl
     ;;
   *)
-    echo "Usage: /etc/init.d/noip {start|stop}"
+    echo "Usage: brewctrl {start|stop}"
     exit 1
     ;;
 esac
