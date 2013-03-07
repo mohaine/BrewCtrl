@@ -112,7 +112,6 @@ void handleOtherRequest(Request * request, Response * response) {
 	} else {
 
 		bool hasNonePath = false;
-		bool lastWasDot = false;
 
 		for (int i = 0; i < length; i++) {
 			char charAt = request->path[i];
@@ -123,7 +122,7 @@ void handleOtherRequest(Request * request, Response * response) {
 					hasNonePath = true;
 				}
 			}
-			if (i > 0 && request->path[i - 1] == '.' && charAt == '.') {
+			if (i > 0 && charAt == '.' && request->path[i - 1] == '.') {
 				continue;
 			}
 			fileName[offset++] = charAt;
