@@ -52,7 +52,7 @@ typedef struct {
 	char method[METHOD_SIZE];
 	char path[PATH_SIZE];
 	int contentLength;
-	char content[BUFFER_SIZE];
+	char * contentp;
 } Request;
 
 typedef struct {
@@ -61,7 +61,7 @@ typedef struct {
 	char status[STATUS_SIZE];
 	char contentType[CONTENT_TYPE_SIZE];
 	int contentLength;
-	char content[BUFFER_SIZE];
+	char * contentp;
 } Response;
 
 typedef struct {
@@ -110,10 +110,23 @@ void handleOtherRequest(Request * request, Response * response) {
 		fileName[offset++] = 'm';
 		fileName[offset++] = 'l';
 	} else {
-		for (int i = 1; i < length; i++) {
+
+		bool hasNonePath = false;
+		bool lastWasDot = false;
+
+		for (int i = 0; i < length; i++) {
 			char charAt = request->path[i];
+			if (!hasNonePath) {
+				if (charAt == '/' || charAt == '.') {
+					continue;
+				} else {
+					hasNonePath = true;
+				}
+			}
+			if (i > 0 && request->path[i - 1] == '.' && charAt == '.') {
+				continue;
+			}
 			fileName[offset++] = charAt;
-			//TODO CLEAN
 		}
 	}
 	fileName[offset] = 0;
@@ -125,12 +138,16 @@ void handleOtherRequest(Request * request, Response * response) {
 		DBG("Send File %s\n", fileName);
 
 		ssize_t s = st.st_size;
-		if (s > BUFFER_SIZE) {
-			s = BUFFER_SIZE;
+
+		response->contentp = malloc(s);
+		if (response->contentp == NULL) {
+			ERR("Failed to malloc %d\n", s);
+			exit(1);
 		}
+
 		FILE* f = fopen(fileName, "rb");
 		if (f) {
-			int readSize = fread(response->content, 1, s, f);
+			int readSize = fread(response->contentp, 1, s, f);
 			if (readSize == s) {
 
 				if (checkSuffix(fileName, ".html")) {
@@ -157,17 +174,30 @@ void handleOtherRequest(Request * request, Response * response) {
 	} else {
 		DBG("404 File %s\n", fileName);
 
+		response->contentp = malloc(100);
+		if (response->contentp == NULL) {
+			ERR("Failed to malloc\n");
+			exit(1);
+		}
+
 		sprintf(response->status, "Not Found");
 		response->statusCode = 404;
-		sprintf(response->content, "Not Found");
-		response->contentLength = strlen(response->content);
+		sprintf(response->contentp, "Not Found");
+		response->contentLength = strlen(response->contentp);
 	}
 }
 
 void handleVersionRequest(Request * request, Response * response) {
 	sprintf(response->contentType, "text/json");
-	sprintf(response->content, "{\"version\":\"1.0\"}\r\n");
-	response->contentLength = strlen(response->content);
+
+	response->contentp = malloc(100);
+	if (response->contentp == NULL) {
+		ERR("Failed to malloc\n");
+		exit(1);
+	}
+
+	sprintf(response->contentp, "{\"version\":\"1.0\"}\r\n");
+	response->contentLength = strlen(response->contentp);
 }
 
 int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
@@ -220,7 +250,7 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 void handleConfigRequest(Request * request, Response * response) {
 	if (request->contentLength > 0) {
 		char * buffer = malloc(request->contentLength + 1);
-		int paramSize = readParam("configuration", request->content, request->contentLength, buffer);
+		int paramSize = readParam("configuration", request->contentp, request->contentLength, buffer);
 		if (paramSize > 0) {
 			Configuration * cfg = parseJsonConfiguration(buffer);
 			if (cfg != NULL) {
@@ -237,7 +267,14 @@ void handleConfigRequest(Request * request, Response * response) {
 			DBG("400 for handleConfigRequest\n");
 			response->statusCode = 400;
 			sprintf(response->status, "Bad Request");
-			sprintf(response->content, "Bad Request");
+
+			response->contentp = malloc(100);
+			if (response->contentp == NULL) {
+				ERR("Failed to malloc\n");
+				exit(1);
+			}
+
+			sprintf(response->contentp, "Bad Request");
 			return;
 		}
 		free(buffer);
@@ -246,9 +283,16 @@ void handleConfigRequest(Request * request, Response * response) {
 	Configuration* configuration = getConfiguration();
 	if (configuration != NULL) {
 		char * json = formatJsonConfiguration(configuration);
+		int jsonLength = strlen(json);
+		response->contentp = malloc(jsonLength + 1);
+		if (response->contentp == NULL) {
+			ERR("Failed to malloc\n");
+			exit(1);
+		}
+
 		sprintf(response->contentType, "text/json");
-		sprintf(response->content, "%s", json);
-		response->contentLength = strlen(response->content);
+		sprintf(response->contentp, "%s", json);
+		response->contentLength = jsonLength;
 		free(json);
 	} else {
 		sprintf(response->contentType, "text/json");
@@ -393,7 +437,7 @@ void handleStatusRequest(Request * request, Response * response) {
 
 		bool valid = true;
 
-		int paramSize = readParam("mode", request->content, request->contentLength, tmp);
+		int paramSize = readParam("mode", request->contentp, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
 			DBG("handleStatusRequest: mode\n");
 			if (strcmp(tmp, "OFF") == 0) {
@@ -410,7 +454,7 @@ void handleStatusRequest(Request * request, Response * response) {
 				valid = false;
 			}
 		}
-		paramSize = readParam("steps", request->content, request->contentLength, tmp);
+		paramSize = readParam("steps", request->contentp, request->contentLength, tmp);
 
 		if (valid && paramSize > 0) {
 
@@ -456,7 +500,7 @@ void handleStatusRequest(Request * request, Response * response) {
 			}
 		}
 
-		paramSize = readParam("modifySteps", request->content, request->contentLength, tmp);
+		paramSize = readParam("modifySteps", request->contentp, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
 
 			DBG("handleStatusRequest: modifySteps\n");
@@ -497,7 +541,14 @@ void handleStatusRequest(Request * request, Response * response) {
 			DBG("400 for handleStatusRequest\n");
 			response->statusCode = 400;
 			sprintf(response->status, "Bad Request");
-			sprintf(response->content, "Bad Request");
+
+			response->contentp = malloc(100);
+			if (response->contentp == NULL) {
+				ERR("Failed to malloc\n");
+				exit(1);
+			}
+
+			sprintf(response->contentp, "Bad Request");
 			return;
 		}
 	}
@@ -572,10 +623,18 @@ void handleStatusRequest(Request * request, Response * response) {
 		json_object_object_add(sensor, "reading", json_object_new_boolean(hasVaildTemp(ts)));
 	}
 
-	sprintf(response->content, "%s", json_object_get_string(status));
-	json_object_put(status);
+	const char * json = json_object_get_string(status);
+	int jsonLength = strlen(json);
 
-	response->contentLength = strlen(response->content);
+	response->contentp = malloc(jsonLength + 1);
+	if (response->contentp == NULL) {
+		ERR("Failed to malloc\n");
+		exit(1);
+	}
+
+	sprintf(response->contentp, "%s", json);
+	json_object_put(status);
+	response->contentLength = jsonLength;
 
 }
 
@@ -602,19 +661,33 @@ typedef struct {
 	int clntSocket;
 } HandleClientParmas;
 
+int sendBuffer(int clntSocket, char *data, int length) {
+	int sent = 0;
+	while (sent < length) {
+		int sendSize = send(clntSocket, data + sent, length - sent, MSG_NOSIGNAL);
+		if (sendSize < 0) {
+			return 0;
+		} else if (sendSize > 0) {
+			sent += sendSize;
+		}
+	}
+	return 1;
+}
+
 void sendHttpResponse(int clntSocket, Response *response) {
 	char * buffer = malloc(BUFFER_SIZE);
 
 	sprintf(buffer, "%s %d %s\r\nContent-Length: %d\r\nContent-Type: %s\r\n\r\n", response->method, response->statusCode, response->status, response->contentLength, response->contentType);
-	send(clntSocket, buffer, strlen(buffer), MSG_NOSIGNAL | MSG_DONTWAIT);
-	send(clntSocket, response->content, response->contentLength, MSG_NOSIGNAL | MSG_DONTWAIT);
 
-//	write(stdout, response->content, response->contentLength);
+	int success = send(clntSocket, buffer, strlen(buffer), MSG_NOSIGNAL | MSG_DONTWAIT);
+	if (success != 0 && response->contentp != NULL && response->contentLength > 0) {
+		sendBuffer(clntSocket, response->contentp, response->contentLength);
+	}
 
 	free(buffer);
 }
 
-void handleClientThread(void *ptr) {
+void * handleClientThread(void *ptr) {
 
 	HandleClientParmas * params = (HandleClientParmas *) ptr;
 	int clntSocket = params->clntSocket;
@@ -626,6 +699,10 @@ void handleClientThread(void *ptr) {
 	request->method[0] = 0;
 	request->path[0] = 0;
 	request->contentLength = 0;
+	request->contentp = NULL;
+
+	response->contentLength = 0;
+	response->contentp = NULL;
 
 	int bufferOffset = 0;
 
@@ -704,36 +781,46 @@ void handleClientThread(void *ptr) {
 						DBG("400 for Post Size %d\n",request->contentLength);
 						response->statusCode = 400;
 						sprintf(response->status, "Bad Request");
-						sprintf(response->content, "Bad Request");
-						response->contentLength = strlen(response->content);
+
+						response->contentp = malloc(100);
+						if (response->contentp == NULL) {
+							ERR("Failed to malloc\n");
+							exit(1);
+						}
+
+						sprintf(response->contentp, "Bad Request");
+						response->contentLength = strlen(response->contentp);
 					} else {
 
-						for (int i = 0; i < BUFFER_SIZE; i++) {
-							request->content[i] = 0;
+						DBG("Post size: %d\n",request->contentLength);
+
+						request->contentp = malloc(request->contentLength + 1);
+						if (request->contentp == NULL) {
+							ERR("Failed to malloc\n");
+							exit(1);
 						}
 
 						DBG("Read: %d \n",request->contentLength);
 
-						readSize = recv(clntSocket, request->content, request->contentLength, MSG_WAITALL);
+						readSize = recv(clntSocket, request->contentp, request->contentLength, MSG_WAITALL);
 
 						DBG("Actual Read: %d\n",readSize);
 
 						if (readSize == 0) {
 							break;
 						}
-						request->content[readSize + 1] = 0;
-						DBG("Data: %s\n",request->content);
+						request->contentp[readSize + 1] = 0;
+						DBG("Data: %s\n",request->contentp);
 
 					}
 
 				}
 
 				if (!handled) {
-					for (int i = 0; i < SERVICES_COUNT; i++) {
+					for (int i = 0; !handled && i < SERVICES_COUNT; i++) {
 						if (strcmp(request->path, services[i].path) == 0) {
 							services[i].handleRequest(request, response);
 							handled = true;
-							break;
 						}
 					}
 				}
@@ -742,6 +829,17 @@ void handleClientThread(void *ptr) {
 					handleOtherRequest(request, response);
 				}
 				sendHttpResponse(clntSocket, response);
+
+				//DBG("Complete Request %s %d size: %d content-type: %s\n",request->path , response->statusCode, response->contentLength,response->contentType);
+
+				if (request->contentp != NULL) {
+					free(request->contentp);
+					request->contentp = NULL;
+				}
+				if (response->contentp != NULL) {
+					free(response->contentp);
+					response->contentp = NULL;
+				}
 
 				headerLine = 0;
 				bufferOffset = 0;
@@ -761,14 +859,23 @@ void handleClientThread(void *ptr) {
 
 	close(clntSocket);
 	fflush(stdout);
+
+	if (request->contentp != NULL) {
+		free(request->contentp);
+	}
+	if (response->contentp != NULL) {
+		free(response->contentp);
+	}
+
 	free(request);
 	free(response);
 	free(buffer);
 
 	pthread_exit(NULL);
+	return NULL;
 }
 
-void listenThread(void *ptr) {
+void * listenThread(void *ptr) {
 
 	int sock;
 	int setSockOp = 1;
@@ -780,11 +887,13 @@ void listenThread(void *ptr) {
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		perror("Socket");
 		pthread_exit(NULL);
+		return NULL;
 	}
 
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &setSockOp, sizeof(int)) == -1) {
 		perror("Setsockopt");
 		pthread_exit(NULL);
+		return NULL;
 	}
 
 	server_addr.sin_family = AF_INET;
@@ -817,6 +926,8 @@ void listenThread(void *ptr) {
 	}
 
 	pthread_exit(NULL);
+	return NULL;
+
 }
 void startComm() {
 	setupComm();
