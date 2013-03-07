@@ -18,7 +18,7 @@ case "$1" in
     echo "Starting brewctrl"
     # run application you want to start
     cd /opt/BrewCtrl/RaspberryPi/
-    ./brewctrl
+    ./brewctrl &
     ;;
   stop)
     echo "Stopping brewctrl"
