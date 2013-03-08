@@ -50,9 +50,14 @@ void readSensors() {
 		if (f) {
 			int readSize = fread(data, 1, sizeof(data), f);
 			if (readSize > 0) {
+
+				DBG("readSize: %d\n",readSize);
+
 				data[sizeof(data) - 1] = 0;
 
 				if (memcmp(BAD_READ, data, sizeof(BAD_READ) - 1) != 0) {
+
+
 					char* crcIndex = strstr(data, "crc=");
 					if (crcIndex > 0) {
 
@@ -61,6 +66,9 @@ void readSensors() {
 							// Have a valid read. Get the value
 
 							char* tIndex = strstr(crcIndex, "t=");
+
+							DBG("tIndex: %d\n",tIndex);
+
 							if (tIndex > 0) {
 								tIndex += 2;
 								tIndex[10] = 0;

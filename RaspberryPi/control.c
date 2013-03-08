@@ -291,8 +291,8 @@ void updateStepTimer() {
 					step->controlPointCount++;
 				}
 			}
-			stepCount = 1;
 		}
+		stepCount = 1;
 
 	}
 	unlockSteps();
