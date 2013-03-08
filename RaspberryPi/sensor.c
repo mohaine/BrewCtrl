@@ -48,15 +48,12 @@ void readSensors() {
 		FILE* f = fopen(tmp, "rb");
 
 		if (f) {
-			int readSize = fread(data, 1, sizeof(data), f);
-			if (readSize > 0) {
+			int readSize = fread(data, 1, sizeof(data - 1), f);
+			if (readSize > 20) {
 
-				DBG("readSize: %d\n",readSize);
-
-				data[sizeof(data) - 1] = 0;
+				data[readSize] = 0;
 
 				if (memcmp(BAD_READ, data, sizeof(BAD_READ) - 1) != 0) {
-
 
 					char* crcIndex = strstr(data, "crc=");
 					if (crcIndex > 0) {
@@ -67,7 +64,7 @@ void readSensors() {
 
 							char* tIndex = strstr(crcIndex, "t=");
 
-							DBG("tIndex: %d\n",tIndex);
+							DBG("tIndex: %d %d\n",tIndex,(tIndex - data));
 
 							if (tIndex > 0) {
 								tIndex += 2;
