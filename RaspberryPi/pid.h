@@ -30,7 +30,7 @@ typedef struct {
 	double minOutput;
 	double previousError;
 	double integral;
-	unsigned long second;
+	//unsigned long second;
 	byte output;
 	byte updateInt;
 } Pid;

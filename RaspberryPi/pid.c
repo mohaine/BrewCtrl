@@ -26,7 +26,7 @@ void setupPid(Pid * da) {
 	da->Kp = 78.2577;
 	da->Kd = 269.7192;
 	da->Ki = 0.9532;
-	da->updateInt = 1;
+	//da->updateInt = 1;
 
 	da->minOutput = 0;
 	da->maxOutput = 100;
@@ -40,32 +40,33 @@ void setMaxDuty(Pid * da, int maxDuty) {
 
 int getDutyFromAdjuster(Pid * pid, double targetTemp, double currentTemp) {
 
-	if (pid->second % pid->updateInt == 0) {
+//	if (pid->second % pid->updateInt == 0) {
 
-		float dt = pid->updateInt;
+//		float dt = pid->updateInt;
+	float dt = 1;
 
-		float error = targetTemp - currentTemp;
-		pid->integral = pid->integral + (error * dt * pid->Ki);
+	float error = targetTemp - currentTemp;
+	pid->integral = pid->integral + (error * dt * pid->Ki);
 
-		if (pid->integral > pid->maxOutput) {
-			pid->integral = pid->maxOutput;
-		} else if (pid->integral < pid->minOutput) {
-			pid->integral = pid->minOutput;
-		}
-
-		float derivative = (error - pid->previousError) / dt;
-		float newOutput = (pid->Kp * error) + (pid->integral) + (pid->Kd * derivative);
-		pid->previousError = error;
-
-		if (newOutput >= pid->maxOutput) {
-			newOutput = pid->maxOutput;
-		} else if (newOutput <= pid->minOutput) {
-			newOutput = pid->minOutput;
-		}
-		pid->output = (int) newOutput;
+	if (pid->integral > pid->maxOutput) {
+		pid->integral = pid->maxOutput;
+	} else if (pid->integral < pid->minOutput) {
+		pid->integral = pid->minOutput;
 	}
 
-	pid->second++;
+	float derivative = (error - pid->previousError) / dt;
+	float newOutput = (pid->Kp * error) + (pid->integral) + (pid->Kd * derivative);
+	pid->previousError = error;
+
+	if (newOutput >= pid->maxOutput) {
+		newOutput = pid->maxOutput;
+	} else if (newOutput <= pid->minOutput) {
+		newOutput = pid->minOutput;
+	}
+	pid->output = (int) newOutput;
+//	}
+
+//	pid->second++;
 	return pid->output;
 
 }
