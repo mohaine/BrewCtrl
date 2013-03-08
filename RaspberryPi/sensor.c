@@ -45,13 +45,14 @@ void readSensors() {
 	for (int sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
 		TempSensor *sensor = &sensors[sensorIndex];
 		sprintf(tmp, "%s/%s", sensor->sysfile, "w1_slave");
-		FILE* f = fopen(tmp, "rb");
+
+		FILE* f = fopen(tmp, "r");
 
 		if (f) {
-			int readSize = fread(data, 1, sizeof(data - 1), f);
-			if (readSize > 20) {
+			int readSize = fread(data, 1, sizeof(data) - 1, f);
 
-				data[readSize] = 0;
+			if (readSize > 20) {
+				data[readSize + 1] = 0;
 
 				if (memcmp(BAD_READ, data, sizeof(BAD_READ) - 1) != 0) {
 
@@ -63,9 +64,6 @@ void readSensors() {
 							// Have a valid read. Get the value
 
 							char* tIndex = strstr(crcIndex, "t=");
-
-							DBG("tIndex: %d %d\n",tIndex,(tIndex - data));
-
 							if (tIndex > 0) {
 								tIndex += 2;
 								tIndex[10] = 0;

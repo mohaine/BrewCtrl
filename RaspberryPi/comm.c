@@ -130,11 +130,11 @@ void handleOtherRequest(Request * request, Response * response) {
 	}
 	fileName[offset] = 0;
 
-	DBG("Map to File %s\n", fileName);
+//	DBG("Map to File %s\n", fileName);
 
 	struct stat st;
 	if (stat(fileName, &st) >= 0) {
-		DBG("Send File %s\n", fileName);
+//		DBG("Send File %s\n", fileName);
 
 		ssize_t s = st.st_size;
 
@@ -205,13 +205,13 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 
 	int index = 0;
 
-	while (index < paramDataLength) {
+	while (index + nameLenght < paramDataLength) {
 
 		if (paramData[index + nameLenght] == '=' && strncmp(name, paramData + index, nameLenght) == 0) {
 			index = index + nameLenght + 1;
 			int length = 0;
 			while (index < paramDataLength && paramData[index] != '\r' && paramData[index] != '\n') {
-				if (paramData[index] == '%' && index < paramDataLength + 2) {
+				if (paramData[index] == '%' && index < paramDataLength - 2) {
 					index++;
 					unsigned int data;
 					data = 0;
@@ -799,18 +799,10 @@ void * handleClientThread(void *ptr) {
 							exit(1);
 						}
 
-						DBG("Read: %d \n",request->contentLength);
-
 						readSize = recv(clntSocket, request->contentp, request->contentLength, MSG_WAITALL);
+						request->contentp[readSize] = 0;
 
-						DBG("Actual Read: %d\n",readSize);
-
-						if (readSize == 0) {
-							break;
-						}
-						request->contentp[readSize + 1] = 0;
-						DBG("Data: %s\n",request->contentp);
-
+						//DBG("Data: %s\n",request->contentp);
 					}
 
 				}
