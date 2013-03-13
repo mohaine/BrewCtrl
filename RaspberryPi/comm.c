@@ -792,7 +792,7 @@ void * handleClientThread(void *ptr) {
 						response->contentLength = strlen(response->contentp);
 					} else {
 
-						DBG("Post size: %d\n",request->contentLength);
+						//DBG("Post size: %d\n",request->contentLength);
 
 						request->contentp = malloc(request->contentLength + 1);
 						if (request->contentp == NULL) {

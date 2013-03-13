@@ -244,7 +244,7 @@ void addManualStep() {
 				setupControlPoint(cp);
 				step->controlPointCount++;
 			}
-		} 
+		}
 		stepCount = 1;
 	}
 
@@ -374,7 +374,7 @@ void updatePinsForSetDuty() {
 
 				int duty = cp->duty;
 
-				//			DBG("Pin: %d Duty: %d\n",cp->controlPin, cp->duty);
+				//DBG("Pin: %d Duty: %d\n",cp->controlPin, cp->duty);
 
 				int maxAmps = 0;
 
@@ -420,16 +420,16 @@ void turnHeatOff() {
 	Control* control = getControl();
 	control->mode = MODE_HEAT_OFF;
 
+	lockSteps();
+
 	Configuration * cfg = getConfiguration();
 	if (cfg != NULL) {
-
 		BreweryLayout * bl = cfg->brewLayout;
 		if (bl != NULL && bl->tanks.data != NULL) {
 			Tank * tA = (Tank *) bl->tanks.data;
 			for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
 				Tank * t = &tA[tankIndex];
 				if (t->heater != NULL) {
-					lockSteps();
 					// Found a heater element. Turn it off.
 					for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
 						ControlStep * cs = getControlStep(csIndex);
@@ -441,12 +441,35 @@ void turnHeatOff() {
 							}
 						}
 					}
-					unlockSteps();
-
 				}
 			}
 		}
+		// Turn pumps on if manual.  Off otherwise
+		if (bl != NULL && bl->pumps.data != NULL) {
+			Pump * pA = (Pump *) bl->pumps.data;
+			for (int pumpIndex = 0; pumpIndex < bl->pumps.count; pumpIndex++) {
+				Pump * p = &pA[pumpIndex];
+				// Found a heater element. Turn it off.
+				for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
+					ControlStep * cs = getControlStep(csIndex);
+					for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
+						ControlPoint * cp = &cs->controlPoints[cpIndex];
+						if (cp->controlPin == p->pin) {
+
+							if (cp->automaticControl) {
+								cp->duty = 0;
+								setHeatOn(&cp->dutyController, false);
+							} else {
+								setHeatOn(&cp->dutyController, true);
+							}
+						}
+					}
+				}
+			}
+		}
+
 	}
+	unlockSteps();
 
 }
 
