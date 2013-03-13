@@ -632,7 +632,6 @@ void handleStatusRequest(Request * request, Response * response) {
 	} 
 	
 	
-	DBG("json: %s\n",json);
 	sprintf(response->contentp, "%s", json);
 	json_object_put(status);
 	response->contentLength = jsonLength;
