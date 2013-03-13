@@ -51,7 +51,6 @@ void readSensors() {
 
 		if (f) {
 			int readSize = fread(data, 1, sizeof(data) - 1, f);
-			DBG("ReadSize: %d\n",readSize);
 			if (readSize > 20) {
 				data[readSize + 1] = 0;
 
@@ -65,8 +64,6 @@ void readSensors() {
 							// Have a valid read. Get the value
 
 							char* tIndex = strstr(crcIndex, "t=");
-
-							DBG("tIndex: %d\n",(tIndex-data));
 
 							if (tIndex > 0) {
 								tIndex += 2;

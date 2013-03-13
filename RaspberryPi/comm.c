@@ -629,8 +629,10 @@ void handleStatusRequest(Request * request, Response * response) {
 	if (response->contentp == NULL) {
 		ERR("Failed to malloc\n");
 		exit(1);
-	}
-
+	} 
+	
+	
+	DBG("json: %s\n",json);
 	sprintf(response->contentp, "%s", json);
 	json_object_put(status);
 	response->contentLength = jsonLength;

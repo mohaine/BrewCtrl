@@ -192,6 +192,64 @@ void selectReadingSensors() {
 	}
 }
 
+void addManualStep() {
+	Configuration * cfg = getConfiguration();
+	if (cfg != NULL) {
+
+		DBG("Create new Manual Step\n");
+		ControlStep * step = &controlSteps[0];
+		step->stepTime = 0;
+		step->active = false;
+		sprintf(step->name, "Manual Step");
+
+		char * stepId = generateRandomId();
+		sprintf(step->id, "%s", stepId);
+		free(stepId);
+
+		step->controlPointCount = 0;
+		BreweryLayout * bl = cfg->brewLayout;
+		if (bl != NULL && bl->tanks.data != NULL) {
+			Tank * tA = (Tank *) bl->tanks.data;
+			for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
+
+				DBG("TANK\n");
+
+				Tank * t = &tA[tankIndex];
+				if (t->heater != NULL) {
+					ControlPoint * cp = &step->controlPoints[step->controlPointCount];
+					cp->controlPin = t->heater->pin;
+					cp->automaticControl = false;
+					cp->duty = 0;
+					cp->fullOnAmps = t->heater->fullOnAmps;
+					cp->hasDuty = t->heater->hasDuty;
+					cp->initComplete = false;
+					setupControlPoint(cp);
+					step->controlPointCount++;
+
+					DBG("Setup control point for pin %d\n",cp->controlPin);
+
+				}
+			}
+
+			Pump * pA = (Pump *) bl->pumps.data;
+			for (int pumpIndex = 0; pumpIndex < bl->pumps.count; pumpIndex++) {
+				Pump * p = &pA[pumpIndex];
+				ControlPoint * cp = &step->controlPoints[step->controlPointCount];
+				cp->controlPin = p->pin;
+				cp->automaticControl = false;
+				cp->duty = 0;
+				cp->fullOnAmps = 0;
+				cp->hasDuty = p->hasDuty;
+				cp->initComplete = false;
+				setupControlPoint(cp);
+				step->controlPointCount++;
+			}
+		} 
+		stepCount = 1;
+	}
+
+}
+
 void updateStepTimer() {
 	Control* control = getControl();
 	lockSteps();
@@ -244,56 +302,7 @@ void updateStepTimer() {
 		}
 	}
 	if (stepCount == 0) {
-		DBG("Create new Manual Step\n");
-		ControlStep * step = &controlSteps[0];
-		step->stepTime = 0;
-		step->active = false;
-		sprintf(step->name, "Manual Step");
-
-		char * stepId = generateRandomId();
-		sprintf(step->id, "%s", stepId);
-		free(stepId);
-
-		step->controlPointCount = 0;
-
-		Configuration * cfg = getConfiguration();
-		if (cfg != NULL) {
-
-			BreweryLayout * bl = cfg->brewLayout;
-			if (bl != NULL && bl->tanks.data != NULL) {
-				Tank * tA = (Tank *) bl->tanks.data;
-				for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
-					Tank * t = &tA[tankIndex];
-					if (t->heater != NULL) {
-						ControlPoint * cp = &step->controlPoints[step->controlPointCount];
-						cp->controlPin = t->heater->pin;
-						cp->automaticControl = false;
-						cp->duty = 0;
-						cp->fullOnAmps = t->heater->fullOnAmps;
-						cp->hasDuty = t->heater->hasDuty;
-						cp->initComplete = false;
-						setupControlPoint(cp);
-						step->controlPointCount++;
-					}
-				}
-
-				Pump * pA = (Pump *) bl->pumps.data;
-				for (int pumpIndex = 0; pumpIndex < bl->pumps.count; pumpIndex++) {
-					Pump * p = &pA[pumpIndex];
-					ControlPoint * cp = &step->controlPoints[step->controlPointCount];
-					cp->controlPin = p->pin;
-					cp->automaticControl = false;
-					cp->duty = 0;
-					cp->fullOnAmps = 0;
-					cp->hasDuty = p->hasDuty;
-					cp->initComplete = false;
-					setupControlPoint(cp);
-					step->controlPointCount++;
-				}
-			}
-		}
-		stepCount = 1;
-
+		addManualStep();
 	}
 	unlockSteps();
 }
@@ -356,12 +365,16 @@ void updatePinsForSetDuty() {
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
 
+			//	DBG("***********  updatePinsForSetDuty *************** \n");
+
 			int controlPointCount = step->controlPointCount;
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				setupControlPoint(cp);
 
 				int duty = cp->duty;
+
+				//			DBG("Pin: %d Duty: %d\n",cp->controlPin, cp->duty);
 
 				int maxAmps = 0;
 
@@ -416,7 +429,6 @@ void turnHeatOff() {
 			for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
 				Tank * t = &tA[tankIndex];
 				if (t->heater != NULL) {
-
 					lockSteps();
 					// Found a heater element. Turn it off.
 					for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
