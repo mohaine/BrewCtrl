@@ -12,7 +12,7 @@ public class DrawStyleSwing {
 	public static final Color PUMP_OFF = Color.red;
 	public static final Color TANK = Color.white;
 	public static final Color TANK_INSIDE = Color.lightGray;
-	public static Color BACKGROUND = Color.gray;
+	public static Color BACKGROUND = Color.lightGray;
 	public static Color FOREGROUND = Color.black;
 	public static final Color INACTIVE = Color.gray;
 	public static final Color PENDING = Color.pink;
