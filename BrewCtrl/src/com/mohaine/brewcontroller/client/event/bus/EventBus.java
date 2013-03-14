@@ -33,20 +33,19 @@ public class EventBus {
 			synchronized (handlers) {
 				Event.Type<?> unknownType = type;
 				ArrayList<? extends EventHandler> handlerList = handlers.get(unknownType);
-
 				if (handlerList == null) {
 					handlerList = new ArrayList();
 					handlers.put(unknownType, handlerList);
 				}
-				synchronized (handlerList) {
-					final ArrayList<H> typedHandlerList = (ArrayList<H>) handlerList;
-
+				final ArrayList<H> typedHandlerList = (ArrayList<H>) handlerList;
+				synchronized (typedHandlerList) {
 					typedHandlerList.add(handler);
-
 					return new HandlerRegistration() {
 						@Override
 						public void removeHandler() {
-							typedHandlerList.remove(handler);
+							synchronized (typedHandlerList) {
+								typedHandlerList.remove(handler);
+							}
 						}
 					};
 				}
@@ -61,11 +60,14 @@ public class EventBus {
 			handlerList = handlers.get(event.getAssociatedType());
 		}
 		if (handlerList != null) {
+			ArrayList<? extends EventHandler> handlerListCopy;
 			synchronized (handlerList) {
-				for (EventHandler eventHandler : handlerList) {
-					event.dispatch(eventHandler);
-				}
+				handlerListCopy = new ArrayList(handlerList);
 			}
+			for (EventHandler eventHandler : handlerListCopy) {
+				event.dispatch(eventHandler);
+			}
+
 		}
 	}
 }
