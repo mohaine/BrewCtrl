@@ -19,6 +19,8 @@
 package com.mohaine.brewcontroller.web.client;
 
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.mohaine.brewcontroller.client.display.DrawStyle.BColor;
+import com.mohaine.brewcontroller.client.display.DrawStyle.BFont;
 
 public class Colors {
 
@@ -36,4 +38,39 @@ public class Colors {
 	public static final String TEXT_FONT = "12px sans-serif";
 	public static final String TEMP_TARGET_FONT = "20px sans-serif";
 
+	public static CssColor mapColor(BColor c) {
+		switch (c) {
+		case BACKGROUND:
+			return BACKGROUND;
+		case FOREGROUND:
+			return FOREGROUND;
+		case INACTIVE:
+			return INACTIVE;
+		case ERROR:
+			return ERROR;
+		case PENDING:
+			return PENDING;
+		case PUMP_OFF:
+			return PUMP_OFF;
+		case PUMP_ON:
+			return PUMP_ON;
+		case TANK:
+			return TANK;
+		case TANK_INSIDE:
+			return TANK_INSIDE;
+		}
+
+		return ERROR;
+	}
+	public static String mapFont(BFont f) {
+		switch (f) {
+		case TEMP_FONT:
+			return TEMP_FONT;
+		case TEXT_FONT:
+			return TEXT_FONT;
+		case TEMP_TARGET_FONT:
+			return TEMP_TARGET_FONT;
+		}
+		return TEMP_TARGET_FONT;
+	}
 }

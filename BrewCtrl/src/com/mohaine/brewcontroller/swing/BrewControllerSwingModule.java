@@ -26,7 +26,8 @@ import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerGui;
 import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.client.ControllerHardware;
-import com.mohaine.brewcontroller.client.display.BreweryDisplay.BreweryDisplayDrawer;
+import com.mohaine.brewcontroller.client.FormatterDefaults;
+import com.mohaine.brewcontroller.client.display.BreweryDisplayDrawer.DrawerCanvas;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
 import com.mohaine.brewcontroller.client.page.Overview.OverviewDisplay;
@@ -44,6 +45,7 @@ public class BrewControllerSwingModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		bind(FormatterDefaults.class).toInstance(new FormatterDefaultsJava());
 		bind(ControllerUrlLoader.class).toInstance(new ControllerUrlLoader());
 		bind(ConfigurationLoader.class).toInstance(new FileConfigurationLoader(configFile));
 		bind(BrewJsonConverter.class).to(BrewJsonConverterRefection.class).asEagerSingleton();
@@ -51,7 +53,7 @@ public class BrewControllerSwingModule extends AbstractModule {
 		bind(ControllerHardware.class).to(ControllerHardwareJsonUrlRequest.class).asEagerSingleton();
 		bind(OverviewDisplay.class).to(OverviewDisplaySwing.class);
 		bind(EventBus.class).asEagerSingleton();
-		bind(BreweryDisplayDrawer.class).to(BreweryDisplayDrawerSwing.class);
+		bind(DrawerCanvas.class).to(BreweryDisplayDrawerSwing.class);
 
 	}
 

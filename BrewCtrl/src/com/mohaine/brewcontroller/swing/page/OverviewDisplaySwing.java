@@ -56,7 +56,6 @@ public class OverviewDisplaySwing extends JPanel implements OverviewDisplay {
 	@Override
 	public void setBreweryLayout(BreweryLayout layout) {
 		breweryDisplay.setBreweryLayout(layout);
-
 		invalidate();
 
 	}

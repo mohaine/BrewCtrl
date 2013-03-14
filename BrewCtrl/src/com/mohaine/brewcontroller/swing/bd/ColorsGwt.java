@@ -3,7 +3,7 @@ package com.mohaine.brewcontroller.swing.bd;
 import java.awt.Color;
 import java.awt.Font;
 
-public class Colors {
+public class ColorsGwt {
 
 	public static final Color PUMP_ON = Color.green;
 	public static final Color PUMP_OFF = Color.red;
@@ -19,40 +19,4 @@ public class Colors {
 	public static final Font TEXT_FONT = new Font("Dialog", Font.PLAIN, 12);
 	public static final Font TEMP_TARGET_FONT = new Font("Dialog", Font.PLAIN, 20);
 
-	public static Color mapColor(com.mohaine.brewcontroller.client.display.DrawStyle.BColor c) {
-		switch (c) {
-		case BACKGROUND:
-			return BACKGROUND;
-		case FOREGROUND:
-			return FOREGROUND;
-		case INACTIVE:
-			return INACTIVE;
-		case ERROR:
-			return ERROR;
-		case PENDING:
-			return PENDING;
-		case PUMP_OFF:
-			return PUMP_OFF;
-		case PUMP_ON:
-			return PUMP_ON;
-		case TANK:
-			return TANK;
-		case TANK_INSIDE:
-			return TANK_INSIDE;
-		}
-
-		return ERROR;
-	}
-
-	public static Font mapFont(com.mohaine.brewcontroller.client.display.DrawStyle.BFont f) {
-		switch (f) {
-		case TEMP_FONT:
-			return TEMP_FONT;
-		case TEXT_FONT:
-			return TEXT_FONT;
-		case TEMP_TARGET_FONT:
-			return TEMP_TARGET_FONT;
-		}
-		return TEMP_TARGET_FONT;
-	}
 }

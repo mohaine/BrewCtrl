@@ -45,20 +45,7 @@ public class BreweryDisplay {
 
 	List<BreweryComponentDisplay> displays = new ArrayList<BreweryComponentDisplay>();
 
-	public interface BreweryDisplayDrawer {
-
-		void setDisplays(List<BreweryComponentDisplay> displays, int width, int height);
-
-		void redrawBreweryComponent(BreweryComponent component);
-
-		void addMouseListener(DrawerMouseListener drawerMouseListener);
-
-		void redrawAll();
-
-		Object getWidget();
-	}
-
-	private BreweryDisplayDrawer drawer;
+	private BreweryDisplayDrawer<?> drawer;
 	// private BreweryLayout brewLayout;
 	private List<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 	private ControllerHardware controller;
@@ -67,7 +54,7 @@ public class BreweryDisplay {
 	private EventBus eventBus;
 
 	@Inject
-	public BreweryDisplay(BreweryDisplayDrawer drawer, EventBus eventBus, ControllerHardware controller) {
+	public BreweryDisplay(BreweryDisplayDrawer<?> drawer, EventBus eventBus, ControllerHardware controller) {
 		this.drawer = drawer;
 		this.controller = controller;
 		this.eventBus = eventBus;
