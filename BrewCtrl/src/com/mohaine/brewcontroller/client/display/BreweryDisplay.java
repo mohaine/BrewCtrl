@@ -54,7 +54,7 @@ public class BreweryDisplay {
 	private EventBus eventBus;
 
 	@Inject
-	public BreweryDisplay(BreweryDisplayDrawer<?> drawer, EventBus eventBus, ControllerHardware controller) {
+	public BreweryDisplay(@SuppressWarnings("rawtypes") BreweryDisplayDrawer drawer, EventBus eventBus, ControllerHardware controller) {
 		this.drawer = drawer;
 		this.controller = controller;
 		this.eventBus = eventBus;
