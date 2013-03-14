@@ -20,6 +20,10 @@ package com.mohaine.brewcontroller.client.display;
 
 public class DrawStyle {
 
+	public enum HAlign {
+		RIGHT, CENTER, LEFT
+	}
+
 	public enum BColor {
 		PUMP_ON, PUMP_OFF, TANK, TANK_INSIDE, BACKGROUND, FOREGROUND, INACTIVE, PENDING, ERROR
 	}

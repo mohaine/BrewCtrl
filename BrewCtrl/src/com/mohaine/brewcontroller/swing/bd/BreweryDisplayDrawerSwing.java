@@ -22,6 +22,7 @@ import com.mohaine.brewcontroller.client.display.BreweryDisplayDrawer.DrawerCanv
 import com.mohaine.brewcontroller.client.display.BreweryDisplayDrawer.RedrawHook;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BColor;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BFont;
+import com.mohaine.brewcontroller.client.display.DrawStyle.HAlign;
 import com.mohaine.brewcontroller.client.display.DrawerMouseListener;
 import com.mohaine.brewcontroller.client.display.DrawerMouseListener.DrawerMouseEvent;
 import com.mohaine.brewcontroller.swing.bd.BreweryDisplayDrawerSwing.GraphicContext;
@@ -225,16 +226,16 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 	}
 
 	@Override
-	public void drawText(final GraphicContext g, final String text, final BColor textColor, final BColor bgColor, final boolean alignRight, final int left, final int top, final int width,
-			final int height, final BFont font) {
+	public void drawText(final GraphicContext g, final String text, final BColor textColor, final BColor bgColor, final HAlign align, final int left, final int top, final int width, final int height,
+			final BFont font) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			drawTextSwing(g, text, textColor, bgColor, alignRight, left, top, width, height, font);
+			drawTextSwing(g, text, textColor, bgColor, align, left, top, width, height, font);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					@Override
 					public void run() {
-						drawTextSwing(g, text, textColor, bgColor, alignRight, left, top, width, height, font);
+						drawTextSwing(g, text, textColor, bgColor, align, left, top, width, height, font);
 					}
 				});
 			} catch (Exception e) {
@@ -243,7 +244,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 		}
 	}
 
-	private void drawTextSwing(GraphicContext gc, String text, BColor textColor, BColor bgColor, boolean alignRight, int left, int top, int width, int height, BFont font) {
+	private void drawTextSwing(GraphicContext gc, String text, BColor textColor, BColor bgColor, HAlign align, int left, int top, int width, int height, BFont font) {
 
 		gc.g.setColor(DrawStyleSwing.mapColor(bgColor));
 
@@ -255,7 +256,19 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 		FontMetrics fontMetrics = gc.g.getFontMetrics();
 		Rectangle2D stringBounds = fontMetrics.getStringBounds(text, gc.g);
 
-		int x = alignRight ? (int) (width - stringBounds.getWidth()) : 0;
+		int x;
+		switch (align) {
+
+		case RIGHT:
+			x = (int) (width - stringBounds.getWidth());
+			break;
+		case CENTER:
+			x = (int) (width / 2 - (stringBounds.getWidth() / 2));
+			break;
+		default:
+			x = 0;
+			break;
+		}
 		int y = (int) (-stringBounds.getCenterY()) + height / 2;
 
 		gc.g.drawString(text, left + x, top + y);

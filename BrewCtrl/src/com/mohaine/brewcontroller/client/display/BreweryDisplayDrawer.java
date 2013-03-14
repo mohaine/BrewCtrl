@@ -30,6 +30,7 @@ import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BColor;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BFont;
+import com.mohaine.brewcontroller.client.display.DrawStyle.HAlign;
 import com.mohaine.brewcontroller.client.layout.BreweryComponent;
 import com.mohaine.brewcontroller.client.layout.HeatElement;
 import com.mohaine.brewcontroller.client.layout.Pump;
@@ -38,6 +39,7 @@ import com.mohaine.brewcontroller.client.layout.Tank;
 
 public class BreweryDisplayDrawer<T> {
 
+	private static final int NAME_HEIGHT = 20;
 	private UnitConversion conversion;
 	private ControllerHardware controller;
 
@@ -67,7 +69,7 @@ public class BreweryDisplayDrawer<T> {
 
 		void fillRect(T context, int i, int j, int width, int height, BColor background);
 
-		void drawText(T context, String text, BColor textColor, BColor bgColor, boolean alignRight, int left, int top, int width, int height, BFont font);
+		void drawText(T context, String text, BColor textColor, BColor bgColor, HAlign align, int left, int top, int width, int height, BFont font);
 
 		Object getWidget();
 
@@ -114,7 +116,7 @@ public class BreweryDisplayDrawer<T> {
 		for (BreweryComponentDisplay display : displays) {
 			BreweryComponent displayComponent = display.getComponent();
 			if (displayComponent == component) {
-				drawComponent(context, display, true);
+				drawComponent(context, display);
 				break;
 			}
 		}
@@ -135,7 +137,7 @@ public class BreweryDisplayDrawer<T> {
 	private void redrawAll(T context) {
 		canvas.fillRect(context, 0, 0, getWidth(), getHeight(), BColor.BACKGROUND);
 		for (BreweryComponentDisplay display : displays) {
-			drawComponent(context, display, true);
+			drawComponent(context, display);
 		}
 		canvas.displayContext(context);
 	}
@@ -144,12 +146,10 @@ public class BreweryDisplayDrawer<T> {
 		return canvas.getWidget();
 	}
 
-	private void drawComponent(T context2d, BreweryComponentDisplay display, boolean full) {
+	private void drawComponent(T context2d, BreweryComponentDisplay display) {
 		BreweryComponent component = display.getComponent();
 		if (Tank.TYPE.equals(component.getType())) {
-			if (full) {
-				drawTank(context2d, display);
-			}
+			drawTank(context2d, display);
 		} else if (Pump.TYPE.equals(component.getType())) {
 			drawPump(context2d, display);
 		} else if (Sensor.TYPE.equals(component.getType())) {
@@ -201,15 +201,15 @@ public class BreweryDisplayDrawer<T> {
 		if (text == null) {
 			text = Integer.toString(duty) + "%";
 		}
-		drawText(g, display, text, color, BColor.TANK, true);
+		drawText(g, display, text, color, BColor.TANK, HAlign.RIGHT);
 	}
 
-	private void drawText(T g, BreweryComponentDisplay display, String tempDisplay, BColor textColor, BColor bgColor, boolean alignRight) {
-		drawText(g, tempDisplay, textColor, bgColor, alignRight, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), display.getHeight(), BFont.TEMP_FONT);
+	private void drawText(T g, BreweryComponentDisplay display, String tempDisplay, BColor textColor, BColor bgColor, HAlign align) {
+		drawText(g, tempDisplay, textColor, bgColor, align, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), display.getHeight(), BFont.TEMP_FONT);
 	}
 
-	private void drawText(T context, String text, BColor textColor, BColor bgColor, boolean alignRight, int left, int top, int width, int height, BFont font) {
-		canvas.drawText(context, text, textColor, bgColor, alignRight, left, top, width, height, font);
+	private void drawText(T context, String text, BColor textColor, BColor bgColor, HAlign align, int left, int top, int width, int height, BFont font) {
+		canvas.drawText(context, text, textColor, bgColor, align, left, top, width, height, font);
 	}
 
 	private void drawSensor(T g, BreweryComponentDisplay display) {
@@ -225,7 +225,7 @@ public class BreweryDisplayDrawer<T> {
 			} else {
 				textColor = BColor.ERROR;
 			}
-			drawText(g, tempDisplay, textColor, BColor.TANK, false, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, BFont.TEMP_FONT);
+			drawText(g, tempDisplay, textColor, BColor.TANK, HAlign.LEFT, display.getAbsLeft(), display.getAbsTop(), display.getWidth(), 30, BFont.TEMP_FONT);
 
 			boolean clearText = true;
 			ControlStep selectedStep = controller.getSelectedStep();
@@ -239,23 +239,15 @@ public class BreweryDisplayDrawer<T> {
 					// }
 					clearText = false;
 					tempDisplay = numberFormatWhole.format(tempDisplayConveter.convertFrom(cp.getTargetTemp())) + "\u00B0";
-					drawText(g, "(" + tempDisplay + ")", textColor, BColor.TANK, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, BFont.TEMP_TARGET_FONT);
+					drawText(g, "(" + tempDisplay + ")", textColor, BColor.TANK, HAlign.LEFT, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, BFont.TEMP_TARGET_FONT);
 				}
 			}
 
 			if (clearText) {
-				drawText(g, "", textColor, BColor.TANK, false, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, BFont.TEMP_TARGET_FONT);
+				drawText(g, "", textColor, BColor.TANK, HAlign.LEFT, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, BFont.TEMP_TARGET_FONT);
 			}
 		}
 	}
-
-	// private void drawName(T context, BreweryComponentDisplay display) {
-	// String name = display.getComponent().getName();
-	//
-	// canvas.drawText(context, name, BColor.FOREGROUND, BColor.BACKGROUND,
-	// true, display.getAbsLeft(), display.getAbsTop(), width, height,
-	// BFont.TEMP_TARGET_FONT);
-	// }
 
 	private void drawPump(T g, BreweryComponentDisplay display) {
 		int top = display.getTop();
@@ -301,7 +293,9 @@ public class BreweryDisplayDrawer<T> {
 			backPaint = (on ? BColor.PUMP_ON : BColor.PUMP_OFF);
 		}
 
+		height -= NAME_HEIGHT;
 		canvas.drawPump(g, left, top, width, height, backPaint, on);
+		canvas.drawText(g, display.getComponent().getName(), BColor.FOREGROUND, BColor.BACKGROUND, HAlign.CENTER, left, top + height + 1, width, NAME_HEIGHT - 1, BFont.TEXT_FONT);
 
 	}
 
@@ -310,7 +304,10 @@ public class BreweryDisplayDrawer<T> {
 		int left = display.getLeft();
 		int width = display.getWidth();
 		int height = display.getHeight();
+
+		height -= NAME_HEIGHT;
 		canvas.drawTank(g, left, top, width, height);
+		canvas.drawText(g, display.getComponent().getName(), BColor.FOREGROUND, BColor.BACKGROUND, HAlign.CENTER, left, top + height + 1, width, NAME_HEIGHT - 1, BFont.TEXT_FONT);
 	}
 
 }

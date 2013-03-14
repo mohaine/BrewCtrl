@@ -38,6 +38,7 @@ import com.mohaine.brewcontroller.client.display.BreweryDisplayDrawer.DrawerCanv
 import com.mohaine.brewcontroller.client.display.BreweryDisplayDrawer.RedrawHook;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BColor;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BFont;
+import com.mohaine.brewcontroller.client.display.DrawStyle.HAlign;
 import com.mohaine.brewcontroller.client.display.DrawerMouseListener;
 import com.mohaine.brewcontroller.client.display.DrawerMouseListener.DrawerMouseEvent;
 
@@ -109,14 +110,6 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 		mouseAdaptor.listeners.add(drawerMouseListener);
 	}
 
-	private void drawText(Context2d g, String text, CssColor textColor, CssColor bgColor, boolean alignRight, int left, int top, int width, int height, String font) {
-		g.setFillStyle(bgColor);
-		g.fillRect(left, top, width, height);
-		g.setFont(font);
-		g.setFillStyle(textColor);
-		g.fillText(text, left, top + height);
-	}
-
 	private void drawEllipse(Context2d ctx, int x, int y, int w, int h) {
 		double kappa = .5522848;
 		double ox = (w / 2) * kappa; // control point offset horizontal
@@ -142,11 +135,9 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 		return panel;
 	}
 
-	
-
 	@Override
 	public void init(RedrawHook<Context2d> hook) {
-		
+
 	}
 
 	@Override
@@ -180,9 +171,16 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 	}
 
 	@Override
-	public void drawText(Context2d context, String text, BColor textColor, BColor bgColor, boolean alignRight, int left, int top, int width, int height, BFont font) {
-		drawText(context, text, DrawStyleGwt.mapColor(textColor), DrawStyleGwt.mapColor(bgColor), alignRight, left, top, width, height, DrawStyleGwt.mapFont(font));
+	public void drawText(Context2d context, String text, BColor textColor, BColor bgColor, HAlign align, int left, int top, int width, int height, BFont font) {
+		//TODO ALIGN
+		
+		context.setFillStyle(DrawStyleGwt.mapColor(bgColor));
+		context.fillRect(left, top, width, height);
+		context.setFont(DrawStyleGwt.mapFont(font));
+		context.setFillStyle(DrawStyleGwt.mapColor(textColor));
+		context.fillText(text, left, top + height);
 	}
+
 
 	@Override
 	public void drawPump(Context2d g, int left, int top, int width, int height, BColor backPaint, boolean on) {

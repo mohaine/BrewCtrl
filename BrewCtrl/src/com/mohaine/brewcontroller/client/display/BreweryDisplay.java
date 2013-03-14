@@ -268,7 +268,7 @@ public class BreweryDisplay {
 
 			List<Pump> pumps = brewLayout.getPumps();
 			for (Pump pump : pumps) {
-				createBcd(pump, 100, 100);
+				createBcd(pump, 100, 120);
 			}
 
 			layoutDisplays();
