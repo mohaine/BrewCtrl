@@ -86,12 +86,10 @@ public class BreweryDisplayDrawer<T> {
 
 		this.canvas = canvas;
 		canvas.init(new RedrawHook<T>() {
-
 			@Override
 			public void redraw(T context) {
 				redrawAll(context);
 			}
-
 		});
 	}
 

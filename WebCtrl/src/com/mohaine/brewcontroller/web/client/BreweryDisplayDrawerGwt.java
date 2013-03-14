@@ -174,19 +174,19 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 
 	@Override
 	public void fillRect(Context2d context, int left, int top, int width, int height, BColor background) {
-		context.setFillStyle(Colors.mapColor(background));
+		context.setFillStyle(DrawStyleGwt.mapColor(background));
 		context.fillRect(left, top, width, height);
 
 	}
 
 	@Override
 	public void drawText(Context2d context, String text, BColor textColor, BColor bgColor, boolean alignRight, int left, int top, int width, int height, BFont font) {
-		drawText(context, text, Colors.mapColor(textColor), Colors.mapColor(bgColor), alignRight, left, top, width, height, Colors.mapFont(font));
+		drawText(context, text, DrawStyleGwt.mapColor(textColor), DrawStyleGwt.mapColor(bgColor), alignRight, left, top, width, height, DrawStyleGwt.mapFont(font));
 	}
 
 	@Override
 	public void drawPump(Context2d g, int left, int top, int width, int height, BColor backPaint, boolean on) {
-		CssColor strokePaint = Colors.FOREGROUND;
+		CssColor strokePaint = DrawStyleGwt.FOREGROUND;
 
 		int cirSize = (int) (Math.min(width, height) - 1);
 
@@ -197,7 +197,7 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 		g.translate(left, top);
 
 		g.setStrokeStyle(strokePaint);
-		g.setFillStyle(Colors.mapColor(backPaint));
+		g.setFillStyle(DrawStyleGwt.mapColor(backPaint));
 		g.fillRect(cirRadius, 0, width - cirRadius - 1, cirRadius * 0.67);
 		g.strokeRect(cirRadius, 0, width - cirRadius - 1, cirRadius * 0.67);
 
@@ -215,8 +215,8 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 	@Override
 	public void drawTank(Context2d g, int left, int top, int width, int height) {
 
-		g.setFillStyle(Colors.TANK);
-		g.setStrokeStyle(Colors.FOREGROUND);
+		g.setFillStyle(DrawStyleGwt.TANK);
+		g.setStrokeStyle(DrawStyleGwt.FOREGROUND);
 
 		int boxTopLeft = top + TANK_TOP_HEIGHT / 2;
 
@@ -224,7 +224,7 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 		drawEllipse(g, left, top + height, width, TANK_TOP_HEIGHT);
 		// Middle
 		g.fillRect(left, boxTopLeft, width, height);
-		g.setFillStyle(Colors.TANK_INSIDE);
+		g.setFillStyle(DrawStyleGwt.TANK_INSIDE);
 		g.beginPath();
 		g.moveTo(left, boxTopLeft);
 		g.lineTo(left, boxTopLeft + height);

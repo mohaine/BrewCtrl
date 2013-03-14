@@ -22,7 +22,7 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BColor;
 import com.mohaine.brewcontroller.client.display.DrawStyle.BFont;
 
-public class Colors {
+public class DrawStyleGwt {
 
 	public static final CssColor PUMP_ON = CssColor.make("green");
 	public static final CssColor PUMP_OFF = CssColor.make("red");

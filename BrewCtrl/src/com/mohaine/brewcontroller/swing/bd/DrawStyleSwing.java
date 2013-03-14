@@ -3,7 +3,10 @@ package com.mohaine.brewcontroller.swing.bd;
 import java.awt.Color;
 import java.awt.Font;
 
-public class Colors {
+import com.mohaine.brewcontroller.client.display.DrawStyle.BColor;
+import com.mohaine.brewcontroller.client.display.DrawStyle.BFont;
+
+public class DrawStyleSwing {
 
 	public static final Color PUMP_ON = Color.green;
 	public static final Color PUMP_OFF = Color.red;
@@ -19,7 +22,7 @@ public class Colors {
 	public static final Font TEXT_FONT = new Font("Dialog", Font.PLAIN, 12);
 	public static final Font TEMP_TARGET_FONT = new Font("Dialog", Font.PLAIN, 20);
 
-	public static Color mapColor(com.mohaine.brewcontroller.client.display.DrawStyle.BColor c) {
+	public static Color mapColor(BColor c) {
 		switch (c) {
 		case BACKGROUND:
 			return BACKGROUND;
@@ -44,7 +47,7 @@ public class Colors {
 		return ERROR;
 	}
 
-	public static Font mapFont(com.mohaine.brewcontroller.client.display.DrawStyle.BFont f) {
+	public static Font mapFont(BFont f) {
 		switch (f) {
 		case TEMP_FONT:
 			return TEMP_FONT;

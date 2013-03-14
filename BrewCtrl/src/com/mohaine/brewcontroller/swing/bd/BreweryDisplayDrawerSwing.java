@@ -220,7 +220,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 	}
 
 	private void fillRectSwing(GraphicContext gc, int left, int top, int width, int height, BColor background) {
-		gc.g.setColor(Colors.mapColor(background));
+		gc.g.setColor(DrawStyleSwing.mapColor(background));
 		gc.g.fillRect(left, top, width, height);
 	}
 
@@ -245,12 +245,12 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 
 	private void drawTextSwing(GraphicContext gc, String text, BColor textColor, BColor bgColor, boolean alignRight, int left, int top, int width, int height, BFont font) {
 
-		gc.g.setColor(Colors.mapColor(bgColor));
+		gc.g.setColor(DrawStyleSwing.mapColor(bgColor));
 
 		gc.g.fillRect(left, top, width, height);
 
-		gc.g.setColor(Colors.mapColor(textColor));
-		gc.g.setFont(Colors.mapFont(font));
+		gc.g.setColor(DrawStyleSwing.mapColor(textColor));
+		gc.g.setFont(DrawStyleSwing.mapFont(font));
 
 		FontMetrics fontMetrics = gc.g.getFontMetrics();
 		Rectangle2D stringBounds = fontMetrics.getStringBounds(text, gc.g);
@@ -282,19 +282,19 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 
 	private void drawPumpSwing(GraphicContext gc, int left, int top, int width, int height, BColor backPaint, boolean on) {
 
-		Color strokePaint = Colors.mapColor(BColor.FOREGROUND);
+		Color strokePaint = DrawStyleSwing.mapColor(BColor.FOREGROUND);
 
 		int cirSize = (int) (Math.min(width, height) - 1);
 
 		int cirRadius = cirSize / 2;
 		Shape square = new Rectangle2D.Double(cirRadius + left, top, width - cirRadius - 1, cirRadius * 0.67);
-		gc.g.setColor(Colors.mapColor(backPaint));
+		gc.g.setColor(DrawStyleSwing.mapColor(backPaint));
 		gc.g.fill(square);
 		gc.g.setColor(strokePaint);
 		gc.g.draw(square);
 
 		Shape circle = new Ellipse2D.Float(left, top, cirSize, cirSize);
-		gc.g.setColor(Colors.mapColor(backPaint));
+		gc.g.setColor(DrawStyleSwing.mapColor(backPaint));
 		gc.g.fill(circle);
 		gc.g.setColor(strokePaint);
 		gc.g.draw(circle);
@@ -328,8 +328,8 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 	private void drawTankSwing(GraphicContext gc, int left, int top, int width, int height) {
 		int boxHeight = height - TANK_TOP_HEIGHT;
 
-		Color tankColor = Colors.TANK;
-		Color strokePaint = Colors.FOREGROUND;
+		Color tankColor = DrawStyleSwing.TANK;
+		Color strokePaint = DrawStyleSwing.FOREGROUND;
 		// bottom arc
 		Shape circleBottom = new Ellipse2D.Float(left, top + boxHeight, width, TANK_TOP_HEIGHT);
 		gc.g.setColor(tankColor);
@@ -348,7 +348,7 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 
 		// Inside/Top of tank
 		Shape circleTop = new Ellipse2D.Float(left, top, width, TANK_TOP_HEIGHT);
-		gc.g.setColor(Colors.TANK_INSIDE);
+		gc.g.setColor(DrawStyleSwing.TANK_INSIDE);
 		gc.g.fill(circleTop);
 		gc.g.setColor(strokePaint);
 		gc.g.draw(circleTop);
