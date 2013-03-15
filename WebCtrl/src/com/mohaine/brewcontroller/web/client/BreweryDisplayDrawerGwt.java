@@ -24,6 +24,7 @@ import java.util.List;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.canvas.dom.client.TextMetrics;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
@@ -172,29 +173,32 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 
 	@Override
 	public void drawText(Context2d context, String text, BColor textColor, BColor bgColor, HAlign align, int left, int top, int width, int height, BFont font) {
-		//TODO ALIGN
 		
+		context.setFillStyle(DrawStyleGwt.mapColor(bgColor));
+		context.fillRect(left, top, width, height);
+		context.setFont(DrawStyleGwt.mapFont(font));
+		
+		
+		TextMetrics measureText = context.measureText(text);
 		int x;
 		switch (align) {
 
 		case RIGHT:
-			x = (int) (width - stringBounds.getWidth());
+			x = (int) (width - measureText.getWidth());
 			break;
 		case CENTER:
-			x = (int) (width / 2 - (stringBounds.getWidth() / 2));
+			x = (int) (width / 2 - (measureText.getWidth() / 2));
 			break;
 		default:
 			x = 0;
 			break;
 		}
-		
-		context.setFillStyle(DrawStyleGwt.mapColor(bgColor));
-		context.fillRect(left, top, width, height);
-		context.setFont(DrawStyleGwt.mapFont(font));
-		context.setFillStyle(DrawStyleGwt.mapColor(textColor));
-		context.fillText(text, left, top + height);
-	}
 
+		
+		
+		context.setFillStyle(DrawStyleGwt.mapColor(textColor));
+		context.fillText(text, left + x, top + height);
+	}
 
 	@Override
 	public void drawPump(Context2d g, int left, int top, int width, int height, BColor backPaint, boolean on) {
@@ -234,16 +238,16 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 
 		// Bottom round
 		drawEllipse(g, left, top + height - (TANK_TOP_HEIGHT), width, TANK_TOP_HEIGHT);
-		
+
 		// Middle
-		g.fillRect(left, boxTopLeft, width, height-TANK_TOP_HEIGHT);
+		g.fillRect(left, boxTopLeft, width, height - TANK_TOP_HEIGHT);
 		g.setFillStyle(DrawStyleGwt.TANK_INSIDE);
 		g.beginPath();
-		
+
 		g.moveTo(left, boxTopLeft);
-		g.lineTo(left, boxTopLeft + height-TANK_TOP_HEIGHT);
+		g.lineTo(left, boxTopLeft + height - TANK_TOP_HEIGHT);
 		g.moveTo(left + width, boxTopLeft);
-		g.lineTo(left + width, boxTopLeft + height-TANK_TOP_HEIGHT);
+		g.lineTo(left + width, boxTopLeft + height - TANK_TOP_HEIGHT);
 		g.stroke();
 
 		// Top
