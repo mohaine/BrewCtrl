@@ -28,6 +28,7 @@ import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.FormatterDefaults;
 import com.mohaine.brewcontroller.client.display.BreweryDisplayDrawer.DrawerCanvas;
+import com.mohaine.brewcontroller.client.display.Scheduler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
 import com.mohaine.brewcontroller.client.page.Overview.OverviewDisplay;
@@ -45,6 +46,8 @@ public class BrewControllerSwingModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+
+		bind(Scheduler.class).to(SchedulerJava.class).asEagerSingleton();
 		bind(FormatterDefaults.class).toInstance(new FormatterDefaultsJava());
 		bind(ControllerUrlLoader.class).toInstance(new ControllerUrlLoader());
 		bind(ConfigurationLoader.class).toInstance(new FileConfigurationLoader(configFile));

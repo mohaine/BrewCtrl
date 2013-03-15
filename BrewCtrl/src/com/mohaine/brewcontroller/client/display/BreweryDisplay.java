@@ -26,6 +26,8 @@ import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay.DisplayType;
+import com.mohaine.brewcontroller.client.display.Scheduler.Cancelable;
+import com.mohaine.brewcontroller.client.display.Scheduler.RunRepeat;
 import com.mohaine.brewcontroller.client.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.client.event.BreweryComponentChangeEventHandler;
 import com.mohaine.brewcontroller.client.event.ChangeSelectedStepEvent;
@@ -53,12 +55,15 @@ public class BreweryDisplay {
 
 	private MouseState mouseState;
 	private EventBus eventBus;
+	private Scheduler scheduler;
 
 	@Inject
-	public BreweryDisplay(@SuppressWarnings("rawtypes") BreweryDisplayDrawer drawer, EventBus eventBus, ControllerHardware controller) {
+	public BreweryDisplay(@SuppressWarnings("rawtypes") BreweryDisplayDrawer drawer, EventBus eventBus, ControllerHardware controller, Scheduler scheduler) {
 		this.drawer = drawer;
 		this.controller = controller;
 		this.eventBus = eventBus;
+
+		this.scheduler = scheduler;
 
 		drawer.addMouseListener(new DrawerMouseListener() {
 
@@ -75,6 +80,7 @@ public class BreweryDisplay {
 				mouseState = new MouseState();
 				mouseState.x = e.getX();
 				mouseState.y = e.getY();
+
 				for (int i = displays.size() - 1; i > -1; i--) {
 					BreweryComponentDisplay display = displays.get(i);
 
@@ -144,23 +150,50 @@ public class BreweryDisplay {
 		mouseState.canDrag = false;
 		if (mouseState.display != null) {
 			mouseState.canDrag = true;
-			BreweryComponent component = mouseState.display.getComponent();
+			final BreweryComponent component = mouseState.display.getComponent();
 			ControlStep selectedStep = controller.getSelectedStep();
 
 			mouseState.display.setMouseDown(true);
 
 			if (mouseState.display.getType() == DisplayType.UpCtrl || mouseState.display.getType() == DisplayType.DownCtrl) {
 				mouseState.canDrag = false;
-				int direction = mouseState.display.getType() == DisplayType.UpCtrl ? 1 : -1;
+				final int direction = mouseState.display.getType() == DisplayType.UpCtrl ? 1 : -1;
 				if (selectedStep != null) {
 					if (component instanceof BrewHardwareControl) {
-						ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
-						if (controlPoint != null && !controlPoint.isAutomaticControl()) {
-							if (component instanceof HeatElement) {
-								int newDuty = (int) (controlPoint.getDuty() + direction);
-								setNewDuty(component, selectedStep, controlPoint, newDuty);
+
+						RunRepeat run = new RunRepeat() {
+							int delay = 400;
+
+							@Override
+							public long run() {
+								ControlStep selectedStep = controller.getSelectedStep();
+								if (selectedStep != null) {
+									ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+									if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+										if (component instanceof HeatElement) {
+											int newDuty = (int) (controlPoint.getDuty() + direction);
+											setNewDuty(component, selectedStep, controlPoint, newDuty);
+
+											if (newDuty >= 100 || newDuty <= 0) {
+												return -1;
+											}
+											if (delay > 100) {
+												delay -= 100;
+											} else if (delay > 50) {
+												delay = 50;
+											}
+											return delay;
+										}
+									}
+								}
+								return -1;
 							}
+						};
+						long schedule = run.run();
+						if (schedule > -1) {
+							mouseState.whileDown = scheduler.scheduleReapeating(run, schedule);
 						}
+
 					} else if (component instanceof Sensor) {
 						Sensor sensor = (Sensor) component;
 						ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
@@ -188,6 +221,10 @@ public class BreweryDisplay {
 	}
 
 	private void handleUp() {
+		if (mouseState.whileDown != null) {
+			mouseState.whileDown.cancel();
+			mouseState.whileDown = null;
+		}
 		if (mouseState.display != null) {
 			mouseState.display.setMouseDown(false);
 			BreweryDisplay.this.drawer.redrawDisplay(mouseState.display);
@@ -366,6 +403,7 @@ public class BreweryDisplay {
 
 	private static class MouseState {
 
+		public Cancelable whileDown;
 		public boolean canDrag;
 		protected long startTime;
 		protected long lastTime;
