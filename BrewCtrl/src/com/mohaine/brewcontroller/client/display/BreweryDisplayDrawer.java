@@ -161,10 +161,14 @@ public class BreweryDisplayDrawer<T> {
 
 		switch (display.getType()) {
 		case UpCtrl:
-			drawArrow(context, display, false);
+			if (ContollerLogic.canModify(controller, display.getComponent())) {
+				drawArrow(context, display, false);
+			}
 			break;
 		case DownCtrl:
-			drawArrow(context, display, true);
+			if (ContollerLogic.canModify(controller, display.getComponent())) {
+				drawArrow(context, display, true);
+			}
 			break;
 		case Compenent:
 			if (Tank.TYPE.equals(component.getType())) {

@@ -46,6 +46,10 @@ import com.mohaine.brewcontroller.client.layout.Tank;
 
 public class BreweryDisplay {
 
+	private static final int MAX_TEMP = 110;
+
+	private static final int ARROW_SIZE = 15;
+
 	List<BreweryComponentDisplay> displays = new ArrayList<BreweryComponentDisplay>();
 
 	private BreweryDisplayDrawer<?> drawer;
@@ -160,7 +164,6 @@ public class BreweryDisplay {
 				final int direction = mouseState.display.getType() == DisplayType.UpCtrl ? 1 : -1;
 				if (selectedStep != null) {
 					if (component instanceof BrewHardwareControl) {
-
 						RunRepeat run = new RunRepeat() {
 							int delay = 400;
 
@@ -195,42 +198,40 @@ public class BreweryDisplay {
 						}
 
 					} else if (component instanceof Sensor) {
-						Sensor sensor = (Sensor) component;
-						ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
-						if (controlPoint != null && controlPoint.isAutomaticControl()) {
 
-							RunRepeat run = new RunRepeat() {
-								int delay = 400;
+						RunRepeat run = new RunRepeat() {
+							int delay = 400;
 
-								@Override
-								public long run() {
-									ControlStep selectedStep = controller.getSelectedStep();
-									if (selectedStep != null) {
-										ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
-										if (controlPoint != null && !controlPoint.isAutomaticControl()) {
-											double newTemp = controlPoint.getTargetTemp() + direction;
-											double setNewTemp = setNewTemp(component, selectedStep, controlPoint, newTemp);
-											if (newTemp == setNewTemp) {
-												return -1;
-											}
-											if (delay > 100) {
-												delay -= 100;
-											} else if (delay > 50) {
-												delay = 50;
-											}
-											return delay;
+							@Override
+							public long run() {
+								ControlStep selectedStep = controller.getSelectedStep();
+								if (selectedStep != null) {
+									Sensor sensor = (Sensor) component;
+									ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
+									if (controlPoint != null && controlPoint.isAutomaticControl()) {
+										double newTemp = controlPoint.getTargetTemp() + direction;
+										setNewTemp(component, selectedStep, controlPoint, newTemp);
 
+										if (newTemp <= 0 || newTemp >= MAX_TEMP) {
+											return -1;
 										}
-									}
-									return -1;
-								}
-							};
-							long schedule = run.run();
-							if (schedule > -1) {
-								mouseState.whileDown = scheduler.scheduleReapeating(run, schedule);
-							}
+										if (delay > 100) {
+											delay -= 100;
+										} else if (delay > 50) {
+											delay = 50;
+										}
+										return delay;
 
+									}
+								}
+								return -1;
+							}
+						};
+						long schedule = run.run();
+						if (schedule > -1) {
+							mouseState.whileDown = scheduler.scheduleReapeating(run, schedule);
 						}
+
 					}
 				}
 			} else if (component instanceof Pump) {
@@ -298,11 +299,11 @@ public class BreweryDisplay {
 		}
 	}
 
-	private double setNewTemp(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, double newTemp) {
+	private void setNewTemp(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, double newTemp) {
 		if (newTemp < 0) {
 			newTemp = 0;
 		} else if (newTemp > 110) {
-			newTemp = 110;
+			newTemp = MAX_TEMP;
 		}
 
 		if (newTemp != controlPoint.getTargetTemp()) {
@@ -310,10 +311,9 @@ public class BreweryDisplay {
 			eventBus.fireEvent(new StepModifyEvent(selectedStep));
 		}
 
-		return newTemp;
 	}
 
-	private int setNewDuty(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, int newDuty) {
+	private void setNewDuty(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, int newDuty) {
 		if (newDuty < 0) {
 			newDuty = 0;
 		} else if (newDuty > 100) {
@@ -325,7 +325,6 @@ public class BreweryDisplay {
 			eventBus.fireEvent(new StepModifyEvent(selectedStep));
 		}
 
-		return newDuty;
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
@@ -337,29 +336,41 @@ public class BreweryDisplay {
 				BreweryComponentDisplay tankBcd = createBcd(tank, 200, 200);
 
 				if (tank.getHeater() != null) {
-					BreweryComponentDisplay elementDisplay = createBcd(tank.getHeater(), 97 - 15, 30);
+					BreweryComponentDisplay elementDisplay = createBcd(tank.getHeater(), 97 - ARROW_SIZE, 30);
 					elementDisplay.setTop(25);
 					elementDisplay.setLeft(102);
 					elementDisplay.setParent(tankBcd);
 
-					BreweryComponentDisplay up = createBcd(tank.getHeater(), 15, 15);
+					BreweryComponentDisplay up = createBcd(tank.getHeater(), ARROW_SIZE, ARROW_SIZE);
 					up.setTop(elementDisplay.getTop());
 					up.setLeft(elementDisplay.getLeft() + elementDisplay.getWidth());
 					up.setType(DisplayType.UpCtrl);
 					up.setParent(tankBcd);
 
-					BreweryComponentDisplay down = createBcd(tank.getHeater(), 15, 15);
-					down.setTop(elementDisplay.getTop() + 15);
+					BreweryComponentDisplay down = createBcd(tank.getHeater(), ARROW_SIZE, ARROW_SIZE);
+					down.setTop(elementDisplay.getTop() + ARROW_SIZE);
 					down.setLeft(elementDisplay.getLeft() + elementDisplay.getWidth());
 					down.setType(DisplayType.DownCtrl);
 					down.setParent(tankBcd);
 				}
 
 				if (tank.getSensor() != null) {
-					BreweryComponentDisplay bcd = createBcd(tank.getSensor(), 97, 60);
-					bcd.setTop(25);
-					bcd.setLeft(2);
-					bcd.setParent(tankBcd);
+					BreweryComponentDisplay elementDisplay = createBcd(tank.getSensor(), 97, 60);
+					elementDisplay.setTop(25);
+					elementDisplay.setLeft(2);
+					elementDisplay.setParent(tankBcd);
+
+					BreweryComponentDisplay up = createBcd(tank.getSensor(), ARROW_SIZE, ARROW_SIZE);
+					up.setTop(elementDisplay.getTop());
+					up.setLeft(elementDisplay.getLeft() + elementDisplay.getWidth());
+					up.setType(DisplayType.UpCtrl);
+					up.setParent(tankBcd);
+
+					BreweryComponentDisplay down = createBcd(tank.getSensor(), ARROW_SIZE, ARROW_SIZE);
+					down.setTop(elementDisplay.getTop() + ARROW_SIZE);
+					down.setLeft(elementDisplay.getLeft() + elementDisplay.getWidth());
+					down.setType(DisplayType.DownCtrl);
+					down.setParent(tankBcd);
 				}
 			}
 
