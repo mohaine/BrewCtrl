@@ -198,8 +198,38 @@ public class BreweryDisplay {
 						Sensor sensor = (Sensor) component;
 						ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
 						if (controlPoint != null && controlPoint.isAutomaticControl()) {
-							double newTemp = controlPoint.getTargetTemp() + direction;
-							setNewTemp(component, selectedStep, controlPoint, newTemp);
+
+							RunRepeat run = new RunRepeat() {
+								int delay = 400;
+
+								@Override
+								public long run() {
+									ControlStep selectedStep = controller.getSelectedStep();
+									if (selectedStep != null) {
+										ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+										if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+											double newTemp = controlPoint.getTargetTemp() + direction;
+											double setNewTemp = setNewTemp(component, selectedStep, controlPoint, newTemp);
+											if (newTemp == setNewTemp) {
+												return -1;
+											}
+											if (delay > 100) {
+												delay -= 100;
+											} else if (delay > 50) {
+												delay = 50;
+											}
+											return delay;
+
+										}
+									}
+									return -1;
+								}
+							};
+							long schedule = run.run();
+							if (schedule > -1) {
+								mouseState.whileDown = scheduler.scheduleReapeating(run, schedule);
+							}
+
 						}
 					}
 				}
@@ -268,7 +298,7 @@ public class BreweryDisplay {
 		}
 	}
 
-	private void setNewTemp(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, double newTemp) {
+	private double setNewTemp(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, double newTemp) {
 		if (newTemp < 0) {
 			newTemp = 0;
 		} else if (newTemp > 110) {
@@ -279,9 +309,11 @@ public class BreweryDisplay {
 			controlPoint.setTargetTemp(newTemp);
 			eventBus.fireEvent(new StepModifyEvent(selectedStep));
 		}
+
+		return newTemp;
 	}
 
-	private void setNewDuty(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, int newDuty) {
+	private int setNewDuty(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, int newDuty) {
 		if (newDuty < 0) {
 			newDuty = 0;
 		} else if (newDuty > 100) {
@@ -292,6 +324,8 @@ public class BreweryDisplay {
 			controlPoint.setDuty(newDuty);
 			eventBus.fireEvent(new StepModifyEvent(selectedStep));
 		}
+
+		return newDuty;
 	}
 
 	public void setBreweryLayout(BreweryLayout brewLayout) {
