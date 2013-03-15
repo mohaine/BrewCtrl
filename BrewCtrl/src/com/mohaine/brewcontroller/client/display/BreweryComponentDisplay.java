@@ -4,15 +4,18 @@ import com.mohaine.brewcontroller.client.layout.BreweryComponent;
 
 public class BreweryComponentDisplay {
 
+	public enum DisplayType {
+		Compenent, UpCtrl, DownCtrl
+	}
+
 	private BreweryComponent component;
 	private int height;
 	private int width;
 	private int top;
 	private int left;
 	private BreweryComponentDisplay parent;
-
-	// private List<BreweryComponentDisplay> children = new
-	// ArrayList<BreweryComponentDisplay>();
+	private DisplayType type = DisplayType.Compenent;
+	private boolean mouseDown;
 
 	public BreweryComponentDisplay(BreweryComponent component) {
 		this.component = component;
@@ -85,6 +88,22 @@ public class BreweryComponentDisplay {
 			left += parent.getAbsLeft();
 		}
 		return left;
+	}
+
+	public DisplayType getType() {
+		return type;
+	}
+
+	public void setType(DisplayType type) {
+		this.type = type;
+	}
+
+	public boolean isMouseDown() {
+		return mouseDown;
+	}
+
+	public void setMouseDown(boolean mouseDown) {
+		this.mouseDown = mouseDown;
 	}
 
 }

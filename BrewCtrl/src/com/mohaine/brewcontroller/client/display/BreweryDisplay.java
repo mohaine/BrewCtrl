@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
 import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
+import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay.DisplayType;
 import com.mohaine.brewcontroller.client.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.client.event.BreweryComponentChangeEventHandler;
 import com.mohaine.brewcontroller.client.event.ChangeSelectedStepEvent;
@@ -50,7 +51,7 @@ public class BreweryDisplay {
 	private List<HandlerRegistration> handlers = new ArrayList<HandlerRegistration>();
 	private ControllerHardware controller;
 
-	private DragState dragState;
+	private MouseState mouseState;
 	private EventBus eventBus;
 
 	@Inject
@@ -63,55 +64,55 @@ public class BreweryDisplay {
 
 			@Override
 			public void mouseUp(DrawerMouseEvent e) {
-				dragState = null;
+				if (mouseState != null) {
+					handleUp();
+				}
+				mouseState = null;
 			}
 
 			@Override
 			public void mouseDown(DrawerMouseEvent e) {
-
-				dragState = new DragState();
-				dragState.x = e.getX();
-				dragState.y = e.getY();
-
+				mouseState = new MouseState();
+				mouseState.x = e.getX();
+				mouseState.y = e.getY();
 				for (int i = displays.size() - 1; i > -1; i--) {
 					BreweryComponentDisplay display = displays.get(i);
 
 					int absLeft = display.getAbsLeft();
 					int absTop = display.getAbsTop();
-					if (dragState.x >= absLeft && dragState.x < absLeft + display.getWidth()) {
-						if (dragState.y >= absTop && dragState.y < absTop + display.getHeight()) {
-							dragState.display = display;
-
+					if (mouseState.x >= absLeft && mouseState.x < absLeft + display.getWidth()) {
+						if (mouseState.y >= absTop && mouseState.y < absTop + display.getHeight()) {
+							mouseState.display = display;
 							break;
 						}
 					}
 				}
-				handleDragDown();
-				dragState.lastTime = System.currentTimeMillis();
-				dragState.lastX = dragState.x;
-				dragState.lastY = dragState.y;
+				handleDown();
+				mouseState.startTime = System.currentTimeMillis();
+				mouseState.lastTime = mouseState.startTime;
+				mouseState.lastX = mouseState.x;
+				mouseState.lastY = mouseState.y;
 			}
 
 			@Override
 			public void mouseDragged(DrawerMouseEvent e) {
-				if (dragState != null && dragState.display != null) {
-
-					long time = System.currentTimeMillis() - dragState.lastTime;
-					int deltaX = dragState.x - e.getX();
-					int deltaY = dragState.y - e.getY();
-
+				if (mouseState != null && mouseState.display != null) {
+					long time = System.currentTimeMillis() - mouseState.lastTime;
+					int deltaX = mouseState.x - e.getX();
+					int deltaY = mouseState.y - e.getY();
 					if (time < 300 && Math.abs(deltaX) < 15 && Math.abs(deltaY) < 15) {
 						// System.out.println("   Ignore: " + time + "  " +
 						// deltaX + "," + deltaY);
 						return;
 					}
-
-					dragState.x = e.getX();
-					dragState.y = e.getY();
-					handleDrag();
-					dragState.lastTime = System.currentTimeMillis();
-					dragState.lastX = dragState.x;
-					dragState.lastY = dragState.y;
+					mouseState.x = e.getX();
+					mouseState.y = e.getY();
+					if (mouseState.canDrag) {
+						handleDrag();
+					}
+					mouseState.lastTime = System.currentTimeMillis();
+					mouseState.lastX = mouseState.x;
+					mouseState.lastY = mouseState.y;
 				}
 			}
 		});
@@ -123,21 +124,10 @@ public class BreweryDisplay {
 			}
 		}));
 
-		// handlers.add(eventBus.addHandler(StepsModifyEvent.getType(), new
-		// StepsModifyEventHandler() {
-		// @Override
-		// public void onStepsChange() {
-		// BreweryDisplay.this.drawer.redrawAll();
-		// }
-		// }));
-
 		eventBus.addHandler(StepModifyEvent.getType(), new StepModifyEventHandler() {
-
 			@Override
 			public void onStepChange(ControlStep step, boolean fromServer) {
-
 				BreweryDisplay.this.drawer.redrawAll();
-
 			}
 		});
 
@@ -150,95 +140,120 @@ public class BreweryDisplay {
 
 	}
 
-	private void handleDragDown() {
-		if (dragState.display != null) {
-			BreweryComponent component = dragState.display.getComponent();
+	private void handleDown() {
+		mouseState.canDrag = false;
+		if (mouseState.display != null) {
+			mouseState.canDrag = true;
+			BreweryComponent component = mouseState.display.getComponent();
 			ControlStep selectedStep = controller.getSelectedStep();
-			if (selectedStep != null) {
-				if (component instanceof BrewHardwareControl) {
+
+			mouseState.display.setMouseDown(true);
+
+			if (mouseState.display.getType() == DisplayType.UpCtrl || mouseState.display.getType() == DisplayType.DownCtrl) {
+				mouseState.canDrag = false;
+				int direction = mouseState.display.getType() == DisplayType.UpCtrl ? 1 : -1;
+				if (selectedStep != null) {
+					if (component instanceof BrewHardwareControl) {
+						ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+						if (controlPoint != null && !controlPoint.isAutomaticControl()) {
+							if (component instanceof HeatElement) {
+								int newDuty = (int) (controlPoint.getDuty() + direction);
+								setNewDuty(component, selectedStep, controlPoint, newDuty);
+							}
+						}
+					} else if (component instanceof Sensor) {
+						Sensor sensor = (Sensor) component;
+						ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
+						if (controlPoint != null && controlPoint.isAutomaticControl()) {
+							double newTemp = controlPoint.getTargetTemp() + direction;
+							setNewTemp(component, selectedStep, controlPoint, newTemp);
+						}
+					}
+				}
+			} else if (component instanceof Pump) {
+				mouseState.canDrag = false;
+				if (selectedStep != null) {
 					BrewHardwareControl brewHardwareControl = (BrewHardwareControl) component;
 					ControlPoint controlPoint = selectedStep.getControlPointForPin(brewHardwareControl.getPin());
 					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
-						if (component instanceof Pump) {
-							controlPoint.setDuty(controlPoint.getDuty() > 0 ? 0 : 100);
-							BreweryDisplay.this.drawer.redrawBreweryComponent(component);
-							eventBus.fireEvent(new StepModifyEvent(selectedStep));
-						}
+						controlPoint.setDuty(controlPoint.getDuty() > 0 ? 0 : 100);
+						eventBus.fireEvent(new StepModifyEvent(selectedStep));
 					}
-					// } else if (component instanceof Sensor) {
-					// Sensor sensor = (Sensor) component;
-					// ControlPoint controlPoint =
-					// selectedStep.getControlPointForAddress(sensor.getAddress());
-					// if (controlPoint != null &&
-					// !controlPoint.isAutomaticControl()) {
-					// }
 				}
 			}
+
+			BreweryDisplay.this.drawer.redrawDisplay(mouseState.display);
+
+		}
+	}
+
+	private void handleUp() {
+		if (mouseState.display != null) {
+			mouseState.display.setMouseDown(false);
+			BreweryDisplay.this.drawer.redrawDisplay(mouseState.display);
 		}
 	}
 
 	private void handleDrag() {
-		if (dragState.display != null) {
-			double delta = dragState.lastY - dragState.y;
+		if (mouseState.display != null) {
+			double delta = mouseState.lastY - mouseState.y;
 
-			long time = System.currentTimeMillis() - dragState.lastTime;
+			long time = System.currentTimeMillis() - mouseState.lastTime;
 			if (time > 200 && Math.abs(delta) < 30) {
 				delta = delta < 0 ? -1 : 1;
 			} else if (time > 100 && Math.abs(delta) > 15) {
 				delta = delta * 0.5;
 			}
 
-			BreweryComponent component = dragState.display.getComponent();
+			BreweryComponent component = mouseState.display.getComponent();
 			ControlStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
-
 				if (component instanceof BrewHardwareControl) {
 					ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
 					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 						if (component instanceof HeatElement) {
 							int newDuty = (int) (controlPoint.getDuty() + delta);
-							if (newDuty < 0) {
-								newDuty = 0;
-							} else if (newDuty > 100) {
-								newDuty = 100;
-							}
-
-							if (newDuty != controlPoint.getDuty()) {
-
-								// System.out.println("   " +
-								// controlPoint.getDuty() + " =>: " + newDuty +
-								// " Delta: " + delta);
-
-								controlPoint.setDuty(newDuty);
-								BreweryDisplay.this.drawer.redrawBreweryComponent(component);
-								eventBus.fireEvent(new StepModifyEvent(selectedStep));
-							}
+							setNewDuty(component, selectedStep, controlPoint, newDuty);
 						}
 					}
 				} else if (component instanceof Sensor) {
 					Sensor sensor = (Sensor) component;
 					ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
 					if (controlPoint != null && controlPoint.isAutomaticControl()) {
-
 						delta = delta * (5.0 / 9.0);
-
 						double newTemp = controlPoint.getTargetTemp() + delta;
 
-						if (newTemp < 0) {
-							newTemp = 0;
-						} else if (newTemp > 110) {
-							newTemp = 110;
-						}
-
-						if (newTemp != controlPoint.getTargetTemp()) {
-							controlPoint.setTargetTemp(newTemp);
-							BreweryDisplay.this.drawer.redrawBreweryComponent(component);
-							eventBus.fireEvent(new StepModifyEvent(selectedStep));
-						}
+						setNewTemp(component, selectedStep, controlPoint, newTemp);
 					}
 				}
 
 			}
+		}
+	}
+
+	private void setNewTemp(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, double newTemp) {
+		if (newTemp < 0) {
+			newTemp = 0;
+		} else if (newTemp > 110) {
+			newTemp = 110;
+		}
+
+		if (newTemp != controlPoint.getTargetTemp()) {
+			controlPoint.setTargetTemp(newTemp);
+			eventBus.fireEvent(new StepModifyEvent(selectedStep));
+		}
+	}
+
+	private void setNewDuty(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, int newDuty) {
+		if (newDuty < 0) {
+			newDuty = 0;
+		} else if (newDuty > 100) {
+			newDuty = 100;
+		}
+
+		if (newDuty != controlPoint.getDuty()) {
+			controlPoint.setDuty(newDuty);
+			eventBus.fireEvent(new StepModifyEvent(selectedStep));
 		}
 	}
 
@@ -251,10 +266,22 @@ public class BreweryDisplay {
 				BreweryComponentDisplay tankBcd = createBcd(tank, 200, 200);
 
 				if (tank.getHeater() != null) {
-					BreweryComponentDisplay bcd = createBcd(tank.getHeater(), 97, 30);
-					bcd.setTop(25);
-					bcd.setLeft(102);
-					bcd.setParent(tankBcd);
+					BreweryComponentDisplay elementDisplay = createBcd(tank.getHeater(), 97 - 15, 30);
+					elementDisplay.setTop(25);
+					elementDisplay.setLeft(102);
+					elementDisplay.setParent(tankBcd);
+
+					BreweryComponentDisplay up = createBcd(tank.getHeater(), 15, 15);
+					up.setTop(elementDisplay.getTop());
+					up.setLeft(elementDisplay.getLeft() + elementDisplay.getWidth());
+					up.setType(DisplayType.UpCtrl);
+					up.setParent(tankBcd);
+
+					BreweryComponentDisplay down = createBcd(tank.getHeater(), 15, 15);
+					down.setTop(elementDisplay.getTop() + 15);
+					down.setLeft(elementDisplay.getLeft() + elementDisplay.getWidth());
+					down.setType(DisplayType.DownCtrl);
+					down.setParent(tankBcd);
 				}
 
 				if (tank.getSensor() != null) {
@@ -263,7 +290,6 @@ public class BreweryDisplay {
 					bcd.setLeft(2);
 					bcd.setParent(tankBcd);
 				}
-
 			}
 
 			List<Pump> pumps = brewLayout.getPumps();
@@ -277,8 +303,8 @@ public class BreweryDisplay {
 
 	private BreweryComponentDisplay createBcd(BreweryComponent comp, int width, int height) {
 		BreweryComponentDisplay display = new BreweryComponentDisplay(comp);
-		display.setSize(width, height);
 		displays.add(display);
+		display.setSize(width, height);
 		return display;
 	}
 
@@ -296,7 +322,6 @@ public class BreweryDisplay {
 
 			width = Math.max(width, left);
 			height = Math.max(height, top + tank.getHeight() + 5);
-
 		}
 
 		left = 5;
@@ -339,8 +364,10 @@ public class BreweryDisplay {
 		}
 	}
 
-	private static class DragState {
+	private static class MouseState {
 
+		public boolean canDrag;
+		protected long startTime;
 		protected long lastTime;
 		protected BreweryComponentDisplay display;
 		protected int lastY;

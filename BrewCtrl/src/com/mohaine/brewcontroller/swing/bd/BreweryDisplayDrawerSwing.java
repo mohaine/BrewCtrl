@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
@@ -365,5 +366,30 @@ public class BreweryDisplayDrawerSwing extends Canvas implements DrawerCanvas<Gr
 		gc.g.fill(circleTop);
 		gc.g.setColor(strokePaint);
 		gc.g.draw(circleTop);
+	}
+
+	@Override
+	public void drawArrow(GraphicContext gc, int left, int top, int width, int height, boolean down, boolean fill) {
+
+		gc.g.setColor(DrawStyleSwing.FOREGROUND);
+		Polygon polygon = new Polygon();
+		int right = left + width;
+		int middle = left + width / 2;
+		int bottom = top + height;
+
+		if (down) {
+			polygon.addPoint(left, top);
+			polygon.addPoint(right, top);
+			polygon.addPoint(middle, bottom);
+		} else {
+			polygon.addPoint(middle, top);
+			polygon.addPoint(right, bottom);
+			polygon.addPoint(left, bottom);
+		}
+		gc.g.drawPolygon(polygon);
+		if (fill) {
+			gc.g.fillPolygon(polygon);
+		}
+
 	}
 }

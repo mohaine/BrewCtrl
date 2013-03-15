@@ -173,12 +173,11 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 
 	@Override
 	public void drawText(Context2d context, String text, BColor textColor, BColor bgColor, HAlign align, int left, int top, int width, int height, BFont font) {
-		
+
 		context.setFillStyle(DrawStyleGwt.mapColor(bgColor));
 		context.fillRect(left, top, width, height);
 		context.setFont(DrawStyleGwt.mapFont(font));
-		
-		
+
 		TextMetrics measureText = context.measureText(text);
 		int x;
 		switch (align) {
@@ -194,8 +193,6 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 			break;
 		}
 
-		
-		
 		context.setFillStyle(DrawStyleGwt.mapColor(textColor));
 		context.fillText(text, left + x, top + height);
 	}
@@ -252,6 +249,31 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 
 		// Top
 		drawEllipse(g, left, top, width, TANK_TOP_HEIGHT);
+	}
+
+	@Override
+	public void drawArrow(Context2d g, int left, int top, int width, int height, boolean down, boolean fill) {
+		g.setFillStyle(DrawStyleGwt.FOREGROUND);
+		g.setStrokeStyle(DrawStyleGwt.FOREGROUND);
+
+		int right = left + width;
+		int middle = left + width / 2;
+		int bottom = top + height;
+		g.beginPath();
+		if (down) {
+			g.moveTo(left, top);
+			g.lineTo(right, top);
+			g.lineTo(middle, bottom);
+		} else {
+			g.moveTo(middle, top);
+			g.lineTo(right, bottom);
+			g.lineTo(left, bottom);
+		}
+		g.stroke();
+		if (fill) {
+			g.fill();
+		}
+
 	}
 
 }

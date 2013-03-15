@@ -40,7 +40,8 @@ import com.mohaine.brewcontroller.client.layout.Tank;
 public class BreweryDisplayDrawer<T> {
 
 	private static final int NAME_HEIGHT = 20;
-	private UnitConversion conversion;
+	private static final int CTRL_PAD = 2;
+	UnitConversion conversion;
 	private ControllerHardware controller;
 
 	private DrawerCanvas<T> canvas;
@@ -76,6 +77,8 @@ public class BreweryDisplayDrawer<T> {
 		void drawPump(T context, int left, int top, int width, int height, BColor backPaint, boolean on);
 
 		void drawTank(T context, int left, int top, int width, int height);
+
+		void drawArrow(T context, int absLeft, int absTop, int width, int height, boolean downArrow, boolean fillArrow);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -111,8 +114,15 @@ public class BreweryDisplayDrawer<T> {
 		redrawAll();
 	}
 
+	public void redrawDisplay(BreweryComponentDisplay display) {
+		T context = canvas.getContext();
+		drawComponent(context, display);
+		canvas.displayContext(context);
+	}
+
 	public void redrawBreweryComponent(BreweryComponent component) {
 		T context = canvas.getContext();
+
 		for (BreweryComponentDisplay display : displays) {
 			BreweryComponent displayComponent = display.getComponent();
 			if (displayComponent == component) {
@@ -146,22 +156,44 @@ public class BreweryDisplayDrawer<T> {
 		return canvas.getWidget();
 	}
 
-	private void drawComponent(T context2d, BreweryComponentDisplay display) {
+	private void drawComponent(T context, BreweryComponentDisplay display) {
 		BreweryComponent component = display.getComponent();
-		if (Tank.TYPE.equals(component.getType())) {
-			drawTank(context2d, display);
-		} else if (Pump.TYPE.equals(component.getType())) {
-			drawPump(context2d, display);
-		} else if (Sensor.TYPE.equals(component.getType())) {
-			drawSensor(context2d, display);
-		} else if (HeatElement.TYPE.equals(component.getType())) {
-			drawHeatElement(context2d, display);
-		} else {
-			canvas.fillRect(context2d, display.getAbsLeft(), display.getAbsLeft(), display.getWidth(), display.getHeight(), BColor.FOREGROUND);
+
+		switch (display.getType()) {
+		case UpCtrl:
+			drawArrow(context, display, false);
+			break;
+		case DownCtrl:
+			drawArrow(context, display, true);
+			break;
+		case Compenent:
+			if (Tank.TYPE.equals(component.getType())) {
+				drawTank(context, display);
+			} else if (Pump.TYPE.equals(component.getType())) {
+				drawPump(context, display);
+			} else if (Sensor.TYPE.equals(component.getType())) {
+				drawSensor(context, display);
+			} else if (HeatElement.TYPE.equals(component.getType())) {
+				drawHeatElement(context, display);
+			} else {
+				canvas.fillRect(context, display.getAbsLeft(), display.getAbsLeft(), display.getWidth(), display.getHeight(), BColor.FOREGROUND);
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
-	private void drawHeatElement(T g, BreweryComponentDisplay display) {
+	private void drawArrow(T context, BreweryComponentDisplay display, boolean down) {
+		int left = display.getAbsLeft() + CTRL_PAD;
+		int top = display.getAbsTop() + CTRL_PAD;
+		int width = display.getWidth() - CTRL_PAD * 2;
+		int height = display.getHeight() - CTRL_PAD * 2;
+
+		canvas.drawArrow(context, left, top, width, height, down, !display.isMouseDown());
+	}
+
+	private void drawHeatElement(T context, BreweryComponentDisplay display) {
 		HeatElement heater = (HeatElement) display.getComponent();
 		int duty = heater.getDuty();
 		String text = null;
@@ -201,7 +233,7 @@ public class BreweryDisplayDrawer<T> {
 		if (text == null) {
 			text = Integer.toString(duty) + "%";
 		}
-		drawText(g, display, text, color, BColor.TANK, HAlign.RIGHT);
+		drawText(context, display, text, color, BColor.TANK, HAlign.RIGHT);
 	}
 
 	private void drawText(T g, BreweryComponentDisplay display, String tempDisplay, BColor textColor, BColor bgColor, HAlign align) {
