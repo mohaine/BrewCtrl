@@ -81,6 +81,15 @@ public class BreweryDisplay {
 
 			@Override
 			public void mouseDown(DrawerMouseEvent e) {
+
+				if (mouseState != null) {
+					Cancelable whileDown = mouseState.whileDown;
+					if (whileDown != null) {
+						whileDown.cancel();
+					}
+					mouseState.whileDown = null;
+					mouseState = null;
+				}
 				mouseState = new MouseState();
 				mouseState.x = e.getX();
 				mouseState.y = e.getY();
