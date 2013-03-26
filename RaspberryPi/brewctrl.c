@@ -23,17 +23,21 @@
 #include <sys/time.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdint.h>
+
+uint64_t startTime = 0;
 
 long millis() {
-
 	struct timeval time;
-
 	gettimeofday(&time, NULL);
-	double millisInMicrosonds = time.tv_usec / 1000.0;
-	double millisInSeconds = time.tv_sec * 1000;
-	double totalMilliseconds = millisInSeconds + millisInMicrosonds;
-	double totalMillisecondsRoundUp = totalMilliseconds + 0.5;
-	return (long) (totalMillisecondsRoundUp);
+
+	uint64_t currentTime = time.tv_usec + time.tv_sec * 1000000;
+
+	if (startTime == 0) {
+		startTime = currentTime;
+	}
+
+	return (long) ((currentTime - startTime) / 1000);
 }
 
 char * generateRandomId() {
