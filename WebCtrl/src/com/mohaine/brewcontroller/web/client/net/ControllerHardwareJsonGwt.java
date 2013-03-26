@@ -33,6 +33,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Timer;
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.bean.Configuration;
+import com.mohaine.brewcontroller.client.display.Scheduler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
 import com.mohaine.brewcontroller.client.net.Callback;
@@ -69,8 +70,8 @@ public class ControllerHardwareJsonGwt extends ControllerHardwareJson {
 	}
 
 	@Inject
-	public ControllerHardwareJsonGwt(EventBus eventBusp, BrewJsonConverter converter) throws Exception {
-		super(eventBusp, converter);
+	public ControllerHardwareJsonGwt(EventBus eventBusp, BrewJsonConverter converter, Scheduler scheduler) throws Exception {
+		super(eventBusp, converter, scheduler);
 		statusTimer.schedule(500);
 	}
 

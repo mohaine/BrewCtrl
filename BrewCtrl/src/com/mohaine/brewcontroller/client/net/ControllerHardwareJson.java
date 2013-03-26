@@ -12,6 +12,8 @@ import com.mohaine.brewcontroller.client.bean.ControllerStatus;
 import com.mohaine.brewcontroller.client.bean.ControllerStatus.Mode;
 import com.mohaine.brewcontroller.client.bean.TempSensor;
 import com.mohaine.brewcontroller.client.bean.VersionBean;
+import com.mohaine.brewcontroller.client.display.Scheduler;
+import com.mohaine.brewcontroller.client.display.Scheduler.RunRepeat;
 import com.mohaine.brewcontroller.client.event.BreweryComponentChangeEvent;
 import com.mohaine.brewcontroller.client.event.BreweryLayoutChangeEvent;
 import com.mohaine.brewcontroller.client.event.ChangeModeEvent;
@@ -32,7 +34,8 @@ import com.mohaine.brewcontroller.shared.json.JsonObjectConverter;
 import com.mohaine.brewcontroller.shared.util.StringUtils;
 
 public abstract class ControllerHardwareJson implements ControllerHardware {
-
+	public static final String OK = "OK";
+	private static int STATUS_TIMEOUT_MS = 2000;
 	private List<BrewHardwareControl> brewHardwareControls = new ArrayList<BrewHardwareControl>();
 
 	private ControllerStatus controllerStatus;
@@ -56,6 +59,9 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 	private final JsonObjectConverter converter;
 
+	private Scheduler scheduler;
+	protected long lastStatusUpdate;
+
 	protected abstract Configuration loadDefaultConfiguration();
 
 	protected abstract void saveDefaultConfiguration() throws Exception;
@@ -69,7 +75,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 	}
 
 	@Inject
-	public ControllerHardwareJson(EventBus eventBusp, BrewJsonConverter converter) throws Exception {
+	public ControllerHardwareJson(EventBus eventBusp, BrewJsonConverter converter, Scheduler scheduler) throws Exception {
 		super();
 		this.converter = converter.getJsonConverter();
 		this.eventBus = eventBusp;
@@ -83,6 +89,22 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				}
 			}
 		});
+
+		scheduler.scheduleReapeating(new RunRepeat() {
+
+			@Override
+			public long run() {
+
+				if (OK.equals(status)) {
+					if (System.currentTimeMillis() - lastStatusUpdate > 2000) {
+						setStatus("Status Update Timeout");
+					}
+				}
+
+				return STATUS_TIMEOUT_MS;
+			}
+		}, STATUS_TIMEOUT_MS);
+
 	}
 
 	protected void updateStatus() throws Exception {
@@ -126,8 +148,8 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				commandRequest.runRequest(new Callback<String>() {
 					@Override
 					public void onSuccess(String response) {
-
-						setStatus("OK");
+						lastStatusUpdate = System.currentTimeMillis();
+						setStatus(OK);
 						boolean success = false;
 						List<Event<?>> eventsToFire = new ArrayList<Event<?>>();
 						try {

@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import com.mohaine.brewcontroller.ConfigurationLoader;
 import com.mohaine.brewcontroller.ControllerUrlLoader;
 import com.mohaine.brewcontroller.client.bean.Configuration;
+import com.mohaine.brewcontroller.client.display.Scheduler;
 import com.mohaine.brewcontroller.client.event.bus.EventBus;
 import com.mohaine.brewcontroller.client.net.BrewJsonConverter;
 import com.mohaine.brewcontroller.client.net.Callback;
@@ -20,8 +21,9 @@ public class ControllerHardwareJsonUrlRequest extends ControllerHardwareJson {
 	private ControllerUrlLoader controllerUrlLoader;
 
 	@Inject
-	public ControllerHardwareJsonUrlRequest(EventBus eventBusp, BrewJsonConverter converter, ConfigurationLoader configurationLoader, ControllerUrlLoader controllerUrlLoader) throws Exception {
-		super(eventBusp, converter);
+	public ControllerHardwareJsonUrlRequest(EventBus eventBusp, BrewJsonConverter converter, ConfigurationLoader configurationLoader, ControllerUrlLoader controllerUrlLoader, Scheduler scheduler)
+			throws Exception {
+		super(eventBusp, converter, scheduler);
 		this.controllerUrlLoader = controllerUrlLoader;
 		this.configurationLoader = configurationLoader;
 
