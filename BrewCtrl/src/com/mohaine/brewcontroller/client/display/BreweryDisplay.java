@@ -184,7 +184,7 @@ public class BreweryDisplay {
 									if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 										if (component instanceof HeatElement) {
 											int newDuty = (int) (controlPoint.getDuty() + direction);
-											setNewDuty(component, selectedStep, controlPoint, newDuty);
+											setNewDuty(mouseState, component, selectedStep, controlPoint, newDuty);
 
 											if (newDuty >= 100 || newDuty <= 0) {
 												return -1;
@@ -219,7 +219,7 @@ public class BreweryDisplay {
 									ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
 									if (controlPoint != null && controlPoint.isAutomaticControl()) {
 										double newTemp = controlPoint.getTargetTemp() + direction;
-										setNewTemp(component, selectedStep, controlPoint, newTemp);
+										setNewTemp(mouseState, component, selectedStep, controlPoint, newTemp);
 
 										if (newTemp <= 0 || newTemp >= MAX_TEMP) {
 											return -1;
@@ -265,6 +265,11 @@ public class BreweryDisplay {
 			mouseState.whileDown.cancel();
 			mouseState.whileDown = null;
 		}
+
+		Runnable whenComplete = mouseState.whenComplete;
+		if (whenComplete != null) {
+			whenComplete.run();
+		}
 		if (mouseState.display != null) {
 			mouseState.display.setMouseDown(false);
 			BreweryDisplay.this.drawer.redrawDisplay(mouseState.display);
@@ -290,7 +295,7 @@ public class BreweryDisplay {
 					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 						if (component instanceof HeatElement) {
 							int newDuty = (int) (controlPoint.getDuty() + delta);
-							setNewDuty(component, selectedStep, controlPoint, newDuty);
+							setNewDuty(mouseState, component, selectedStep, controlPoint, newDuty);
 						}
 					}
 				} else if (component instanceof Sensor) {
@@ -300,7 +305,7 @@ public class BreweryDisplay {
 						delta = delta * (5.0 / 9.0);
 						double newTemp = controlPoint.getTargetTemp() + delta;
 
-						setNewTemp(component, selectedStep, controlPoint, newTemp);
+						setNewTemp(mouseState, component, selectedStep, controlPoint, newTemp);
 					}
 				}
 
@@ -308,7 +313,7 @@ public class BreweryDisplay {
 		}
 	}
 
-	private void setNewTemp(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, double newTemp) {
+	private void setNewTemp(MouseState mouseState, BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, double newTemp) {
 		if (newTemp < 0) {
 			newTemp = 0;
 		} else if (newTemp > 110) {
@@ -316,13 +321,19 @@ public class BreweryDisplay {
 		}
 
 		if (newTemp != controlPoint.getTargetTemp()) {
+			if (mouseState.whenComplete == null) {
+				mouseState.whenComplete = new MouseStateWhenComplete();
+			}
+			MouseStateWhenComplete wc = (MouseStateWhenComplete) mouseState.whenComplete;
+			wc.selectedStep = selectedStep;
 			controlPoint.setTargetTemp(newTemp);
-			eventBus.fireEvent(new StepModifyEvent(selectedStep));
+			drawer.addPending(controlPoint);
+			BreweryDisplay.this.drawer.redrawBreweryComponent(component);
 		}
 
 	}
 
-	private void setNewDuty(BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, int newDuty) {
+	private void setNewDuty(MouseState mouseState, BreweryComponent component, ControlStep selectedStep, ControlPoint controlPoint, int newDuty) {
 		if (newDuty < 0) {
 			newDuty = 0;
 		} else if (newDuty > 100) {
@@ -330,8 +341,14 @@ public class BreweryDisplay {
 		}
 
 		if (newDuty != controlPoint.getDuty()) {
+			if (mouseState.whenComplete == null) {
+				mouseState.whenComplete = new MouseStateWhenComplete();
+			}
+			MouseStateWhenComplete wc = (MouseStateWhenComplete) mouseState.whenComplete;
+			wc.selectedStep = selectedStep;
 			controlPoint.setDuty(newDuty);
-			eventBus.fireEvent(new StepModifyEvent(selectedStep));
+			drawer.addPending(controlPoint);
+			BreweryDisplay.this.drawer.redrawBreweryComponent(component);
 		}
 
 	}
@@ -456,8 +473,8 @@ public class BreweryDisplay {
 	}
 
 	private static class MouseState {
-
 		public Cancelable whileDown;
+		public Runnable whenComplete;
 		public boolean canDrag;
 		protected long startTime;
 		protected long lastTime;
@@ -468,6 +485,17 @@ public class BreweryDisplay {
 		protected int y;
 		protected int x;
 
+	}
+
+	private class MouseStateWhenComplete implements Runnable {
+		public ControlStep selectedStep;
+
+		@Override
+		public void run() {
+			eventBus.fireEvent(new StepModifyEvent(selectedStep));
+
+			drawer.clearPending();
+		}
 	}
 
 }
