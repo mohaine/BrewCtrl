@@ -12,7 +12,8 @@
 	<property name="web.home" value="${build.home}/web" />
 	<property name="jar.home" value="${build.home}/jar" />
 	<property name="brewctrl" value="../BrewCtrl" />
-
+	<property name="rpi.web" value="../RaspberryPi/web" />
+	
 
 	<path id="compile.classpath">
 		<fileset dir="lib">
@@ -46,6 +47,17 @@
 		<delete dir="${build.home}" />
 	</target>
 
+	<target name="copy-to-rpi" depends="gwt-compile">
+		<delete dir="${rpi.web}" />
+		<mkdir dir="${rpi.web}" />
+
+		<copy todir="../RaspberryPi/web">
+			<fileset dir="${web.home}">
+				<include name="**/*" />
+				<exclude name="WEB-INF/**" />
+			</fileset>
+		</copy>
+	</target>
 
 	<target name="gwt-compile" depends="">
 		<property name="gwt.compile.library" value="com.mohaine.brewcontroller.web.WebCtrl" />

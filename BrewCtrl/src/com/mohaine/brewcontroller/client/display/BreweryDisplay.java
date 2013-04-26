@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
+import com.mohaine.brewcontroller.client.TempFConverter;
 import com.mohaine.brewcontroller.client.bean.ControlPoint;
 import com.mohaine.brewcontroller.client.bean.ControlStep;
 import com.mohaine.brewcontroller.client.display.BreweryComponentDisplay.DisplayType;
@@ -170,7 +171,7 @@ public class BreweryDisplay {
 
 			if (mouseState.display.getType() == DisplayType.UpCtrl || mouseState.display.getType() == DisplayType.DownCtrl) {
 				mouseState.canDrag = false;
-				final int direction = mouseState.display.getType() == DisplayType.UpCtrl ? 1 : -1;
+				final double direction = mouseState.display.getType() == DisplayType.UpCtrl ? TempFConverter.convertF2C(1) : TempFConverter.convertF2C(-1);
 				if (selectedStep != null) {
 					if (component instanceof BrewHardwareControl) {
 						RunRepeat run = new RunRepeat() {
@@ -183,7 +184,12 @@ public class BreweryDisplay {
 									ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
 									if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 										if (component instanceof HeatElement) {
-											int newDuty = (int) (controlPoint.getDuty() + direction);
+
+											if (mouseState.adjustValue == null) {
+												mouseState.adjustValue = new Double(controlPoint.getDuty());
+											}
+
+											int newDuty = (int) (mouseState.adjustValue + direction);
 											setNewDuty(mouseState, component, selectedStep, controlPoint, newDuty);
 
 											if (newDuty >= 100 || newDuty <= 0) {
@@ -218,7 +224,12 @@ public class BreweryDisplay {
 									Sensor sensor = (Sensor) component;
 									ControlPoint controlPoint = selectedStep.getControlPointForAddress(sensor.getAddress());
 									if (controlPoint != null && controlPoint.isAutomaticControl()) {
-										double newTemp = controlPoint.getTargetTemp() + direction;
+
+										if (mouseState.adjustValue == null) {
+											mouseState.adjustValue = new Double(controlPoint.getTargetTemp());
+										}
+
+										double newTemp = mouseState.adjustValue + direction;
 										setNewTemp(mouseState, component, selectedStep, controlPoint, newTemp);
 
 										if (newTemp <= 0 || newTemp >= MAX_TEMP) {
@@ -473,6 +484,7 @@ public class BreweryDisplay {
 	}
 
 	private static class MouseState {
+		protected Double adjustValue;
 		public Cancelable whileDown;
 		public Runnable whenComplete;
 		public boolean canDrag;
