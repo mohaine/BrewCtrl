@@ -171,7 +171,7 @@ public class BreweryDisplay {
 
 			if (mouseState.display.getType() == DisplayType.UpCtrl || mouseState.display.getType() == DisplayType.DownCtrl) {
 				mouseState.canDrag = false;
-				final double direction = mouseState.display.getType() == DisplayType.UpCtrl ? TempFConverter.convertF2C(1) : TempFConverter.convertF2C(-1);
+				final int direction = mouseState.display.getType() == DisplayType.UpCtrl ? 1 : -1;
 				if (selectedStep != null) {
 					if (component instanceof BrewHardwareControl) {
 						RunRepeat run = new RunRepeat() {
@@ -190,6 +190,7 @@ public class BreweryDisplay {
 											}
 
 											int newDuty = (int) (mouseState.adjustValue + direction);
+											mouseState.adjustValue = new Double(newDuty);
 											setNewDuty(mouseState, component, selectedStep, controlPoint, newDuty);
 
 											if (newDuty >= 100 || newDuty <= 0) {
@@ -229,7 +230,8 @@ public class BreweryDisplay {
 											mouseState.adjustValue = new Double(controlPoint.getTargetTemp());
 										}
 
-										double newTemp = mouseState.adjustValue + direction;
+										double newTemp = mouseState.adjustValue + TempFConverter.convertF2C(32 + direction);
+										mouseState.adjustValue = newTemp;
 										setNewTemp(mouseState, component, selectedStep, controlPoint, newTemp);
 
 										if (newTemp <= 0 || newTemp >= MAX_TEMP) {
