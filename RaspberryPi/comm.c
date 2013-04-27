@@ -912,7 +912,7 @@ void * listenThread(void *ptr) {
 		HandleClientParmas * params = malloc(sizeof(HandleClientParmas));
 
 		params->clntSocket = accept(sock, (struct sockaddr *) &client_addr, &sin_size);
-		printf("Connection from (%s , %d)\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+		DBG("Connection from (%s , %d)\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
 		pthread_create(&thread, NULL, handleClientThread, (void*) params);
 	}
