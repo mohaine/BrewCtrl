@@ -49,6 +49,7 @@ int main() {
 
 	initLogFile();
 	initConfiguration();
+	startComm();
 
 //	Configuration* configuration = getConfiguration();
 //	if (configuration != NULL) {

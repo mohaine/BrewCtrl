@@ -88,7 +88,6 @@ void loop(void) {
 	turnOff();
 	searchForTempSensors();
 
-	startComm();
 
 	startLoopFunction(1000, updateDuty);
 	startLoopFunction(100, updatePinsForSetDuty);
