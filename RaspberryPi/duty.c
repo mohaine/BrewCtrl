@@ -59,9 +59,9 @@ void pinMode(int pin, bool inout) {
 void digitalWrite(int pin, bool hilow) {
 
 	if (hilow) {
-		DBG("   %d -> ON\n", pin);
+		//DBG("   %d -> ON\n", pin);
 	} else {
-		DBG("   %d -> OFF\n", pin);
+		//DBG("   %d -> OFF\n", pin);
 	}
 
 #ifdef MOCK

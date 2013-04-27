@@ -38,6 +38,9 @@ int sensorCount = 0;
 #define BAD_READ "00 00 00 00 00 00 00 00 00 : crc=00 YES"
 
 void readSensors() {
+
+	DBG("Read Sensors\n");
+
 	char tmp[PATH_MAX];
 
 	char data[200];
@@ -81,23 +84,36 @@ void readSensors() {
 
 								// 85 is the chips start up temp.  It reads as a valid temp so......
 								if (!hasVaildTemp(sensor) && (tempC == 85 || tempC == 0)) {
+									DBG("Sensor temp is startup temp. Ignore\n");
 								} else if ((sensor->lastTemp < 84 || sensor->lastTemp > 86) && tempC == 85) {
 									// Was reading temp ouside of 85+-1 and have temp = 85.0 assume it is startup temp
+									DBG("Sensor temp is startup temp 85 and wasn't close last time. Ignore\n");
 								} else if ((sensor->lastTemp < -1 || sensor->lastTemp > 1) && tempC == 0) {
 									// Was reading temp ouside of 0+-1 and have temp = 0.0 assume it is startup temp
+									DBG("Sensor temp is startup temp 0 and wasn't close last time. Ignore\n");
 								} else {
 									sensor->lastTemp = tempC;
 									sensor->lastReadMillis = millis();
 								}
-
+							} else {
+								DBG("no t= in sensor data\n");
 							}
+						} else {
+							DBG("invalid crc in sensor data\n");
 						}
+					} else {
+						DBG("no crc in sensor data\n");
 					}
-
+				} else {
+					DBG("read zero temp/crc data from sensor data\n");
 				}
+			} else {
+				DBG("Failed to read 20 from sensor file\n");
 			}
 
 			fclose(f);
+		} else {
+			DBG("Failed to open sensor file\n");
 		}
 
 	}

@@ -34,9 +34,11 @@ void initLogFile() {
 	starttimeus = tv.tv_sec * 1000000 + tv.tv_usec;
 
 #ifdef __DEBUG
-	logFp = fopen(LOG_FILE, "w");
 	if (logFp == NULL) {
-		fprintf(stderr,"Failed to open log file %s for writing\n", LOG_FILE);
+		logFp = fopen(LOG_FILE, "w");
+		if (logFp == NULL) {
+			fprintf(stderr,"Failed to open log file %s for writing\n", LOG_FILE);
+		}
 	}
 #endif
 }
