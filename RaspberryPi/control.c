@@ -312,10 +312,16 @@ void updateStepTimer() {
  *
  */
 void updateDuty() {
+	DBG("Read Senors\n");
 	readSensors();
+	DBG("Read Senors - Done\n");
+
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
+		DBG("Lock Steps\n");
+
 		lockSteps();
+		DBG("Got Lock Steps\n");
 
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
@@ -347,6 +353,7 @@ void updateDuty() {
 				}
 			}
 		}
+
 		unlockSteps();
 	}
 }
