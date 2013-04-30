@@ -360,8 +360,13 @@ void updateDuty() {
 			}
 		}
 
+		DBG("Try unlockSteps\n");
 		unlockSteps();
+		DBG("Complete unlockSteps\n");
 	}
+
+	DBG("RETURN\n");
+
 }
 
 /*
