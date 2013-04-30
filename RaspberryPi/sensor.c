@@ -168,7 +168,7 @@ void searchForTempSensors() {
 								DBG("Found New Sensor: %s\n", addressStr);
 								sensor->addressPtr = addressStr;
 								sensor->lastReadMillis = -1;
-								sensor->sensorMutux = PTHREAD_MUTEX_INITIALIZER;
+								pthread_mutex_init(&sensor->sensorMutux,NULL);
 								sensorCount++;
 								valid = true;
 							} else {
