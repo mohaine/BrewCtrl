@@ -43,7 +43,7 @@
 typedef struct {
 	unsigned int delayTime;
 	long lastRunTime;
-	int print;
+	bool print;
 	void (*workFunction)();
 } LoopFunction;
 
@@ -84,9 +84,9 @@ void* loopFunctionPThread(void *ptr) {
 	return NULL;
 }
 
-LoopFunction* startLoopFunction(int delayTime, void (*workFunction)()) {
+LoopFunction* startLoopFunction(int delayTime, void (*workFunction)(), bool print) {
 	LoopFunction *lf = malloc(sizeof(LoopFunction));
-	lf->print = false;
+	lf->print = print;
 	lf->delayTime = delayTime;
 	lf->workFunction = workFunction;
 
@@ -96,23 +96,18 @@ LoopFunction* startLoopFunction(int delayTime, void (*workFunction)()) {
 	return lf;
 
 }
-void test(void) {
-	printf("Test %lu\n", millis());
-}
+
 
 void loop(void) {
 	setupControl();
 	turnOff();
 	searchForTempSensors();
 
-	LoopFunction* updateDuty = startLoopFunction(1000, updateDuty);
-
-	updateDuty->print = true;
-
-	startLoopFunction(100, updatePinsForSetDuty);
-	startLoopFunction(250, updateStepTimer);
-	startLoopFunction(10000, searchForTempSensors);
-	startLoopFunction(1000, selectReadingSensors);
+	LoopFunction* updateDuty = startLoopFunction(1000, updateDuty,true);
+	startLoopFunction(100, updatePinsForSetDuty,false);
+	startLoopFunction(250, updateStepTimer,false);
+	startLoopFunction(10000, searchForTempSensors,false);
+	startLoopFunction(1000, selectReadingSensors,false);
 
 	while (true) {
 		sleep(100000);
