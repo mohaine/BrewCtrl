@@ -106,6 +106,7 @@ void loop(void) {
 	startLoopFunction(100, updatePinsForSetDuty, false);
 	startLoopFunction(250, updateStepTimer, false);
 	startLoopFunction(10000, searchForTempSensors, false);
+	startLoopFunction(1000, readSensors, false);
 	startLoopFunction(1000, selectReadingSensors, false);
 
 	while (true) {

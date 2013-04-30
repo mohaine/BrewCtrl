@@ -613,13 +613,18 @@ void handleStatusRequest(Request * request, Response * response) {
 	for (int i = 0; i < getSensorCount(); i++) {
 		TempSensor *ts = getSensorByIndex(i);
 
+		lockSensor(ts);
+
+
 		sensor = json_object_new_object();
 		json_object_array_add(sensors, sensor);
 
 		json_object_object_add(sensor, "address", json_object_new_string(ts->addressPtr));
-
 		json_object_object_add(sensor, "tempatureC", json_object_new_double(ts->lastTemp));
 		json_object_object_add(sensor, "reading", json_object_new_boolean(hasVaildTemp(ts)));
+
+		unlockSensor(ts);
+
 	}
 
 	const char * json = json_object_get_string(status);

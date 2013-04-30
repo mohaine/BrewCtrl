@@ -26,7 +26,9 @@
 typedef struct {
 	char * addressPtr;
 	double lastTemp;
-	unsigned long lastReadMillis;char * restrict sysfile;
+	unsigned long lastReadMillis;
+	pthread_mutex_t sensorMutux;
+	char * restrict sysfile;
 
 } TempSensor;
 
@@ -37,6 +39,8 @@ TempSensor* getSensorByIndex(int i);
 int getSensorCount();
 void listSensors();
 bool hasVaildTemp(TempSensor* sensor);
+void lockSensor(TempSensor* sensor);
+void unlockSensor(TempSensor* sensor);
 
 #endif
 

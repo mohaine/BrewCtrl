@@ -27,17 +27,22 @@
 #include <string.h>
 #include <linux/limits.h>
 #include <limits.h>
+#include <pthread.h>
 
 #define MAX_SENSORS 100
 
 TempSensor sensors[MAX_SENSORS];
 int sensorCount = 0;
+pthread_mutex_t oneWireMutux = PTHREAD_MUTEX_INITIALIZER;
 
 #define W1_ROOT SYS_PATH"/bus/w1/devices/"
 
 #define BAD_READ "00 00 00 00 00 00 00 00 00 : crc=00 YES"
 
 void readSensors() {
+
+	pthread_mutex_lock(&oneWireMutux);
+
 	char tmp[PATH_MAX];
 
 	char data[200];
@@ -79,6 +84,7 @@ void readSensors() {
 
 								double tempC = ((double) milliCs) / 1000;
 
+								lockSensor(sensor);
 								// 85 is the chips start up temp.  It reads as a valid temp so......
 								if (!hasVaildTemp(sensor) && (tempC == 85 || tempC == 0)) {
 									DBG("Sensor temp is startup temp. Ignore\n");
@@ -92,6 +98,7 @@ void readSensors() {
 									sensor->lastTemp = tempC;
 									sensor->lastReadMillis = millis();
 								}
+								unlockSensor(sensor);
 							} else {
 								DBG("no t= in sensor data\n");
 							}
@@ -114,19 +121,24 @@ void readSensors() {
 		}
 
 	}
+
+	pthread_mutex_unlock(&oneWireMutux);
+
 }
 
 bool hasVaildTemp(TempSensor* sensor) {
-//printf("%u %u\n",millis(), millis() - sensor->lastReadMillis);
+	lockSensor(sensor);
 	if (sensor->lastReadMillis > 0) {
-
-		return millis() - sensor->lastReadMillis < 2000;
+		int lastReadMillis = millis() - sensor->lastReadMillis < 2000;
+		unlockSensor(sensor);
+		return lastReadMillis;
 	}
-
+	unlockSensor(sensor);
 	return false;
 }
 
 void searchForTempSensors() {
+	pthread_mutex_lock(&oneWireMutux);
 	DIR *dp;
 	struct dirent *ep;
 	byte address[8];
@@ -156,6 +168,7 @@ void searchForTempSensors() {
 								DBG("Found New Sensor: %s\n", addressStr);
 								sensor->addressPtr = addressStr;
 								sensor->lastReadMillis = -1;
+								sensor->sensorMutux = PTHREAD_MUTEX_INITIALIZER;
 								sensorCount++;
 								valid = true;
 							} else {
@@ -179,16 +192,14 @@ void searchForTempSensors() {
 	} else {
 		ERR("Couldn't One Wire directory: %s\n", W1_ROOT);
 	}
+	pthread_mutex_unlock(&oneWireMutux);
 
 }
 
 TempSensor* getSensorByAddress(char* address) {
-
 	for (int sensorIndex = 0; sensorIndex < sensorCount; sensorIndex++) {
 		TempSensor *sensor = &sensors[sensorIndex];
-
 		bool same = strcmp(sensor->addressPtr, address) == 0;
-
 		if (same) {
 			return sensor;
 		}
@@ -233,3 +244,11 @@ void listSensors() {
 
 	}
 }
+
+void lockSensor(TempSensor* sensor) {
+	pthread_mutex_lock(&sensor->sensorMutux);
+}
+void unlockSensor(TempSensor* sensor) {
+	pthread_mutex_unlock(&sensor->sensorMutux);
+}
+

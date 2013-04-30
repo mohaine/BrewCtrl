@@ -312,9 +312,6 @@ void updateStepTimer() {
  *
  */
 void updateDuty() {
-	DBG("Read Senors\n");
-	readSensors();
-	DBG("Read Senors - Done\n");
 
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
@@ -335,6 +332,7 @@ void updateDuty() {
 					DBG("Got Sensor Address\n");
 
 					if (sensor != NULL) {
+						lockSensor(sensor);
 						if (hasVaildTemp(sensor)) {
 							DBG("Has Valid Temp\n");
 							if (cp->hasDuty) {
@@ -353,6 +351,8 @@ void updateDuty() {
 							DBG("Sensor not reading\n");
 							cp->duty = 0;
 						}
+						unlockSensor(sensor);
+
 					} else {
 						DBG("Failed to find sensor\n");
 					}
