@@ -38,9 +38,6 @@ int sensorCount = 0;
 #define BAD_READ "00 00 00 00 00 00 00 00 00 : crc=00 YES"
 
 void readSensors() {
-
-	DBG("Read Sensors\n");
-
 	char tmp[PATH_MAX];
 
 	char data[200];
