@@ -43,7 +43,7 @@
 typedef struct {
 	unsigned int delayTime;
 	long lastRunTime;
-	bool print;
+	int print;
 	void (*workFunction)();
 } LoopFunction;
 
