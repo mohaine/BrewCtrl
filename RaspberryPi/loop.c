@@ -59,7 +59,7 @@ void* loopFunctionPThread(void *ptr) {
 
 		long now = millis();
 
-		if (lf->lastRunTime < now) {
+		if (now < lf->lastRunTime) {
 			lf->lastRunTime = now;
 		}
 
