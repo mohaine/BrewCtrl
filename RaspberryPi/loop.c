@@ -56,18 +56,23 @@ void* loopFunctionPThread(void *ptr) {
 	lf->lastRunTime = millis() - lf->delayTime;
 
 	while (true) {
+
+		long now = millis();
+
+		if (lf->lastRunTime < now) {
+			lf->lastRunTime = now;
+		}
+
 		long nextTime = lf->lastRunTime + lf->delayTime;
-		int sleepTime = (nextTime) - millis();
+		int sleepTime = (nextTime) - now;
 
 		if (sleepTime > 0) {
-			//DBG("Sleep %d\n", sleepTime);
+			DBG("Sleep %d\n", sleepTime);
 			usleep(sleepTime * 1000);
 		} else {
-
 			if (-sleepTime > lf->delayTime) {
 				DBG("Thread too slow %d\n", sleepTime);
-
-				nextTime = millis() - lf->delayTime;
+				nextTime = now - lf->delayTime;
 			}
 			lf->lastRunTime = nextTime;
 			lf->workFunction();
