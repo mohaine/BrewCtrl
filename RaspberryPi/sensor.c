@@ -42,9 +42,9 @@ pthread_mutex_t oneWireMutux = PTHREAD_MUTEX_INITIALIZER;
 void readSensors() {
 
 
-	DBG("Get One Wire Lock\n");
+	DBG("Read Sensors Get One Wire Lock\n");
 	pthread_mutex_lock(&oneWireMutux);
-	DBG("Got One WSire Lock\n");
+	DBG("Read Sensors Got One WSire Lock\n");
 
 	char tmp[PATH_MAX];
 
@@ -254,9 +254,14 @@ void listSensors() {
 }
 
 void lockSensor(TempSensor* sensor) {
+	DBG("lockSensor\n");
 	pthread_mutex_lock(&sensor->sensorMutux);
+	DBG("lockSensor Locked\n");
+
 }
 void unlockSensor(TempSensor* sensor) {
+	DBG("unlockSensor\n");
 	pthread_mutex_unlock(&sensor->sensorMutux);
+	DBG("unlockSensor unLocked\n");
 }
 
