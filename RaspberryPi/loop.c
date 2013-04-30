@@ -40,11 +40,10 @@
 #include <errno.h>
 #include <pthread.h>
 
-#define LOOP_FUNCTIONS 4
-
 typedef struct {
 	unsigned int delayTime;
 	long lastRunTime;
+	bool print;
 	void (*workFunction)();
 } LoopFunction;
 
@@ -67,7 +66,9 @@ void* loopFunctionPThread(void *ptr) {
 		int sleepTime = (nextTime) - now;
 
 		if (sleepTime > 0) {
-			DBG("Sleep %d\n", sleepTime);
+			if (lf->print) {
+				DBG("Sleep %d\n", sleepTime);
+			}
 			usleep(sleepTime * 1000);
 		} else {
 			if (-sleepTime > lf->delayTime) {
@@ -83,14 +84,16 @@ void* loopFunctionPThread(void *ptr) {
 	return NULL;
 }
 
-void startLoopFunction(int delayTime, void (*workFunction)()) {
+LoopFunction* startLoopFunction(int delayTime, void (*workFunction)()) {
 	LoopFunction *lf = malloc(sizeof(LoopFunction));
-
+	lf->print = false;
 	lf->delayTime = delayTime;
 	lf->workFunction = workFunction;
 
 	pthread_t thread;
 	pthread_create(&thread, NULL, loopFunctionPThread, lf);
+
+	return lf;
 
 }
 void test(void) {
@@ -102,7 +105,10 @@ void loop(void) {
 	turnOff();
 	searchForTempSensors();
 
-	startLoopFunction(1000, updateDuty);
+	LoopFunction* updateDuty = startLoopFunction(1000, updateDuty);
+
+	updateDuty->print = true;
+
 	startLoopFunction(100, updatePinsForSetDuty);
 	startLoopFunction(250, updateStepTimer);
 	startLoopFunction(10000, searchForTempSensors);
