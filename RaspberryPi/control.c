@@ -315,9 +315,7 @@ void updateDuty() {
 
 	Control* control = getControl();
 	if (control->mode == MODE_ON) {
-		DBG("Lock Steps\n");
 		lockSteps();
-		DBG("Got Lock Steps\n");
 
 		if (stepCount > 0) {
 			ControlStep * step = &controlSteps[0];
@@ -359,13 +357,9 @@ void updateDuty() {
 				}
 			}
 		}
-
-		DBG("Try unlockSteps\n");
 		unlockSteps();
-		DBG("Complete unlockSteps\n");
 	}
 
-	DBG("RETURN\n");
 
 }
 

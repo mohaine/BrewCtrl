@@ -22,6 +22,7 @@
 #include "brewctrl.h"
 
 #include <linux/limits.h>
+#include <pthread.h>
 
 typedef struct {
 	char * addressPtr;
