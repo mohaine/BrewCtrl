@@ -55,12 +55,18 @@ void* loopFunctionPThread(void *ptr) {
 	lf->lastRunTime = millis() - lf->delayTime;
 
 	while (true) {
-		int sleepTime = (lf->lastRunTime + lf->delayTime) - millis();
+		long nextTime = lf->lastRunTime + lf->delayTime;
+		int sleepTime = (nextTime) - millis();
 
 		if (sleepTime > 0) {
+			DBG("Sleep %d\n", sleepTime);
 			usleep(sleepTime * 1000);
 		} else {
-			lf->lastRunTime = lf->lastRunTime + lf->delayTime;
+
+			if (-sleepTime > lf->delayTime) {
+				nextTime = millis() - lf->delayTime;
+			}
+			lf->lastRunTime = nextTime;
 			lf->workFunction();
 		}
 	}
@@ -87,7 +93,6 @@ void loop(void) {
 	setupControl();
 	turnOff();
 	searchForTempSensors();
-
 
 	startLoopFunction(1000, updateDuty);
 	startLoopFunction(100, updatePinsForSetDuty);
