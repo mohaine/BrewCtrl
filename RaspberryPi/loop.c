@@ -30,6 +30,7 @@
 #include "pid.h"
 #include "comm.h"
 #include "control.h"
+#include "logger.h"
 
 #include <unistd.h>
 #include <stdlib.h>
