@@ -60,11 +60,13 @@ void* loopFunctionPThread(void *ptr) {
 		int sleepTime = (nextTime) - millis();
 
 		if (sleepTime > 0) {
-			DBG("Sleep %d\n", sleepTime);
+			//DBG("Sleep %d\n", sleepTime);
 			usleep(sleepTime * 1000);
 		} else {
 
 			if (-sleepTime > lf->delayTime) {
+				DBG("Thread too slow %d\n", sleepTime);
+
 				nextTime = millis() - lf->delayTime;
 			}
 			lf->lastRunTime = nextTime;
