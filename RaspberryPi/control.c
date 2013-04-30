@@ -211,9 +211,6 @@ void addManualStep() {
 		if (bl != NULL && bl->tanks.data != NULL) {
 			Tank * tA = (Tank *) bl->tanks.data;
 			for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
-
-				DBG("TANK\n");
-
 				Tank * t = &tA[tankIndex];
 				if (t->heater != NULL) {
 					ControlPoint * cp = &step->controlPoints[step->controlPointCount];

@@ -41,7 +41,10 @@ pthread_mutex_t oneWireMutux = PTHREAD_MUTEX_INITIALIZER;
 
 void readSensors() {
 
+
+	DBG("Get One Wire Lock\n");
 	pthread_mutex_lock(&oneWireMutux);
+	DBG("Got One WSire Lock\n");
 
 	char tmp[PATH_MAX];
 
@@ -138,7 +141,12 @@ bool hasVaildTemp(TempSensor* sensor) {
 }
 
 void searchForTempSensors() {
+
+	DBG("Get One Wire Lock\n");
 	pthread_mutex_lock(&oneWireMutux);
+	DBG("G0t One Wire Lock\n");
+
+
 	DIR *dp;
 	struct dirent *ep;
 	byte address[8];
