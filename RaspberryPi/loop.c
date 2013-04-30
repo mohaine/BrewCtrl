@@ -97,17 +97,16 @@ LoopFunction* startLoopFunction(int delayTime, void (*workFunction)(), bool prin
 
 }
 
-
 void loop(void) {
 	setupControl();
 	turnOff();
 	searchForTempSensors();
 
-	LoopFunction* updateDuty = startLoopFunction(1000, updateDuty,true);
-	startLoopFunction(100, updatePinsForSetDuty,false);
-	startLoopFunction(250, updateStepTimer,false);
-	startLoopFunction(10000, searchForTempSensors,false);
-	startLoopFunction(1000, selectReadingSensors,false);
+	startLoopFunction(1000, updateDuty, true);
+	startLoopFunction(100, updatePinsForSetDuty, false);
+	startLoopFunction(250, updateStepTimer, false);
+	startLoopFunction(10000, searchForTempSensors, false);
+	startLoopFunction(1000, selectReadingSensors, false);
 
 	while (true) {
 		sleep(100000);
