@@ -319,21 +319,15 @@ void updateDuty() {
 			int controlPointCount = step->controlPointCount;
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
-				DBG("Update Cp %d\n",cp->controlPin);
 				cp->dutyController.on = true;
 				if (cp->automaticControl) {
-					DBG("Get Sensor Address\n");
 					TempSensor* sensor = getSensorByAddress(cp->tempSensorAddressPtr);
-					DBG("Got Sensor Address\n");
 
 					if (sensor != NULL) {
 						lockSensor(sensor,"CTRL updateDuty");
 						if (hasVaildTemp(sensor)) {
-							DBG("Has Valid Temp\n");
 							if (cp->hasDuty) {
-								DBG("getDutyFromAdjuster\n");
 								cp->duty = getDutyFromAdjuster(&cp->pid, cp->targetTemp, sensor->lastTemp);
-								DBG("gotDutyFromAdjuster\n");
 							} else {
 								//TODO MIN TOGGLE TIME!!!!
 								if (sensor->lastTemp < cp->targetTemp) {
@@ -343,7 +337,6 @@ void updateDuty() {
 								}
 							}
 						} else {
-							DBG("Sensor not reading\n");
 							cp->duty = 0;
 						}
 						unlockSensor(sensor);

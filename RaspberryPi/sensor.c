@@ -191,7 +191,6 @@ void searchForTempSensors() {
 		ERR("Couldn't One Wire directory: %s\n", W1_ROOT);
 	}
 
-	DBG("RETURN\n");
 
 }
 
