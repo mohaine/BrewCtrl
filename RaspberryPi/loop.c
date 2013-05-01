@@ -101,7 +101,7 @@ void loop(void) {
 	setupControl();
 	turnOff();
 
-	startLoopFunction(30000, searchForTempSensors, true);
+	startLoopFunction(30000, searchForTempSensors, false);
 
 	startLoopFunction(1000, updateDuty, false);
 	startLoopFunction(100, updatePinsForSetDuty, false);
