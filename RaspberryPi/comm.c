@@ -613,7 +613,7 @@ void handleStatusRequest(Request * request, Response * response) {
 	for (int i = 0; i < getSensorCount(); i++) {
 		TempSensor *ts = getSensorByIndex(i);
 
-		lockSensor(ts);
+		lockSensor(ts,"COMM");
 
 
 		sensor = json_object_new_object();

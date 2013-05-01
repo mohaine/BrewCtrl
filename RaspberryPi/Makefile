@@ -2,8 +2,8 @@ CC=gcc
 CFLAGSD=  
 
 
-CFLAGS=-c -Wall -std=c99 $(CFLAGSD) 
-LDFLAGS=-lpthread   -lm 
+CFLAGS=-c -Wall -std=c99 $(CFLAGSD)  -lpthread
+LDFLAGS=-lpthread -lm 
 SOURCES= pid.c duty.c brewctrl.c comm.c  loop.c control.c sensor.c config.c logger.c
 OBJECTS=$(SOURCES:.c=.o) 
 BREWCTRL=brewctrl
@@ -14,6 +14,10 @@ CFLAGS += -g -rdynamic
 
 CFLAGSD+= -DMOCK
 CFLAGSD+= -D__DEBUG
+
+
+
+
 
 #CFLAGS += -O2
 #LDFLAGS += -O2

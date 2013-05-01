@@ -327,7 +327,7 @@ void updateDuty() {
 					DBG("Got Sensor Address\n");
 
 					if (sensor != NULL) {
-						lockSensor(sensor);
+						lockSensor(sensor,"CTRL updateDuty");
 						if (hasVaildTemp(sensor)) {
 							DBG("Has Valid Temp\n");
 							if (cp->hasDuty) {

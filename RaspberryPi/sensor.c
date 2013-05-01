@@ -19,35 +19,26 @@
 #include "sensor.h"
 #include "logger.h"
 
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
+#include <unistd.h>
+
 #include <linux/limits.h>
-#include <limits.h>
 #include <pthread.h>
 
 #define MAX_SENSORS 100
 
 TempSensor sensors[MAX_SENSORS];
 int sensorCount = 0;
-pthread_mutex_t oneWireMutux = PTHREAD_MUTEX_INITIALIZER;
 
-#define W1_ROOT SYS_PATH"/bus/w1/devices/"
+#define W1_ROOT SYS_PATH"/bus/w1/devices"
 
 #define BAD_READ "00 00 00 00 00 00 00 00 00 : crc=00 YES"
 
 void readSensors() {
-
-
-	DBG("Read Sensors Get One Wire Lock\n");
-	pthread_mutex_lock(&oneWireMutux);
-	DBG("Read Sensors Got One WSire Lock\n");
-
 	char tmp[PATH_MAX];
-
 	char data[200];
 	int sensorCount = getSensorCount();
 
@@ -87,7 +78,7 @@ void readSensors() {
 
 								double tempC = ((double) milliCs) / 1000;
 
-								lockSensor(sensor);
+								lockSensor(sensor, "READ");
 								// 85 is the chips start up temp.  It reads as a valid temp so......
 								if (!hasVaildTemp(sensor) && (tempC == 85 || tempC == 0)) {
 									DBG("Sensor temp is startup temp. Ignore\n");
@@ -125,12 +116,12 @@ void readSensors() {
 
 	}
 
-	pthread_mutex_unlock(&oneWireMutux);
+//	pthread_mutex_unlock(&oneWireMutux);
 
 }
 
 bool hasVaildTemp(TempSensor* sensor) {
-	lockSensor(sensor);
+	lockSensor(sensor, "hasVaildTemp");
 	if (sensor->lastReadMillis > 0) {
 		int lastReadMillis = millis() - sensor->lastReadMillis < 2000;
 		unlockSensor(sensor);
@@ -142,28 +133,29 @@ bool hasVaildTemp(TempSensor* sensor) {
 
 void searchForTempSensors() {
 
-	DBG("Get One Wire Lock\n");
-	pthread_mutex_lock(&oneWireMutux);
-	DBG("G0t One Wire Lock\n");
+	pthread_mutexattr_t mta;
 
-
+	DBG("searchForTempSensors....\n");
+	char tmp[PATH_MAX];
 	DIR *dp;
 	struct dirent *ep;
 	byte address[8];
 
 	dp = opendir(W1_ROOT);
 	if (dp != NULL) {
-		char * restrict tmp = malloc(PATH_MAX);
+
 		while ((ep = readdir(dp))) {
+
 			if (strlen(ep->d_name) == 15 && ep->d_name[2] == '-') {
 				sprintf(tmp, "%s/%s", W1_ROOT, ep->d_name);
+
 				TempSensor* sensor = &sensors[sensorCount];
 
-				sensor->sysfile = realpath(tmp, NULL);
-
-				if (sensor->sysfile) {
+				if (realpath(tmp, sensor->sysfile)) {
 					bool valid = false;
+
 					sprintf(tmp, "%s/%s", sensor->sysfile, "id");
+
 					FILE* f = fopen(tmp, "rb");
 					if (f) {
 						int readSize = fread(&address, 1, 8, f);
@@ -176,7 +168,11 @@ void searchForTempSensors() {
 								DBG("Found New Sensor: %s\n", addressStr);
 								sensor->addressPtr = addressStr;
 								sensor->lastReadMillis = -1;
-								pthread_mutex_init(&sensor->sensorMutux,NULL);
+
+								pthread_mutexattr_init(&mta);
+								pthread_mutexattr_settype(&mta, PTHREAD_MUTEX_RECURSIVE_NP);
+								pthread_mutex_init(&sensor->sensorMutux, &mta);
+
 								sensorCount++;
 								valid = true;
 							} else {
@@ -185,22 +181,17 @@ void searchForTempSensors() {
 						}
 						fclose(f);
 					}
-					if (!valid) {
-						free(sensor->sysfile);
-						sensor->sysfile = NULL;
-					}
 				}
 
 			}
 		}
-
-		free(tmp);
 		(void) closedir(dp);
 
 	} else {
 		ERR("Couldn't One Wire directory: %s\n", W1_ROOT);
 	}
-	pthread_mutex_unlock(&oneWireMutux);
+
+	DBG("RETURN\n");
 
 }
 
@@ -253,15 +244,10 @@ void listSensors() {
 	}
 }
 
-void lockSensor(TempSensor* sensor) {
-	DBG("lockSensor\n");
+void lockSensor(TempSensor* sensor, char* why) {
 	pthread_mutex_lock(&sensor->sensorMutux);
-	DBG("lockSensor Locked\n");
-
 }
 void unlockSensor(TempSensor* sensor) {
-	DBG("unlockSensor\n");
 	pthread_mutex_unlock(&sensor->sensorMutux);
-	DBG("unlockSensor unLocked\n");
 }
 
