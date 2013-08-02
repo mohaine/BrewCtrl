@@ -46,7 +46,7 @@ void handler(int sig) {
 
 int main() {
 	signal(SIGSEGV, handler);
-
+	initBrewCtrl();
 	initLogFile();
 	initConfiguration();
 	startComm();

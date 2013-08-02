@@ -25,19 +25,19 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-uint64_t startTime = 0;
-
+struct timeval startTime;
+void initBrewCtrl(){
+	gettimeofday(&startTime, NULL);
+}
 long millis() {
 	struct timeval time;
+	
 	gettimeofday(&time, NULL);
 
-	uint64_t currentTime = time.tv_usec + time.tv_sec * 1000000;
+	long mills = (time.tv_sec - startTime.tv_sec) * 1000;
+	mills += (time.tv_usec - startTime.tv_usec ) / 1000;
 
-	if (startTime == 0) {
-		startTime = currentTime;
-	}
-
-	return (long) ((currentTime - startTime) / 1000);
+	return mills;
 }
 
 char * generateRandomId() {
