@@ -9,8 +9,8 @@ OBJECTS=$(SOURCES:.c=.o)
 BREWCTRL=brewctrl
 LISTSENSORS=listsensors
 
-LDFLAGS += -g -rdynamic
-CFLAGS += -g -rdynamic
+LDFLAGS += -g -rdynamic -finstrument-functions
+CFLAGS += -g -rdynamic -finstrument-functions
 
 #CFLAGSD+= -DMOCK
 #CFLAGSD+= -D__DEBUG -D__DEBUG_FILE
@@ -42,8 +42,7 @@ brewctrlrun: $(BREWCTRL)
 	
 listrun: $(LISTSENSORS)
 	./$(LISTSENSORS)
-	
-
+			
 	
 default: all
 	

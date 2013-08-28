@@ -535,9 +535,6 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 }
 
 Configuration * parseJsonConfiguration(byte *data) {
-
-    DBG("parseJsonConfiguration Entry  %s\n",data);
-
     bool valid = false;
     Configuration * cfg = malloc(sizeof(Configuration));
 
@@ -550,13 +547,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 
     json_object *config = json_tokener_parse(data);
     if (config != NULL) {
-
-        DBG("parseJsonConfiguration RAW JSON Valid\n");
-
         if (json_object_get_type(config) == json_type_object) {
-
-            DBG("parseJsonConfiguration Parse Config\n");
-
             valid = true;
             json_object * value;
 
@@ -567,7 +558,6 @@ Configuration * parseJsonConfiguration(byte *data) {
                 cfg->version = generateRandomId();
             }
 
-            DBG("parseJsonConfiguration version OK\n");
 
             value = json_object_object_get(config, "logMessages");
             if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
@@ -575,8 +565,6 @@ Configuration * parseJsonConfiguration(byte *data) {
             } else {
                 cfg->logMessages = false;
             }
-
-            DBG("parseJsonConfiguration logMessages OK\n");
 
             value = json_object_object_get(config, "brewLayout");
             if (valid && value != NULL && json_object_get_type(value) == json_type_object) {
@@ -586,12 +574,9 @@ Configuration * parseJsonConfiguration(byte *data) {
                 valid = false;
             }
 
-            DBG("parseJsonConfiguration brewLayout OK\n");
+
 
             if (valid) {
-
-                DBG("parseJsonConfiguration Parse Sensors\n");
-
                 value = json_object_object_get(config, "sensors");
                 if (value != NULL && json_object_get_type(value) == json_type_array) {
                     json_object * sensorsJsonArray = value;
@@ -614,7 +599,6 @@ Configuration * parseJsonConfiguration(byte *data) {
                             sc->name = mallocString(value);
                         } else {
                             DBG("parseJsonConfiguration SensorConfig Missing Name\n");
-
                             valid = false;
                             break;
                         }
@@ -643,7 +627,7 @@ Configuration * parseJsonConfiguration(byte *data) {
                     DBG("parseJsonConfiguration Missing Sensors\n");
                     valid = false;
                 }
-                DBG("parse Sensors Complete\n");
+
             }
             if (valid) {
                 value = json_object_object_get(config, "stepLists");
@@ -747,16 +731,12 @@ Configuration * parseJsonConfiguration(byte *data) {
         json_object_put(config);
     }
 
-    DBG("parseJsonConfiguration Valid? %d\n",valid);
 
     if (!valid) {
-
-        DBG("parseJsonConfiguration freeConfiguration\n");
-
         freeConfiguration(cfg);
         cfg = NULL;
     }
-    DBG("parseJsonConfiguration RETURN\n");
+
     return cfg;
 
 }
