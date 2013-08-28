@@ -113,8 +113,11 @@ void selectReadingSensors() {
                 }
                 memcpy(addressCopy, s->addressPtr, addressLength);
 
-                sc->name = NULL;
-                sc->location = NULL;
+                sc->name = malloc(2);
+		strcpy(sc->name,"");
+                sc->location = malloc(2);
+		strcpy(sc->location,"");
+
                 sc->address = addressCopy;
 
                 cfg->sensors.data = (void*) data;
@@ -131,11 +134,13 @@ void selectReadingSensors() {
 
 // Update Tank selected Sensors
     if (cfg != NULL && cfg->sensors.data != NULL && cfg->sensors.count > 0) {
-
         BreweryLayout * bl = cfg->brewLayout;
         if (bl != NULL && bl->tanks.data != NULL) {
             Tank * tA = (Tank *) bl->tanks.data;
             for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
+
+
+
                 Tank * t = &tA[tankIndex];
                 if (t->sensor != NULL) {
                     bool found = false;
@@ -163,7 +168,7 @@ void selectReadingSensors() {
                     }
 
                     if (!found) {
-//						DBG("Missing Sensor for %s\n", t->name);
+
                         SensorConfig * sA = (SensorConfig *) cfg->sensors.data;
                         for (int scI = 0; scI < cfg->sensors.count; scI++) {
                             SensorConfig * sc = &sA[scI];
@@ -183,7 +188,6 @@ void selectReadingSensors() {
                                     if (oldAddress != NULL) {
                                         free(oldAddress);
                                     }
-
                                     writeConfiguration(cfg);
                                 }
                             }
