@@ -114,9 +114,9 @@ void selectReadingSensors() {
                 memcpy(addressCopy, s->addressPtr, addressLength);
 
                 sc->name = malloc(2);
-		strcpy(sc->name,"");
+                strcpy(sc->name,"");
                 sc->location = malloc(2);
-		strcpy(sc->location,"");
+                strcpy(sc->location,"");
 
                 sc->address = addressCopy;
 
@@ -157,7 +157,9 @@ void selectReadingSensors() {
                                 if (strcmp(sc->address, t->sensor->address) == 0) {
                                     if(strcmp(sc->location, t->name) != 0) {
                                         found = false;
-                                        t->sensor->address = "";
+
+                                        t->sensor->address = malloc(2);
+                                        strcpy(t->sensor->address,"");
                                         changeConfigVersion(cfg);
                                     }
                                 }
