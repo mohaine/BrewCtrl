@@ -35,12 +35,12 @@ int main() {
 //		}
 //	}
 
-	searchForTempSensors();
-	readSensors();
+    searchForTempSensors();
+    readSensors();
 
-	listSensors();
+    listSensors();
 
-	return 0;
+    return 0;
 
 }
 

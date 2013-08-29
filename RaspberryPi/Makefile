@@ -2,18 +2,23 @@ CC=gcc
 CFLAGSD=  
 
 
-CFLAGS=-c -Wall -std=c99 $(CFLAGSD) 
-LDFLAGS=-lpthread   -lm 
+CFLAGS=-c -Wall -std=c99 $(CFLAGSD)  -lpthread
+LDFLAGS=-lpthread -lm 
 SOURCES= pid.c duty.c brewctrl.c comm.c  loop.c control.c sensor.c config.c logger.c
 OBJECTS=$(SOURCES:.c=.o) 
 BREWCTRL=brewctrl
 LISTSENSORS=listsensors
 
-LDFLAGS += -g -rdynamic
-CFLAGS += -g -rdynamic
+LDFLAGS += -g -rdynamic -finstrument-functions
+CFLAGS += -g -rdynamic -finstrument-functions
 
-CFLAGSD+= -DMOCK
+#CFLAGSD+= -DMOCK
+#CFLAGSD+= -D__DEBUG -D__DEBUG_FILE
 CFLAGSD+= -D__DEBUG
+
+
+
+
 
 #CFLAGS += -O2
 #LDFLAGS += -O2
@@ -37,8 +42,7 @@ brewctrlrun: $(BREWCTRL)
 	
 listrun: $(LISTSENSORS)
 	./$(LISTSENSORS)
-	
-
+			
 	
 default: all
 	

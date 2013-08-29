@@ -32,23 +32,24 @@
 #include "logger.h"
 
 void handler(int sig) {
-	void *array[10];
-	size_t size;
+    void *array[10];
+    size_t size;
 
-	// get void*'s for all entries on the stack
-	size = backtrace(array, 10);
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 10);
 
-	// print out all the frames to stderr
-	fprintf(stderr, "Error: signal %d:\n", sig);
-	backtrace_symbols_fd(array, size, 2);
-	exit(1);
+    // print out all the frames to stderr
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, 2);
+    exit(1);
 }
 
 int main() {
-	signal(SIGSEGV, handler);
-
-	initLogFile();
-	initConfiguration();
+    signal(SIGSEGV, handler);
+    initBrewCtrl();
+    initLogFile();
+    initConfiguration();
+    startComm();
 
 //	Configuration* configuration = getConfiguration();
 //	if (configuration != NULL) {
@@ -67,11 +68,9 @@ int main() {
 //
 //	}
 
-	printf("Start Comm\n");
-	startComm();
-	printf("Start Loop\n");
-	loop();
+    printf("Start Loop\n");
+    loop();
 
-	closeLogFile();
+    closeLogFile();
 }
 

@@ -18,7 +18,9 @@
 
 package com.mohaine.brewcontroller.client.display;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import com.mohaine.brewcontroller.client.ControllerHardware;
@@ -51,6 +53,7 @@ public class BreweryDisplayDrawer<T> {
 
 	private Formatter<Number> numberFormat;
 	private Formatter<Number> numberFormatWhole;
+	private Map<Integer, ControlPoint> pendingUpdates = new HashMap<Integer, ControlPoint>();
 
 	public interface RedrawHook<T> {
 		void redraw(T context);
@@ -207,7 +210,13 @@ public class BreweryDisplayDrawer<T> {
 		if (selectedStep != null) {
 
 			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getPin());
+
 			if (controlPointForPin != null) {
+				ControlPoint pendingChanges = pendingUpdates.get(controlPointForPin.getControlPin());
+				if (pendingChanges != null) {
+					controlPointForPin = pendingChanges;
+				}
+
 				int cpDuty = controlPointForPin.getDuty();
 
 				if (controlPointForPin.isAutomaticControl()) {
@@ -218,7 +227,7 @@ public class BreweryDisplayDrawer<T> {
 					if (controlPointForPin.isAutomaticControl()) {
 						text = Integer.toString(duty) + "%";
 					} else {
-						if (duty != cpDuty) {
+						if (duty != cpDuty || pendingChanges != null) {
 							color = BColor.PENDING;
 						}
 						text = Integer.toString(cpDuty) + "%";
@@ -268,11 +277,16 @@ public class BreweryDisplayDrawer<T> {
 			if (selectedStep != null) {
 				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
 				if (cp != null && cp.isAutomaticControl()) {
-					// if (selectedStep.isActive()) {
-					// if (cp.getTargetTemp() != sensor.getTargetTemp()) {
-					// textColor = Color.PENDING;
-					// }
-					// }
+					if (selectedStep.isActive()) {
+						ControlPoint pendingChanges = pendingUpdates.get(cp.getControlPin());
+						if (pendingChanges != null) {
+							cp = pendingChanges;
+						}
+
+						if (pendingChanges != null) {
+							textColor = BColor.PENDING;
+						}
+					}
 					clearText = false;
 					tempDisplay = numberFormatWhole.format(tempDisplayConveter.convertFrom(cp.getTargetTemp())) + "\u00B0";
 					drawText(g, "(" + tempDisplay + ")", textColor, BColor.TANK, HAlign.LEFT, display.getAbsLeft(), display.getAbsTop() + 30, display.getWidth(), 30, BFont.TEMP_TARGET_FONT);
@@ -346,4 +360,11 @@ public class BreweryDisplayDrawer<T> {
 		canvas.drawText(g, display.getComponent().getName(), BColor.FOREGROUND, BColor.BACKGROUND, HAlign.CENTER, left, top + height + 1, width, NAME_HEIGHT - 1, BFont.TEXT_FONT);
 	}
 
+	public void addPending(ControlPoint controlPoint) {
+		pendingUpdates.put(controlPoint.getControlPin(), controlPoint);
+	}
+
+	public void clearPending() {
+		pendingUpdates.clear();
+	}
 }
