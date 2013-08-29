@@ -17,7 +17,8 @@
  */
 
 #define ONE_WIRE_PIN 4
-#define DEFAULT_PORT 2739
+//#define DEFAULT_PORT 2739
+#define DEFAULT_PORT 80 
 
 #define BUFFER_SIZE 1024*512
 #define PATH_SIZE 1024
