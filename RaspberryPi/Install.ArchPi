@@ -1,0 +1,9 @@
+pacman -S git gcc make pkg-config json-c
+
+cd /opt/
+git clone https://github.com/mohaine/BrewCtrl.git
+
+cd /opt/BrewCtrl/RaspberryPi/
+
+make brewctrl
+

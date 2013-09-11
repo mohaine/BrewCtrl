@@ -37,7 +37,7 @@ public class MockServlet extends HttpServlet {
 	}
 
 	private String getBaseCmdUrl() {
-		String baseUrl = "http://localhost:" + ControllerUrlLoader.DEFAULT_PORT + "/cmd";
+		String baseUrl = "http://smaug:" + ControllerUrlLoader.DEFAULT_PORT + "/cmd";
 		return baseUrl;
 	}
 }

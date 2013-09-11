@@ -227,7 +227,6 @@ public class BreweryDisplayDrawerGwt implements DrawerCanvas<Context2d> {
 
 	@Override
 	public void drawTank(Context2d g, int left, int top, int width, int height) {
-
 		g.setFillStyle(DrawStyleGwt.TANK);
 		g.setStrokeStyle(DrawStyleGwt.FOREGROUND);
 

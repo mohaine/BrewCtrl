@@ -34,7 +34,7 @@ public class DrawStyleGwt {
 	public static final CssColor PENDING = CssColor.make("pink");
 	public static CssColor ERROR = CssColor.make("red");
 
-	public static final String TEMP_FONT = "32px sans-serif";
+	public static final String TEMP_FONT = "48px sans-serif";
 	public static final String TEXT_FONT = "12px sans-serif";
 	public static final String TEMP_TARGET_FONT = "20px sans-serif";
 
