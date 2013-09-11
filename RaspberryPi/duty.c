@@ -97,6 +97,7 @@ void setupDutyController(DutyController * hs, int pin) {
 }
 
 void resetDutyState(DutyController * hs) {
+    //DBG("resetDutyState %d\n",hs->controlPin);
     hs->timeOn = 0;
     hs->timeOff = 0;
     hs->dutyLastCheckTime = millis();
@@ -143,7 +144,7 @@ void updateHeatForStateAndDuty(DutyController * hs) {
         } else {
             hs->timeOff += (timeSinceLast);
         }
-        hs->dutyLastCheckTime = now;
+
 
         if (hs->duty == 100) {
             newHeatPinState = true;
@@ -167,6 +168,9 @@ void updateHeatForStateAndDuty(DutyController * hs) {
             }
         }
     } else {
+        hs->dutyLastCheckTime = now;
+        hs->timeOn = 0;
+        hs->timeOff = 0;
         newHeatPinState = false;
     }
 

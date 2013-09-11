@@ -420,13 +420,15 @@ void updatePinsForSetDuty() {
 }
 
 void turnOff() {
+    DBG("Turn Off\n");
+
     Control* control = getControl();
     control->mode = MODE_OFF;
     lockSteps();
     for (int csIndex = 0; csIndex < getControlStepCount() && csIndex < MAX_STEP_COUNT; csIndex++) {
         ControlStep * cs = getControlStep(csIndex);
         for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
-            cs->controlPoints[cpIndex].duty = 0;
+            //cs->controlPoints[cpIndex].duty = 0;
             setHeatOn(&cs->controlPoints[cpIndex].dutyController, false);
         }
     }
@@ -434,6 +436,8 @@ void turnOff() {
 }
 
 void turnHeatOff() {
+    DBG("Turn Heat Off\n");
+
     Control* control = getControl();
     control->mode = MODE_HEAT_OFF;
 
@@ -453,7 +457,6 @@ void turnHeatOff() {
                         for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
                             ControlPoint * cp = &cs->controlPoints[cpIndex];
                             if (cp->controlPin == t->heater->pin) {
-                                cp->duty = 0;
                                 setHeatOn(&cp->dutyController, false);
                             }
                         }
@@ -472,9 +475,7 @@ void turnHeatOff() {
                     for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
                         ControlPoint * cp = &cs->controlPoints[cpIndex];
                         if (cp->controlPin == p->pin) {
-
                             if (cp->automaticControl) {
-                                cp->duty = 0;
                                 setHeatOn(&cp->dutyController, false);
                             } else {
                                 setHeatOn(&cp->dutyController, true);

@@ -17,7 +17,6 @@
  */
 
 #define ONE_WIRE_PIN 4
-//#define DEFAULT_PORT 2739
 #define DEFAULT_PORT 80 
 
 #define BUFFER_SIZE 1024*512
@@ -606,6 +605,7 @@ void handleStatusRequest(Request * request, Response * response) {
             json_object_object_add(controlPoint, "targetTemp", json_object_new_double(cp->targetTemp));
             json_object_object_add(controlPoint, "hasDuty", json_object_new_boolean(cp->hasDuty));
             json_object_object_add(controlPoint, "automaticControl", json_object_new_boolean(cp->automaticControl));
+            json_object_object_add(controlPoint, "on", json_object_new_boolean(cp->dutyController.on));
         }
 
     }
@@ -934,3 +934,4 @@ void startComm() {
     pthread_create(&thread, NULL, listenThread, NULL);
 
 }
+
