@@ -20,7 +20,7 @@ package com.mohaine.brewcontroller.client.bean;
 
 public class TempSensor {
 	private String address = "";
-	private double tempatureC;
+	private double temperatureC;
 	private boolean reading = false;
 
 	public void setAddress(String address) {
@@ -31,12 +31,12 @@ public class TempSensor {
 		return address;
 	}
 
-	public double getTempatureC() {
-		return tempatureC;
+	public double getTemperatureC() {
+		return temperatureC;
 	}
 
-	public void setTempatureC(double tempatureC) {
-		this.tempatureC = tempatureC;
+	public void setTemperatureC(double temperatureC) {
+		this.temperatureC = temperatureC;
 	}
 
 	public boolean isReading() {

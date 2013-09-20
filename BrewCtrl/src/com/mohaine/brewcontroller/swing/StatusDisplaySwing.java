@@ -357,7 +357,7 @@ public class StatusDisplaySwing extends JPanel {
 
 		public void update() {
 			label.setValue(sensor);
-			value.setText(tempFormat.format(conversion.getTempDisplayConveter().convertFrom(sensor.getTempatureC())));
+			value.setText(tempFormat.format(conversion.getTempDisplayConveter().convertFrom(sensor.getTemperatureC())));
 			label.setForeground(sensor.isReading() ? normalStatusForeground : Color.red);
 		}
 	}

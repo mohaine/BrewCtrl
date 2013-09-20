@@ -82,7 +82,7 @@ public class MockHardware {
 			if (status != null) {
 				List<TempSensor> sensors = status.getSensors();
 				for (TempSensor hardwareSensor : sensors) {
-					hardwareSensor.setTempatureC(hardwareSensor.getTempatureC() + (r.nextDouble() - 0.5));
+					hardwareSensor.setTemperatureC(hardwareSensor.getTemperatureC() + (r.nextDouble() - 0.5));
 				}
 				if (configuration != null) {
 					BreweryLayout layout = configuration.getBrewLayout();

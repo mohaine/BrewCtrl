@@ -621,7 +621,7 @@ void handleStatusRequest(Request * request, Response * response) {
         json_object_array_add(sensors, sensor);
 
         json_object_object_add(sensor, "address", json_object_new_string(ts->addressPtr));
-        json_object_object_add(sensor, "tempatureC", json_object_new_double(ts->lastTemp));
+        json_object_object_add(sensor, "temperatureC", json_object_new_double(ts->lastTemp));
         json_object_object_add(sensor, "reading", json_object_new_boolean(hasVaildTemp(ts)));
 
         unlockSensor(ts);

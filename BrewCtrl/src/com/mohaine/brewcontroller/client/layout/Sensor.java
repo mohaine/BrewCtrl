@@ -7,7 +7,7 @@ public class Sensor extends BreweryComponent {
 	public static final String TYPE = "Sensor";
 
 	private String address = "";
-	private double tempatureC;
+	private double temperatureC;
 	private boolean reading = false;
 
 	public void setAddress(String address) {
@@ -18,12 +18,12 @@ public class Sensor extends BreweryComponent {
 		return address;
 	}
 
-	public double getTempatureC() {
-		return tempatureC;
+	public double getTemperatureC() {
+		return temperatureC;
 	}
 
-	public void setTempatureC(double tempatureC) {
-		this.tempatureC = tempatureC;
+	public void setTemperatureC(double temperatureC) {
+		this.temperatureC = temperatureC;
 	}
 
 	public boolean isReading() {
@@ -42,7 +42,7 @@ public class Sensor extends BreweryComponent {
 	public void updateFrom(TempSensor tankTs) {
 		this.address = tankTs.getAddress();
 		this.reading = tankTs.isReading();
-		this.tempatureC = tankTs.getTempatureC();
+		this.temperatureC = tankTs.getTemperatureC();
 	}
 
 }
