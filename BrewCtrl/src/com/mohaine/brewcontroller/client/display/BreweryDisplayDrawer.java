@@ -277,10 +277,10 @@ public class BreweryDisplayDrawer<T> {
 
 	private void drawSensor(T g, BreweryComponentDisplay display) {
 		Sensor sensor = (Sensor) display.getComponent();
-		Double tempatureC = sensor.getTempatureC();
-		if (tempatureC != null) {
+		Double temperatureC = sensor.getTemperatureC();
+		if (temperatureC != null) {
 			final Converter<Double, Double> tempDisplayConveter = conversion.getTempDisplayConveter();
-			String tempDisplay = numberFormat.format(tempDisplayConveter.convertFrom(tempatureC)) + "\u00B0";
+			String tempDisplay = numberFormat.format(tempDisplayConveter.convertFrom(temperatureC)) + "\u00B0";
 
 			BColor textColor;
 			if (sensor.isReading()) {

@@ -1,0 +1,7 @@
+.tank {
+
+}
+
+.tank .temp.notReading tspan{
+	fill: #f00;
+}

@@ -56,12 +56,12 @@ public class MockHardwareServer {
 		TempSensor sensor1 = new TempSensor();
 		sensor1.setAddress("0000000000000001");
 		sensor1.setReading(true);
-		sensor1.setTempatureC(25);
+		sensor1.setTemperatureC(25);
 		sensors.add(sensor1);
 		TempSensor sensor2 = new TempSensor();
 		sensor2.setAddress("0000000000000002");
 		sensor2.setReading(true);
-		sensor2.setTempatureC(26);
+		sensor2.setTemperatureC(26);
 		sensors.add(sensor2);
 
 		status.setSensors(sensors);

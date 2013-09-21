@@ -313,11 +313,11 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 						tankTs = new TempSensor();
 					}
 
-					Double oldTemp = sensor.getTempatureC();
+					Double oldTemp = sensor.getTemperatureC();
 					boolean oldReding = sensor.isReading();
 					sensor.updateFrom(tankTs);
 
-					boolean diff = forceDirty || !equals(oldTemp, sensor.getTempatureC()) || oldReding != sensor.isReading();
+					boolean diff = forceDirty || !equals(oldTemp, sensor.getTemperatureC()) || oldReding != sensor.isReading();
 					if (diff) {
 						eventsToFire.add(new BreweryComponentChangeEvent(sensor));
 					}
@@ -328,14 +328,14 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 		}
 	}
 
-	private boolean equals(Double temp, Double tempatureC) {
-		if (temp == tempatureC) {
+	private boolean equals(Double temp, Double temperatureC) {
+		if (temp == temperatureC) {
 			return true;
-		} else if (temp == null || tempatureC == null) {
+		} else if (temp == null || temperatureC == null) {
 			return false;
 		}
 
-		return Math.abs(temp - tempatureC) < 0.001;
+		return Math.abs(temp - temperatureC) < 0.001;
 	}
 
 	protected void connect() throws Exception {
@@ -474,7 +474,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 		for (int i = 0; i < sensors.size(); i++) {
 			TempSensor tempSensor = sensors.get(i);
 			if (tempSensor.getAddress().equals(sensorAddress)) {
-				return tempSensor.getTempatureC();
+				return tempSensor.getTemperatureC();
 			}
 		}
 		return null;

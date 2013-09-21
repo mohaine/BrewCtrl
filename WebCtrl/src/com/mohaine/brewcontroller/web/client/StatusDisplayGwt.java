@@ -412,7 +412,7 @@ public class StatusDisplayGwt extends Composite {
 
 		public void update() {
 			label.setValue(sensor);
-			value.setText(tempFormat.format(conversion.getTempDisplayConveter().convertFrom(sensor.getTempatureC())));
+			value.setText(tempFormat.format(conversion.getTempDisplayConveter().convertFrom(sensor.getTemperatureC())));
 			// TODO
 			// label.setForeground(sensor.isReading() ? normalStatusForeground :
 			// Color.red);

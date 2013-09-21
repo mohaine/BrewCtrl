@@ -6,7 +6,7 @@
             "name":"RIMS",
             "sensor":{
                "address":"28d00c7d02000081",
-               "tempatureC":0.0,
+               "temperatureC":0.0,
                "reading":false
             },
             "heater":{
@@ -21,7 +21,7 @@
             "name":"TUN",
             "sensor":{
                "address":"28b5af8e0200002d",
-               "tempatureC":0.0,
+               "temperatureC":0.0,
                "reading":false
             }
          },
