@@ -17,7 +17,11 @@
  */
 
 #define ONE_WIRE_PIN 4
-#define DEFAULT_PORT 80 
+
+
+#ifndef DEFAULT_PORT
+#define DEFAULT_PORT 80
+#endif
 
 #define BUFFER_SIZE 1024*512
 #define PATH_SIZE 1024
@@ -84,7 +88,7 @@ int checkSuffix(const char *str, const char *suffix) {
 }
 
 void handleOtherRequest(Request * request, Response * response) {
-	DBG("Request Path: '%s'\n", request->path);
+	//DBG("Request Path: '%s'\n", request->path);
 
 	char fileName[PATH_SIZE];
 	int length = strlen(request->path);
@@ -163,6 +167,10 @@ void handleOtherRequest(Request * request, Response * response) {
 					sprintf(response->contentType, "image/png");
 				} else if (checkSuffix(fileName, ".ico")) {
 					sprintf(response->contentType, "image/icon");
+				} else if (checkSuffix(fileName, ".svg")) {
+					//sprintf(response->contentType, "text/xml");
+				} else if (checkSuffix(fileName, ".map")) {
+					sprintf(response->contentType, "application/json");
 				} else {
 					DBG("Unhandled file type %s\n", fileName);
 
@@ -356,13 +364,18 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				json_object *controlPoint = json_object_array_get_idx(controlPoints, cpI);
 				ControlPoint *cp = &cs->controlPoints[cpI];
 
-				value = json_object_object_get(controlPoint, "controlPin");
+				value = json_object_object_get(controlPoint, "controlIo");
 				if (value != NULL && json_object_get_type(value) == json_type_int) {
-					cp->controlPin = json_object_get_int(value);
+					cp->controlIo = json_object_get_int(value);
 				} else {
-					DBG("Invalid Control Point: No controlPin\n");
-					valid = false;
-					break;
+					value = json_object_object_get(controlPoint, "controlPin");
+					if (value != NULL && json_object_get_type(value) == json_type_int) {
+						cp->controlIo = json_object_get_int(value);
+					} else {
+						DBG("Invalid Control Point: No controlIo\n");
+						valid = false;
+						break;
+					}
 				}
 
 				value = json_object_object_get(controlPoint, "duty");
@@ -600,7 +613,7 @@ void handleStatusRequest(Request * request, Response * response) {
 			controlPoint = json_object_new_object();
 			json_object_array_add(controlPoints, controlPoint);
 
-			json_object_object_add(controlPoint, "controlPin", json_object_new_int(cp->controlPin));
+			json_object_object_add(controlPoint, "controlIo", json_object_new_int(cp->controlIo));
 			json_object_object_add(controlPoint, "duty", json_object_new_int(cp->duty));
 			json_object_object_add(controlPoint, "fullOnAmps", json_object_new_int(cp->fullOnAmps));
 			json_object_object_add(controlPoint, "tempSensorAddress", json_object_new_string(cp->tempSensorAddressPtr));

@@ -70,7 +70,7 @@ void setupControlPoint(ControlPoint *cp) {
             cp->duty = 0;
             setupPid(&cp->pid);
         }
-        setupDutyController(&cp->dutyController, cp->controlPin);
+        setupDutyController(&cp->dutyController, cp->controlIo);
         cp->initComplete = true;
     }
 }
@@ -223,7 +223,7 @@ void addManualStep() {
                 Tank * t = &tA[tankIndex];
                 if (t->heater != NULL) {
                     ControlPoint * cp = &step->controlPoints[step->controlPointCount];
-                    cp->controlPin = t->heater->pin;
+                    cp->controlIo = t->heater->io;
                     cp->automaticControl = false;
                     cp->duty = 0;
                     cp->fullOnAmps = t->heater->fullOnAmps;
@@ -232,7 +232,7 @@ void addManualStep() {
                     setupControlPoint(cp);
                     step->controlPointCount++;
 
-                    DBG("Setup control point for pin %d\n",cp->controlPin);
+                    DBG("Setup control point for io %d\n",cp->controlIo);
 
                 }
             }
@@ -241,7 +241,7 @@ void addManualStep() {
             for (int pumpIndex = 0; pumpIndex < bl->pumps.count; pumpIndex++) {
                 Pump * p = &pA[pumpIndex];
                 ControlPoint * cp = &step->controlPoints[step->controlPointCount];
-                cp->controlPin = p->pin;
+                cp->controlIo = p->io;
                 cp->automaticControl = false;
                 cp->duty = 0;
                 cp->fullOnAmps = 0;
@@ -401,7 +401,7 @@ void updatePinsForSetDuty() {
 
 
                 if (cp->hasDuty) {
-                    //DBG("  Pin: %d Duty: %d\n",cp->controlPin, cp->duty);
+                    //DBG("  Pin: %d Duty: %d\n",cp->controlIo, cp->duty);
                     setHeatDuty(&cp->dutyController, duty);
                     updateHeatForStateAndDuty(&cp->dutyController);
                 } else {
@@ -409,7 +409,7 @@ void updatePinsForSetDuty() {
                 }
 
 
-                if (cp->dutyController.pinState) {
+                if (cp->dutyController.ioState) {
                     currentAmps += cp->fullOnAmps;
                 }
             }
@@ -456,7 +456,7 @@ void turnHeatOff() {
                         ControlStep * cs = getControlStep(csIndex);
                         for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
                             ControlPoint * cp = &cs->controlPoints[cpIndex];
-                            if (cp->controlPin == t->heater->pin) {
+                            if (cp->controlIo == t->heater->io) {
                                 setHeatOn(&cp->dutyController, false);
                             }
                         }
@@ -474,7 +474,7 @@ void turnHeatOff() {
                     ControlStep * cs = getControlStep(csIndex);
                     for (int cpIndex = 0; cpIndex < cs->controlPointCount && cpIndex < MAX_CP_COUNT; cpIndex++) {
                         ControlPoint * cp = &cs->controlPoints[cpIndex];
-                        if (cp->controlPin == p->pin) {
+                        if (cp->controlIo == p->io) {
                             if (cp->automaticControl) {
                                 setHeatOn(&cp->dutyController, false);
                             } else {

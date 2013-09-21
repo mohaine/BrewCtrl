@@ -283,7 +283,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 				if (controlPoints != null) {
 					for (BrewHardwareControl bhc : brewHardwareControls) {
 						for (ControlPoint controlPoint : controlPoints) {
-							if (controlPoint.getControlPin() == bhc.getPin()) {
+							if (controlPoint.getControlIo() == bhc.getIo()) {
 								if (forceDirty || bhc.getDuty() != controlPoint.getDuty()) {
 									bhc.setDuty(controlPoint.getDuty());
 									eventsToFire.add(new BreweryComponentChangeEvent(bhc));
@@ -498,7 +498,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 		for (Pump pump : pumps) {
 			ControlPoint controlPoint = new ControlPoint();
 			controlPoint.setAutomaticControl(false);
-			controlPoint.setControlPin(pump.getPin());
+			controlPoint.setControlIo(pump.getIo());
 			controlPoint.setHasDuty(pump.isHasDuty());
 			controlPoints.add(controlPoint);
 		}
@@ -509,7 +509,7 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 			if (heater != null) {
 				ControlPoint controlPoint = new ControlPoint();
 				controlPoint.setAutomaticControl(false);
-				controlPoint.setControlPin(heater.getPin());
+				controlPoint.setControlIo(heater.getIo());
 				controlPoint.setHasDuty(heater.isHasDuty());
 				controlPoint.setFullOnAmps(heater.getFullOnAmps());
 

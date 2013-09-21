@@ -5,3 +5,29 @@
 .tank .temp.notReading tspan{
 	fill: #f00;
 }
+
+
+.heatElement.on  .element{
+	fill: #f00;
+}
+.heatElement.off  .element{
+	fill: none;
+}
+
+
+
+.pump.on  .pumpBody {
+	fill: #0f0;
+}
+.pump.off  .pumpBody {
+	fill: #f00;
+}
+
+
+.pump.on  .onoff {
+	fill: none;
+}
+
+.pump.off  .onoff {
+	fill: #000;
+}

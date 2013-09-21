@@ -70,9 +70,9 @@ public class ControlStep {
 		this.controlPoints = controlPoints;
 	}
 
-	public ControlPoint getControlPointForPin(int pin) {
+	public ControlPoint getControlPointForPin(int io) {
 		for (ControlPoint cp : controlPoints) {
-			if (cp.getControlPin() == pin) {
+			if (cp.getControlIo() == io) {
 				return cp;
 			}
 		}

@@ -181,7 +181,7 @@ public class BreweryDisplay {
 							public long run() {
 								ControlStep selectedStep = controller.getSelectedStep();
 								if (selectedStep != null) {
-									ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+									ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getIo());
 									if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 										if (component instanceof HeatElement) {
 
@@ -260,7 +260,7 @@ public class BreweryDisplay {
 				mouseState.canDrag = false;
 				if (selectedStep != null) {
 					BrewHardwareControl brewHardwareControl = (BrewHardwareControl) component;
-					ControlPoint controlPoint = selectedStep.getControlPointForPin(brewHardwareControl.getPin());
+					ControlPoint controlPoint = selectedStep.getControlPointForPin(brewHardwareControl.getIo());
 					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 						controlPoint.setDuty(controlPoint.getDuty() > 0 ? 0 : 100);
 						eventBus.fireEvent(new StepModifyEvent(selectedStep));
@@ -304,7 +304,7 @@ public class BreweryDisplay {
 			ControlStep selectedStep = controller.getSelectedStep();
 			if (selectedStep != null) {
 				if (component instanceof BrewHardwareControl) {
-					ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getPin());
+					ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) component).getIo());
 					if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 						if (component instanceof HeatElement) {
 							int newDuty = (int) (controlPoint.getDuty() + delta);

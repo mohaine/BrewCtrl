@@ -220,10 +220,10 @@ public class BreweryDisplayDrawer<T> {
 		ControlStep selectedStep = controller.getSelectedStep();
 		if (selectedStep != null) {
 
-			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getPin());
+			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(heater.getIo());
 
 			if (controlPointForPin != null) {
-				ControlPoint pendingChanges = pendingUpdates.get(controlPointForPin.getControlPin());
+				ControlPoint pendingChanges = pendingUpdates.get(controlPointForPin.getControlIo());
 				if (pendingChanges != null) {
 					controlPointForPin = pendingChanges;
 				}
@@ -296,7 +296,7 @@ public class BreweryDisplayDrawer<T> {
 				ControlPoint cp = selectedStep.getControlPointForAddress(sensor.getAddress());
 				if (cp != null && cp.isAutomaticControl()) {
 					if (selectedStep.isActive()) {
-						ControlPoint pendingChanges = pendingUpdates.get(cp.getControlPin());
+						ControlPoint pendingChanges = pendingUpdates.get(cp.getControlIo());
 						if (pendingChanges != null) {
 							cp = pendingChanges;
 						}
@@ -333,7 +333,7 @@ public class BreweryDisplayDrawer<T> {
 
 		ControlStep selectedStep = controller.getSelectedStep();
 		if (selectedStep != null) {
-			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(pump.getPin());
+			ControlPoint controlPointForPin = selectedStep.getControlPointForPin(pump.getIo());
 			if (controlPointForPin != null) {
 				int cpDuty = controlPointForPin.getDuty();
 
@@ -379,7 +379,7 @@ public class BreweryDisplayDrawer<T> {
 	}
 
 	public void addPending(ControlPoint controlPoint) {
-		pendingUpdates.put(controlPoint.getControlPin(), controlPoint);
+		pendingUpdates.put(controlPoint.getControlIo(), controlPoint);
 	}
 
 	public void clearPending() {
