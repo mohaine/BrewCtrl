@@ -12,7 +12,7 @@ LISTSENSORS=listsensors
 LDFLAGS += -g -rdynamic -finstrument-functions
 CFLAGS += -g -rdynamic -finstrument-functions
 
-CFLAGSD+= -DMOCK -DDEFAULT_PORT=2739
+#CFLAGSD+= -DMOCK -DDEFAULT_PORT=2739
 #CFLAGSD+= -D__DEBUG -D__DEBUG_FILE
 CFLAGSD+= -D__DEBUG
 
