@@ -132,7 +132,7 @@
            sodipodi:role="line"
            id="tspan3811-6"
            x="111.00446"
-           y="378.15906"><%= BrewCtrl.round(BrewCtrl.convertC2F(temperatureC),1) %>&#xb0;</tspan></text>
+           y="378.15906"><%= BrewCtrl.round(BrewCtrl.convertC2F(temperatureC),1).toFixed(1) %>&#xb0;</tspan></text>
     </g>
     <% } %>         
     
