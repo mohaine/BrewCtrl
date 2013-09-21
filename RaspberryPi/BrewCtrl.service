@@ -1,0 +1,10 @@
+[Unit]
+Description=BrewCtrl
+
+[Service]
+ExecStart=/opt/BrewCtrl/RaspberryPi/brewctrl
+WorkingDirectory=/opt/BrewCtrl/RaspberryPi
+
+
+[Install]
+WantedBy=multi-user.target
