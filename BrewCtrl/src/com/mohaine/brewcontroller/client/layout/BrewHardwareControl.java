@@ -1,7 +1,7 @@
 package com.mohaine.brewcontroller.client.layout;
 
 public abstract class BrewHardwareControl extends BreweryComponent {
-	private int pin;
+	private int io;
 	private int duty;
 	private boolean hasDuty;
 
@@ -13,12 +13,12 @@ public abstract class BrewHardwareControl extends BreweryComponent {
 		this.duty = duty;
 	}
 
-	public int getPin() {
-		return pin;
+	public int getIo() {
+		return io;
 	}
 
-	public void setPin(int pin) {
-		this.pin = pin;
+	public void setIo(int io) {
+		this.io = io;
 	}
 
 	public boolean isHasDuty() {

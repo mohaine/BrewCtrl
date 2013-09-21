@@ -34,8 +34,8 @@ typedef struct
   unsigned long timeOff;  
   int duty;
   bool on;
-  bool pinState;
-  byte controlPin;
+  bool ioState;
+  byte controlIo;
 } 
 DutyController;
 
@@ -45,7 +45,7 @@ void updateHeatForStateAndDuty(DutyController * hs);
 void updateForPinState(DutyController * hs, bool newHeatPinState);
 void setHeatDuty(DutyController * hs, int duty);
 void resetDutyState(DutyController * hs);
-void setupDutyController(DutyController * hs, int pin);
+void setupDutyController(DutyController * hs, int io);
 
 #endif
 

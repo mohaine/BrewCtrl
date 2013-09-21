@@ -38,7 +38,7 @@ typedef struct {
 
 typedef struct {
 	bool initComplete;
-	int controlPin;
+	int controlIo;
 	int duty;
 	int fullOnAmps;
 	char tempSensorAddressPtr[17];

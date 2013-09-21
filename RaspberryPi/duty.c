@@ -28,9 +28,9 @@
 
 #define GPIO_ROOT SYS_PATH"/class/gpio"
 
-void pinMode(int pin, bool inout) {
+void ioMode(int io, bool inout) {
 #ifdef MOCK
-    printf("          Pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
+    printf("          Pin %d In/Out to %s\n", io, inout ? "In" : "Out");
 #else
     char tmp[10];
     char path[PATH_MAX];
@@ -38,66 +38,66 @@ void pinMode(int pin, bool inout) {
 
     FILE* f = fopen(path, "wb");
     if (f) {
-        sprintf(tmp, "%d", pin);
+        sprintf(tmp, "%d", io);
         fwrite(tmp, 1, strlen(tmp), f);
         fclose(f);
     } else {
-        ERR("Failed export pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
+        ERR("Failed export io %d In/Out to %s\n", io, inout ? "In" : "Out");
     }
-    sprintf(path, "%s/gpio%d/direction", GPIO_ROOT, pin);
+    sprintf(path, "%s/gpio%d/direction", GPIO_ROOT, io);
     f = fopen(path, "wb");
     if (f) {
         sprintf(tmp, "%s", inout ? "in" : "out");
         fwrite(tmp, 1, strlen(tmp), f);
         fclose(f);
     } else {
-        ERR("Failed to set direction on pin %d In/Out to %s\n", pin, inout ? "In" : "Out");
+        ERR("Failed to set direction on io %d In/Out to %s\n", io, inout ? "In" : "Out");
     }
 #endif
 }
 
-void digitalWrite(int pin, bool hilow) {
+void digitalWrite(int io, bool hilow) {
 
     if (hilow) {
-        //DBG("   %d -> ON\n", pin);
+        //DBG("   %d -> ON\n", io);
     } else {
-        //DBG("   %d -> OFF\n", pin);
+        //DBG("   %d -> OFF\n", io);
     }
 
 #ifdef MOCK
-//	printf("Pin %d set to %s\n", pin, hilow ? "On" : "Off");
+//	printf("Pin %d set to %s\n", io, hilow ? "On" : "Off");
 #else
     char tmp[10];
     char path[PATH_MAX];
-    sprintf(path, "%s/gpio%d/value", GPIO_ROOT, pin);
+    sprintf(path, "%s/gpio%d/value", GPIO_ROOT, io);
     FILE* f = fopen(path, "wb");
     if (f) {
         sprintf(tmp, "%s", hilow ? "1" : "0");
         fwrite(tmp, 1, strlen(tmp), f);
         fclose(f);
     } else {
-        ERR("Failed to set output on pin %d to %s\n", pin, hilow ? "On" : "Off");
+        ERR("Failed to set output on io %d to %s\n", io, hilow ? "On" : "Off");
     }
 #endif
 
 }
 
-void setupDutyController(DutyController * hs, int pin) {
-    DBG("setupDutyController %d\n",pin);
+void setupDutyController(DutyController * hs, int io) {
+    DBG("setupDutyController %d\n",io);
 
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
-    hs->controlPin = pin;
+    ioMode(io, OUTPUT);
+    digitalWrite(io, LOW);
+    hs->controlIo = io;
     hs->dutyLastCheckTime = 0;
     hs->timeOn = 0;
     hs->timeOff = 0;
     hs->duty = 0;
     hs->on = false;
-    hs->pinState = false;
+    hs->ioState = false;
 }
 
 void resetDutyState(DutyController * hs) {
-    //DBG("resetDutyState %d\n",hs->controlPin);
+    //DBG("resetDutyState %d\n",hs->controlIo);
     hs->timeOn = 0;
     hs->timeOff = 0;
     hs->dutyLastCheckTime = millis();
@@ -106,10 +106,10 @@ void resetDutyState(DutyController * hs) {
 
 void updateForPinState(DutyController * hs, bool newHeatPinState) {
     newHeatPinState = newHeatPinState & hs->on;
-    if (newHeatPinState != hs->pinState) {
+    if (newHeatPinState != hs->ioState) {
         hs->dutyOnOffLastChange = millis();
-        hs->pinState = newHeatPinState;
-        digitalWrite(hs->controlPin, hs->pinState ? HIGH : LOW);
+        hs->ioState = newHeatPinState;
+        digitalWrite(hs->controlIo, hs->ioState ? HIGH : LOW);
     }
 }
 
@@ -133,13 +133,13 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 
         unsigned long timeSinceLast  = now - hs->dutyLastCheckTime;
         /*
-        if(hs->controlPin == 10){
+        if(hs->controlIo == 10){
         DBG("  Before dutyLastCheckTime: %lu Off Time: %lu dutyLastCheckTime:  %lu timeSinceLast: %lu now: %lu\n", hs->timeOn , hs->timeOff , hs->dutyLastCheckTime,timeSinceLast,now );
         }
         */
 
 
-        if (hs->pinState) {
+        if (hs->ioState) {
             hs->timeOn += (timeSinceLast);
         } else {
             hs->timeOff += (timeSinceLast);
@@ -157,7 +157,7 @@ void updateHeatForStateAndDuty(DutyController * hs) {
             int percentOnTest = (int)(percentOn * 1000);
 
             /*
-              if(hs->controlPin == 10){
+              if(hs->controlIo == 10){
             	DBG("     After OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n", hs->timeOn , hs->timeOff , totalTime , percentOn * 100);
               }
             */

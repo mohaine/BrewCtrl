@@ -200,7 +200,7 @@ public class StepDisplayListSwing extends JPanel {
 				BrewHardwareControl bhc = layout.findBrewHardwareControlByNameOrParentName(cfgCp.getControlName());
 				Sensor sensor = layout.findSensorByNameOrParentName(cfgCp.getTargetName());
 				if (bhc != null && sensor != null) {
-					ControlPoint controlPoint = step.getControlPointForPin(bhc.getPin());
+					ControlPoint controlPoint = step.getControlPointForPin(bhc.getIo());
 					if (controlPoint != null) {
 						controlPoint.setAutomaticControl(true);
 						controlPoint.setTargetTemp(cfgCp.getTargetTemp());

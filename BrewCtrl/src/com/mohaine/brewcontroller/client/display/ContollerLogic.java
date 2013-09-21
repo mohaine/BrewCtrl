@@ -14,7 +14,7 @@ public class ContollerLogic {
 		if (selectedStep != null) {
 
 			if (control instanceof BrewHardwareControl) {
-				ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) control).getPin());
+				ControlPoint controlPoint = selectedStep.getControlPointForPin(((BrewHardwareControl) control).getIo());
 				if (controlPoint != null && !controlPoint.isAutomaticControl()) {
 					return true;
 				}

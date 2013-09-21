@@ -7,6 +7,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    class="tank"
@@ -15,7 +16,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="tank.svg">
+   sodipodi:docname="tank-orig.svg">
   <metadata
      id="metadata19">
     <rdf:RDF>
@@ -36,19 +37,19 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2091"
-     inkscape:window-height="1012"
+     inkscape:window-width="2003"
+     inkscape:window-height="1124"
      id="namedview17"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="0.67568347"
-     inkscape:cx="180.81431"
-     inkscape:cy="-58.855116"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:zoom="1.9111215"
+     inkscape:cx="17.667844"
+     inkscape:cy="174.31917"
+     inkscape:window-x="348"
+     inkscape:window-y="57"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
@@ -88,55 +89,38 @@
          id="tspan3807"
          x="341.07144"
          y="407.36218" /></text>
-         
-         
-         
-         	<% if(heater){ %>                 
-                       <g class="heatElement <%= heater.on? "on":"off" %>">
-         
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-       x="315"
-       y="399.58597"
-       id="text3809"
-      ><tspan
-         sodipodi:role="line"
-         id="tspan3811"
-         x="315"
-         y="399.58597"><%= heater.duty %> %</tspan></text>
-           
-          
-           <path class="element" 
-       style="stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 323.46877,166.93594 -7.86241,0 0,4.35438 -114.32869,0 0,4.43918 112.51107,0 0,4.43918 -112.51107,0 0,4.43918 114.32869,0 0,3.32534 7.86241,0 z"
-       id="path3809"
-       inkscape:connector-curvature="0"
-       transform="translate(96.123233,233)"
-       sodipodi:nodetypes="ccccccccccccc" />
-                 </g>  
-          <% } %> 
-          
-	<% if(hasSensor){ %>                 
     <g
-       class="temp  <%= reading?"reading":"notReading" %>" 
+       class="heatElement"
+       id="g12"
+       transform="translate(216.97137,-17.996449)">
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+         x="203.56337"
+         y="399.58597"
+         id="text3809"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan3000"
+           x="203.56337"
+           y="399.58597">100 %</tspan></text>
+    </g>
+    <g
+       class="temp  "
        id="g11"
        transform="translate(-14.799829,-48.839437)">
       <text
          xml:space="preserve"
          style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
          x="111.00446"
-         y="378.15906" 
+         y="378.15906"
          id="text3809-4"
          sodipodi:linespacing="125%"><tspan
            sodipodi:role="line"
            id="tspan3811-6"
            x="111.00446"
-           y="378.15906"><%= BrewCtrl.round(BrewCtrl.convertC2F(temperatureC),1) %>&#xb0;</tspan></text>
+           y="378.15906">156.9°</tspan></text>
     </g>
-    <% } %>         
-    
-    
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
@@ -147,8 +131,50 @@
          sodipodi:role="line"
          id="tspan2992"
          x="260.26801"
-         y="264.73135"><%= name %></tspan></text>
-           
-         
+         y="264.73135">Tun</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 323.46877,166.93594 -7.86241,0 0,4.35438 -114.32869,0 0,4.43918 112.51107,0 0,4.43918 -112.51107,0 0,4.43918 114.32869,0 0,3.32534 7.86241,0 z"
+       id="path3809"
+       inkscape:connector-curvature="0"
+       transform="translate(96.123233,217.93717)"
+       sodipodi:nodetypes="ccccccccccccc" />
+    <image
+       y="314.53876"
+       x="-282.42206"
+       id="image3080"
+       xlink:href="file:///home/graessle/Pictures/Screenshot%20from%202013-09-20%2022:59:45.png"
+       height="159"
+       width="305" />
+    <g
+       id="g3120">
+      <path
+         transform="translate(90.890703,207.47211)"
+         d="m -234.94057,27.236113 a 41.075359,41.075359 0 1 1 -82.15072,0 41.075359,41.075359 0 1 1 82.15072,0 z"
+         sodipodi:ry="41.075359"
+         sodipodi:rx="41.075359"
+         sodipodi:cy="27.236113"
+         sodipodi:cx="-276.01593"
+         id="path3087"
+         style="fill:none;stroke:#000000;stroke-opacity:1"
+         sodipodi:type="arc" />
+      <rect
+         y="193.59904"
+         x="-186.99043"
+         height="27.276783"
+         width="57.625454"
+         id="rect3091"
+         style="fill:none;stroke:#000000;stroke-width:0.93237054;stroke-opacity:1" />
+      <path
+         transform="translate(106.32668,219.2453)"
+         d="m -279.41709,15.462922 a 12.034819,12.034819 0 1 1 -24.06963,0 12.034819,12.034819 0 1 1 24.06963,0 z"
+         sodipodi:ry="12.034819"
+         sodipodi:rx="12.034819"
+         sodipodi:cy="15.462922"
+         sodipodi:cx="-291.4519"
+         id="path3118"
+         style="fill:none;stroke:#000000;stroke-opacity:1"
+         sodipodi:type="arc" />
+    </g>
   </g>
 </svg>

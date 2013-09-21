@@ -138,7 +138,7 @@ void searchForTempSensors() {
 
     pthread_mutexattr_t mta;
 
-    DBG("searchForTempSensors....\n");
+    //DBG("searchForTempSensors....\n");
     char tmp[PATH_MAX];
     DIR *dp;
     struct dirent *ep;

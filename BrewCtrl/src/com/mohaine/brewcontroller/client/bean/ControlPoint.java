@@ -2,7 +2,7 @@ package com.mohaine.brewcontroller.client.bean;
 
 public class ControlPoint {
 
-	private int controlPin;
+	private int controlIo;
 	private int duty;
 	private int fullOnAmps;
 	private String tempSensorAddress = "0000000000000000";
@@ -43,12 +43,12 @@ public class ControlPoint {
 		this.automaticControl = automaticControl;
 	}
 
-	public int getControlPin() {
-		return controlPin;
+	public int getControlIo() {
+		return controlIo;
 	}
 
-	public void setControlPin(int i) {
-		controlPin = i;
+	public void setControlIo(int i) {
+		controlIo = i;
 	}
 
 	public int getDuty() {
@@ -88,7 +88,7 @@ public class ControlPoint {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (automaticControl ? 1231 : 1237);
-		result = prime * result + controlPin;
+		result = prime * result + controlIo;
 		result = prime * result + duty;
 		result = prime * result + fullOnAmps;
 		result = prime * result + (hasDuty ? 1231 : 1237);
@@ -111,7 +111,7 @@ public class ControlPoint {
 		ControlPoint other = (ControlPoint) obj;
 		if (automaticControl != other.automaticControl)
 			return false;
-		if (controlPin != other.controlPin)
+		if (controlIo != other.controlIo)
 			return false;
 		if (duty != other.duty)
 			return false;
@@ -133,7 +133,7 @@ public class ControlPoint {
 
 	@Override
 	public String toString() {
-		return "ControlPoint [controlPin=" + controlPin + ", duty=" + duty + ", tempSensorAddress=" + tempSensorAddress + ", targetTemp=" + targetTemp + ", hasDuty=" + hasDuty + ", automaticControl="
+		return "ControlPoint [controlIo=" + controlIo + ", duty=" + duty + ", tempSensorAddress=" + tempSensorAddress + ", targetTemp=" + targetTemp + ", hasDuty=" + hasDuty + ", automaticControl="
 				+ automaticControl + "]";
 	}
 
