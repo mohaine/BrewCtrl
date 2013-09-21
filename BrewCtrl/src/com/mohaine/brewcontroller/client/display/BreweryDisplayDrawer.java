@@ -119,8 +119,19 @@ public class BreweryDisplayDrawer<T> {
 
 	public void redrawDisplay(BreweryComponentDisplay display) {
 		T context = canvas.getContext();
-		drawComponent(context, display);
+		redrawDisplay(context, display);
+
 		canvas.displayContext(context);
+	}
+
+	private void redrawDisplay(T context, BreweryComponentDisplay display) {
+		drawComponent(context, display);
+
+		for (BreweryComponentDisplay child : displays) {
+			if (child.getParent() == display) {
+				redrawDisplay(context, child);
+			}
+		}
 	}
 
 	public void redrawBreweryComponent(BreweryComponent component) {
@@ -229,8 +240,15 @@ public class BreweryDisplayDrawer<T> {
 					} else {
 						if (duty != cpDuty || pendingChanges != null) {
 							color = BColor.PENDING;
+						} else {
+							color = BColor.PUMP_ON;
 						}
+
 						text = Integer.toString(cpDuty) + "%";
+					}
+
+					if (!controlPointForPin.isOn()) {
+						color = BColor.PUMP_OFF;
 					}
 
 				} else {

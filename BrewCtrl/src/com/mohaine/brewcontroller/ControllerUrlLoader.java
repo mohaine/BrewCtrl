@@ -5,7 +5,7 @@ import java.util.prefs.Preferences;
 public class ControllerUrlLoader {
 	private static final String BREW_CTRL_URL = "BrewCtrlUrl";
 
-	public static int DEFAULT_PORT = 2739;
+	public static int DEFAULT_PORT = 80;
 
 	private String url = getPrefs().get(BREW_CTRL_URL, "http://raspberrypi:" + DEFAULT_PORT + "/");
 

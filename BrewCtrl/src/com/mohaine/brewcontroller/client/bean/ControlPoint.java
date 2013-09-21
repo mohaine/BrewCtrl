@@ -9,6 +9,7 @@ public class ControlPoint {
 	private double targetTemp;
 	private boolean hasDuty;
 	private boolean automaticControl;
+	private boolean on;
 
 	public String getTempSensorAddress() {
 		return tempSensorAddress;
@@ -74,6 +75,14 @@ public class ControlPoint {
 		this.fullOnAmps = (int) fullOnAmps & 0xff;
 	}
 
+	public boolean isOn() {
+		return on;
+	}
+
+	public void setOn(boolean on) {
+		this.on = on;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -83,6 +92,7 @@ public class ControlPoint {
 		result = prime * result + duty;
 		result = prime * result + fullOnAmps;
 		result = prime * result + (hasDuty ? 1231 : 1237);
+		result = prime * result + (on ? 1231 : 1237);
 		long temp;
 		temp = Double.doubleToLongBits(targetTemp);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -108,6 +118,8 @@ public class ControlPoint {
 		if (fullOnAmps != other.fullOnAmps)
 			return false;
 		if (hasDuty != other.hasDuty)
+			return false;
+		if (on != other.on)
 			return false;
 		if (Double.doubleToLongBits(targetTemp) != Double.doubleToLongBits(other.targetTemp))
 			return false;

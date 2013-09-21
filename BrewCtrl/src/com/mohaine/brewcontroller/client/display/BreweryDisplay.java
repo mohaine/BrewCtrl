@@ -49,7 +49,7 @@ public class BreweryDisplay {
 
 	private static final int MAX_TEMP = 110;
 
-	private static final int ARROW_SIZE = 15;
+	private static final int ARROW_SIZE = 30;
 
 	List<BreweryComponentDisplay> displays = new ArrayList<BreweryComponentDisplay>();
 
@@ -375,9 +375,9 @@ public class BreweryDisplay {
 				BreweryComponentDisplay tankBcd = createBcd(tank, 200, 200);
 
 				if (tank.getHeater() != null) {
-					BreweryComponentDisplay elementDisplay = createBcd(tank.getHeater(), 97 - ARROW_SIZE, 30);
-					elementDisplay.setTop(25);
-					elementDisplay.setLeft(102);
+					BreweryComponentDisplay elementDisplay = createBcd(tank.getHeater(), 160, 55);
+					elementDisplay.setTop(100);
+					elementDisplay.setLeft(10);
 					elementDisplay.setParent(tankBcd);
 
 					BreweryComponentDisplay up = createBcd(tank.getHeater(), ARROW_SIZE, ARROW_SIZE);
@@ -394,8 +394,8 @@ public class BreweryDisplay {
 				}
 
 				if (tank.getSensor() != null) {
-					BreweryComponentDisplay elementDisplay = createBcd(tank.getSensor(), 97, 60);
-					elementDisplay.setTop(25);
+					BreweryComponentDisplay elementDisplay = createBcd(tank.getSensor(), 120, 20);
+					elementDisplay.setTop(30);
 					elementDisplay.setLeft(2);
 					elementDisplay.setParent(tankBcd);
 
