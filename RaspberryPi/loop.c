@@ -22,7 +22,6 @@
  #define BOIL_HEAT_CONTROL_PIN 7
  */
 
-#define _GNU_SOURCE
 
 #include "brewctrl.h"
 #include "sensor.h"

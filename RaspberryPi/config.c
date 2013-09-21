@@ -65,8 +65,8 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
         if (t->sensor != NULL) {
             json_object *sensor = json_object_new_object();
             json_object_object_add(tank, "sensor", sensor);
-
             json_object_object_add(sensor, "address", json_object_new_string(t->sensor->address));
+            json_object_object_add(tank, "sensorAddress", json_object_new_string(t->sensor->address));
         }
         if (t->heater != NULL) {
             json_object *heater = json_object_new_object();
@@ -437,9 +437,7 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
                     if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
                         t->name = mallocString(value);
                     } else {
-
                         DBG("parseBrewLayout tank missing name");
-
                         valid = false;
                         break;
                     }
@@ -456,6 +454,10 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
                         t->heater = parseHeatElement(value);
                     } else {
                         t->heater = NULL;
+                    }
+
+                    if(t->sensor == NULL){
+                        t->sensor = malloc(sizeof(Sensor));
                     }
 
                 }

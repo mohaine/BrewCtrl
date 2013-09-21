@@ -1,3 +1,4 @@
 eclipse.preferences.version=1
+jarsExcludedFromWebInfLib=/home/graessle/source/BrewCtrl/WebCtrl/lib/gin-r169.jar
 warSrcDir=war
 warSrcDirIsOutput=true

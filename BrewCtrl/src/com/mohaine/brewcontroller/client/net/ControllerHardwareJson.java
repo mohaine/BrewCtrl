@@ -59,7 +59,6 @@ public abstract class ControllerHardwareJson implements ControllerHardware {
 
 	private final JsonObjectConverter converter;
 
-	private Scheduler scheduler;
 	protected long lastStatusUpdate;
 
 	protected abstract Configuration loadDefaultConfiguration();

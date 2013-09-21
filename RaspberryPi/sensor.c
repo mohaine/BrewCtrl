@@ -19,14 +19,17 @@
 #include "sensor.h"
 #include "logger.h"
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <linux/limits.h>
 #include <pthread.h>
+
+char *realpath(const char *path, char *resolved_path);
+
 
 #define MAX_SENSORS 100
 
@@ -152,7 +155,6 @@ void searchForTempSensors() {
                 TempSensor* sensor = &sensors[sensorCount];
 
                 if (realpath(tmp, sensor->sysfile)) {
-                    bool valid = false;
 
                     sprintf(tmp, "%s/%s", sensor->sysfile, "id");
 
@@ -174,7 +176,6 @@ void searchForTempSensors() {
                                 pthread_mutex_init(&sensor->sensorMutux, &mta);
 
                                 sensorCount++;
-                                valid = true;
                             } else {
                                 free(addressStr);
                             }

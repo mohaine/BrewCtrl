@@ -2,7 +2,7 @@ CC=gcc
 CFLAGSD=  
 
 
-CFLAGS=-c -Wall -std=c99 $(CFLAGSD)  -lpthread
+CFLAGS=-c -Wall -std=c99 -D_GNU_SOURCE $(CFLAGSD)  -lpthread
 LDFLAGS=-lpthread -lm 
 SOURCES= pid.c duty.c brewctrl.c comm.c  loop.c control.c sensor.c config.c logger.c
 OBJECTS=$(SOURCES:.c=.o) 

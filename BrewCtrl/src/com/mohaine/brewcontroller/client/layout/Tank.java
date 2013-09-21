@@ -1,9 +1,6 @@
 package com.mohaine.brewcontroller.client.layout;
 
 public class Tank extends BreweryComponent {
-	public static final String KETTLE_NAME = "Kettle";
-	public static final String TUN_NAME = "TUN";
-	public static final String HLT_NAME = "HLT";
 
 	public static final String TYPE = "Tank";
 
@@ -12,8 +9,18 @@ public class Tank extends BreweryComponent {
 		return TYPE;
 	}
 
+	private String sensorAddress;
+
 	private Sensor sensor;
 	private HeatElement heater;
+
+	public String getSensorAddress() {
+		return sensorAddress;
+	}
+
+	public void setSensorAddress(String sensorAddress) {
+		this.sensorAddress = sensorAddress;
+	}
 
 	public Sensor getSensor() {
 		return sensor;
