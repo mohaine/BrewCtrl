@@ -7,7 +7,32 @@
   <script src="js/jquery.js"></script>
   <script src="js/underscore.js"></script>
   <script src="js/backbone-min.js"></script> 
+
+
+ <script type="text/template" id="step-template">
+    <div class="step">
+    	
+    	<span class="stepName"><b><%= name %></b></span>    	
+    	<span class="stepTime"><%= BrewCtrl.formatTime(stepTime) %></span>
+    	<span class="stepTime">X</span>    
+      </div>
+  </script>
+
+ <script type="text/template" id="mode-template">
+    <div class="step">
+       	<button id="modeOn" class="<%= mode=="ON"? "down":"up" %>">On</button>
+		<button id="modeHold" class="<%= mode=="HOLD"? "down":"up" %>">Hold</button>
+		<button id="modeHeatOff" class="<%= mode=="HEAT_OFF"? "down":"up" %>">Heat Off</button>
+		<button id="modeOff" class="<%= mode=="OFF"? "down":"up" %>">Off</button>
+      </div>
+  </script>
+  
+  
+  
   <script src="main.js"></script>
+  <script src="step.js"></script>
+  <script src="tank.js"></script>
+
 
 </head>
 
@@ -15,9 +40,23 @@
 
 
 
+<div id="brewctrl-steps"></div>
+
 <div id="brewctrl-tanks"></div>
 
 <div id="brewctrl-pumps"></div>
+
+
+
+
+<div id="brewctrl-mode"></div>
+
+
+
+
+</div>
+
+
 
 
 

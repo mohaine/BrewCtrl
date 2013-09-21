@@ -1,28 +1,26 @@
 .tank {
-
+	
 }
 
-.tank .temp.notReading tspan{
+.tank .temp.notReading tspan {
 	fill: #f00;
 }
 
-
-.heatElement.on  .element{
+.heatElement.on  .element {
 	fill: #f00;
 }
-.heatElement.off  .element{
+
+.heatElement.off  .element {
 	fill: none;
 }
-
-
 
 .pump.on  .pumpBody {
 	fill: #0f0;
 }
+
 .pump.off  .pumpBody {
 	fill: #f00;
 }
-
 
 .pump.on  .onoff {
 	fill: none;
@@ -30,4 +28,45 @@
 
 .pump.off  .onoff {
 	fill: #000;
+}
+
+.step {
+	display: inline-block;
+	border: 1px solid black;
+	border-radius: 3px;
+	padding: 3px;
+}
+
+.step .stepName {
+	display: inline-block;
+	min-width: 10em;
+}
+
+.step .stepTime {
+	display: inline-block;
+	min-width: 5em;
+}
+
+.step .stepTime {
+	display: inline-block;
+	min-width: 5em;
+}
+
+button {
+	font-weight: bold;
+	border-radius: 2px;
+	padding: 3px;
+	border: 1px solid #fff;
+	background-color: white;
+	color: black;
+}
+
+button:hover {
+	border: 1px solid #88f;
+}
+
+button.down {
+	border: 1px solid #88f;
+	background-color: #88f;
+	color: white;
 }

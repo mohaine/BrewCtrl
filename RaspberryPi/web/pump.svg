@@ -30,7 +30,7 @@
 
   <defs
      id="defs4" />
-  <g class="pump   <%= on? "on":"off" %>"
+  <g class="pump   <%= duty>0? "on":"off" %>"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
