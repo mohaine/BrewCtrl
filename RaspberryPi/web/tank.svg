@@ -92,7 +92,7 @@
          
          
          	<% if(heater){ %>                 
-                       <g class="heatElement <%= heater.on? "on":"off" %>">
+                       <g  id="heatElement" class="heatElement <%= heater.on? "on":"off" %>">
          
     <text
        xml:space="preserve"

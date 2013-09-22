@@ -34,18 +34,68 @@ BrewCtrl.Collections.Pumps = Backbone.Collection.extend({
 	}
 });
 
+BrewCtrl.Views.DutyEdit = Backbone.View.extend({
+	template : _.template($('#duty-template').html()),
+	tagName : "span",
+
+	// The DOM events specific to an item.
+	events : {
+		"click #duty100" : "duty100",
+		"click #duty50" : "duty50",
+		"click #duty0" : "duty0",
+
+	},
+	duty100 : function() {
+		this.updateDuty(100);
+	},
+	duty50 : function() {
+		this.updateDuty(50);
+	},
+	duty0 : function() {
+		this.updateDuty(0);
+	},
+	updateDuty : function(newDuty) {
+
+		var selectedStep = BrewCtrl.main.getSelectedStep();
+		if (selectedStep) {
+			
+				
+			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("heater").io);
+			if (controlPoint) {
+				controlPoint.set("duty", newDuty);
+				BrewCtrl.main.updateStep(selectedStep);
+			}
+		}
+
+		this.completeAction();
+	},
+	completeAction : function() {
+	},
+	render : function() {
+		var display = this.template({
+		});
+		this.$el.html(display);
+		return this;
+	}
+});
+
 BrewCtrl.Views.Tank = Backbone.View.extend({
 	template : _.template(BrewCtrl.loadTemplate("tank.svg")),
 	tagName : "span",
 
 	// The DOM events specific to an item.
 	events : {
-
+		"click #heatElement" : "editDuty"
 	},
 
 	initialize : function() {
 		this.listenTo(this.model, 'change', this.render);
 		// this.listenTo(this.model, 'destroy', this.remove);
+	},
+	editDuty : function(event) {
+		BrewCtrl.showPopup(new BrewCtrl.Views.DutyEdit({
+			model : this.model
+		}), event);
 	},
 	render : function() {
 		var display = this.template(this.model.toJSON());
@@ -64,9 +114,8 @@ BrewCtrl.Views.Pump = Backbone.View.extend({
 	},
 	toggleState : function() {
 		var newDuty = this.model.get("duty") > 0 ? 0 : 100;
-		this.model.set("duty", newDuty);
+		//this.model.set("duty", newDuty);
 		var selectedStep = BrewCtrl.main.getSelectedStep();
-
 		if (selectedStep) {
 			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("io"));
 			if (controlPoint) {

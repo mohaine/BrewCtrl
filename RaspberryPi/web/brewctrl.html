@@ -19,7 +19,7 @@
   </script>
 
  <script type="text/template" id="mode-template">
-    <div class="step">
+    <div class="mode">
        	<button id="modeOn" class="<%= mode=="ON"? "down":"up" %>">On</button>
 		<button id="modeHold" class="<%= mode=="HOLD"? "down":"up" %>">Hold</button>
 		<button id="modeHeatOff" class="<%= mode=="HEAT_OFF"? "down":"up" %>">Heat Off</button>
@@ -27,6 +27,27 @@
       </div>
   </script>
   
+  
+  <script type="text/template" id="duty-template">
+      <div class="duty">
+
+      
+       	<button id="duty0">0%</button><br/>
+       	<button id="duty50">50%</button><br/>
+       	<button id="duty100">100%</button><br/>
+      </div>
+  </script>
+  
+    <script type="text/template" id="popup-template">
+    	
+    	<div class="glass"></div>
+    	
+    	<div class="popup"> 
+    	
+       	 <div class="content"> </div>
+    	   
+        </div>
+  </script>
   
   
   <script src="main.js"></script>
@@ -45,8 +66,6 @@
 <div id="brewctrl-tanks"></div>
 
 <div id="brewctrl-pumps"></div>
-
-
 
 
 <div id="brewctrl-mode"></div>

@@ -27,7 +27,6 @@ var BrewCtrl = {
 		value = Math.round(value * factor);
 		return value / factor;
 	},
-
 	formatTime : function(time) {
 		if (time == 0) {
 			return "Forever";
@@ -76,7 +75,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		var self = this;
 		var config = self.get("config");
 
-		//console.log(data);
+		// console.log(data);
 
 		var steps = new BrewCtrl.Collections.Steps(data.steps);
 		self.set("steps", steps);
@@ -237,20 +236,20 @@ BrewCtrl.Views.Mode = Backbone.View.extend({
 	turnHeatOff : function() {
 		BrewCtrl.main.updateMode("HEAT_OFF");
 	},
-
 	render : function() {
 		var display = this.template({
 			mode : BrewCtrl.main.get("mode")
 		});
 		this.$el.html(display);
 		return this;
-	},
+	}
 });
 
 BrewCtrl.Views.Main = Backbone.View.extend({
 	el : $("#brewctrl-main"),
 	events : {
 		"click #toggle-all" : "toggleAllComplete"
+
 	},
 
 	initialize : function() {
@@ -308,6 +307,37 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 		return this;
 	}
 });
+
+BrewCtrl.showPopup = function(popupContent,event) {
+	var display = _.template($('#popup-template').html());
+	var html = display({});
+	var popupEl = $('<div/>').html(html)[0];
+	var glass = $($(popupEl).children(".glass")[0]);
+	
+	var hidePopup = function() {
+		popupEl.parentElement.removeChild(popupEl);
+	};
+	
+	glass.click(hidePopup);
+
+	var popup = $(popupEl).children(".popup")[0];
+
+	popup.style.top = event.clientY + "px";
+	popup.style.left = event.clientX + "px";
+
+	var content = $($(popup).children(".content")[0]);
+	content.empty();
+	if (popupContent.completeAction) {
+		var oldCompleteAction = popupContent.completeAction;
+		popupContent.completeAction = function(){
+			popupContent.completeAction = oldCompleteAction;			
+			popupContent.completeAction();
+			hidePopup();			
+		}
+	}
+	content.append(popupContent.render().el);
+	$("body").append(popupEl);
+};
 
 $(function() {
 	BrewCtrl.main = new BrewCtrl.Models.Main();
