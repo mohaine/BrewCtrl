@@ -41,6 +41,7 @@ DutyController;
 
 
 void setHeatOn(DutyController * hs, bool newState);
+void updateOfOverAmps(DutyController * hs);
 void updateHeatForStateAndDuty(DutyController * hs);
 void updateForPinState(DutyController * hs, bool newHeatPinState);
 void setHeatDuty(DutyController * hs, int duty);

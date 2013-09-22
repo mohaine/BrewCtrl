@@ -124,24 +124,34 @@ void setHeatOn(DutyController * hs, bool newState) {
 	}
 }
 
+void updateTimeOnOff(DutyController * hs,unsigned long now ) {
+	unsigned long timeSinceLast = now - hs->dutyLastCheckTime;
+	/*
+	 if(hs->controlIo == 10){
+	 DBG("  Before dutyLastCheckTime: %lu Off Time: %lu dutyLastCheckTime:  %lu timeSinceLast: %lu now: %lu\n", hs->timeOn , hs->timeOff , hs->dutyLastCheckTime,timeSinceLast,now );
+	 }
+	 */
+
+	if (hs->ioState) {
+		hs->timeOn += (timeSinceLast);
+	} else {
+		hs->timeOff += (timeSinceLast);
+	}
+}
+
+void updateOfOverAmps(DutyController * hs) {
+	unsigned long now = millis();
+	updateTimeOnOff(hs);
+	updateForPinState(hs, false);
+
+}
+
+
 void updateHeatForStateAndDuty(DutyController * hs) {
 	unsigned long now = millis();
 	bool newHeatPinState = false;
 	if (hs->on) {
-
-		unsigned long timeSinceLast = now - hs->dutyLastCheckTime;
-		/*
-		 if(hs->controlIo == 10){
-		 DBG("  Before dutyLastCheckTime: %lu Off Time: %lu dutyLastCheckTime:  %lu timeSinceLast: %lu now: %lu\n", hs->timeOn , hs->timeOff , hs->dutyLastCheckTime,timeSinceLast,now );
-		 }
-		 */
-
-		if (hs->ioState) {
-			hs->timeOn += (timeSinceLast);
-		} else {
-			hs->timeOff += (timeSinceLast);
-		}
-
+		updateTimeOnOff(hs,now);
 		if (hs->duty == 100) {
 			newHeatPinState = true;
 		} else if (hs->duty == 0) {
