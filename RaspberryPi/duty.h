@@ -28,10 +28,9 @@
 typedef struct
 {
 
-  unsigned long dutyOnOffLastChange;
-  unsigned long dutyLastCheckTime;  
-  unsigned long timeOn;  
-  unsigned long timeOff;  
+  unsigned long lastUpdateOnOffTimes;
+  unsigned long dutyTimeOn;
+  unsigned long dutyTimeOff;
   int duty;
   bool on;
   bool ioState;

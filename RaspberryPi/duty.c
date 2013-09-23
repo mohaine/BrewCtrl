@@ -88,9 +88,9 @@ void setupDutyController(DutyController * hs, int io) {
 	ioMode(io, OUTPUT);
 	digitalWrite(io, LOW);
 	hs->controlIo = io;
-	hs->dutyLastCheckTime = 0;
-	hs->timeOn = 0;
-	hs->timeOff = 0;
+	hs->lastUpdateOnOffTimes = millis();
+	hs->dutyTimeOn = 0;
+	hs->dutyTimeOff = 0;
 	hs->duty = 0;
 	hs->on = false;
 	hs->ioState = false;
@@ -98,16 +98,23 @@ void setupDutyController(DutyController * hs, int io) {
 
 void resetDutyState(DutyController * hs) {
 	//DBG("resetDutyState %d\n",hs->controlIo);
-	hs->timeOn = 0;
-	hs->timeOff = 0;
-	hs->dutyLastCheckTime = millis();
-	hs->dutyOnOffLastChange = hs->dutyLastCheckTime;
+	hs->dutyTimeOn = 0;
+	hs->dutyTimeOff = 0;
+	hs->lastUpdateOnOffTimes = millis();
 }
 
 void updateForPinState(DutyController * hs, bool newHeatPinState) {
+	unsigned long now = millis();
+	unsigned long timeSinceLast = now - hs->lastUpdateOnOffTimes;
+	if (hs->ioState) {
+		hs->dutyTimeOn += (timeSinceLast);
+	} else {
+		hs->dutyTimeOff += (timeSinceLast);
+	}
+	hs->lastUpdateOnOffTimes = now;
+
 	newHeatPinState = newHeatPinState & hs->on;
 	if (newHeatPinState != hs->ioState) {
-		hs->dutyOnOffLastChange = millis();
 		hs->ioState = newHeatPinState;
 		digitalWrite(hs->controlIo, hs->ioState ? HIGH : LOW);
 	}
@@ -124,59 +131,45 @@ void setHeatOn(DutyController * hs, bool newState) {
 	}
 }
 
-void updateTimeOnOff(DutyController * hs,unsigned long now ) {
-	unsigned long timeSinceLast = now - hs->dutyLastCheckTime;
-	/*
-	 if(hs->controlIo == 10){
-	 DBG("  Before dutyLastCheckTime: %lu Off Time: %lu dutyLastCheckTime:  %lu timeSinceLast: %lu now: %lu\n", hs->timeOn , hs->timeOff , hs->dutyLastCheckTime,timeSinceLast,now );
-	 }
-	 */
-
-	if (hs->ioState) {
-		hs->timeOn += (timeSinceLast);
-	} else {
-		hs->timeOff += (timeSinceLast);
-	}
-}
-
 void updateOfOverAmps(DutyController * hs) {
-	unsigned long now = millis();
-	updateTimeOnOff(hs);
 	updateForPinState(hs, false);
-
 }
-
 
 void updateHeatForStateAndDuty(DutyController * hs) {
-	unsigned long now = millis();
 	bool newHeatPinState = false;
 	if (hs->on) {
-		updateTimeOnOff(hs,now);
 		if (hs->duty == 100) {
 			newHeatPinState = true;
 		} else if (hs->duty == 0) {
 			newHeatPinState = false;
 		} else {
 
-			unsigned long totalTime = hs->timeOn + hs->timeOff;
-			double percentOn = ((double) hs->timeOn) / totalTime;
+			unsigned long timeSinceLast = millis() - hs->lastUpdateOnOffTimes;
+			unsigned long timeOn = hs->dutyTimeOn;
+			unsigned long timeOff = hs->dutyTimeOff;
+
+			if (hs->ioState) {
+				timeOn += (timeSinceLast);
+			} else {
+				timeOff += (timeSinceLast);
+			}
+
+			unsigned long totalTime = timeOn + timeOff;
+			double percentOn = ((double) timeOn) / totalTime;
 			int percentOnTest = (int) (percentOn * 1000);
 
-			/*
-			 if(hs->controlIo == 10){
-			 DBG("     After OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n", hs->timeOn , hs->timeOff , totalTime , percentOn * 100);
-			 }
-			 */
 			if (percentOnTest >= hs->duty * 10) {
 				newHeatPinState = false;
 			} else {
 				newHeatPinState = true;
 			}
+
+			if (hs->controlIo == 10) {
+				DBG("     On: %s OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n",(newHeatPinState?"ON " : "OFF"), timeOn , timeOff , totalTime , percentOn * 100);
+			}
+
 		}
 	} else {
-		hs->dutyLastCheckTime = now;
-		hs->timeOn = 0;
-		hs->timeOff = 0;
 		newHeatPinState = false;
 	}
 
