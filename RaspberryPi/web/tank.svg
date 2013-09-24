@@ -91,7 +91,7 @@
          
          
          
-         	<% if(heater){ %>                 
+         	<% if(heater && heater.get("io") >= 0){ %>                 
                        <g  id="heatElement" class="heatElement <%= heater.on? "on":"off" %>">
          
     <text

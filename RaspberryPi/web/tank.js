@@ -1,4 +1,7 @@
 BrewCtrl.Models.Tank = Backbone.Model.extend({
+	initialize : function() {
+		this.set('heater', new BrewCtrl.Models.Heater(this.get("heater")));
+	},
 	defaults : function() {
 		return {
 			name : "Unknown",
@@ -15,6 +18,16 @@ BrewCtrl.Collections.Tanks = Backbone.Collection.extend({
 	model : BrewCtrl.Models.Tank,
 	initialize : function() {
 	}
+});
+
+BrewCtrl.Models.Heater = Backbone.Model.extend({
+	defaults : function() {
+		return {
+			on : false,
+			duty : 0,
+			io : -1
+		};
+	},
 });
 
 BrewCtrl.Models.Pump = Backbone.Model.extend({
@@ -58,9 +71,7 @@ BrewCtrl.Views.DutyEdit = Backbone.View.extend({
 
 		var selectedStep = BrewCtrl.main.getSelectedStep();
 		if (selectedStep) {
-			
-				
-			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("heater").io);
+			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("heater").get("io"));
 			if (controlPoint) {
 				controlPoint.set("duty", newDuty);
 				BrewCtrl.main.updateStep(selectedStep);

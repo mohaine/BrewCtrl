@@ -101,18 +101,15 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			});
 
 			var heater = tank.get("heater")
-			if (heater) {
+			if (heater && heater.get("io") >= 0) {
 				if (activeStep) {
-
-					var controlPoint = activeStep.get("controlPoints").findByIo(heater.io);
+					var controlPoint = activeStep.get("controlPoints").findByIo(heater.get("io"));
 					if (controlPoint) {
 						heater.duty = controlPoint.get("duty");
 						heater.on = controlPoint.get("on");
 						tank.set("heaterDuty", heater.duty);
 						tank.set("heaterOn", heater.on);
-						foundSensor = true;
 					}
-
 				}
 			}
 
