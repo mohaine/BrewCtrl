@@ -106,6 +106,14 @@ void resetDutyState(DutyController * hs) {
 void updateForPinState(DutyController * hs, bool newHeatPinState) {
 	unsigned long now = millis();
 	unsigned long timeSinceLast = now - hs->lastUpdateOnOffTimes;
+	if (timeSinceLast > 30000) {
+		// Over 30 seconds since last change. Dump silly values
+		hs->dutyTimeOn = 0;
+		hs->dutyTimeOff = 0;
+		timeSinceLast = 0;
+
+	}
+
 	if (hs->ioState) {
 		hs->dutyTimeOn += (timeSinceLast);
 	} else {
@@ -163,10 +171,11 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 			} else {
 				newHeatPinState = true;
 			}
-
+			/*
 			if (hs->controlIo == 10) {
 				DBG("     On: %s OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n",(newHeatPinState?"ON " : "OFF"), timeOn , timeOff , totalTime , percentOn * 100);
 			}
+			*/
 
 		}
 	} else {
