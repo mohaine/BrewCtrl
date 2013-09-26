@@ -10,8 +10,7 @@
 
 
  <script type="text/template" id="step-template">
-    <div class="step">
-    	
+    <div class="step">    	
     	<span class="stepName"><b><%= name %></b></span>    	
     	<span class="stepTime"><%= BrewCtrl.formatTime(stepTime) %></span>
     	<span class="stepTime">X</span>    
@@ -29,13 +28,42 @@
   
   
   <script type="text/template" id="duty-template">
-      <div class="duty">
+    <div class="numberEdit">
+  <div class="numberEditIncrement">
+   
+  <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" class="tank"
+ width="108.92324"   height="150.25929"  id="svg2" version="1.1">
+  <g id="layer1" transform="matrix(1.3483728,0,0,1.3483728,294.70373,-264.23893)">
+    <text xml:space="preserve"
+    style="font-size:32px;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+x="-213.65553" y="263.32492" id="text3001">
+<tspan id="textValue" x="-213.65553" y="263.32492" >43%</tspan>
+</text>
+    <path style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+    d="m -178.17897,196.60411 -38.98235,31.91843 77.9647,0 z" id="upOne" />
+    <path style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+    d="m -178.17897,306.74885 -38.98235,-31.91843 77.96469,0 z" id="downOne" />
+  </g>
+</svg>
+ 
+  
+  </div>
+  
+      <div class="quickSelect">
+      	<%
+if(quickClickValues){      	
+	for(key in quickClickValues){
+		var quickClick = quickClickValues[key];
+%>      	  
+       	<button id="<%=quickClick.id%>" class="quickClick"><%=quickClick.text%></button><br/>
 
-      
-       	<button id="duty0">0%</button><br/>
-       	<button id="duty50">50%</button><br/>
-       	<button id="duty100">100%</button><br/>
+<%      	  
+	}
+}
+%>
       </div>
+        </div>
+      
   </script>
   
     <script type="text/template" id="popup-template">

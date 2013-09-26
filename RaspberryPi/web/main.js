@@ -305,16 +305,16 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 	}
 });
 
-BrewCtrl.showPopup = function(popupContent,event) {
+BrewCtrl.showPopup = function(popupContent, event) {
 	var display = _.template($('#popup-template').html());
 	var html = display({});
 	var popupEl = $('<div/>').html(html)[0];
 	var glass = $($(popupEl).children(".glass")[0]);
-	
+
 	var hidePopup = function() {
 		popupEl.parentElement.removeChild(popupEl);
 	};
-	
+
 	glass.click(hidePopup);
 
 	var popup = $(popupEl).children(".popup")[0];
@@ -326,10 +326,10 @@ BrewCtrl.showPopup = function(popupContent,event) {
 	content.empty();
 	if (popupContent.completeAction) {
 		var oldCompleteAction = popupContent.completeAction;
-		popupContent.completeAction = function(){
-			popupContent.completeAction = oldCompleteAction;			
+		popupContent.completeAction = function() {
+			popupContent.completeAction = oldCompleteAction;
 			popupContent.completeAction();
-			hidePopup();			
+			hidePopup();
 		}
 	}
 	content.append(popupContent.render().el);
