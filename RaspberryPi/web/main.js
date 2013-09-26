@@ -42,7 +42,13 @@ var BrewCtrl = {
 		}
 		formated = formated + seconds;
 		return formated;
+	},
+	confirm : function(msg, work) {
+		if (confirm(msg)) {
+			work();
+		}
 	}
+
 }
 
 BrewCtrl.Models.Main = Backbone.Model.extend({
@@ -160,7 +166,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			}
 		});
 	},
-
 	getActiveStep : function() {
 		var steps = this.get("steps");
 		return steps.first();
@@ -171,6 +176,20 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	updateStep : function(step) {
 		this.retrieveStatus({
 			"modifySteps" : JSON.stringify([ step.toJSON() ])
+		});
+	},
+	deleteStep : function(stepToDelete) {
+		var newStepList = [];
+		this.get("steps").each(function(step) {
+			if (stepToDelete.get("id") != step.get("id")) {
+				newStepList.push(step.toJSON());
+			}
+		});
+		this.applySteps(newStepList);
+	},
+	applySteps : function(steps) {
+		this.retrieveStatus({
+			"steps" : JSON.stringify(steps)
 		});
 	},
 	updateMode : function(mode) {

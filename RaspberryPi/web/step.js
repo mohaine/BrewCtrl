@@ -3,11 +3,11 @@ BrewCtrl.Models.ControlPoint = Backbone.Model.extend({
 		return {
 			controlName : "",
 			targetName : "",
-			automaticControl: false,
-			controlIo: 0,
-			duty: 0,
-			on: false,
-			targetTemp: 0
+			automaticControl : false,
+			controlIo : 0,
+			duty : 0,
+			on : false,
+			targetTemp : 0
 		};
 	},
 });
@@ -39,10 +39,10 @@ BrewCtrl.Collections.ControlPoints = Backbone.Collection.extend({
 	model : BrewCtrl.Models.ControlPoint,
 	initialize : function() {
 	},
-	findByIo: function(io){
+	findByIo : function(io) {
 		var cpFound;
-		this.each(function(cp){
-			if(cp.get("controlIo") == io){
+		this.each(function(cp) {
+			if (cp.get("controlIo") == io) {
 				cpFound = cp;
 			}
 		});
@@ -60,16 +60,13 @@ BrewCtrl.Collections.StepLists = Backbone.Collection.extend({
 	}
 });
 
-
-
-
 BrewCtrl.Views.Step = Backbone.View.extend({
-	template: _.template($('#step-template').html()),
+	template : _.template($('#step-template').html()),
 	tagName : "span",
 
 	// The DOM events specific to an item.
 	events : {
-
+		"click .stepDelete" : "deleteStep"
 	},
 
 	initialize : function() {
@@ -80,5 +77,10 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 		this.$el.html(display);
 		return this;
 	},
+	deleteStep : function() {
+		var self = this;
+		BrewCtrl.confirm("Are you sure you want to delete Step \"" + self.model.get("name") + "\"?", function() {
+			BrewCtrl.main.deleteStep(self.model);
+		});
+	}
 });
-
