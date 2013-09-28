@@ -29,7 +29,7 @@ var BrewCtrl = {
 	},
 	formatTime : function(time) {
 		if (time == 0) {
-			return "Forever";
+			return "\u221E";
 		}
 
 		var minutes = parseInt(time / 60);
@@ -41,6 +41,18 @@ var BrewCtrl = {
 			formated = formated + '0';
 		}
 		formated = formated + seconds;
+		return formated;
+	},
+	formatTimeMinutes : function(time) {
+		if (time == 0) {
+			return "\u221E";
+		}
+
+		var minutes = parseInt(time / 60);
+		var seconds = parseInt(time - (minutes * 60));
+
+		var formated = minutes
+
 		return formated;
 	},
 	confirm : function(msg, work) {
@@ -88,7 +100,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		var self = this;
 		var config = self.get("config");
 
-		//console.log(data);
+		// console.log(data);
 
 		var steps = new BrewCtrl.Collections.Steps(data.steps);
 		self.set("steps", steps);
@@ -169,7 +181,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				console.log(e);
 			},
 			complete : function() {
-				// self.scheduleStatusUpdate();
+				self.scheduleStatusUpdate();
 			}
 		});
 	},
@@ -327,6 +339,135 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 
 		this.renderSteps();
 		this.renderMode();
+		return this;
+	}
+});
+
+BrewCtrl.Views.NumberEdit = Backbone.View.extend({
+	template : _.template($('#duty-template').html()),
+	tagName : "span",
+	increment : 1,
+	minValue : 0,
+	maxValue : 100,
+	quickClickValues : [],
+	updateDisplay : function() {
+		$(this.$el.find("#textValue")[0]).text(this.getTextValue());
+	},
+	mouseDown : function(increment) {
+		var self = this;
+		var count = 0;
+		var timeoutFunction = function() {
+			if (self.mouseDownTimeout) {
+				clearTimeout(self.mouseDownTimeout);
+				self.mouseDownTimeout = null;
+			}
+
+			self.updateValue(self.getValue() + (increment));
+			count++;
+
+			var delay = 300;
+			if (count > 3) {
+				delay = 200;
+			} else if (count > 7) {
+				delay = 100;
+			}
+
+			self.mouseDownTimeout = setTimeout(timeoutFunction, delay);
+		};
+		timeoutFunction();
+
+	},
+	mouseUp : function() {
+		var self = this;
+		if (self.mouseDownTimeout) {
+			clearTimeout(self.mouseDownTimeout);
+			self.mouseDownTimeout = null;
+		}
+		this.applyChange();
+	},
+
+	updateValue : function(newValue, skipUpdate) {
+
+		if (newValue > this.maxValue) {
+			newValue = this.maxValue;
+		}
+		if (newValue < this.minValue) {
+			newValue = this.minValue;
+		}
+
+		if(newValue == this.getValue()){
+			return;
+		}
+		
+		console.log("newValue: "+ newValue)
+
+		
+		this.setValue(newValue);
+		this.updateDisplay();
+	},
+
+	applyChange : function() {
+
+	},
+	getValue : function() {
+		return 0;
+	},
+	getTextValue : function() {
+		return this.getValue();
+	},
+
+	setValue : function() {
+	},
+	completeAction : function() {
+	},
+	render : function() {
+		var self = this;
+
+		if (self.quickClickValues) {
+			for (key in self.quickClickValues) {
+				var quickClick = self.quickClickValues[key];
+				if (!quickClick.id) {
+					quickClick.id = BrewCtrl.alphaId();
+				}
+			}
+		}
+
+		var display = this.template({
+			quickClickValues : self.quickClickValues
+		});
+		this.$el.html(display);
+
+		var stopMouseDown = function() {
+			self.mouseUp();
+		}
+
+		var startUpFunction = function(event) {
+			event.preventDefault();
+			self.mouseDown(self.increment);
+		}
+		var startDownFunction = function(event) {
+			event.preventDefault();
+			self.mouseDown(-self.increment);
+		}
+
+		var upOne = $(this.$el.find("#upOne")[0]);
+		upOne.on("touchstart", startUpFunction);
+		upOne.on("touchend", stopMouseDown);
+		upOne.mousedown(startUpFunction);
+		upOne.mouseup(stopMouseDown);
+
+		var downOne = $(this.$el.find("#downOne")[0]);
+		downOne.on("touchstart", startDownFunction);
+		downOne.on("touchend", stopMouseDown);
+		downOne.mousedown(startDownFunction);
+		downOne.mouseup(stopMouseDown);
+
+		self.updateDisplay();
+
+		for (key in self.quickClickValues) {
+			var quickClick = self.quickClickValues[key];
+			$(this.$el.find("#" + quickClick.id)[0]).click(quickClick.click);
+		}
 		return this;
 	}
 });

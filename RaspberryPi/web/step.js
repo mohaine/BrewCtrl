@@ -75,12 +75,60 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 
 	// The DOM events specific to an item.
 	events : {
-		"click .stepDelete" : "deleteStep"
-	},
+		"click .stepDelete" : "deleteStep",
+		"click .stepTime" : "editTime"
 
+	},
 	initialize : function() {
 		this.listenTo(this.model, 'change', this.render);
+
 	},
+
+	editTime : function(event) {
+		var step = this.model;
+
+		var popup = new BrewCtrl.Views.NumberEdit({
+
+		});
+		popup.increment = 60;
+		popup.maxValue = 60 * 60 * 60;
+
+		popup.applyChange = function() {
+			BrewCtrl.main.updateStep(step);
+		};
+		popup.getValue = function() {
+			return step.get("stepTime");
+		};
+		popup.getTextValue = function() {
+			return BrewCtrl.formatTimeMinutes(this.getValue());
+		};
+		popup.setValue = function(newValue) {
+
+			step.set("stepTime", newValue);
+		};
+
+		popup.quickClickValues = [];
+		var createQuick = function(minutes) {
+			var time = minutes * 60;
+			return {
+				text : BrewCtrl.formatTimeMinutes(time),
+				click : function() {
+					popup.updateValue(time);
+					popup.applyChange();
+				}
+			};
+		}
+
+		popup.quickClickValues.push(createQuick(15));
+		popup.quickClickValues.push(createQuick(30));
+		popup.quickClickValues.push(createQuick(60));
+		popup.quickClickValues.push(createQuick(90));
+		popup.quickClickValues.push(createQuick(0));
+
+		BrewCtrl.showPopup(popup, event);
+
+	},
+
 	render : function() {
 		var display = this.template(this.model.toJSON());
 		this.$el.html(display);
