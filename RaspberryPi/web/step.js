@@ -76,17 +76,19 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 	// The DOM events specific to an item.
 	events : {
 		"click .stepDelete" : "deleteStep",
-		"click .stepTime" : "editTime"
+		"click .stepTime" : "editTime",
+		"click .select" : "selectStep"
 
 	},
 	initialize : function() {
 		this.listenTo(this.model, 'change', this.render);
-
+	},
+	selectStep : function(event) {
+		BrewCtrl.main.selectStep(this.model);
 	},
 
 	editTime : function(event) {
 		var step = this.model;
-
 		var popup = new BrewCtrl.Views.NumberEdit({
 
 		});
@@ -103,7 +105,6 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 			return BrewCtrl.formatTimeMinutes(this.getValue());
 		};
 		popup.setValue = function(newValue) {
-
 			step.set("stepTime", newValue);
 		};
 
@@ -132,6 +133,12 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 	render : function() {
 		var display = this.template(this.model.toJSON());
 		this.$el.html(display);
+
+		if (this.model.get("selected")) {
+			var stepElement = $(this.$el.find(".step")[0]);
+			stepElement.addClass("selected");
+		}
+
 		return this;
 	},
 	deleteStep : function() {

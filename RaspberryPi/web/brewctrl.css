@@ -36,9 +36,20 @@
 
 .step {
 	display: inline-block;
+	padding: 2px;
 	border: 1px solid black;
 	border-radius: 3px;
 	padding: 3px;
+	border: 1px solid black;
+}
+
+.step.selected {
+	border: 3px solid black;
+	padding: 0px;
+}
+
+.step .select {
+	cursor: pointer;
 }
 
 .step .stepName {
@@ -60,18 +71,16 @@
 	position: relative;
 }
 
-.numberEditIncrement{
-	margin-right: 75px;	
+.numberEditIncrement {
+	margin-right: 75px;
 	padding: 7px;
 }
 
-
 .quickSelect {
 	position: absolute;
-	top:0px;
-	right:0px;
+	top: 0px;
+	right: 0px;
 }
-
 
 button.quickClick {
 	width: 75px;
@@ -85,6 +94,13 @@ button.quickClick {
 	border: 1px solid black;
 	border-radius: 3px;
 	padding: 3px;
+}
+
+.mode button {
+	width: 6em;
+	font-size: large;
+	
+	
 }
 
 button {

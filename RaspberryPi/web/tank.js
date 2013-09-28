@@ -47,8 +47,6 @@ BrewCtrl.Collections.Pumps = Backbone.Collection.extend({
 	}
 });
 
-
-
 BrewCtrl.Views.Tank = Backbone.View.extend({
 	template : BrewCtrl.loadTemplate("tank.svg"),
 	tagName : "span",
@@ -155,7 +153,7 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 				popup.getTextValue = function() {
 					return this.getValue() + "%";
 				};
-				popup.setValue = function(newValue) {				
+				popup.setValue = function(newValue) {
 					controlPoint.set("duty", newValue);
 				};
 				popup.quickClickValues = [ {
@@ -204,11 +202,11 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 		var $element = $(element);
 		$($element.find("#tankNameText")[0]).text(this.model.get("name"));
 
-		var temp = $($element.find("#tempature")[0]);
+		var temp = $($element.find("#temperatures")[0]);
+
 		if (this.model.get("hasSensor")) {
 			temp.attr("class", "tank " + (this.model.get("reading") ? "reading" : "notReading"));
 			$($element.find("#tempatureText")[0]).text(BrewCtrl.round(BrewCtrl.convertC2F(this.model.get("temperatureC")), 1).toFixed(1) + '\xB0');
-
 		} else {
 			temp.remove();
 		}

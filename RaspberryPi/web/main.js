@@ -106,8 +106,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		self.set("steps", steps);
 		self.set("mode", data.mode);
 
-		var activeStep = this.getActiveStep();
-
 		if (data.configurationVersion != config.get("version")) {
 			self.loadConfiguration();
 			return;
@@ -124,32 +122,18 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 					foundSensor = true;
 				}
 			});
-
-			var heater = tank.get("heater")
-			if (heater && heater.get("io") >= 0) {
-				if (activeStep) {
-					var controlPoint = activeStep.get("controlPoints").findByIo(heater.get("io"));
-					if (controlPoint) {
-						heater.set("duty", controlPoint.get("duty"));
-						heater.set("on", controlPoint.get("on"));
-						tank.set("heaterDuty", controlPoint.get("duty"));
-						tank.set("heaterOn", controlPoint.get("on"));
-						tank.set("targetTemp", controlPoint.get("targetTemp"));
-					}
-				}
-			}
 			tank.set("hasSensor", foundSensor);
 		});
-		brewLayout.get("pumps").each(function(pump) {
-			if (activeStep) {
-				var controlPoint = activeStep.get("controlPoints").findByIo(pump.get("io"));
-				if (controlPoint) {
-					pump.set("duty", controlPoint.get("duty") > 0);
-					pump.set("on", controlPoint.get("on"));
-				}
 
-			}
-		});
+		self.updateSelectedFlag();
+		var selectedStep = self.getSelectedStep();
+
+		if (selectedStep) {
+			self.updateLayoutForStep(selectedStep);
+		} else {
+			self.selectStep(self.getActiveStep());
+		}
+
 	},
 	scheduleStatusUpdate : function() {
 		var self = this;
@@ -189,8 +173,57 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		var steps = this.get("steps");
 		return steps.first();
 	},
+	selectStep : function(stepToSelect) {
+		var self = this;
+		self.selectedStepId = stepToSelect ? stepToSelect.get("id") : "";
+		self.updateSelectedFlag();
+		self.updateLayoutForStep(stepToSelect);
+	},
+	updateSelectedFlag : function(stepToSelect) {
+		var self = this;
+		var steps = this.get("steps");
+		steps.each(function(step) {
+			step.set("selected", self.selectedStepId == step.get("id"));
+		});
+	},
+	updateLayoutForStep : function(activeStep) {
+		var config = this.get("config");
+		var brewLayout = config.get("brewLayout");
+		brewLayout.get("tanks").each(function(tank) {
+			var heater = tank.get("heater")
+			if (heater && heater.get("io") >= 0) {
+				if (activeStep) {
+					var controlPoint = activeStep.get("controlPoints").findByIo(heater.get("io"));
+					if (controlPoint) {
+						heater.set("duty", controlPoint.get("duty"));
+						heater.set("on", controlPoint.get("on"));
+						tank.set("heaterDuty", controlPoint.get("duty"));
+						tank.set("heaterOn", controlPoint.get("on"));
+						tank.set("targetTemp", controlPoint.get("targetTemp"));
+					}
+				}
+			}
+		});
+		brewLayout.get("pumps").each(function(pump) {
+			if (activeStep) {
+				var controlPoint = activeStep.get("controlPoints").findByIo(pump.get("io"));
+				if (controlPoint) {
+					pump.set("duty", controlPoint.get("duty") > 0);
+					pump.set("on", controlPoint.get("on"));
+				}
+
+			}
+		});
+	},
 	getSelectedStep : function() {
-		return this.getActiveStep();
+		var steps = this.get("steps");
+		var selected = null;
+		steps.each(function(step) {
+			if (step.get("selected")) {
+				selected = step;
+			}
+		});
+		return selected;
 	},
 	updateStep : function(step) {
 		this.retrieveStatus({
@@ -395,13 +428,9 @@ BrewCtrl.Views.NumberEdit = Backbone.View.extend({
 			newValue = this.minValue;
 		}
 
-		if(newValue == this.getValue()){
+		if (newValue == this.getValue()) {
 			return;
 		}
-		
-		console.log("newValue: "+ newValue)
-
-		
 		this.setValue(newValue);
 		this.updateDisplay();
 	},
