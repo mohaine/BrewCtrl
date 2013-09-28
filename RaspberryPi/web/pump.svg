@@ -27,26 +27,48 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2003"
+     inkscape:window-height="1124"
+     id="namedview17"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="1.9111215"
+     inkscape:cx="341.54063"
+     inkscape:cy="32.872588"
+     inkscape:window-x="348"
+     inkscape:window-y="57"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
   <defs
      id="defs4" />
-  <g class="pump   <%= duty>0? "on":"off" %>"
-     inkscape:label="Layer 1"
+ <g class="pump"
+      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1"
+     id="pump"
      transform="translate(226.70305,-193.125)">
-   
+
     <g 
-    
        id="g3120">
-      <rect class="pumpBody"
+      <rect  class="pumpBody"
          y="193.59904"
          x="-186.99043"
          height="27.276783"
          width="57.625454"
-         id="rect3091"
+         id="pumpBody"
          style="stroke:#000000;stroke-width:0.93237054;stroke-opacity:1" />
-      <path class="pumpBody"
+      <path  class="pumpBody"
          transform="translate(90.890703,207.47211)"
          d="m -234.94057,27.236113 c 0,22.685294 -18.39007,41.075359 -41.07536,41.075359 -22.68529,0 -41.07536,-18.390065 -41.07536,-41.075359 0,-22.685295 18.39007,-41.07536 41.07536,-41.07536 22.68529,0 41.07536,18.390065 41.07536,41.07536 z"
          sodipodi:ry="41.075359"
@@ -56,7 +78,7 @@
          id="path3087"
          style="stroke:#000000;stroke-opacity:1"
          sodipodi:type="arc" />
-       <path class="onoff"
+      <path class="onoff"
          transform="translate(106.32668,219.2453)"
          d="m -279.41709,15.462922 c 0,6.646647 -5.38817,12.034819 -12.03481,12.034819 -6.64665,0 -12.03482,-5.388172 -12.03482,-12.034819 0,-6.6466467 5.38817,-12.0348186 12.03482,-12.0348186 6.64664,0 12.03481,5.3881719 12.03481,12.0348186 z"
          sodipodi:ry="12.034819"
@@ -69,14 +91,14 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
        x="-223.04028"
        y="304.017"
-       id="text3001"
+       id="pumpName"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan3003"
+         id="pumpNameText"
          x="-223.04028"
-         y="304.017"><%= name %></tspan></text>
+         y="304.017">Pump</tspan></text>
   </g>
 </svg>

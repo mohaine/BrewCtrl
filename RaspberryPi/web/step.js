@@ -47,6 +47,15 @@ BrewCtrl.Collections.ControlPoints = Backbone.Collection.extend({
 			}
 		});
 		return cpFound;
+	},
+	findByAutomaticAndSensorAddress : function(address) {
+		var cpFound;
+		this.each(function(cp) {
+			if (cp.get("automaticControl") && cp.get("tempSensorAddress") == address) {
+				cpFound = cp;
+			}
+		});
+		return cpFound;
 	}
 });
 BrewCtrl.Collections.Steps = Backbone.Collection.extend({

@@ -47,6 +47,13 @@ var BrewCtrl = {
 		if (confirm(msg)) {
 			work();
 		}
+	},
+	alphaId : function() {
+		var raw = [];
+		for ( var i = 0; i < 8; i++) {
+			raw[raw.length] = String.fromCharCode(Math.floor(Math.random() * 26 + 65));
+		}
+		return raw.join('');
 	}
 
 }
@@ -81,7 +88,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		var self = this;
 		var config = self.get("config");
 
-		// console.log(data);
+		//console.log(data);
 
 		var steps = new BrewCtrl.Collections.Steps(data.steps);
 		self.set("steps", steps);
@@ -111,14 +118,14 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				if (activeStep) {
 					var controlPoint = activeStep.get("controlPoints").findByIo(heater.get("io"));
 					if (controlPoint) {
-						heater.duty = controlPoint.get("duty");
-						heater.on = controlPoint.get("on");
-						tank.set("heaterDuty", heater.duty);
-						tank.set("heaterOn", heater.on);
+						heater.set("duty", controlPoint.get("duty"));
+						heater.set("on", controlPoint.get("on"));
+						tank.set("heaterDuty", controlPoint.get("duty"));
+						tank.set("heaterOn", controlPoint.get("on"));
+						tank.set("targetTemp", controlPoint.get("targetTemp"));
 					}
 				}
 			}
-
 			tank.set("hasSensor", foundSensor);
 		});
 		brewLayout.get("pumps").each(function(pump) {
@@ -161,7 +168,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				console.log("scheduleStatusUpdate Error");
 				console.log(e);
 			},
-			always : function() {
+			complete : function() {
 				// self.scheduleStatusUpdate();
 			}
 		});

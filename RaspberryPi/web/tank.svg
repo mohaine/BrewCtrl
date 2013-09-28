@@ -10,8 +10,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    class="tank"
-   width="324.59738"
-   height="234.18266"
+   width="205.48909"
+   height="234.64206"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
@@ -36,17 +36,17 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2091"
-     inkscape:window-height="1012"
+     inkscape:window-width="2114"
+     inkscape:window-height="1369"
      id="namedview17"
      showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:zoom="0.67568347"
-     inkscape:cx="180.81431"
-     inkscape:cy="-58.855116"
+     fit-margin-top="0.3"
+     fit-margin-left="0.3"
+     fit-margin-right="0.3"
+     fit-margin-bottom="0.3"
+     inkscape:zoom="1.9111215"
+     inkscape:cx="128.21275"
+     inkscape:cy="124.98193"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="0"
@@ -57,10 +57,10 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-96.123233,-217.93717)">
+     transform="translate(-95.762569,-217.71119)">
     <g
        id="g3048"
-       transform="matrix(0.75284965,0,0,0.75284965,23.757122,53.862368)">
+       transform="matrix(0.47493002,0,0,0.75284965,50.471915,53.862368)">
       <path
          inkscape:connector-curvature="0"
          id="path2985-0"
@@ -77,78 +77,68 @@
          style="fill:#a0a0a0;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          sodipodi:type="arc" />
     </g>
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="341.07144"
-       y="407.36218"
-       id="text3805"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan3807"
-         x="341.07144"
-         y="407.36218" /></text>
-         
-         
-         
-         	<% if(heater && heater.get("io") >= 0){ %>                 
-                       <g  id="heatElement" class="heatElement <%= heater.on? "on":"off" %>">
-         
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-       x="315"
-       y="399.58597"
-       id="text3809"
-      ><tspan
-         sodipodi:role="line"
-         id="tspan3811"
-         x="315"
-         y="399.58597"><%= heater.duty %> %</tspan></text>
-           
-          
-           <path class="element" 
-       style="stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 323.46877,166.93594 -7.86241,0 0,4.35438 -114.32869,0 0,4.43918 112.51107,0 0,4.43918 -112.51107,0 0,4.43918 114.32869,0 0,3.32534 7.86241,0 z"
-       id="path3809"
-       inkscape:connector-curvature="0"
-       transform="translate(96.123233,233)"
-       sodipodi:nodetypes="ccccccccccccc" />
-                 </g>  
-          <% } %> 
-          
-	<% if(hasSensor){ %>                 
     <g
-       class="temp  <%= reading?"reading":"notReading" %>" 
-       id="g11"
-       transform="translate(-14.799829,-48.839437)">
+       id="heatElement">
       <text
          xml:space="preserve"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-         x="111.00446"
-         y="378.15906" 
-         id="text3809-4"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+         x="173.19844"
+         y="396.44644"
+         id="text3809"
          sodipodi:linespacing="125%"><tspan
            sodipodi:role="line"
-           id="tspan3811-6"
-           x="111.00446"
-           y="378.15906"><%= BrewCtrl.round(BrewCtrl.convertC2F(temperatureC),1).toFixed(1) %>&#xb0;</tspan></text>
+           id="heatElementText"
+           x="173.19844"
+           y="396.44644">100%</tspan></text>
+      <path
+         class="element"
+         style="stroke:#000000;stroke-width:1.04674006px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 299.7437,398.38955 -8.63379,0 0,4.34469 -125.54539,0 0,4.4293 123.54945,0 0,4.42929 -123.54945,0 0,4.4293 125.54539,0 0,3.31794 8.63379,0 z"
+         id="path3809"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccccccccccc" />
     </g>
-    <% } %>         
-    
-    
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-       x="260.26801"
-       y="264.73135"
-       id="text2990"
+       x="197.47765"
+       y="262.11508"
+       id="tankName"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan2992"
-         x="260.26801"
-         y="264.73135"><%= name %></tspan></text>
-           
-         
+         id="tankNameText"
+         x="197.47765"
+         y="262.11508">Name</tspan></text>
+    <g
+       id="temperatures">
+      <g
+         transform="translate(-13.753323,-63.490521)"
+         id="temperature"
+         class="temp">
+        <text
+           sodipodi:linespacing="125%"
+           id="text3809-4"
+           y="378.15906"
+           x="111.00446"
+           style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+           xml:space="preserve"><tspan
+             y="378.15906"
+             x="111.00446"
+             id="tempatureText"
+             sodipodi:role="line">156.9 °</tspan></text>
+      </g>
+      <text
+         inkscape:label="#text3028"
+         sodipodi:linespacing="125%"
+         id="targetTemp"
+         y="342.23672"
+         x="99.262749"
+         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="342.23672"
+           x="99.262749"
+           id="targetTempText"
+           sodipodi:role="line">(123)</tspan></text>
+    </g>
   </g>
 </svg>
