@@ -94,8 +94,37 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	start : function() {
 		var self = this;
 		this.loadConfiguration();
-	},
 
+		self.checkStatusUpdate();
+	},
+	checkStatusUpdate : function() {
+		var self = this;
+		if (self.statusTimeout) {
+			clearTimeout(self.statusCheckTimeout);
+			self.statusCheckTimeout = 0;
+		}
+
+		if (!self.lastStatusUpdateTime || new Date().getTime() - self.lastStatusUpdateTime > 1000) {
+
+			if (!self.statusPopup) {
+				var status = new BrewCtrl.Views.Status({});
+				self.statusPopup = BrewCtrl.showPopup(status, {
+					clientX : 2,
+					clientY : 3
+				}, function() {
+					self.statusPopup = null;
+				});
+			}
+
+		} else if (self.statusPopup) {
+			self.statusPopup.hidePopup();
+
+		}
+
+		self.statusCheckTimeout = setTimeout(function() {
+			self.checkStatusUpdate();
+		}, 500);
+	},
 	applyStatus : function(data) {
 		var self = this;
 		var config = self.get("config");
@@ -133,6 +162,8 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		} else {
 			self.selectStep(self.getActiveStep());
 		}
+
+		self.lastStatusUpdateTime = new Date().getTime();
 
 	},
 	scheduleStatusUpdate : function() {
@@ -279,7 +310,15 @@ BrewCtrl.Models.Layout = Backbone.Model.extend({
 		};
 	},
 });
-
+BrewCtrl.Views.Status = Backbone.View.extend({
+	template : _.template($('#popup-status-loading').html()),
+	tagName : "div",
+	render : function() {
+		var display = this.template({});
+		this.$el.html(display);
+		return this;
+	}
+});
 BrewCtrl.Views.Mode = Backbone.View.extend({
 	template : _.template($('#mode-template').html()),
 	tagName : "span",
@@ -501,14 +540,20 @@ BrewCtrl.Views.NumberEdit = Backbone.View.extend({
 	}
 });
 
-BrewCtrl.showPopup = function(popupContent, event) {
+BrewCtrl.showPopup = function(popupContent, event, onHide) {
 	var display = _.template($('#popup-template').html());
 	var html = display({});
 	var popupEl = $('<div/>').html(html)[0];
 	var glass = $($(popupEl).children(".glass")[0]);
 
 	var hidePopup = function() {
-		popupEl.parentElement.removeChild(popupEl);
+		if (popupEl.parentElement) {
+			popupEl.parentElement.removeChild(popupEl);
+		}
+
+		if (onHide) {
+			onHide();
+		}
 	};
 
 	glass.click(hidePopup);
@@ -530,6 +575,10 @@ BrewCtrl.showPopup = function(popupContent, event) {
 	}
 	content.append(popupContent.render().el);
 	$("body").append(popupEl);
+
+	return {
+		hidePopup : hidePopup
+	};
 };
 
 $(function() {

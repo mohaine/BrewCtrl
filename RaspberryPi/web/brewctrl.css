@@ -1,3 +1,8 @@
+.statusLoading {
+	font-size: 40px;
+	font-weight: bold;
+}
+
 .tank {
 	
 }
@@ -96,8 +101,6 @@ button.quickClick {
 .mode button {
 	width: 6em;
 	font-size: large;
-	
-	
 }
 
 button {
