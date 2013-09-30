@@ -54,7 +54,7 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 	// The DOM events specific to an item.
 	events : {
 		"click #heatElement" : "editDuty",
-		"click #tempatures" : "editTargetTemp"
+		"click #temperatures" : "editTargetTemp"
 	},
 
 	initialize : function() {
@@ -228,9 +228,7 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 				if (controlPoint) {
 
 					$($element.find("#targetTempText")[0]).text("(" + BrewCtrl.round(BrewCtrl.convertC2F(controlPoint.get("targetTemp")), 0).toFixed(0) + '\xB0)');
-					$($element.find("#temperatures")[0]).click(function(event) {
-						self.editTargetTemp(event);
-					});
+				
 
 					showTarget = true;
 				}

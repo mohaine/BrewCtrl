@@ -45,7 +45,7 @@
      fit-margin-right="0.3"
      fit-margin-bottom="0.3"
      inkscape:zoom="1.351367"
-     inkscape:cx="166.76155"
+     inkscape:cx="75.742601"
      inkscape:cy="128.6352"
      inkscape:window-x="0"
      inkscape:window-y="27"
@@ -109,32 +109,40 @@
          id="tankNameText"
          x="197.47765"
          y="262.11508">Name</tspan></text>
-    <g
-       id="temperatures">
-      <text
-         class="temp"
-         sodipodi:linespacing="125%"
-         id="text3809-4"
-         y="315.89194"
+         
+         <g id="temperatures">
+         
+             <path
+       style="fill:#fff;stroke:#none;"
+       d="m 3.3299614,58.894094 143.9283286,0 0,71.039176 -143.9283286,0 z"
+       id="path3002"
+       inkscape:connector-curvature="0"
+       transform="translate(95.762569,225.71119)"
+       sodipodi:nodetypes="ccccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="98.446396"
+       y="315.89194"
+       id="text3809-4"
+       sodipodi:linespacing="125%"
+       class="temp"><tspan
+         sodipodi:role="line"
+         id="tempatureText"
          x="98.446396"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="315.89194"
-           x="98.446396"
-           id="tempatureText"
-           sodipodi:role="line">156.9 °</tspan></text>
-      <text
-         inkscape:label="#text3028"
-         sodipodi:linespacing="125%"
-         id="targetTemp"
-         y="340.66696"
+         y="315.89194">156.9 °</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="99.786003"
+       y="340.66696"
+       id="targetTemp"
+       sodipodi:linespacing="125%"
+       inkscape:label="#text3028"><tspan
+         sodipodi:role="line"
+         id="targetTempText"
          x="99.786003"
-         style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-         xml:space="preserve"><tspan
-           y="340.66696"
-           x="99.786003"
-           id="targetTempText"
-           sodipodi:role="line">(123)</tspan></text>
-    </g>
+         y="340.66696">(123)</tspan></text>
+ </g>
   </g>
 </svg>
