@@ -94,37 +94,8 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	start : function() {
 		var self = this;
 		this.loadConfiguration();
-
-		self.checkStatusUpdate();
 	},
-	checkStatusUpdate : function() {
-		var self = this;
-		if (self.statusTimeout) {
-			clearTimeout(self.statusCheckTimeout);
-			self.statusCheckTimeout = 0;
-		}
 
-		if (!self.lastStatusUpdateTime || new Date().getTime() - self.lastStatusUpdateTime > 1000) {
-
-			if (!self.statusPopup) {
-				var status = new BrewCtrl.Views.Status({});
-				self.statusPopup = BrewCtrl.showPopup(status, {
-					clientX : 2,
-					clientY : 3
-				}, function() {
-					self.statusPopup = null;
-				});
-			}
-
-		} else if (self.statusPopup) {
-			self.statusPopup.hidePopup();
-
-		}
-
-		self.statusCheckTimeout = setTimeout(function() {
-			self.checkStatusUpdate();
-		}, 500);
-	},
 	applyStatus : function(data) {
 		var self = this;
 		var config = self.get("config");
@@ -140,6 +111,15 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			return;
 		}
 
+		self.updateSelectedFlag();
+		var selectedStep = self.getSelectedStep();
+		if (selectedStep) {
+			self.updateLayoutForStep(selectedStep);
+		} else {
+			var activeStep = self.getActiveStep();
+			self.selectStep(activeStep);
+		}
+
 		var brewLayout = config.get("brewLayout");
 		brewLayout.get("tanks").each(function(tank) {
 			var foundSensor = false;
@@ -153,17 +133,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			});
 			tank.set("hasSensor", foundSensor);
 		});
-
-		self.updateSelectedFlag();
-		var selectedStep = self.getSelectedStep();
-
-		if (selectedStep) {
-			self.updateLayoutForStep(selectedStep);
-		} else {
-			self.selectStep(self.getActiveStep());
-		}
-
-		self.lastStatusUpdateTime = new Date().getTime();
 
 	},
 	scheduleStatusUpdate : function() {
@@ -206,6 +175,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	},
 	selectStep : function(stepToSelect) {
 		var self = this;
+
 		self.selectedStepId = stepToSelect ? stepToSelect.get("id") : "";
 		self.updateSelectedFlag();
 		self.updateLayoutForStep(stepToSelect);
@@ -213,11 +183,20 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	updateSelectedFlag : function(stepToSelect) {
 		var self = this;
 		var steps = this.get("steps");
+		var stepToSelect = null;
 		steps.each(function(step) {
-			step.set("selected", self.selectedStepId == step.get("id"));
+			step.set("selected", false);
+			if (self.selectedStepId == step.get("id")) {
+				stepToSelect = step;
+			}
 		});
+		if (stepToSelect) {
+			stepToSelect.set("selected", true);
+		}
+
 	},
 	updateLayoutForStep : function(activeStep) {
+
 		var config = this.get("config");
 		var brewLayout = config.get("brewLayout");
 		brewLayout.get("tanks").each(function(tank) {
@@ -226,6 +205,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				if (activeStep) {
 					var controlPoint = activeStep.get("controlPoints").findByIo(heater.get("io"));
 					if (controlPoint) {
+
 						heater.set("duty", controlPoint.get("duty"));
 						heater.set("on", controlPoint.get("on"));
 						tank.set("heaterDuty", controlPoint.get("duty"));
@@ -247,6 +227,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		});
 	},
 	getSelectedStep : function() {
+
 		var steps = this.get("steps");
 		var selected = null;
 		steps.each(function(step) {
@@ -254,6 +235,9 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				selected = step;
 			}
 		});
+
+		console.log("getSelectedStep: " + selected);
+
 		return selected;
 	},
 	updateStep : function(step) {
@@ -310,15 +294,7 @@ BrewCtrl.Models.Layout = Backbone.Model.extend({
 		};
 	},
 });
-BrewCtrl.Views.Status = Backbone.View.extend({
-	template : _.template($('#popup-status-loading').html()),
-	tagName : "div",
-	render : function() {
-		var display = this.template({});
-		this.$el.html(display);
-		return this;
-	}
-});
+
 BrewCtrl.Views.Mode = Backbone.View.extend({
 	template : _.template($('#mode-template').html()),
 	tagName : "span",
@@ -540,20 +516,14 @@ BrewCtrl.Views.NumberEdit = Backbone.View.extend({
 	}
 });
 
-BrewCtrl.showPopup = function(popupContent, event, onHide) {
+BrewCtrl.showPopup = function(popupContent, event) {
 	var display = _.template($('#popup-template').html());
 	var html = display({});
 	var popupEl = $('<div/>').html(html)[0];
 	var glass = $($(popupEl).children(".glass")[0]);
 
 	var hidePopup = function() {
-		if (popupEl.parentElement) {
-			popupEl.parentElement.removeChild(popupEl);
-		}
-
-		if (onHide) {
-			onHide();
-		}
+		popupEl.parentElement.removeChild(popupEl);
 	};
 
 	glass.click(hidePopup);
@@ -575,10 +545,6 @@ BrewCtrl.showPopup = function(popupContent, event, onHide) {
 	}
 	content.append(popupContent.render().el);
 	$("body").append(popupEl);
-
-	return {
-		hidePopup : hidePopup
-	};
 };
 
 $(function() {
