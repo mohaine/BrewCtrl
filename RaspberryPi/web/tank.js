@@ -140,6 +140,11 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 		if (selectedStep) {
 			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("heater").get("io"));
 			if (controlPoint) {
+
+				if (controlPoint.get("automaticControl")) {
+					return;
+				}
+
 				var popup = new BrewCtrl.Views.NumberEdit({
 
 				});
@@ -239,7 +244,13 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 		var heater = this.model.get("heater")
 		var heatElement = $($element.find("#heatElement")[0]);
 		if (heater && heater.get("io") >= 0) {
-			heatElement.attr("class", "heatElement " + (heater.get("on") ? "on" : "off"));
+
+			var className = "heatElement";
+			if (heater.get("automaticControl")) {
+				className += " automatic"
+			}
+			className += heater.get("on") ? " on" : " off"
+			heatElement.attr("class", className);
 			$($element.find("#heatElementText")[0]).text(heater.get("duty") + '%');
 		} else {
 			heatElement.remove();
@@ -266,6 +277,11 @@ BrewCtrl.Views.Pump = Backbone.View.extend({
 		if (selectedStep) {
 			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("io"));
 			if (controlPoint) {
+
+				if (controlPoint.get("automaticControl")) {
+					return;
+				}
+
 				controlPoint.set("duty", newDuty);
 				BrewCtrl.main.updateStep(selectedStep);
 			}
@@ -282,7 +298,16 @@ BrewCtrl.Views.Pump = Backbone.View.extend({
 
 		$($(element).find("#pumpNameText")[0]).text(this.model.get("name"));
 
-		$($(element).find("#pump")[0]).attr("class", "pump " + (this.model.get("duty") > 0 ? "on" : "off"));
+		var className = "pump";
+		if (this.model.get("automaticControl")) {
+			className += " automatic"
+		}
+
+		var actuallyOn = this.model.get("on") && this.model.get("duty") > 0;
+		className += this.model.get("duty") > 0 ? " on" : " off"
+		className += actuallyOn ? " actuallyOn" : " actuallyOff"
+
+		$($(element).find("#pump")[0]).attr("class", className);
 
 		this.$el.empty();
 		this.$el.append(element);

@@ -3,7 +3,7 @@
 	font-weight: bold;
 }
 
-.tank {
+.automatic {
 	
 }
 
@@ -15,6 +15,16 @@
 	cursor: pointer;
 }
 
+
+.heatElement.automatic  tspan {
+	fill-opacity: 0.5;
+}
+
+
+.heatElement.automatic.on  .element {
+	fill: #faa;
+}
+
 .heatElement.on  .element {
 	fill: #f00;
 }
@@ -22,6 +32,7 @@
 .heatElement.off  .element {
 	fill: none;
 }
+
 
 .pump.on  .pumpBody {
 	fill: #0f0;
@@ -31,11 +42,21 @@
 	fill: #f00;
 }
 
-.pump.on  .onoff {
+.pump.on.automatic .pumpBody {
+	fill: #8f8;
+}
+
+.pump.off.automatic  .pumpBody {
+	fill: #f88;
+}
+
+
+
+.pump.actuallyOn  .onoff {
 	fill: none;
 }
 
-.pump.off  .onoff {
+.pump.actuallyOff  .onoff {
 	fill: #000;
 }
 

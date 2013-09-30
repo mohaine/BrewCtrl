@@ -208,9 +208,12 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 
 						heater.set("duty", controlPoint.get("duty"));
 						heater.set("on", controlPoint.get("on"));
+						heater.set("automaticControl", controlPoint.get("automaticControl"));
+						
 						tank.set("heaterDuty", controlPoint.get("duty"));
 						tank.set("heaterOn", controlPoint.get("on"));
 						tank.set("targetTemp", controlPoint.get("targetTemp"));
+						tank.set("automaticControl", controlPoint.get("automaticControl"));
 					}
 				}
 			}
@@ -221,6 +224,8 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				if (controlPoint) {
 					pump.set("duty", controlPoint.get("duty") > 0);
 					pump.set("on", controlPoint.get("on"));
+					pump.set("automaticControl", controlPoint.get("automaticControl"));
+
 				}
 
 			}
@@ -235,9 +240,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				selected = step;
 			}
 		});
-
-		console.log("getSelectedStep: " + selected);
-
 		return selected;
 	},
 	updateStep : function(step) {
