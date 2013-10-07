@@ -130,6 +130,7 @@ char* formatJsonConfiguration(Configuration * cfg) {
 			json_object *stepList = json_object_new_object();
 			json_object_array_add(stepLists, stepList);
 			StepList * t = &stA[slI];
+
 			json_object_object_add(stepList, "name", json_object_new_string(t->name != NULL ? t->name : ""));
 
 			json_object *steps = json_object_new_array();
@@ -178,7 +179,7 @@ char* formatJsonConfiguration(Configuration * cfg) {
 	return buffer;
 }
 
-char* mallocString(json_object *obj) {
+char* mallocStringFromJsonString(json_object *obj) {
 	const char * tmp;
 	tmp = json_object_get_string(obj);
 	int length = strlen(tmp);
@@ -200,7 +201,7 @@ HeatElement * parseHeatElement(json_object *layout) {
 		json_object * value;
 		value = json_object_object_get(layout, "name");
 		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-			s->name = mallocString(value);
+			s->name = mallocStringFromJsonString(value);
 		} else {
 			valid = false;
 		}
@@ -246,7 +247,7 @@ Sensor * parseSensor(json_object *layout) {
 		json_object * value;
 		value = json_object_object_get(layout, "address");
 		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-			s->address = mallocString(value);
+			s->address = mallocStringFromJsonString(value);
 		} else {
 			s->address = malloc(8);
 			s->address[0] = 0;
@@ -376,14 +377,14 @@ bool parseStepControlPoint(StepControlPoint * cp, json_object *controlPoint) {
 
 	value = json_object_object_get(controlPoint, "targetName");
 	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-		cp->targetName = mallocString(value);
+		cp->targetName = mallocStringFromJsonString(value);
 	} else {
 		DBG("parseJsonConfiguration ControlPoint Missing targetName\n");
 		valid = false;
 	}
 	value = json_object_object_get(controlPoint, "controlName");
 	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-		cp->controlName = mallocString(value);
+		cp->controlName = mallocStringFromJsonString(value);
 	} else {
 		DBG("parseJsonConfiguration ControlPoint Missing controlName\n");
 		valid = false;
@@ -440,7 +441,7 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 
 					value = json_object_object_get(tank, "name");
 					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-						t->name = mallocString(value);
+						t->name = mallocStringFromJsonString(value);
 					} else {
 						DBG("parseBrewLayout tank missing name");
 						valid = false;
@@ -492,7 +493,7 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 						json_object * value;
 						value = json_object_object_get(pump, "name");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-							s->name = mallocString(value);
+							s->name = mallocStringFromJsonString(value);
 						} else {
 							DBG("parseBrewLayout pump missing name\n");
 							valid = false;
@@ -572,7 +573,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 
 			value = json_object_object_get(config, "version");
 			if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-				cfg->version = mallocString(value);
+				cfg->version = mallocStringFromJsonString(value);
 			} else {
 				cfg->version = generateRandomId();
 			}
@@ -612,7 +613,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 						json_object *sensor = json_object_array_get_idx(sensorsJsonArray, i);
 						value = json_object_object_get(sensor, "name");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-							sc->name = mallocString(value);
+							sc->name = mallocStringFromJsonString(value);
 						} else {
 							DBG("parseJsonConfiguration SensorConfig Missing Name\n");
 							valid = false;
@@ -621,7 +622,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 
 						value = json_object_object_get(sensor, "location");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-							sc->location = mallocString(value);
+							sc->location = mallocStringFromJsonString(value);
 						} else {
 							DBG("parseJsonConfiguration SensorConfig Missing Location\n");
 							valid = false;
@@ -630,7 +631,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 
 						value = json_object_object_get(sensor, "address");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-							sc->address = mallocString(value);
+							sc->address = mallocStringFromJsonString(value);
 						} else {
 							DBG("parseJsonConfiguration SensorConfig Missing Address\n");
 							valid = false;
@@ -655,18 +656,21 @@ Configuration * parseJsonConfiguration(byte *data) {
 					cfg->stepLists.data = malloc(sizeof(StepList) * cfg->stepLists.count);
 					StepList * slA = (StepList *) cfg->stepLists.data;
 
+					// Clean for free if we abort early
 					for (int slI = 0; slI < cfg->stepLists.count; slI++) {
-
 						StepList * sl = &slA[slI];
-
 						sl->name = NULL;
 						sl->steps.count = 0;
 						sl->steps.data = NULL;
+					}
+
+					for (int slI = 0; slI < cfg->stepLists.count; slI++) {
+						StepList * sl = &slA[slI];
 
 						json_object *stepList = json_object_array_get_idx(stepLists, slI);
 						value = json_object_object_get(stepList, "name");
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-							sl->name = mallocString(value);
+							sl->name = mallocStringFromJsonString(value);
 						} else {
 							valid = false;
 							break;
@@ -679,6 +683,7 @@ Configuration * parseJsonConfiguration(byte *data) {
 							sl->steps.data = malloc(sizeof(Step) * sl->steps.count);
 							Step * slA = (Step *) sl->steps.data;
 
+							// Clean for free if we abort early
 							for (int slsI = 0; slsI < sl->steps.count; slsI++) {
 
 								Step * s = &slA[slsI];
@@ -687,18 +692,22 @@ Configuration * parseJsonConfiguration(byte *data) {
 								s->controlPoints.count = 0;
 								s->controlPoints.data = NULL;
 								s->time = NULL;
+							}
+							for (int slsI = 0; slsI < sl->steps.count; slsI++) {
+
+								Step * s = &slA[slsI];
 
 								json_object *step = json_object_array_get_idx(steps, slsI);
 								value = json_object_object_get(step, "name");
 								if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-									s->name = mallocString(value);
+									s->name = mallocStringFromJsonString(value);
 								} else {
 									valid = false;
 									break;
 								}
 								value = json_object_object_get(step, "time");
 								if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
-									s->time = mallocString(value);
+									s->time = mallocStringFromJsonString(value);
 								} else {
 									valid = false;
 									break;

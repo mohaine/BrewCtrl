@@ -24,6 +24,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 struct timeval startTime;
 void initBrewCtrl() {
@@ -55,4 +56,14 @@ char * generateRandomId() {
     }
     data[16] = 0;
     return data;
+}
+
+char* mallocStringFromString(char *str) {
+	int length = strlen(str);
+	char * returnValue = malloc(length + 1);
+	if (returnValue == NULL) {
+		exit(-1);
+	}
+	memcpy(returnValue, str, length + 1);
+	return returnValue;
 }

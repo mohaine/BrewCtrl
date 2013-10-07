@@ -49,5 +49,7 @@
 long millis();
 char * generateRandomId();
 void initBrewCtrl();
+char * mallocStringFromString(char* tmp);
+
 #endif
 
