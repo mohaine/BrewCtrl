@@ -27,6 +27,18 @@ var BrewCtrl = {
 		value = Math.round(value * factor);
 		return value / factor;
 	},
+	parseTime : function(time) {
+		var seconds = 0;
+		var split = time.split(":");
+		split = split.reverse();
+		for ( var i = 0; i < split.length; i++) {
+			var msLevel = parseInt(split[i], 10);
+			msLevel *= Math.pow(60, i);
+			seconds += msLevel;
+		}
+		return seconds;
+
+	},
 	formatTime : function(time) {
 		if (time == 0) {
 			return "\u221E";
@@ -59,6 +71,9 @@ var BrewCtrl = {
 		if (confirm(msg)) {
 			work();
 		}
+	},
+	alert : function(msg) {
+		alert(msg);
 	},
 	alphaId : function() {
 		var raw = [];
@@ -195,8 +210,83 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		}
 
 	},
-	updateLayoutForStep : function(activeStep) {
+	findControlByName : function(name) {
+		var control = null;
+		var self = this;
+		var config = self.get("config");
+		var brewLayout = config.get("brewLayout");
 
+		brewLayout.get("tanks").each(function(tank) {
+
+			if (name == tank.get("name")) {
+				control = tank;
+			}
+
+			var element = tank.get("heater");
+			if (element) {
+				if (name == element.get("name")) {
+					control = element;
+				}
+			}
+		});
+		brewLayout.get("pumps").each(function(pump) {
+			if (name == pump.get("name")) {
+				control = pump;
+			}
+		});
+		return control;
+	},
+	startStepList : function(stepList) {
+		var self = this;
+		var steps = stepList.get("steps");
+		// Todo Resolve IOs if not set
+		var apply = true;
+
+		steps.each(function(step) {
+			step.set("id", BrewCtrl.alphaId());
+
+			if (step.get("stepTime") == null) {
+				step.set("stepTime", BrewCtrl.parseTime(step.get("time")));
+			}
+
+			var controlPoints = step.get("controlPoints");
+			controlPoints.each(function(controlPoint) {
+				var control = self.findControlByName(controlPoint.get("controlName"));
+				if (control != null) {
+
+					if (controlPoint.get("controlIo") < 0) {
+						controlPoint.set("controlIo", control.get("io"));
+					}
+					controlPoint.set("hasDuty", control.get("hasDuty"));
+
+					var fullOnAmps = control.get("fullOnAmps");
+					if (!fullOnAmps) {
+						fullOnAmps = 0;
+					}
+					controlPoint.set("fullOnAmps", fullOnAmps);
+					if (controlPoint.get("automaticControl") || controlPoint.get("targetName")) {
+						controlPoint.set("automaticControl", true);
+						var target = self.findControlByName(controlPoint.get("targetName"));
+						if (target != null) {
+							controlPoint.set("tempSensorAddress", target.get("sensorAddress"));
+						} else {
+							apply = false;
+							BrewCtrl.alert("Failed to find target \"" + controlPoint.get("targetName") + "\"");
+						}
+					}
+				} else {
+					apply = false;
+					BrewCtrl.alert("Failed to find control \"" + controlPoint.get("controlName") + "\"");
+				}
+
+			});
+
+		});
+		if (apply) {
+			this.applySteps(steps);
+		}
+	},
+	updateLayoutForStep : function(activeStep) {
 		var config = this.get("config");
 		var brewLayout = config.get("brewLayout");
 		brewLayout.get("tanks").each(function(tank) {
@@ -209,7 +299,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 						heater.set("duty", controlPoint.get("duty"));
 						heater.set("on", controlPoint.get("on"));
 						heater.set("automaticControl", controlPoint.get("automaticControl"));
-						
+
 						tank.set("heaterDuty", controlPoint.get("duty"));
 						tank.set("heaterOn", controlPoint.get("on"));
 						tank.set("targetTemp", controlPoint.get("targetTemp"));
@@ -385,6 +475,15 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 				model : pump
 			});
 			$("#brewctrl-pumps").append(view.render().el);
+		});
+
+		$("#brewctrl-steplists").empty();
+
+		config.get("stepLists").each(function(stepList) {
+			var view = new BrewCtrl.Views.StepList({
+				model : stepList
+			});
+			$("#brewctrl-steplists").append(view.render().el);
 		});
 
 		this.renderSteps();

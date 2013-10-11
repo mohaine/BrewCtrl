@@ -4,7 +4,7 @@ BrewCtrl.Models.ControlPoint = Backbone.Model.extend({
 			controlName : "",
 			targetName : "",
 			automaticControl : false,
-			controlIo : 0,
+			controlIo : -1,
 			duty : 0,
 			on : false,
 			targetTemp : 0
@@ -146,5 +146,32 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 		BrewCtrl.confirm("Are you sure you want to delete Step \"" + self.model.get("name") + "\"?", function() {
 			BrewCtrl.main.deleteStep(self.model);
 		});
+	}
+});
+
+BrewCtrl.Views.StepList = Backbone.View.extend({
+	template : _.template($('#steplist-template').html()),
+	tagName : "span",
+
+	// The DOM events specific to an item.
+	events : {
+		"click " : "startList",
+
+	},
+	initialize : function() {
+		this.listenTo(this.model, 'change', this.render);
+	},
+	startList : function(event) {
+		var self = this;
+		BrewCtrl.confirm("Are you sure you want to delete the current steps and start \"" + self.model.get("name") + "\"?", function() {
+			BrewCtrl.main.startStepList(self.model);
+		});
+	},
+
+	render : function() {
+		var display = this.template(this.model.toJSON());
+		this.$el.html(display);
+
+		return this;
 	}
 });

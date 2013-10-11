@@ -8,7 +8,11 @@
   <script src="js/underscore.js"></script>
   <script src="js/backbone-min.js"></script> 
 
-
+ <script type="text/template" id="steplist-template">
+    <div class="step ">    	
+    	<span class="name select"><b><%= name %></b></span>    	
+      </div>
+  </script>
  <script type="text/template" id="step-template">
     <div class="step ">    	
     	<span class="stepName select"><b><%= name %></b></span>    	
@@ -123,6 +127,7 @@ if(quickClickValues){
 <div id="brewctrl-tanks"></div>
 <div id="brewctrl-pumps"></div>
 <div id="brewctrl-steps"></div>
+<div id="brewctrl-steplists"></div>
 
 
 
