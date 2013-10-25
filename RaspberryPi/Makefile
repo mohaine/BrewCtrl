@@ -16,8 +16,7 @@ LISTSENSORS=listsensors
 #CFLAGSD+= -D__DEBUG -D__DEBUG_FILE
 #CFLAGSD+= -D__DEBUG
 
-
-include Makefile.local
+-include Makefile.local
 
 
 #CFLAGS += -O2
