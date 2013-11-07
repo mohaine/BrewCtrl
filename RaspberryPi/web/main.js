@@ -31,7 +31,7 @@ var BrewCtrl = {
 		var seconds = 0;
 		var split = time.split(":");
 		split = split.reverse();
-		for ( var i = 0; i < split.length; i++) {
+		for (var i = 0; i < split.length; i++) {
 			var msLevel = parseInt(split[i], 10);
 			msLevel *= Math.pow(60, i);
 			seconds += msLevel;
@@ -77,7 +77,7 @@ var BrewCtrl = {
 	},
 	alphaId : function() {
 		var raw = [];
-		for ( var i = 0; i < 8; i++) {
+		for (var i = 0; i < 8; i++) {
 			raw[raw.length] = String.fromCharCode(Math.floor(Math.random() * 26 + 65));
 		}
 		return raw.join('');
@@ -101,11 +101,17 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	loadConfiguration : function() {
 		var self = this;
 		$.ajax("cmd/configuration").success(function(data) {
-			var config = new BrewCtrl.Models.Config(data);
-			self.set("config", config);
-			self.scheduleStatusUpdate();
+			self.applyConfiguration(data);
 		});
 	},
+
+	applyConfiguration : function(data) {
+		var self = this;
+		var config = new BrewCtrl.Models.Config(data);
+		self.set("config", config);
+		self.scheduleStatusUpdate();
+	},
+
 	start : function() {
 		var self = this;
 		this.loadConfiguration();
@@ -114,8 +120,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	applyStatus : function(data) {
 		var self = this;
 		var config = self.get("config");
-
-		// console.log(data);
 
 		var steps = new BrewCtrl.Collections.Steps(data.steps);
 		self.set("steps", steps);
@@ -458,6 +462,12 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 		$("#brewctrl-mode").append(view.render().el);
 	},
 
+	renderUploadConfig : function() {
+		$("#brewctrl-config-upload").empty();
+		var view = new BrewCtrl.Views.UploadConfiguration({});
+		$("#brewctrl-config-upload").append(view.render().el);
+	},
+
 	render : function() {
 		var config = this.options.main.get("config");
 		var brewLayout = config.get("brewLayout");
@@ -488,6 +498,7 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 
 		this.renderSteps();
 		this.renderMode();
+		this.renderUploadConfig();
 		return this;
 	}
 });
@@ -613,6 +624,53 @@ BrewCtrl.Views.NumberEdit = Backbone.View.extend({
 			var quickClick = self.quickClickValues[key];
 			$(this.$el.find("#" + quickClick.id)[0]).click(quickClick.click);
 		}
+		return this;
+	}
+});
+
+BrewCtrl.Views.UploadConfiguration = Backbone.View.extend({
+	template : _.template($('#config-upload-template').html()),
+	tagName : "span",
+	events : {
+		"click #uploadConfiguration" : "uploadConfiguration"
+	},
+	uploadConfiguration : function() {
+		var form = document.getElementById("configurationToUpload");
+		var files = form.files;
+
+		if (files.length == 0) {
+			BrewCtrl.alert("Please select a file.");
+			return;
+		}
+
+		var data = $(form).serialize()
+
+		$.ajax({
+			type : "POST",
+			url : "cmd/configuration",
+			data : data,
+			success : function(responseData) {
+				BrewCtrl.main.applyConfiguration(responseData);
+				$("#config-upload-form")[0].reset();
+			},
+			fail : function(e) {
+				BrewCtrl.alert("Failed to upload file.");
+				console.log("uploadConfiguration Error");
+			},
+			complete : function() {
+
+			}
+		});
+
+	},
+	completeAction : function() {
+	},
+	render : function() {
+		var self = this;
+
+		var display = this.template({});
+		this.$el.html(display);
+
 		return this;
 	}
 });

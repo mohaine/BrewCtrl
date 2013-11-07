@@ -15,11 +15,9 @@
 	cursor: pointer;
 }
 
-
 .heatElement.automatic  tspan {
 	fill-opacity: 0.5;
 }
-
 
 .heatElement.automatic.on  .element {
 	fill: #faa;
@@ -32,7 +30,6 @@
 .heatElement.off  .element {
 	fill: none;
 }
-
 
 .pump.on  .pumpBody {
 	fill: #0f0;
@@ -49,8 +46,6 @@
 .pump.off.automatic  .pumpBody {
 	fill: #f88;
 }
-
-
 
 .pump.actuallyOn  .onoff {
 	fill: none;
@@ -171,4 +166,10 @@ button.down {
 
 .popup .content {
 	
+}
+
+.config-upload {
+	padding: 3px;
+	border: 3px solid #ccc;
+	border-radius: 3px;
 }

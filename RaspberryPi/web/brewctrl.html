@@ -13,6 +13,8 @@
     	<span class="name select"><b><%= name %></b></span>    	
       </div>
   </script>
+  
+  
  <script type="text/template" id="step-template">
     <div class="step ">    	
     	<span class="stepName select"><b><%= name %></b></span>    	
@@ -20,6 +22,28 @@
     	<span class="stepDelete">&#x2297;</span>    
       </div>
   </script>
+
+
+ <script type="text/template" id="config-upload-template">
+    <div class="config-upload">    	
+    
+    <form id="config-upload-form" method="post" action="/cmd/configuration">
+    <div class="row">
+      <label for="configurationToUpload">Select a Configuration File to Upload</label><br />
+      <input type="file" name="configuration" id="configurationToUpload" />
+    </div>
+    <div id="fileName"></div>
+    <div id="fileSize"></div>
+    <div id="fileType"></div>
+    <div class="row">
+      <input type="button" value="Upload" id="uploadConfiguration"/>
+    </div>
+    <div id="progressNumber"></div>
+  </form>
+    
+    </div>
+  </script>
+
 
  <script type="text/template" id="mode-template">
     <div class="mode">
@@ -126,8 +150,19 @@ if(quickClickValues){
 <div id="brewctrl-mode"></div>
 <div id="brewctrl-tanks"></div>
 <div id="brewctrl-pumps"></div>
+
+
+
 <div id="brewctrl-steps"></div>
+
+<br />
+
+
+<label> Step Lists </label>
 <div id="brewctrl-steplists"></div>
+
+<br />
+<div id="brewctrl-config-upload"></div>
 
 
 
