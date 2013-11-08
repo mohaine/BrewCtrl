@@ -44,6 +44,14 @@
     </div>
   </script>
 
+ <script type="text/template" id="sensor-template">
+    <div class="sensor">    	
+    
+    	Name:<%= name %>  Location: <%= location %>  Temp: <%= BrewCtrl.round(BrewCtrl.convertC2Display(temperatureC), 1).toFixed(1) + '\xB0'  %> Reading: <%= reading %>
+    
+    </div>
+  </script>
+
 
  <script type="text/template" id="mode-template">
     <div class="mode">
@@ -163,6 +171,7 @@ if(quickClickValues){
 
 <br />
 <div id="brewctrl-config-upload"></div>
+<div id="brewctrl-sensors"></div>
 
 
 

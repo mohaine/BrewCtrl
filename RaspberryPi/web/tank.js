@@ -73,7 +73,7 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 				});
 
 				// Increment by 1 degree f
-				popup.increment = BrewCtrl.convertF2C(33);
+				popup.increment = BrewCtrl.convertDisplay2C(33);
 
 				popup.applyChange = function() {
 					BrewCtrl.main.updateStep(selectedStep);
@@ -82,7 +82,7 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 					return controlPoint.get("targetTemp");
 				};
 				popup.getTextValue = function() {
-					return BrewCtrl.round(BrewCtrl.convertC2F(this.getValue()), 0).toFixed(0) + "\xB0";
+					return BrewCtrl.round(BrewCtrl.convertC2Display(this.getValue()), 0).toFixed(0) + "\xB0";
 				}
 
 				popup.setValue = function(newValue) {
@@ -97,32 +97,32 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 				popup.quickClickValues = [ {
 					text : "120\xB0",
 					click : function() {
-						popup.updateValue(BrewCtrl.convertF2C(120));
+						popup.updateValue(BrewCtrl.convertDisplay2C(120));
 						popup.applyChange();
 					}
 
 				}, {
 					text : "140\xB0",
 					click : function() {
-						popup.updateValue(BrewCtrl.convertF2C(140));
+						popup.updateValue(BrewCtrl.convertDisplay2C(140));
 						popup.applyChange();
 					}
 				}, {
 					text : "153\xB0",
 					click : function() {
-						popup.updateValue(BrewCtrl.convertF2C(153));
+						popup.updateValue(BrewCtrl.convertDisplay2C(153));
 						popup.applyChange();
 					}
 				}, {
 					text : "165\xB0",
 					click : function() {
-						popup.updateValue(BrewCtrl.convertF2C(165));
+						popup.updateValue(BrewCtrl.convertDisplay2C(165));
 						popup.applyChange();
 					}
 				}, {
 					text : "210\xB0",
 					click : function() {
-						popup.updateValue(BrewCtrl.convertF2C(210));
+						popup.updateValue(BrewCtrl.convertDisplay2C(210));
 						popup.applyChange();
 					}
 
@@ -211,7 +211,7 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 
 		if (this.model.get("hasSensor")) {
 			temp.attr("class", "tank " + (this.model.get("reading") ? "reading" : "notReading"));
-			$($element.find("#tempatureText")[0]).text(BrewCtrl.round(BrewCtrl.convertC2F(this.model.get("temperatureC")), 1).toFixed(1) + '\xB0');
+			$($element.find("#tempatureText")[0]).text(BrewCtrl.round(BrewCtrl.convertC2Display(this.model.get("temperatureC")), 1).toFixed(1) + '\xB0');
 		} else {
 			temp.remove();
 		}
@@ -227,8 +227,7 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 				var controlPoint = selectedStep.get("controlPoints").findByAutomaticAndSensorAddress(sensorAddress);
 				if (controlPoint) {
 
-					$($element.find("#targetTempText")[0]).text("(" + BrewCtrl.round(BrewCtrl.convertC2F(controlPoint.get("targetTemp")), 0).toFixed(0) + '\xB0)');
-				
+					$($element.find("#targetTempText")[0]).text("(" + BrewCtrl.round(BrewCtrl.convertC2Display(controlPoint.get("targetTemp")), 0).toFixed(0) + '\xB0)');
 
 					showTarget = true;
 				}
@@ -309,6 +308,44 @@ BrewCtrl.Views.Pump = Backbone.View.extend({
 
 		this.$el.empty();
 		this.$el.append(element);
+		return this;
+	},
+});
+
+BrewCtrl.Models.Sensor = Backbone.Model.extend({
+	initialize : function() {
+	},
+	defaults : function() {
+		return {
+			address : "",
+			location : "Unknown Sensor",
+			name : "",
+			temperatureC : 0,
+			reading : false
+		};
+	},
+});
+BrewCtrl.Collections.Sensors = Backbone.Collection.extend({
+	model : BrewCtrl.Models.Sensor,
+	initialize : function() {
+	}
+});
+
+BrewCtrl.Views.Sensor = Backbone.View.extend({
+	template : _.template($('#sensor-template').html()),
+	tagName : "span",
+
+	// The DOM events specific to an item.
+	events : {
+		"click" : "toggleState",
+	},
+
+	initialize : function() {
+		this.listenTo(this.model, 'change', this.render);
+	},
+	render : function() {
+		var display = this.template(this.model.toJSON());
+		this.$el.html(display);
 		return this;
 	},
 });

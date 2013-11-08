@@ -16,9 +16,19 @@ var BrewCtrl = {
 		});
 		return tmpl_string;
 	},
+
+	convertC2Display : function(tempC) {
+		return BrewCtrl.convertC2F(tempC);
+	},
+
 	convertC2F : function(tempC) {
 		return (9.0 / 5.0) * tempC + 32;
 	},
+
+	convertDisplay2C : function(tempC) {
+		return BrewCtrl.convertF2C(tempC);
+	},
+
 	convertF2C : function(tempF) {
 		return (5.0 / 9.0) * (tempF - 32);
 	},
@@ -93,6 +103,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		return {
 			version : null,
 			config : new BrewCtrl.Models.Config(),
+			sensors : new BrewCtrl.Collections.Sensors(),
 			steps : new BrewCtrl.Collections.Steps(),
 			mode : null
 		};
@@ -152,7 +163,14 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			});
 			tank.set("hasSensor", foundSensor);
 		});
-
+		config.get("sensors").each(function(cfgSensor) {
+			_.each(data.sensors, function(sensor) {
+				if (sensor.address == cfgSensor.get("address")) {
+					cfgSensor.set("temperatureC", sensor.temperatureC);
+					cfgSensor.set("reading", sensor.reading);
+				}
+			});
+		});
 	},
 	scheduleStatusUpdate : function() {
 		var self = this;
@@ -366,6 +384,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 BrewCtrl.Models.Config = Backbone.Model.extend({
 	initialize : function() {
 		this.set('brewLayout', new BrewCtrl.Models.Layout(this.get("brewLayout")));
+		this.set('sensors', new BrewCtrl.Collections.Sensors(this.get("sensors")));
 		this.set('stepLists', new BrewCtrl.Collections.StepLists(this.get("stepLists")));
 	},
 
@@ -488,12 +507,19 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 		});
 
 		$("#brewctrl-steplists").empty();
-
 		config.get("stepLists").each(function(stepList) {
 			var view = new BrewCtrl.Views.StepList({
 				model : stepList
 			});
 			$("#brewctrl-steplists").append(view.render().el);
+		});
+
+		$("#brewctrl-sensors").empty();
+		config.get("sensors").each(function(sensor) {
+			var view = new BrewCtrl.Views.Sensor({
+				model : sensor
+			});
+			$("#brewctrl-sensors").append(view.render().el);
 		});
 
 		this.renderSteps();
