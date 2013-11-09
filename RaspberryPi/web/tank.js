@@ -321,7 +321,8 @@ BrewCtrl.Models.Sensor = Backbone.Model.extend({
 			location : "Unknown Sensor",
 			name : "",
 			temperatureC : 0,
-			reading : false
+			reading : false,
+			present: false
 		};
 	},
 });

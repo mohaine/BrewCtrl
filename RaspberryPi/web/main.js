@@ -164,12 +164,16 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			tank.set("hasSensor", foundSensor);
 		});
 		config.get("sensors").each(function(cfgSensor) {
+			var foundSensor = false;
 			_.each(data.sensors, function(sensor) {
 				if (sensor.address == cfgSensor.get("address")) {
 					cfgSensor.set("temperatureC", sensor.temperatureC);
 					cfgSensor.set("reading", sensor.reading);
+					foundSensor = true;
 				}
 			});
+			cfgSensor.set("present", foundSensor);
+
 		});
 	},
 	scheduleStatusUpdate : function() {
