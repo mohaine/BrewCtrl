@@ -7,9 +7,24 @@ BrewCtrl.Models.ControlPoint = Backbone.Model.extend({
 			controlIo : -1,
 			duty : 0,
 			on : false,
-			targetTemp : 0
+			targetTemp : 0,
+			tempSensorAddress: ""
 		};
 	},
+	setupFromControl : function(control) {
+		var self = this;
+
+		
+		self.set("controlName", control.get("name"));
+		self.set("controlIo", control.get("io"));
+		self.set("hasDuty", control.get("hasDuty"));
+
+		var fullOnAmps = control.get("fullOnAmps");
+		if (!fullOnAmps) {
+			fullOnAmps = 0;
+		}
+		self.set("fullOnAmps", fullOnAmps);
+	}
 });
 BrewCtrl.Models.Step = Backbone.Model.extend({
 	initialize : function() {

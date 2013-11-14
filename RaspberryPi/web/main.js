@@ -126,8 +126,35 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	start : function() {
 		var self = this;
 		this.loadConfiguration();
-	},
 
+		self.checkStatusUpdate();
+	},
+	checkStatusUpdate : function() {
+		var self = this;
+		if (self.statusTimeout) {
+			clearTimeout(self.statusCheckTimeout);
+			self.statusCheckTimeout = 0;
+		}
+
+		if (!self.lastStatusUpdateTime || new Date().getTime() - self.lastStatusUpdateTime > 1000) {
+			if (!self.statusPopup) {
+				var status = new BrewCtrl.Views.Status({});
+				self.statusPopup = BrewCtrl.showPopup(status, {
+					clientX : 2,
+					clientY : 3
+				}, function() {
+					self.statusPopup = null;
+				});
+			}
+
+		} else if (self.statusPopup) {
+			self.statusPopup.hidePopup();
+		}
+
+		self.statusCheckTimeout = setTimeout(function() {
+			self.checkStatusUpdate();
+		}, 500);
+	},
 	applyStatus : function(data) {
 		var self = this;
 		var config = self.get("config");
@@ -173,8 +200,9 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				}
 			});
 			cfgSensor.set("present", foundSensor);
-
 		});
+		self.lastStatusUpdateTime = new Date().getTime();
+
 	},
 	scheduleStatusUpdate : function() {
 		var self = this;
@@ -236,6 +264,27 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		}
 
 	},
+
+	listControls : function() {
+		var controlPoints = [];
+		var self = this;
+		var config = self.get("config");
+		var brewLayout = config.get("brewLayout");
+
+		brewLayout.get("tanks").each(function(tank) {
+			var element = tank.get("heater");
+			if (element && element.get("io") > -1) {
+				controlPoints.push(element);
+			}
+		});
+		brewLayout.get("pumps").each(function(pump) {
+			if (pump && pump.get("io") > -1) {
+				controlPoints.push(pump);
+			}
+		});
+		return controlPoints;
+	},
+
 	findControlByName : function(name) {
 		var control = null;
 		var self = this;
@@ -264,9 +313,11 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 	},
 	startStepList : function(stepList) {
 		var self = this;
-		var steps = stepList.get("steps");
+		var steps = _.clone(stepList.get("steps"));
+
 		// Todo Resolve IOs if not set
 		var apply = true;
+		var controls = self.listControls();
 
 		steps.each(function(step) {
 			step.set("id", BrewCtrl.alphaId());
@@ -280,22 +331,14 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				var control = self.findControlByName(controlPoint.get("controlName"));
 				if (control != null) {
 
-					if (controlPoint.get("controlIo") < 0) {
-						controlPoint.set("controlIo", control.get("io"));
-					}
-					controlPoint.set("hasDuty", control.get("hasDuty"));
+					controlPoint.setupFromControl(control);
 
-					var fullOnAmps = control.get("fullOnAmps");
-					if (!fullOnAmps) {
-						fullOnAmps = 0;
-					}
-					controlPoint.set("fullOnAmps", fullOnAmps);
 					if (controlPoint.get("automaticControl") || controlPoint.get("targetName")) {
-						controlPoint.set("automaticControl", true);
 						var target = self.findControlByName(controlPoint.get("targetName"));
 						if (target != null) {
+							controlPoint.set("automaticControl", true);
 							controlPoint.set("tempSensorAddress", target.get("sensorAddress"));
-						} else {
+						} else if (controlPoint.get("automaticControl")) {
 							apply = false;
 							BrewCtrl.alert("Failed to find target \"" + controlPoint.get("targetName") + "\"");
 						}
@@ -304,11 +347,25 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 					apply = false;
 					BrewCtrl.alert("Failed to find control \"" + controlPoint.get("controlName") + "\"");
 				}
-
+			});
+			// Add control points that are missing from step in as manual
+			_.each(controls, function(control) {
+				var found = false;
+				controlPoints.each(function(controlPoint) {
+					if (controlPoint.get("controlIo") == control.get("io")) {
+						found = true;
+					}
+				});
+				if (!found) {
+					var manualCp = new BrewCtrl.Models.ControlPoint();
+					manualCp.setupFromControl(control);
+					controlPoints.add(manualCp);
+				}
 			});
 
 		});
 		if (apply) {
+			// console.log(JSON.stringify(steps));
 			this.applySteps(steps);
 		}
 	},
@@ -411,9 +468,17 @@ BrewCtrl.Models.Layout = Backbone.Model.extend({
 			tanks : [],
 			pumps : []
 		};
-	},
+	}
 });
-
+BrewCtrl.Views.Status = Backbone.View.extend({
+	template : _.template($('#popup-status-loading').html()),
+	tagName : "div",
+	render : function() {
+		var display = this.template({});
+		this.$el.html(display);
+		return this;
+	}
+});
 BrewCtrl.Views.Mode = Backbone.View.extend({
 	template : _.template($('#mode-template').html()),
 	tagName : "span",
@@ -705,14 +770,20 @@ BrewCtrl.Views.UploadConfiguration = Backbone.View.extend({
 	}
 });
 
-BrewCtrl.showPopup = function(popupContent, event) {
+BrewCtrl.showPopup = function(popupContent, event, onHide) {
 	var display = _.template($('#popup-template').html());
 	var html = display({});
 	var popupEl = $('<div/>').html(html)[0];
 	var glass = $($(popupEl).children(".glass")[0]);
 
 	var hidePopup = function() {
-		popupEl.parentElement.removeChild(popupEl);
+		if (popupEl.parentElement) {
+			popupEl.parentElement.removeChild(popupEl);
+		}
+
+		if (onHide) {
+			onHide();
+		}
 	};
 
 	glass.click(hidePopup);
@@ -734,6 +805,10 @@ BrewCtrl.showPopup = function(popupContent, event) {
 	}
 	content.append(popupContent.render().el);
 	$("body").append(popupEl);
+
+	return {
+		hidePopup : hidePopup
+	};
 };
 
 $(function() {
