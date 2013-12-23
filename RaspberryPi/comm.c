@@ -18,7 +18,6 @@
 
 #define ONE_WIRE_PIN 4
 
-
 #ifndef DEFAULT_PORT
 #define DEFAULT_PORT 80
 #endif
@@ -270,6 +269,10 @@ void handleConfigRequest(Request * request, Response * response) {
 				turnOff();
 				setConfiguration(cfg);
 				writeConfiguration(cfg);
+			} else {
+				ERR("400 for handleConfigRequest: Invalid Configuration \n");
+				response->statusCode = 400;
+				sprintf(response->status, "Invalid Configuration");
 			}
 
 		} else {
@@ -797,7 +800,7 @@ void * handleClientThread(void *ptr) {
 
 					if (request->contentLength > BUFFER_SIZE) {
 						handled = true;
-						ERR("400 for Post Size %d\n",request->contentLength);
+						ERR("400 for Post Size %d\n", request->contentLength);
 						response->statusCode = 400;
 						sprintf(response->status, "Bad Request");
 
