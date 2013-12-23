@@ -181,3 +181,13 @@ button.down {
 .sensor.notPresent {
 	display: none;	
 }
+
+.sensor .name {
+	min-width: 5em;
+	display: inline-block;
+}
+
+.sensor .location {
+	min-width: 5em;
+	display: inline-block;
+}

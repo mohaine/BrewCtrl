@@ -1,4 +1,5 @@
 var BrewCtrl = {
+	autoUpdateStatus : false,
 	Models : {},
 	Collections : {},
 	Views : {},
@@ -116,6 +117,28 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		});
 	},
 
+	uploadConfiguration : function(cfgJson, onSuccess) {
+		var self = this;
+		$.ajax({
+			type : "POST",
+			url : "cmd/configuration",
+			data : {
+				"configuration" : cfgJson
+			},
+			success : function(responseData) {
+				self.applyConfiguration(responseData);
+				if (onSuccess) {
+					onSuccess();
+				}
+			},
+			error : function(e) {
+				BrewCtrl.alert("Failed to upload file. : " + e.statusText);
+			},
+
+
+		});
+	},
+
 	applyConfiguration : function(data) {
 		var self = this;
 		var config = new BrewCtrl.Models.Config(data);
@@ -127,7 +150,10 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		var self = this;
 		this.loadConfiguration();
 
-		self.checkStatusUpdate();
+		if (BrewCtrl.autoUpdateStatus) {
+
+			self.checkStatusUpdate();
+		}
 	},
 	checkStatusUpdate : function() {
 		var self = this;
@@ -150,7 +176,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		} else if (self.statusPopup) {
 			self.statusPopup.hidePopup();
 		}
-
 		self.statusCheckTimeout = setTimeout(function() {
 			self.checkStatusUpdate();
 		}, 500);
@@ -234,7 +259,9 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				console.log(e);
 			},
 			complete : function() {
-				self.scheduleStatusUpdate();
+				if (BrewCtrl.autoUpdateStatus) {
+					self.scheduleStatusUpdate();
+				}
 			}
 		});
 	},
@@ -283,6 +310,18 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			}
 		});
 		return controlPoints;
+	},
+
+	listSensorLocations : function() {
+		var locations = [];
+		var self = this;
+		var config = self.get("config");
+		var brewLayout = config.get("brewLayout");
+
+		brewLayout.get("tanks").each(function(tank) {
+			locations.push(tank);
+		});
+		return locations;
 	},
 
 	findControlByName : function(name) {
@@ -738,24 +777,24 @@ BrewCtrl.Views.UploadConfiguration = Backbone.View.extend({
 			return;
 		}
 
-		var data = $(form).serialize()
+		if (files.length > 1) {
+			BrewCtrl.alert("Please select a single file.");
+			return;
+		}
 
-		$.ajax({
-			type : "POST",
-			url : "cmd/configuration",
-			data : data,
-			success : function(responseData) {
-				BrewCtrl.main.applyConfiguration(responseData);
-				$("#config-upload-form")[0].reset();
-			},
-			fail : function(e) {
-				BrewCtrl.alert("Failed to upload file.");
-				console.log("uploadConfiguration Error");
-			},
-			complete : function() {
+		var reader = new FileReader();
+
+		// Read in the image file as a data URL.
+		reader.onloadend = function(evt) {
+			if (evt.target.readyState == FileReader.DONE) {
+				BrewCtrl.main.uploadConfiguration(evt.target.result, function() {
+					$("#config-upload-form")[0].reset();
+				});
 
 			}
-		});
+		};
+
+		reader.readAsBinaryString(files[0]);
 
 	},
 	completeAction : function() {

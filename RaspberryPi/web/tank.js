@@ -322,7 +322,7 @@ BrewCtrl.Models.Sensor = Backbone.Model.extend({
 			name : "",
 			temperatureC : 0,
 			reading : false,
-			present: false
+			present : false
 		};
 	},
 });
@@ -338,15 +338,46 @@ BrewCtrl.Views.Sensor = Backbone.View.extend({
 
 	// The DOM events specific to an item.
 	events : {
-		"click" : "toggleState",
+		"change .name" : "updateName",
+		"change .location" : "updateLocation",
 	},
 
 	initialize : function() {
 		this.listenTo(this.model, 'change', this.render);
 	},
+	updateName : function() {
+		var self = this;
+		var newName = self.$el.find(".name").attr("value");
+		if (newName != self.model.get("name")) {
+			self.model.set("name", newName)
+			BrewCtrl.main.uploadConfiguration(JSON.stringify(self.loadedCfg));
+		}
+	},
+	updateLocation : function() {
+		var self = this;
+		var locationSelect = self.$el.find(".location")[0];
+		var locationName = locationSelect.options[locationSelect.selectedIndex].value
+		if (locationName != self.model.get("location")) {
+			self.model.set("location", locationName)
+			BrewCtrl.main.uploadConfiguration(JSON.stringify(self.loadedCfg));
+		}
+	},
 	render : function() {
-		var display = this.template(this.model.toJSON());
-		this.$el.html(display);
+		var self = this;
+		self.loadedCfg = BrewCtrl.main.get("config");
+		var display = self.template(self.model.toJSON());
+		self.$el.html(display);
+
+		self.$el.find(".name").attr("value", self.model.get("name"));
+
+		var locationSelect = self.$el.find(".location")[0];
+		var locations = BrewCtrl.main.listSensorLocations();
+		_.each(locations, function(location) {
+			var option = new Option(location.get("name"), location.get("name"));
+			option.selected = self.model.get("location") == location.get("name");
+			locationSelect.options.add(option);
+		});
+
 		return this;
 	},
 });

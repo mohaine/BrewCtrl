@@ -45,8 +45,10 @@
   </script>
 
  <script type="text/template" id="sensor-template">
-    <div class="sensor <%= present ? "present":"notPresent" %> <%= reading ? "reading":"notReading" %>">    	    
-    	Name:<%= name %>  Location: <%= location %>  Temp: <%= BrewCtrl.round(BrewCtrl.convertC2Display(temperatureC), 1).toFixed(1) + '\xB0'  %>    
+    <div class="sensor <%= present ? "present":"notPresent" %> <%= reading ? "reading":"notReading" %>">    	   
+    
+     
+    	Name: <input type="text" class="name"/>  Location:  <select class="location"/>  Temp: <%= BrewCtrl.round(BrewCtrl.convertC2Display(temperatureC), 1).toFixed(1) + '\xB0'  %>    
     </div>
   </script>
 
