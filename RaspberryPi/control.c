@@ -142,7 +142,6 @@ void selectReadingSensors() {
 				Tank * t = &tA[tankIndex];
 				if (t->sensor != NULL) {
 					bool found = false;
-
 					if (t->sensor->address != NULL) {
 						TempSensor * s = getSensorByAddress(t->sensor->address);
 						found = s != NULL && hasVaildTemp(s);
@@ -155,16 +154,16 @@ void selectReadingSensors() {
 								if (strcmp(sc->address, t->sensor->address) == 0) {
 									if (strcmp(sc->location, t->name) != 0) {
 										found = false;
-
 										t->sensor->address = malloc(2);
 										strcpy(t->sensor->address, "");
+
+										DBG("  **** Sensor no longer for Tank: %s\n",t->name);
 										changeConfigVersion(cfg);
+
 									}
 								}
 							}
-
 						}
-
 					}
 
 					if (!found) {
@@ -181,9 +180,9 @@ void selectReadingSensors() {
 									char * oldAddress = t->sensor->address;
 
 									t->sensor->address = newAddressString;
-									changeConfigVersion(cfg);
 
 									DBG("Changed tank %s sensor to %s\n", t->name, t->sensor->address);
+									changeConfigVersion(cfg);
 
 									if (oldAddress != NULL) {
 										free(oldAddress);

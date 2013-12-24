@@ -135,7 +135,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				BrewCtrl.alert("Failed to upload file. : " + e.statusText);
 			},
 
-
 		});
 	},
 
@@ -143,6 +142,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		var self = this;
 		var config = new BrewCtrl.Models.Config(data);
 		self.set("config", config);
+		console.log("config version: " + config.get('version'));
 		self.scheduleStatusUpdate();
 	},
 
@@ -151,7 +151,6 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		this.loadConfiguration();
 
 		if (BrewCtrl.autoUpdateStatus) {
-
 			self.checkStatusUpdate();
 		}
 	},
@@ -162,7 +161,7 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 			self.statusCheckTimeout = 0;
 		}
 
-		if (!self.lastStatusUpdateTime || new Date().getTime() - self.lastStatusUpdateTime > 1000) {
+		if (!self.lastStatusUpdateTime || new Date().getTime() - self.lastStatusUpdateTime > 5000) {
 			if (!self.statusPopup) {
 				var status = new BrewCtrl.Views.Status({});
 				self.statusPopup = BrewCtrl.showPopup(status, {

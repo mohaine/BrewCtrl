@@ -52,6 +52,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <pthread.h>
+#include <time.h>
 
 typedef struct {
 	char method[METHOD_SIZE];
@@ -262,13 +263,14 @@ void handleConfigRequest(Request * request, Response * response) {
 		if (paramSize > 0) {
 			Configuration * cfg = parseJsonConfiguration(buffer);
 			if (cfg != NULL) {
-				if (cfg->version != NULL) {
-					free(cfg->version);
-				}
-				cfg->version = generateRandomId();
+				changeConfigVersion(cfg);
 				turnOff();
 				setConfiguration(cfg);
 				writeConfiguration(cfg);
+
+				// Wait a bit for settings to be applied
+
+				nanosleep((struct timespec[] ) { { 0, 200000000 } }, NULL);
 			} else {
 				ERR("400 for handleConfigRequest: Invalid Configuration \n");
 				response->statusCode = 400;

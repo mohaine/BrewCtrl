@@ -392,6 +392,8 @@ bool parseStepControlPoint(StepControlPoint * cp, json_object *controlPoint) {
 	value = json_object_object_get(controlPoint, "targetTemp");
 	if (valid && value != NULL && json_object_get_type(value) == json_type_double) {
 		cp->targetTemp = json_object_get_double(value);
+	} else if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
+		cp->targetTemp = (double) json_object_get_int(value);
 	} else {
 		DBG("parseJsonConfiguration ControlPoint Missing targetTemp\n");
 		valid = false;
@@ -721,11 +723,12 @@ Configuration * parseJsonConfiguration(byte *data) {
 									s->controlPoints.data = malloc(sizeof(StepControlPoint) * s->controlPoints.count);
 									StepControlPoint * slCpA = (StepControlPoint *) s->controlPoints.data;
 
+									DBG(" CP for Step %s %d\n", s->name,s->controlPoints.count);
+
 									for (int slcpI = 0; slcpI < s->controlPoints.count; slcpI++) {
 
 										StepControlPoint * cp = &slCpA[slcpI];
 										json_object *controlPoint = json_object_array_get_idx(controlPoints, slcpI);
-
 										valid = parseStepControlPoint(cp, controlPoint);
 										if (!valid) {
 											break;
@@ -818,6 +821,7 @@ void writeConfiguration(Configuration * config) {
 void changeConfigVersion(Configuration * newConfig) {
 	char * oldVersion = newConfig->version;
 	newConfig->version = generateRandomId();
+	DBG("CFG-> %s\n",newConfig->version);
 	if (oldVersion != NULL) {
 		free(oldVersion);
 	}
