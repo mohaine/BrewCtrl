@@ -14,7 +14,8 @@ modprobe w1-therm
 		
 						
 # Make sure everything starts on boot
-echo w1-therm > /etc/modules-load.d/brewctrl.conf 
+echo w1-gpio > /etc/modules-load.d/brewctrl.conf 
+echo w1-therm >> /etc/modules-load.d/brewctrl.conf 
 cp BrewCtrl.service /etc/systemd/system/
 systemctl enable BrewCtrl
 
