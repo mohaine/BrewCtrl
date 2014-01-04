@@ -4,6 +4,8 @@ CFLAGSD=
 SRCDIR=src
 OBJDIR=obj
 
+CFGFILE = BrewControllerConfig.json
+
 CFLAGS=-c -Wall -std=c99 -D_GNU_SOURCE $(CFLAGSD)  -lpthread
 LDFLAGS=-lpthread -lm 
 SOURCES= $(wildcard $(SRCDIR)/*.c) 
@@ -41,6 +43,7 @@ default: all
 	
 create-dir:
 	test -d $(OBJDIR) || mkdir $(OBJDIR)
+	test -f $(CFGFILE) || cp $(CFGFILE).dist $(CFGFILE)
 
 clean: 
 	rm -f $(BREWCTRL) $(OBJDIR)/*.o	
