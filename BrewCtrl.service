@@ -2,8 +2,8 @@
 Description=BrewCtrl
 
 [Service]
-ExecStart=/opt/BrewCtrl/RaspberryPi/brewctrl
-WorkingDirectory=/opt/BrewCtrl/RaspberryPi
+ExecStart=/opt/BrewCtrl/brewctrl
+WorkingDirectory=/opt/BrewCtrl
 
 
 [Install]
