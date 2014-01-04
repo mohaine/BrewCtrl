@@ -141,17 +141,10 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("heater").get("io"));
 			if (controlPoint) {
 
-				if (controlPoint.get("automaticControl")) {
-					BrewCtrl.confirm("Do you want to stop automatic control?", function() {
-						controlPoint.set("automaticControl", false);
-						BrewCtrl.main.updateStep(selectedStep);
-					});
-					return;
-				}
-
 				var popup = new BrewCtrl.Views.NumberEdit({});
 
 				popup.applyChange = function() {
+					controlPoint.set("automaticControl", false);
 					BrewCtrl.main.updateStep(selectedStep);
 				};
 				popup.getValue = function() {
@@ -194,15 +187,14 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 						popup.updateValue(100);
 						popup.applyChange();
 					}
-				}
-				];
-				
-				if(this.model.get("sensorAddress") != ""){				
+				} ];
+
+				if (this.model.get("sensorAddress") != "") {
 					popup.quickClickValues.push({
 						text : "Auto",
 						click : function() {
 							controlPoint.set("automaticControl", true);
-							popup.applyChange();
+							BrewCtrl.main.updateStep(selectedStep);
 							popup.completeAction();
 						}
 					});
@@ -288,11 +280,14 @@ BrewCtrl.Views.Pump = Backbone.View.extend({
 			if (controlPoint) {
 
 				if (controlPoint.get("automaticControl")) {
-					return;
+					BrewCtrl.confirm("Do you want to stop automatic control?", function() {
+						controlPoint.set("automaticControl", false);
+						BrewCtrl.main.updateStep(selectedStep);
+					});
+				} else {
+					controlPoint.set("duty", newDuty);
+					BrewCtrl.main.updateStep(selectedStep);
 				}
-
-				controlPoint.set("duty", newDuty);
-				BrewCtrl.main.updateStep(selectedStep);
 			}
 		}
 	},
