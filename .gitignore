@@ -8,3 +8,4 @@ brewctrl
 trace.out
 Makefile.local
 *.bak
+BrewControllerConfig.json
