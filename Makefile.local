@@ -1,0 +1,4 @@
+CFLAGS +=  -DMOCK 
+CFLAGS += -D__DEBUG
+
+
