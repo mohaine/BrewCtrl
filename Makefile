@@ -24,8 +24,8 @@ BREWCTRL=brewctrl
 -include Makefile.local
 
 
-#CFLAGS += -O2
-#LDFLAGS += -O2
+CFLAGS += -O2
+LDFLAGS += -O2
 
 CFLAGS += $(shell pkg-config --cflags json)
 LDFLAGS += $(shell pkg-config --libs json)
