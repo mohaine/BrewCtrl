@@ -6,3 +6,5 @@ cd /opt/BrewCtrl/
 
 make brewctrl
 
+cp BrewCtrl.service /etc/systemd/system/
+systemctl enable BrewCtrl
