@@ -6,3 +6,4 @@ WebCtrl/war/WEB-INF/lib/
 obj
 brewctrl
 trace.out
+Makefile.local
