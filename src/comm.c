@@ -99,10 +99,11 @@ void handleOtherRequest(Request * request, Response * response) {
 	fileName[offset++] = '/';
 
 	if (length == 1) {
-		fileName[offset++] = 'W';
-		fileName[offset++] = 'e';
 		fileName[offset++] = 'b';
-		fileName[offset++] = 'C';
+		fileName[offset++] = 'r';
+		fileName[offset++] = 'e';
+		fileName[offset++] = 'w';
+		fileName[offset++] = 'c';
 		fileName[offset++] = 't';
 		fileName[offset++] = 'r';
 		fileName[offset++] = 'l';
