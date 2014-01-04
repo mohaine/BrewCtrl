@@ -7,3 +7,4 @@ obj
 brewctrl
 trace.out
 Makefile.local
+*.bak
