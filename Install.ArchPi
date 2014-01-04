@@ -9,10 +9,14 @@ cd /opt/BrewCtrl/
 # Compile
 make brewctrl
 
-# Install Service 
+# Load 1-Wire modules
+modprobe w1-therm
+		
+						
+# Make sure everything starts on boot
+echo w1-therm > /etc/modules-load.d/brewctrl.conf 
 cp BrewCtrl.service /etc/systemd/system/
 systemctl enable BrewCtrl
-
 
 
 # Update install
