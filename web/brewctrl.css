@@ -87,6 +87,8 @@
 .numberEdit {
 	width: 200px;
 	position: relative;
+	height: 190px;
+	display: inline-block;
 }
 
 .numberEditIncrement {
@@ -175,11 +177,11 @@ button.down {
 }
 
 .sensor.notReading {
-	color: red;	
+	color: red;
 }
 
 .sensor.notPresent {
-	display: none;	
+	display: none;
 }
 
 .sensor .name {

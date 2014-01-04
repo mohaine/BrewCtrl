@@ -142,12 +142,14 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 			if (controlPoint) {
 
 				if (controlPoint.get("automaticControl")) {
+					BrewCtrl.confirm("Do you want to stop automatic control?", function() {
+						controlPoint.set("automaticControl", false);
+						BrewCtrl.main.updateStep(selectedStep);
+					});
 					return;
 				}
 
-				var popup = new BrewCtrl.Views.NumberEdit({
-
-				});
+				var popup = new BrewCtrl.Views.NumberEdit({});
 
 				popup.applyChange = function() {
 					BrewCtrl.main.updateStep(selectedStep);
@@ -193,8 +195,18 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 						popup.applyChange();
 					}
 				}
-
 				];
+				
+				if(this.model.get("sensorAddress") != ""){				
+					popup.quickClickValues.push({
+						text : "Auto",
+						click : function() {
+							controlPoint.set("automaticControl", true);
+							popup.applyChange();
+							popup.completeAction();
+						}
+					});
+				}
 				BrewCtrl.showPopup(popup, event);
 			}
 		}
