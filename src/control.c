@@ -65,7 +65,6 @@ void unlockSteps() {
 
 void setupControlPoint(ControlPoint *cp) {
 	if (!cp->initComplete) {
-
 		if (cp->automaticControl) {
 			cp->duty = 0;
 			setupPid(&cp->pid);

@@ -136,9 +136,10 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 	},
 
 	editDuty : function(event) {
+		var self = this;
 		var selectedStep = BrewCtrl.main.getSelectedStep();
 		if (selectedStep) {
-			var controlPoint = selectedStep.get("controlPoints").findByIo(this.model.get("heater").get("io"));
+			var controlPoint = selectedStep.get("controlPoints").findByIo(self.model.get("heater").get("io"));
 			if (controlPoint) {
 
 				var popup = new BrewCtrl.Views.NumberEdit({});
@@ -189,11 +190,14 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 					}
 				} ];
 
-				if (this.model.get("sensorAddress") != "") {
+				if (self.model.get("sensorAddress") != "") {
 					popup.quickClickValues.push({
 						text : "Auto",
-						click : function() {
+						click : function() {							
 							controlPoint.set("automaticControl", true);
+							controlPoint.set("tempSensorAddress", self.model.get("sensorAddress"));							
+							controlPoint.set("targetName",self.model.get("name"))
+
 							BrewCtrl.main.updateStep(selectedStep);
 							popup.completeAction();
 						}

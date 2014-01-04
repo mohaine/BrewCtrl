@@ -214,12 +214,10 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 
 	while (index + nameLenght < paramDataLength) {
 
-		if (paramData[index + nameLenght] == '='
-				&& strncmp(name, paramData + index, nameLenght) == 0) {
+		if (paramData[index + nameLenght] == '=' && strncmp(name, paramData + index, nameLenght) == 0) {
 			index = index + nameLenght + 1;
 			int length = 0;
-			while (index < paramDataLength && paramData[index] != '\r'
-					&& paramData[index] != '\n') {
+			while (index < paramDataLength && paramData[index] != '\r' && paramData[index] != '\n') {
 				if (paramData[index] == '%' && index < paramDataLength - 2) {
 					index++;
 					unsigned int data;
@@ -241,13 +239,11 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 
 		} else {
 // Find the EOL
-			while (index < paramDataLength && paramData[index] != '\r'
-					&& paramData[index] != '\n') {
+			while (index < paramDataLength && paramData[index] != '\r' && paramData[index] != '\n') {
 				index++;
 			}
 // Go past the EOL
-			while (index < paramDataLength
-					&& (paramData[index] == '\r' || paramData[index] == '\n')) {
+			while (index < paramDataLength && (paramData[index] == '\r' || paramData[index] == '\n')) {
 				index++;
 			}
 		}
@@ -260,8 +256,7 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 void handleConfigRequest(Request * request, Response * response) {
 	if (request->contentLength > 0) {
 		char * buffer = malloc(request->contentLength + 1);
-		int paramSize = readParam("configuration", request->contentp,
-				request->contentLength, buffer);
+		int paramSize = readParam("configuration", request->contentp, request->contentLength, buffer);
 		if (paramSize > 0) {
 			Configuration * cfg = parseJsonConfiguration(buffer);
 			if (cfg != NULL) {
@@ -322,8 +317,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 
 	bool valid = true;
 	json_object * value = json_object_object_get(step, "id");
-	if (valid && value != NULL
-			&& json_object_get_type(value) == json_type_string) {
+	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 		sprintf(cs->id, "%s", json_object_get_string(value));
 	} else {
 
@@ -333,8 +327,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	}
 
 	value = json_object_object_get(step, "name");
-	if (valid && value != NULL
-			&& json_object_get_type(value) == json_type_string) {
+	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 		sprintf(cs->name, "%s", json_object_get_string(value));
 	} else {
 		ERR("Invalid Step: No Name\n");
@@ -342,8 +335,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	}
 
 	value = json_object_object_get(step, "stepTime");
-	if (valid && value != NULL
-			&& json_object_get_type(value) == json_type_int) {
+	if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
 		cs->stepTime = json_object_get_int(value);
 	} else {
 		ERR("Invalid Step: No Step Time\n");
@@ -351,8 +343,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	}
 
 	value = json_object_object_get(step, "active");
-	if (valid && value != NULL
-			&& json_object_get_type(value) == json_type_boolean) {
+	if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
 		cs->active = json_object_get_boolean(value);
 	} else {
 		cs->active = false;
@@ -361,11 +352,9 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	if (valid) {
 		DBG("Parse Step %s\n", cs->name);
 
-		json_object * controlPoints = json_object_object_get(step,
-				"controlPoints");
+		json_object * controlPoints = json_object_object_get(step, "controlPoints");
 
-		if (controlPoints != NULL
-				&& json_object_get_type(controlPoints) == json_type_array) {
+		if (controlPoints != NULL && json_object_get_type(controlPoints) == json_type_array) {
 			int controlPointCount = json_object_array_length(controlPoints);
 
 			if (controlPointCount > MAX_CP_COUNT) {
@@ -374,18 +363,15 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 			cs->controlPointCount = controlPointCount;
 			for (int cpI = 0; valid && cpI < controlPointCount; cpI++) {
 
-				json_object *controlPoint = json_object_array_get_idx(
-						controlPoints, cpI);
+				json_object *controlPoint = json_object_array_get_idx(controlPoints, cpI);
 				ControlPoint *cp = &cs->controlPoints[cpI];
 
 				value = json_object_object_get(controlPoint, "controlIo");
-				if (value != NULL
-						&& json_object_get_type(value) == json_type_int) {
+				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->controlIo = json_object_get_int(value);
 				} else {
 					value = json_object_object_get(controlPoint, "controlPin");
-					if (value != NULL
-							&& json_object_get_type(value) == json_type_int) {
+					if (value != NULL && json_object_get_type(value) == json_type_int) {
 						cp->controlIo = json_object_get_int(value);
 					} else {
 						ERR("Invalid Control Point: No controlIo\n");
@@ -395,8 +381,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				}
 
 				value = json_object_object_get(controlPoint, "duty");
-				if (value != NULL
-						&& json_object_get_type(value) == json_type_int) {
+				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->duty = json_object_get_int(value);
 				} else {
 					ERR("Invalid Control Point: No duty\n");
@@ -405,8 +390,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				}
 
 				value = json_object_object_get(controlPoint, "fullOnAmps");
-				if (value != NULL
-						&& json_object_get_type(value) == json_type_int) {
+				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->fullOnAmps = json_object_get_int(value);
 				} else {
 					ERR("Invalid Control Point: No fullOnAmps\n");
@@ -414,12 +398,9 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				value = json_object_object_get(controlPoint,
-						"tempSensorAddress");
-				if (value != NULL
-						&& json_object_get_type(value) == json_type_string) {
-					sprintf(cp->tempSensorAddressPtr, "%s",
-							json_object_get_string(value));
+				value = json_object_object_get(controlPoint, "tempSensorAddress");
+				if (value != NULL && json_object_get_type(value) == json_type_string) {
+					sprintf(cp->tempSensorAddressPtr, "%s", json_object_get_string(value));
 				} else {
 					ERR("Invalid Control Point: No tempSensorAddress\n");
 					valid = false;
@@ -427,11 +408,9 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				}
 
 				value = json_object_object_get(controlPoint, "targetTemp");
-				if (value != NULL
-						&& json_object_get_type(value) == json_type_double) {
+				if (value != NULL && json_object_get_type(value) == json_type_double) {
 					cp->targetTemp = json_object_get_double(value);
-				} else if (value != NULL
-						&& json_object_get_type(value) == json_type_int) {
+				} else if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->targetTemp = json_object_get_int(value);
 				} else {
 					ERR("Invalid Control Point: No targetTemp\n");
@@ -440,8 +419,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				}
 
 				value = json_object_object_get(controlPoint, "hasDuty");
-				if (value != NULL
-						&& json_object_get_type(value) == json_type_boolean) {
+				if (value != NULL && json_object_get_type(value) == json_type_boolean) {
 					cp->hasDuty = json_object_get_boolean(value);
 				} else {
 					ERR("Invalid Control Point: No hasDuty\n");
@@ -449,11 +427,14 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				value = json_object_object_get(controlPoint,
-						"automaticControl");
-				if (value != NULL
-						&& json_object_get_type(value) == json_type_boolean) {
+				value = json_object_object_get(controlPoint, "automaticControl");
+				if (value != NULL && json_object_get_type(value) == json_type_boolean) {
+					bool oldAuto = cp->automaticControl;
 					cp->automaticControl = json_object_get_boolean(value);
+					if (oldAuto != cp->automaticControl) {
+						cp->initComplete = false;
+					}
+
 				} else {
 					ERR("Invalid Control Point: No automaticControl\n");
 					valid = false;
@@ -477,8 +458,7 @@ void handleStatusRequest(Request * request, Response * response) {
 
 		bool valid = true;
 
-		int paramSize = readParam("mode", request->contentp,
-				request->contentLength, tmp);
+		int paramSize = readParam("mode", request->contentp, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
 			DBG("handleStatusRequest: mode\n");
 			if (strcmp(tmp, "OFF") == 0) {
@@ -495,8 +475,7 @@ void handleStatusRequest(Request * request, Response * response) {
 				valid = false;
 			}
 		}
-		paramSize = readParam("steps", request->contentp,
-				request->contentLength, tmp);
+		paramSize = readParam("steps", request->contentp, request->contentLength, tmp);
 
 		if (valid && paramSize > 0) {
 
@@ -504,8 +483,7 @@ void handleStatusRequest(Request * request, Response * response) {
 
 			json_object *steps = json_tokener_parse(tmp);
 
-			if (steps == NULL
-					|| json_object_get_type(steps) != json_type_array) {
+			if (steps == NULL || json_object_get_type(steps) != json_type_array) {
 				valid = false;
 			} else {
 				int stepCount = json_object_array_length(steps);
@@ -522,8 +500,7 @@ void handleStatusRequest(Request * request, Response * response) {
 					valid = parseJsonStep(step, cs);
 					//Init Steps
 					if (valid) {
-						for (int cpI = 0; valid && cpI < cs->controlPointCount;
-								cpI++) {
+						for (int cpI = 0; valid && cpI < cs->controlPointCount; cpI++) {
 							ControlPoint *cp = &cs->controlPoints[cpI];
 							cp->initComplete = false;
 						}
@@ -544,16 +521,14 @@ void handleStatusRequest(Request * request, Response * response) {
 			}
 		}
 
-		paramSize = readParam("modifySteps", request->contentp,
-				request->contentLength, tmp);
+		paramSize = readParam("modifySteps", request->contentp, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
 
 			DBG("handleStatusRequest: modifySteps\n");
 
 			json_object *steps = json_tokener_parse(tmp);
 
-			if (steps == NULL
-					|| json_object_get_type(steps) != json_type_array) {
+			if (steps == NULL || json_object_get_type(steps) != json_type_array) {
 				valid = false;
 			} else {
 				int stepCount = json_object_array_length(steps);
@@ -564,13 +539,14 @@ void handleStatusRequest(Request * request, Response * response) {
 					json_object * value = json_object_object_get(step, "id");
 
 					if (value != NULL) {
-						for (int j = 0; valid && j < getControlStepCount();
-								j++) {
+						for (int j = 0; valid && j < getControlStepCount(); j++) {
 							ControlStep *cs = getControlStep(j);
-							if (strcmp(json_object_get_string(value), cs->id)
-									== 0) {
-								//printf("Update step %s\n", cs->name);
+							if (strcmp(json_object_get_string(value), cs->id) == 0) {
+
+								DBG("Update step %s\n", cs->name);
+
 								valid = parseJsonStep(step, cs);
+
 								break;
 							}
 						}
@@ -603,15 +579,13 @@ void handleStatusRequest(Request * request, Response * response) {
 
 	sprintf(response->contentType, "text/json");
 
-	json_object *status, *sensor, *sensors, *steps, *step, *controlPoints,
-			*controlPoint;
+	json_object *status, *sensor, *sensors, *steps, *step, *controlPoints, *controlPoint;
 
 	status = json_object_new_object();
 
 	Configuration* config = getConfiguration();
 	if (config != NULL && config->version != NULL) {
-		json_object_object_add(status, "configurationVersion",
-				json_object_new_string(config->version));
+		json_object_object_add(status, "configurationVersion", json_object_new_string(config->version));
 	}
 
 	if (getControl()->mode == MODE_OFF) {
@@ -621,8 +595,7 @@ void handleStatusRequest(Request * request, Response * response) {
 	} else if (getControl()->mode == MODE_HOLD) {
 		json_object_object_add(status, "mode", json_object_new_string("HOLD"));
 	} else if (getControl()->mode == MODE_HEAT_OFF) {
-		json_object_object_add(status, "mode",
-				json_object_new_string("HEAT_OFF"));
+		json_object_object_add(status, "mode", json_object_new_string("HEAT_OFF"));
 	}
 
 	sensors = json_object_new_array();
@@ -641,10 +614,8 @@ void handleStatusRequest(Request * request, Response * response) {
 
 		json_object_object_add(step, "name", json_object_new_string(cs->name));
 		json_object_object_add(step, "id", json_object_new_string(cs->id));
-		json_object_object_add(step, "stepTime",
-				json_object_new_int(cs->stepTime));
-		json_object_object_add(step, "active",
-				json_object_new_boolean(cs->active));
+		json_object_object_add(step, "stepTime", json_object_new_int(cs->stepTime));
+		json_object_object_add(step, "active", json_object_new_boolean(cs->active));
 
 		json_object_object_add(step, "controlPoints", controlPoints);
 		for (int cpI = 0; cpI < cs->controlPointCount; cpI++) {
@@ -652,22 +623,14 @@ void handleStatusRequest(Request * request, Response * response) {
 			controlPoint = json_object_new_object();
 			json_object_array_add(controlPoints, controlPoint);
 
-			json_object_object_add(controlPoint, "controlIo",
-					json_object_new_int(cp->controlIo));
-			json_object_object_add(controlPoint, "duty",
-					json_object_new_int(cp->duty));
-			json_object_object_add(controlPoint, "fullOnAmps",
-					json_object_new_int(cp->fullOnAmps));
-			json_object_object_add(controlPoint, "tempSensorAddress",
-					json_object_new_string(cp->tempSensorAddressPtr));
-			json_object_object_add(controlPoint, "targetTemp",
-					json_object_new_double(cp->targetTemp));
-			json_object_object_add(controlPoint, "hasDuty",
-					json_object_new_boolean(cp->hasDuty));
-			json_object_object_add(controlPoint, "automaticControl",
-					json_object_new_boolean(cp->automaticControl));
-			json_object_object_add(controlPoint, "on",
-					json_object_new_boolean(cp->dutyController.on));
+			json_object_object_add(controlPoint, "controlIo", json_object_new_int(cp->controlIo));
+			json_object_object_add(controlPoint, "duty", json_object_new_int(cp->duty));
+			json_object_object_add(controlPoint, "fullOnAmps", json_object_new_int(cp->fullOnAmps));
+			json_object_object_add(controlPoint, "tempSensorAddress", json_object_new_string(cp->tempSensorAddressPtr));
+			json_object_object_add(controlPoint, "targetTemp", json_object_new_double(cp->targetTemp));
+			json_object_object_add(controlPoint, "hasDuty", json_object_new_boolean(cp->hasDuty));
+			json_object_object_add(controlPoint, "automaticControl", json_object_new_boolean(cp->automaticControl));
+			json_object_object_add(controlPoint, "on", json_object_new_boolean(cp->dutyController.on));
 		}
 
 	}
@@ -681,12 +644,9 @@ void handleStatusRequest(Request * request, Response * response) {
 		sensor = json_object_new_object();
 		json_object_array_add(sensors, sensor);
 
-		json_object_object_add(sensor, "address",
-				json_object_new_string(ts->addressPtr));
-		json_object_object_add(sensor, "temperatureC",
-				json_object_new_double(ts->lastTemp));
-		json_object_object_add(sensor, "reading",
-				json_object_new_boolean(hasVaildTemp(ts)));
+		json_object_object_add(sensor, "address", json_object_new_string(ts->addressPtr));
+		json_object_object_add(sensor, "temperatureC", json_object_new_double(ts->lastTemp));
+		json_object_object_add(sensor, "reading", json_object_new_boolean(hasVaildTemp(ts)));
 
 		unlockSensor(ts);
 
@@ -747,15 +707,11 @@ int sendBuffer(int clntSocket, char *data, int length) {
 void sendHttpResponse(int clntSocket, Response *response) {
 	char * buffer = malloc(BUFFER_SIZE);
 
-	sprintf(buffer,
-			"%s %d %s\r\nContent-Length: %d\r\nContent-Type: %s\r\n\r\n",
-			response->method, response->statusCode, response->status,
-			response->contentLength, response->contentType);
+	sprintf(buffer, "%s %d %s\r\nContent-Length: %d\r\nContent-Type: %s\r\n\r\n", response->method, response->statusCode, response->status, response->contentLength, response->contentType);
 
 	int success = send(clntSocket, buffer, strlen(buffer),
 	MSG_NOSIGNAL | MSG_DONTWAIT);
-	if (success != 0 && response->contentp != NULL
-			&& response->contentLength > 0) {
+	if (success != 0 && response->contentp != NULL && response->contentLength > 0) {
 		sendBuffer(clntSocket, response->contentp, response->contentLength);
 	}
 
@@ -833,10 +789,8 @@ void * handleClientThread(void *ptr) {
 				}
 			} else {
 
-				if (strncmp("Content-Length: ", buffer,
-						strlen("Content-Length: ")) == 0) {
-					sscanf(buffer + strlen("Content-Length: "), "%d",
-							&request->contentLength);
+				if (strncmp("Content-Length: ", buffer, strlen("Content-Length: ")) == 0) {
+					sscanf(buffer + strlen("Content-Length: "), "%d", &request->contentLength);
 				}
 
 			}
@@ -877,8 +831,7 @@ void * handleClientThread(void *ptr) {
 							exit(1);
 						}
 
-						readSize = recv(clntSocket, request->contentp,
-								request->contentLength, MSG_WAITALL);
+						readSize = recv(clntSocket, request->contentp, request->contentLength, MSG_WAITALL);
 						request->contentp[readSize] = 0;
 
 						//ERR("Data: %s\n",request->contentp);
@@ -963,8 +916,7 @@ void * listenThread(void *ptr) {
 		return NULL;
 	}
 
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &setSockOp, sizeof(int))
-			== -1) {
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &setSockOp, sizeof(int)) == -1) {
 		perror("Setsockopt");
 		pthread_exit(NULL);
 		return NULL;
@@ -975,8 +927,7 @@ void * listenThread(void *ptr) {
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	bzero(&(server_addr.sin_zero), 8);
 
-	if (bind(sock, (struct sockaddr *) &server_addr, sizeof(struct sockaddr))
-			== -1) {
+	if (bind(sock, (struct sockaddr *) &server_addr, sizeof(struct sockaddr)) == -1) {
 		perror("Unable to bind");
 		pthread_exit(NULL);
 	}
@@ -994,8 +945,7 @@ void * listenThread(void *ptr) {
 
 		HandleClientParmas * params = malloc(sizeof(HandleClientParmas));
 
-		params->clntSocket = accept(sock, (struct sockaddr *) &client_addr,
-				&sin_size);
+		params->clntSocket = accept(sock, (struct sockaddr *) &client_addr, &sin_size);
 		DBG("Connection from (%s , %d)\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
 		pthread_create(&thread, NULL, handleClientThread, (void*) params);
