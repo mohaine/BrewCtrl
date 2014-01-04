@@ -30,7 +30,7 @@ LDFLAGS += $(shell pkg-config --libs json)
 
 all: $(SOURCES) $(BREWCTRL) $(LISTSENSORS)
 	
-$(BREWCTRL): $(OBJECTS)
+$(BREWCTRL): create-dir $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ 
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
@@ -38,5 +38,10 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 default: all
 	
+	
+create-dir:
+	test -d $(OBJDIR) || mkdir $(OBJDIR)
+
 clean: 
 	rm -f $(BREWCTRL) $(OBJDIR)/*.o	
+	! test -d $(OBJDIR) || rmdir $(OBJDIR)
