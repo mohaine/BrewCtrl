@@ -349,7 +349,7 @@ BrewCtrl.Views.Sensor = Backbone.View.extend({
 
 	// The DOM events specific to an item.
 	events : {
-		"change .name" : "updateName",
+		"blur .name" : "updateName",
 		"change .location" : "updateLocation",
 	},
 
@@ -358,7 +358,7 @@ BrewCtrl.Views.Sensor = Backbone.View.extend({
 	},
 	updateName : function() {
 		var self = this;
-		var newName = self.$el.find(".name").attr("value");
+		var newName = self.$el.find(".name").html();
 		if (newName != self.model.get("name")) {
 			self.model.set("name", newName)
 			BrewCtrl.main.uploadConfiguration(JSON.stringify(self.loadedCfg));
@@ -379,7 +379,7 @@ BrewCtrl.Views.Sensor = Backbone.View.extend({
 		var display = self.template(self.model.toJSON());
 		self.$el.html(display);
 
-		self.$el.find(".name").attr("value", self.model.get("name"));
+		self.$el.find(".name").html(self.model.get("name"));
 
 		var locationSelect = self.$el.find(".location")[0];
 		var locations = BrewCtrl.main.listSensorLocations();

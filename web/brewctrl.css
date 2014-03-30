@@ -1,3 +1,7 @@
+button {
+	cursor: pointer;
+}
+
 .statusLoading {
 	font-size: 40px;
 	font-weight: bold;
@@ -78,6 +82,7 @@
 .step .stepTime {
 	display: inline-block;
 	min-width: 5em;
+	cursor: pointer;
 }
 
 .step .stepDelete {

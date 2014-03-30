@@ -9,15 +9,13 @@
   <script src="js/backbone-min.js"></script> 
 
  <script type="text/template" id="steplist-template">
-    <div class="step ">    	
-    	<span class="name select"><b><%= name %></b></span>    	
-      </div>
-  </script>
+    	<button><b><%= name %></b></button>    	
+ </script>
   
   
  <script type="text/template" id="step-template">
-    <div class="step ">    	
-    	<span class="stepName select"><b><%= name %></b></span>    	
+    <div class="step select">    	
+    	<span class="stepName" contenteditable="true"><%= name %></span>    	
     	<span class="stepTime"><%= BrewCtrl.formatTime(stepTime) %></span>
     	<span class="stepDelete">&#x2297;</span>    
       </div>
@@ -45,7 +43,7 @@
 
  <script type="text/template" id="sensor-template">
     <div class="sensor <%= present ? "present":"notPresent" %> <%= reading ? "reading":"notReading" %>">    	            
-    	Name: <input type="text" class="name"/>  Location:  <select class="location"/>  Temp: <%= BrewCtrl.round(BrewCtrl.convertC2Display(temperatureC), 1).toFixed(1) + '\xB0'  %>    
+    	Name: <span contenteditable="true" class="name"/>  Location:  <select class="location"/>  Temp: <%= BrewCtrl.round(BrewCtrl.convertC2Display(temperatureC), 1).toFixed(1) + '\xB0'  %>    
     </div>
   </script>
 

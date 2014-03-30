@@ -8,13 +8,12 @@ BrewCtrl.Models.ControlPoint = Backbone.Model.extend({
 			duty : 0,
 			on : false,
 			targetTemp : 0,
-			tempSensorAddress: ""
+			tempSensorAddress : ""
 		};
 	},
 	setupFromControl : function(control) {
 		var self = this;
 
-		
 		self.set("controlName", control.get("name"));
 		self.set("controlIo", control.get("io"));
 		self.set("hasDuty", control.get("hasDuty"));
@@ -89,6 +88,7 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 
 	// The DOM events specific to an item.
 	events : {
+		"blur .stepName" : "updateName",
 		"click .stepDelete" : "deleteStep",
 		"click .stepTime" : "editTime",
 		"click .select" : "selectStep"
@@ -99,6 +99,18 @@ BrewCtrl.Views.Step = Backbone.View.extend({
 	},
 	selectStep : function(event) {
 		BrewCtrl.main.selectStep(this.model);
+	},
+	updateName : function(event) {
+		var step = this.model;
+		var self = this;
+		var newName = self.$el.find(".stepName").html();
+
+		if (newName != self.model.get("name")) {
+			console.log(self.model.get("name") + " -> " + newName)
+			self.model.set("name", newName)
+		}
+
+
 	},
 
 	editTime : function(event) {
