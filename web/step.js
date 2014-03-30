@@ -33,7 +33,6 @@ BrewCtrl.Models.Step = Backbone.Model.extend({
 	defaults : function() {
 		return {
 			name : "New Step",
-			time : 0,
 			controlPoints : []
 		};
 	},

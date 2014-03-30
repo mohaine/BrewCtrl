@@ -1,5 +1,5 @@
 var BrewCtrl = {
-	autoUpdateStatus : true,
+	autoUpdateStatus : false,
 	Models : {},
 	Collections : {},
 	Views : {},
@@ -349,58 +349,66 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 		});
 		return control;
 	},
+
+	initStep : function(step) {
+		var self = this;
+		step.set("id", BrewCtrl.alphaId());
+
+		if (step.get("stepTime") == null) {
+			if (step.get("time")) {
+				step.set("stepTime", BrewCtrl.parseTime(step.get("time")));
+			} else {
+				step.set("stepTime", 0);
+			}
+		}
+
+		var controlPoints = step.get("controlPoints");
+		controlPoints.each(function(controlPoint) {
+			var control = self.findControlByName(controlPoint.get("controlName"));
+			if (control != null) {
+
+				controlPoint.setupFromControl(control);
+
+				if (controlPoint.get("automaticControl") || controlPoint.get("targetName")) {
+					var target = self.findControlByName(controlPoint.get("targetName"));
+					if (target != null) {
+						controlPoint.set("automaticControl", true);
+						controlPoint.set("tempSensorAddress", target.get("sensorAddress"));
+					} else if (controlPoint.get("automaticControl")) {
+						apply = false;
+						BrewCtrl.alert("Failed to find target \"" + controlPoint.get("targetName") + "\"");
+					}
+				}
+			} else {
+				apply = false;
+				BrewCtrl.alert("Failed to find control \"" + controlPoint.get("controlName") + "\"");
+			}
+		});
+		// Add control points that are missing from step in as manual
+		var controls = self.listControls();
+		_.each(controls, function(control) {
+			var found = false;
+			controlPoints.each(function(controlPoint) {
+				if (controlPoint.get("controlIo") == control.get("io")) {
+					found = true;
+				}
+			});
+			if (!found) {
+				var manualCp = new BrewCtrl.Models.ControlPoint();
+				manualCp.setupFromControl(control);
+				controlPoints.add(manualCp);
+			}
+		});
+	},
 	startStepList : function(stepList) {
 		var self = this;
 		var steps = _.clone(stepList.get("steps"));
 
 		// Todo Resolve IOs if not set
 		var apply = true;
-		var controls = self.listControls();
 
 		steps.each(function(step) {
-			step.set("id", BrewCtrl.alphaId());
-
-			if (step.get("stepTime") == null) {
-				step.set("stepTime", BrewCtrl.parseTime(step.get("time")));
-			}
-
-			var controlPoints = step.get("controlPoints");
-			controlPoints.each(function(controlPoint) {
-				var control = self.findControlByName(controlPoint.get("controlName"));
-				if (control != null) {
-
-					controlPoint.setupFromControl(control);
-
-					if (controlPoint.get("automaticControl") || controlPoint.get("targetName")) {
-						var target = self.findControlByName(controlPoint.get("targetName"));
-						if (target != null) {
-							controlPoint.set("automaticControl", true);
-							controlPoint.set("tempSensorAddress", target.get("sensorAddress"));
-						} else if (controlPoint.get("automaticControl")) {
-							apply = false;
-							BrewCtrl.alert("Failed to find target \"" + controlPoint.get("targetName") + "\"");
-						}
-					}
-				} else {
-					apply = false;
-					BrewCtrl.alert("Failed to find control \"" + controlPoint.get("controlName") + "\"");
-				}
-			});
-			// Add control points that are missing from step in as manual
-			_.each(controls, function(control) {
-				var found = false;
-				controlPoints.each(function(controlPoint) {
-					if (controlPoint.get("controlIo") == control.get("io")) {
-						found = true;
-					}
-				});
-				if (!found) {
-					var manualCp = new BrewCtrl.Models.ControlPoint();
-					manualCp.setupFromControl(control);
-					controlPoints.add(manualCp);
-				}
-			});
-
+			self.initStep(step);
 		});
 		if (apply) {
 			// console.log(JSON.stringify(steps));
@@ -465,6 +473,17 @@ BrewCtrl.Models.Main = Backbone.Model.extend({
 				newStepList.push(step.toJSON());
 			}
 		});
+		this.applySteps(newStepList);
+	},
+	addStep : function() {
+		var self = this;
+		var newStepList = [];
+		this.get("steps").each(function(step) {
+			newStepList.push(step.toJSON());
+		});
+		var step = new BrewCtrl.Models.Step();
+		self.initStep(step);
+		newStepList.push(step.toJSON());
 		this.applySteps(newStepList);
 	},
 	applySteps : function(steps) {
@@ -551,11 +570,7 @@ BrewCtrl.Views.Mode = Backbone.View.extend({
 });
 
 BrewCtrl.Views.Main = Backbone.View.extend({
-	el : $("#brewctrl-main"),
-	events : {
-		"click #toggle-all" : "toggleAllComplete"
-
-	},
+	events : {},
 
 	initialize : function() {
 		var self = this;
@@ -569,10 +584,6 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 			self.renderMode()
 		});
 	},
-
-	toggleAllComplete : function() {
-	},
-
 	renderSteps : function() {
 		$("#brewctrl-steps").empty();
 		this.options.main.get("steps").each(function(step) {
@@ -597,6 +608,13 @@ BrewCtrl.Views.Main = Backbone.View.extend({
 	render : function() {
 		var config = this.options.main.get("config");
 		var brewLayout = config.get("brewLayout");
+
+		var self = this;
+
+		$("#brewctrl-add-step").on("click", function() {
+			console.log()
+			self.options.main.addStep();
+		});
 
 		$("#brewctrl-tanks").empty();
 		brewLayout.get("tanks").each(function(tank) {

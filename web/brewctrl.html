@@ -36,8 +36,7 @@
     <div id="fileSize"></div>
     <div id="fileType"></div>
     <div class="row">
-      <input type="button" value="Upload" id="uploadConfiguration"/>
-    </div>
+      <button  type="button" id="uploadConfiguration" >Upload</button>    </div>
     <div id="progressNumber"></div>
   </form>
     
@@ -45,9 +44,7 @@
   </script>
 
  <script type="text/template" id="sensor-template">
-    <div class="sensor <%= present ? "present":"notPresent" %> <%= reading ? "reading":"notReading" %>">    	   
-    
-     
+    <div class="sensor <%= present ? "present":"notPresent" %> <%= reading ? "reading":"notReading" %>">    	            
     	Name: <input type="text" class="name"/>  Location:  <select class="location"/>  Temp: <%= BrewCtrl.round(BrewCtrl.convertC2Display(temperatureC), 1).toFixed(1) + '\xB0'  %>    
     </div>
   </script>
@@ -154,7 +151,7 @@ if(quickClickValues){
 
 
 
-
+<div id="brewctrl-main">
 <div id="brewctrl-mode"></div>
 <div id="brewctrl-tanks"></div>
 <div id="brewctrl-pumps"></div>
@@ -162,10 +159,9 @@ if(quickClickValues){
 
 
 <div id="brewctrl-steps"></div>
+<button id="brewctrl-add-step">Add New Step</button>
 
 <br />
-
-
 <label> Step Lists </label>
 <div id="brewctrl-steplists"></div>
 
@@ -173,14 +169,7 @@ if(quickClickValues){
 <div id="brewctrl-config-upload"></div>
 <div id="brewctrl-sensors"></div>
 
-
-
-
-
-
-
-
-
+</div>
 
 </body>
 </html>
