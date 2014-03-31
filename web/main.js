@@ -1,5 +1,5 @@
 var BrewCtrl = {
-	autoUpdateStatus : false,
+	autoUpdateStatus : true,
 	Models : {},
 	Collections : {},
 	Views : {},
