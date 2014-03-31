@@ -50,6 +50,7 @@ ControlStep * getControlStep(int index) {
 
 void setupControl() {
 	control.mode = MODE_OFF;
+	strcpy(control.listName, "New List");
 }
 
 Control* getControl() {

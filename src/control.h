@@ -26,6 +26,7 @@
 #define MAX_CP_COUNT 8
 #define MAX_STEP_COUNT 20
 #define STEP_FIELD_LENGTH 100
+#define MAX_LIST_NAME 200
 
 #define MODE_OFF 0
 #define MODE_ON 1
@@ -34,6 +35,7 @@
 
 typedef struct {
 	int mode;
+	char listName[MAX_LIST_NAME];
 } Control;
 
 typedef struct {

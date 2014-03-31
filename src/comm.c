@@ -208,16 +208,14 @@ void handleVersionRequest(Request * request, Response * response) {
 
 int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 	int paramSize = -1;
-	int nameLenght = strlen(name);
+	int nameLength = strlen(name);
 
 	int index = 0;
-
-	while (index + nameLenght < paramDataLength) {
-
-		if (paramData[index + nameLenght] == '=' && strncmp(name, paramData + index, nameLenght) == 0) {
-			index = index + nameLenght + 1;
+	while (index + nameLength < paramDataLength) {
+		if (paramData[index + nameLength] == '=' && strncmp(name, paramData + index, nameLength) == 0) {
+			index = index + nameLength + 1;
 			int length = 0;
-			while (index < paramDataLength && paramData[index] != '\r' && paramData[index] != '\n') {
+			while (index < paramDataLength && paramData[index] != '&' && paramData[index] != '\r' && paramData[index] != '\n') {
 				if (paramData[index] == '%' && index < paramDataLength - 2) {
 					index++;
 					unsigned int data;
@@ -234,23 +232,17 @@ int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
 				index++;
 			}
 			dest[length] = 0;
-
 			return length;
 
 		} else {
-// Find the EOL
-			while (index < paramDataLength && paramData[index] != '\r' && paramData[index] != '\n') {
+			while (index < paramDataLength && paramData[index] != '&' && paramData[index] != '\r' && paramData[index] != '\n') {
 				index++;
 			}
-// Go past the EOL
-			while (index < paramDataLength && (paramData[index] == '\r' || paramData[index] == '\n')) {
-				index++;
-			}
+			index++;
 		}
 
 	}
-
-	return paramSize;
+	return -1;
 }
 
 void handleConfigRequest(Request * request, Response * response) {
@@ -455,9 +447,7 @@ void handleStatusRequest(Request * request, Response * response) {
 	char tmp[BUFFER_SIZE];
 
 	if (request->contentLength > 0) {
-
 		bool valid = true;
-
 		int paramSize = readParam("mode", request->contentp, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
 			DBG("handleStatusRequest: mode\n");
@@ -475,8 +465,18 @@ void handleStatusRequest(Request * request, Response * response) {
 				valid = false;
 			}
 		}
-		paramSize = readParam("steps", request->contentp, request->contentLength, tmp);
+		paramSize = readParam("listName", request->contentp, request->contentLength, tmp);
+		if (valid && paramSize > 0) {
+			DBG("handleStatusRequest: listName\n");
 
+			if (paramSize > MAX_LIST_NAME - 1) {
+				paramSize = MAX_LIST_NAME - 1;
+				tmp[MAX_LIST_NAME] = 0;
+			}
+			strcpy(getControl()->listName, tmp);
+
+		}
+		paramSize = readParam("steps", request->contentp, request->contentLength, tmp);
 		if (valid && paramSize > 0) {
 
 			DBG("handleStatusRequest: steps\n");
@@ -587,6 +587,8 @@ void handleStatusRequest(Request * request, Response * response) {
 	if (config != NULL && config->version != NULL) {
 		json_object_object_add(status, "configurationVersion", json_object_new_string(config->version));
 	}
+
+	json_object_object_add(status, "listName", json_object_new_string(getControl()->listName));
 
 	if (getControl()->mode == MODE_OFF) {
 		json_object_object_add(status, "mode", json_object_new_string("OFF"));
