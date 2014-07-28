@@ -27,8 +27,8 @@ BREWCTRL=brewctrl
 CFLAGS += -O2
 LDFLAGS += -O2
 
-CFLAGS += $(shell pkg-config --cflags json)
-LDFLAGS += $(shell pkg-config --libs json)
+CFLAGS += $(shell pkg-config --cflags json-c)
+LDFLAGS += $(shell pkg-config --libs json-c)
 
 all: $(SOURCES) $(BREWCTRL) $(LISTSENSORS)
 	

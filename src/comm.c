@@ -308,7 +308,8 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	DBG("Parse Step\n");
 
 	bool valid = true;
-	json_object * value = json_object_object_get(step, "id");
+	json_object * value;
+	json_object_object_get_ex(step, "id", &value);
 	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 		sprintf(cs->id, "%s", json_object_get_string(value));
 	} else {
@@ -318,7 +319,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 		valid = false;
 	}
 
-	value = json_object_object_get(step, "name");
+	json_object_object_get_ex(step, "name", &value);
 	if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 		sprintf(cs->name, "%s", json_object_get_string(value));
 	} else {
@@ -326,7 +327,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 		valid = false;
 	}
 
-	value = json_object_object_get(step, "stepTime");
+	json_object_object_get_ex(step, "stepTime", &value);
 	if (valid && value != NULL && json_object_get_type(value) == json_type_int) {
 		cs->stepTime = json_object_get_int(value);
 	} else {
@@ -334,7 +335,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 		valid = false;
 	}
 
-	value = json_object_object_get(step, "active");
+	json_object_object_get_ex(step, "active", &value);
 	if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
 		cs->active = json_object_get_boolean(value);
 	} else {
@@ -358,11 +359,11 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 				json_object *controlPoint = json_object_array_get_idx(controlPoints, cpI);
 				ControlPoint *cp = &cs->controlPoints[cpI];
 
-				value = json_object_object_get(controlPoint, "controlIo");
+				json_object_object_get_ex(controlPoint, "controlIo", &value);
 				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->controlIo = json_object_get_int(value);
 				} else {
-					value = json_object_object_get(controlPoint, "controlPin");
+					json_object_object_get_ex(controlPoint, "controlPin", &value);
 					if (value != NULL && json_object_get_type(value) == json_type_int) {
 						cp->controlIo = json_object_get_int(value);
 					} else {
@@ -372,7 +373,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					}
 				}
 
-				value = json_object_object_get(controlPoint, "duty");
+				json_object_object_get_ex(controlPoint, "duty", &value);
 				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->duty = json_object_get_int(value);
 				} else {
@@ -381,7 +382,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				value = json_object_object_get(controlPoint, "fullOnAmps");
+				json_object_object_get_ex(controlPoint, "fullOnAmps", &value);
 				if (value != NULL && json_object_get_type(value) == json_type_int) {
 					cp->fullOnAmps = json_object_get_int(value);
 				} else {
@@ -390,7 +391,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				value = json_object_object_get(controlPoint, "tempSensorAddress");
+				json_object_object_get_ex(controlPoint, "tempSensorAddress", &value);
 				if (value != NULL && json_object_get_type(value) == json_type_string) {
 					sprintf(cp->tempSensorAddressPtr, "%s", json_object_get_string(value));
 				} else {
@@ -399,7 +400,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				value = json_object_object_get(controlPoint, "targetTemp");
+				json_object_object_get_ex(controlPoint, "targetTemp", &value);
 				if (value != NULL && json_object_get_type(value) == json_type_double) {
 					cp->targetTemp = json_object_get_double(value);
 				} else if (value != NULL && json_object_get_type(value) == json_type_int) {
@@ -410,7 +411,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				value = json_object_object_get(controlPoint, "hasDuty");
+				json_object_object_get_ex(controlPoint, "hasDuty", &value);
 				if (value != NULL && json_object_get_type(value) == json_type_boolean) {
 					cp->hasDuty = json_object_get_boolean(value);
 				} else {
@@ -419,7 +420,7 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 					break;
 				}
 
-				value = json_object_object_get(controlPoint, "automaticControl");
+				json_object_object_get_ex(controlPoint, "automaticControl", &value);
 				if (value != NULL && json_object_get_type(value) == json_type_boolean) {
 					bool oldAuto = cp->automaticControl;
 					cp->automaticControl = json_object_get_boolean(value);
@@ -536,7 +537,8 @@ void handleStatusRequest(Request * request, Response * response) {
 				for (int i = 0; valid && i < stepCount; i++) {
 					json_object *step = json_object_array_get_idx(steps, i);
 
-					json_object * value = json_object_object_get(step, "id");
+					json_object * value;
+					json_object_object_get_ex(step, "id", &value);
 
 					if (value != NULL) {
 						for (int j = 0; valid && j < getControlStepCount(); j++) {

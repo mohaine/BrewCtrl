@@ -277,7 +277,7 @@ void updateStepTimer() {
 						if (newStepTime <= 0) {
 							stepCount--;
 							if (stepCount == 0) {
-								turnOff();
+								addManualStep();
 							} else {
 								for (int i = 0; i < stepCount; i++) {
 									memcpy(&controlSteps[i], &controlSteps[i + 1], sizeof(ControlStep));
