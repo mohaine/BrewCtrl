@@ -18,44 +18,43 @@
  */
 
 #include "brewctrl.h"
-#include "logger.h"
 
-#include <sys/time.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
+#include <sys/time.h>
+#include <time.h>
 
-struct timeval startTime;
+#include "logger.h"
+
 void initBrewCtrl() {
-    gettimeofday(&startTime, NULL);
+
 }
+
 long millis() {
-    struct timeval time;
+	struct timespec time;
+	clock_gettime(CLOCK_MONOTONIC, &time);
 
-    gettimeofday(&time, NULL);
-
-    long mills = (time.tv_sec - startTime.tv_sec) * 1000;
-    mills += (time.tv_usec - startTime.tv_usec ) / 1000;
-
-    return mills;
+	long millisFromSec = (time.tv_sec) * 1000;
+	long millisFromUsec = (time.tv_nsec) / 1000000;
+	return millisFromSec + millisFromUsec;
 }
 
 char * generateRandomId() {
-    char * data = malloc(17);
+	char * data = malloc(17);
 
-    if (data == NULL) {
-        ERR("generateRandomId Malloc Failed\n");
-        exit(-1);
-    }
+	if (data == NULL) {
+		ERR("generateRandomId Malloc Failed\n");
+		exit(-1);
+	}
 
-    for (int i = 0; i < 16; i++) {
-        double x = ((double) rand() / (double) RAND_MAX);
+	for (int i = 0; i < 16; i++) {
+		double x = ((double) rand() / (double) RAND_MAX);
 
-        data[i] = ((char) (0x41 + floor(x * 26.0)));
-    }
-    data[16] = 0;
-    return data;
+		data[i] = ((char) (0x41 + floor(x * 26.0)));
+	}
+	data[16] = 0;
+	return data;
 }
 
 char* mallocStringFromString(char *str) {
