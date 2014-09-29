@@ -7,7 +7,7 @@ OBJDIR=obj
 CFGFILE = BrewControllerConfig.json
 
 CFLAGS=-c -Wall -std=c99 -D_GNU_SOURCE $(CFLAGSD)  -lpthread
-LDFLAGS=-lpthread -lm 
+LDFLAGS=-lpthread -lm -lrt 
 SOURCES= $(wildcard $(SRCDIR)/*.c) 
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
