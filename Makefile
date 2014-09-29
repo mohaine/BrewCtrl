@@ -7,9 +7,10 @@ OBJDIR=obj
 CFGFILE = BrewControllerConfig.json
 
 CFLAGS=-c -Wall -std=c99 -D_GNU_SOURCE $(CFLAGSD)  -lpthread
-LDFLAGS=-lpthread -lm -lrt 
+LDFLAGS=-lpthread -lm 
+LDADD=-lrt 
 SOURCES= $(wildcard $(SRCDIR)/*.c) 
-OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 
 BREWCTRL=brewctrl
@@ -33,7 +34,7 @@ LDFLAGS += $(shell pkg-config --libs json-c)
 all: $(SOURCES) $(BREWCTRL) $(LISTSENSORS)
 	
 $(BREWCTRL): create-dir $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ 
+	$(CC) $(LDFLAGS) $(OBJECTS)  $(LDADD) -o $@ 
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@   
