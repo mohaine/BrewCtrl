@@ -1,0 +1,34 @@
+# Install requirements
+
+apt-get install git gcc make pkg-config systemd-sysv libjson0 libjson0-dbg libjson0-dev
+
+# Check out code
+
+cd /opt/
+git clone https://github.com/mohaine/BrewCtrl.git
+d /opt/BrewCtrl/
+
+# Compile
+PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
+make brewctrl
+
+# Load 1-Wire modules
+modprobe w1-therm
+
+  ## Systemctl would not work until I added the .service suffix to BrewCtrl
+
+# Make sure everything starts on boot
+echo w1-gpio > /etc/modules-load.d/brewctrl.conf
+echo w1-therm >> /etc/modules-load.d/brewctrl.conf
+cp BrewCtrl.service /etc/systemd/system/
+systemctl enable BrewCtrl.service
+
+
+# Update install
+cd /opt/BrewCtrl/
+git pull
+PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
+make clean brewctrl
+systemctl restart BrewCtrl.service
+
+
