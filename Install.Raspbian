@@ -1,12 +1,18 @@
 # Install requirements
 
-apt-get install git gcc make pkg-config systemd-sysv libjson0 libjson0-dbg libjson0-dev
+sudo apt-get install git gcc make pkg-config systemd-sysv libjson0 libjson0-dbg libjson0-dev systemd-sysv 
+
+sudo shutdown -r now
 
 # Check out code
 
+
+cd /usr/lib/arm-linux-gnueabihf/pkgconfig 
+sudo ln -s json-c.pc json.pc
+
 cd /opt/
 git clone https://github.com/mohaine/BrewCtrl.git
-d /opt/BrewCtrl/
+cd /opt/BrewCtrl/
 
 # Compile
 PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
