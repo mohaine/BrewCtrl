@@ -25,6 +25,7 @@
 #include <string.h>
 #include <linux/limits.h>
 #include <limits.h>
+#include <unistd.h>
 
 #define GPIO_ROOT SYS_PATH"/class/gpio"
 
@@ -58,14 +59,14 @@ void ioMode(int io, bool inout) {
 
 void digitalWrite(int io, bool hilow) {
 
-	if (hilow) {
-		//DBG("   %d -> ON\n", io);
-	} else {
-		//DBG("   %d -> OFF\n", io);
-	}
+//	if (hilow) {
+//		DBG("   %d -> ON\n", io);
+//	} else {
+//		DBG("   %d -> OFF\n", io);
+//	}
 
 #ifdef MOCK
-//	printf("Pin %d set to %s\n", io, hilow ? "On" : "Off");
+	printf("Pin %d set to %s\n", io, hilow ? "On" : "Off");
 #else
 	char tmp[10];
 	char path[PATH_MAX];
@@ -80,6 +81,27 @@ void digitalWrite(int io, bool hilow) {
 	}
 #endif
 
+}
+
+void testOutputs() {
+	int gpios[] = { 2, 3, 4, 14, 15, 17, 18, 27, 22, 23, 24, 10, 9, 25, 11, 8, 7 };
+	int i;
+	int numberOfPins = sizeof(gpios) / sizeof(gpios[0]);
+	for (i = 0; i < numberOfPins; i++) {
+		ioMode(gpios[i], OUTPUT);
+	}
+
+	DBG("INIT\n");
+	while (true) {
+		for (i = 0; i < numberOfPins; i++) {
+			digitalWrite(gpios[i], LOW);
+		}
+		sleep(1);
+		for (i = 0; i < numberOfPins; i++) {
+			digitalWrite(gpios[i], HIGH);
+		}
+		sleep(1);
+	}
 }
 
 void setupDutyController(DutyController * hs, int io) {
@@ -172,10 +194,10 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 				newHeatPinState = true;
 			}
 			/*
-			if (hs->controlIo == 10) {
-				DBG("     On: %s OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n",(newHeatPinState?"ON " : "OFF"), timeOn , timeOff , totalTime , percentOn * 100);
-			}
-			*/
+			 if (hs->controlIo == 10) {
+			 DBG("     On: %s OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n",(newHeatPinState?"ON " : "OFF"), timeOn , timeOff , totalTime , percentOn * 100);
+			 }
+			 */
 
 		}
 	} else {

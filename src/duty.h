@@ -38,6 +38,7 @@ typedef struct
 } 
 DutyController;
 
+void testOutputs();
 
 void setHeatOn(DutyController * hs, bool newState);
 void updateOfOverAmps(DutyController * hs);

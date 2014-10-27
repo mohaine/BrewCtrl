@@ -55,13 +55,14 @@ int main(int argc, char **argv) {
 
 	int showHelp = 0;
 	int onlyListSensors = 0;
+	int onlyTestOutput = 0;
 	int startServer = 1;
 	int port = DEFAULT_PORT;
 
 	int c;
 	opterr = 0;
 
-	while ((c = getopt(argc, argv, "hlp:")) != -1)
+	while ((c = getopt(argc, argv, "hlop:")) != -1)
 		switch (c) {
 		case 'h':
 			showHelp = 1;
@@ -69,6 +70,10 @@ int main(int argc, char **argv) {
 			break;
 		case 'l':
 			onlyListSensors = 1;
+			startServer = 0;
+			break;
+		case 'o':
+			onlyTestOutput = 1;
 			startServer = 0;
 			break;
 		case 'p':
@@ -102,9 +107,9 @@ int main(int argc, char **argv) {
 		searchForTempSensors();
 		readSensors();
 		listSensors();
-	}
-
-	if (startServer) {
+	} else if (onlyTestOutput) {
+		testOutputs();
+	} else if (startServer) {
 		initBrewCtrl();
 		initLogFile();
 		initConfiguration();
