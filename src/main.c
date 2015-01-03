@@ -103,6 +103,7 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "         -p <PORT> Listen on Port\n");
 	}
 
+
 	if (onlyListSensors) {
 		searchForTempSensors();
 		readSensors();
@@ -113,8 +114,10 @@ int main(int argc, char **argv) {
 		initBrewCtrl();
 		initLogFile();
 		initConfiguration();
+		initHardware();
+
 		startComm(port);
-		printf("Start Loop\n");
+		DBG("Start Loop\n");
 		loop();
 		closeLogFile();
 	}

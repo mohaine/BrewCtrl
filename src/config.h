@@ -38,7 +38,9 @@ typedef struct {
 
 typedef struct {
 	char* name;
-	int io;bool hasDuty;
+	int io;
+	bool hasDuty;
+	bool invertIo;
 	int fullOnAmps;
 } HeatElement;
 
@@ -49,7 +51,9 @@ typedef struct {
 } Tank;
 typedef struct {
 	char* name;
-	int io;bool hasDuty;
+	int io;
+	bool hasDuty;
+	bool invertIo;
 } Pump;
 
 typedef struct {

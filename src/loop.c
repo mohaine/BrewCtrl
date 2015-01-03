@@ -1,5 +1,5 @@
 /*
- Copyright 2009-2013 Michael Graessle
+ Copyright 2009-2015 Michael Graessle
 
 
  This program is free software: you can redistribute it and/or modify

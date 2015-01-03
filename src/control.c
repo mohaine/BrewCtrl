@@ -1,5 +1,5 @@
 /*
- Copyright 2009-2013 Michael Graessle
+ Copyright 2009-2015 Michael Graessle
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ void selectReadingSensors() {
 		}
 	}
 
-// Update Tank selected Sensors
+    // Update Tank selected Sensors
 	if (cfg != NULL && cfg->sensors.data != NULL && cfg->sensors.count > 0) {
 		BreweryLayout * bl = cfg->brewLayout;
 		if (bl != NULL && bl->tanks.data != NULL) {
@@ -379,9 +379,7 @@ void updatePinsForSetDuty() {
 			for (int cpIndex = 0; cpIndex < controlPointCount; cpIndex++) {
 				ControlPoint *cp = &step->controlPoints[cpIndex];
 				setupControlPoint(cp);
-
 				int duty = cp->duty;
-
 				int maxAmps = 0;
 
 				Configuration* configuration = getConfiguration();
@@ -390,11 +388,11 @@ void updatePinsForSetDuty() {
 				}
 
 				if (currentAmps + cp->fullOnAmps > maxAmps) {
-					updateOfOverAmps(&cp->dutyController);
+					updateForOverAmps(&cp->dutyController);
 				} else if (cp->hasDuty) {
 					//DBG("  Pin: %d Duty: %d\n",cp->controlIo, cp->duty);
 					setHeatDuty(&cp->dutyController, duty);
-					updateHeatForStateAndDuty(&cp->dutyController);
+					updateIoForStateAndDuty(&cp->dutyController);
 				} else {
 					updateForPinState(&cp->dutyController, duty > 0);
 				}
@@ -475,7 +473,6 @@ void turnHeatOff() {
 				}
 			}
 		}
-
 	}
 	unlockSteps();
 

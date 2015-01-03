@@ -1,5 +1,5 @@
 /*
- Copyright 2009-2013 Michael Graessle
+ Copyright 2009-2015 Michael Graessle
 
 
  This program is free software: you can redistribute it and/or modify
@@ -26,12 +26,23 @@
 #include <linux/limits.h>
 #include <limits.h>
 #include <unistd.h>
-
 #define GPIO_ROOT SYS_PATH"/class/gpio"
+#define max(a,b) (a>b?a:b)
+#define MAX_GPIO 40
+
+bool INVERT_GPIO[MAX_GPIO];
+bool HAS_CONTROLLED_GPIO[MAX_GPIO];
+
+void invertGpio(int io, bool invert) {
+	if (io < MAX_GPIO) {
+		HAS_CONTROLLED_GPIO[io] = true;
+		INVERT_GPIO[io] = invert;
+	}
+}
 
 void ioMode(int io, bool inout) {
 #ifdef MOCK
-	printf("          Pin %d In/Out to %s\n", io, inout ? "In" : "Out");
+	DBG("          Pin %d In/Out to %s\n", io, inout ? "In" : "Out");
 #else
 	char tmp[10];
 	char path[PATH_MAX];
@@ -57,16 +68,14 @@ void ioMode(int io, bool inout) {
 #endif
 }
 
-void digitalWrite(int io, bool hilow) {
+void turnIoTo(int io, bool hilow) {
 
-//	if (hilow) {
-//		DBG("   %d -> ON\n", io);
-//	} else {
-//		DBG("   %d -> OFF\n", io);
-//	}
+	if (INVERT_GPIO[io]) {
+		hilow = !hilow;
+	}
 
 #ifdef MOCK
-	printf("Pin %d set to %s\n", io, hilow ? "On" : "Off");
+	DBG("Pin %d set to %s\n", io, hilow ? "On" : "Off");
 #else
 	char tmp[10];
 	char path[PATH_MAX];
@@ -83,22 +92,30 @@ void digitalWrite(int io, bool hilow) {
 
 }
 
-void testOutputs() {
-	int gpios[] = { 2, 3, 4, 14, 15, 17, 18, 27, 22, 23, 24, 10, 9, 25, 11, 8, 7 };
-	int i;
-	int numberOfPins = sizeof(gpios) / sizeof(gpios[0]);
-	for (i = 0; i < numberOfPins; i++) {
-		ioMode(gpios[i], OUTPUT);
+void turnOffSeenControls() {
+	for (int i = 0; i < sizeof(HAS_CONTROLLED_GPIO); i++) {
+		if (HAS_CONTROLLED_GPIO[i]) {
+			turnIoTo(i, LOW);
+		}
 	}
+}
 
-	DBG("INIT\n");
+void testOutputs() {
+
+	int ALL_GPIOS[] = { 2, 3, 4, 14, 15, 17, 18, 27, 22, 23, 24, 10, 9, 25, 11, 8, 7 };
+	int NUMBER_OF_GPIOS = sizeof(ALL_GPIOS) / sizeof(ALL_GPIOS[0]);
+
+	int i;
+	for (i = 0; i < NUMBER_OF_GPIOS; i++) {
+		ioMode(ALL_GPIOS[i], OUTPUT);
+	}
 	while (true) {
-		for (i = 0; i < numberOfPins; i++) {
-			digitalWrite(gpios[i], LOW);
+		for (i = 0; i < NUMBER_OF_GPIOS; i++) {
+			turnIoTo(ALL_GPIOS[i], LOW);
 		}
 		sleep(1);
-		for (i = 0; i < numberOfPins; i++) {
-			digitalWrite(gpios[i], HIGH);
+		for (i = 0; i < NUMBER_OF_GPIOS; i++) {
+			turnIoTo(ALL_GPIOS[i], HIGH);
 		}
 		sleep(1);
 	}
@@ -106,9 +123,9 @@ void testOutputs() {
 
 void setupDutyController(DutyController * hs, int io) {
 	DBG("setupDutyController %d\n",io);
-
+	HAS_CONTROLLED_GPIO[io] = true;
 	ioMode(io, OUTPUT);
-	digitalWrite(io, LOW);
+	turnIoTo(io, LOW);
 	hs->controlIo = io;
 	hs->lastUpdateOnOffTimes = millis();
 	hs->dutyTimeOn = 0;
@@ -129,7 +146,7 @@ void updateForPinState(DutyController * hs, bool newHeatPinState) {
 	unsigned long now = millis();
 	unsigned long timeSinceLast = now - hs->lastUpdateOnOffTimes;
 	if (timeSinceLast > 30000) {
-		// Over 30 seconds since last change. Dump silly values
+// Over 30 seconds since last change. Dump silly values
 		hs->dutyTimeOn = 0;
 		hs->dutyTimeOff = 0;
 		timeSinceLast = 0;
@@ -146,7 +163,7 @@ void updateForPinState(DutyController * hs, bool newHeatPinState) {
 	newHeatPinState = newHeatPinState & hs->on;
 	if (newHeatPinState != hs->ioState) {
 		hs->ioState = newHeatPinState;
-		digitalWrite(hs->controlIo, hs->ioState ? HIGH : LOW);
+		turnIoTo(hs->controlIo, hs->ioState ? HIGH : LOW);
 	}
 }
 
@@ -161,17 +178,17 @@ void setHeatOn(DutyController * hs, bool newState) {
 	}
 }
 
-void updateOfOverAmps(DutyController * hs) {
+void updateForOverAmps(DutyController * hs) {
 	updateForPinState(hs, false);
 }
 
-void updateHeatForStateAndDuty(DutyController * hs) {
-	bool newHeatPinState = false;
+void updateIoForStateAndDuty(DutyController * hs) {
+	bool newPinState = false;
 	if (hs->on) {
 		if (hs->duty == 100) {
-			newHeatPinState = true;
+			newPinState = true;
 		} else if (hs->duty == 0) {
-			newHeatPinState = false;
+			newPinState = false;
 		} else {
 
 			unsigned long timeSinceLast = millis() - hs->lastUpdateOnOffTimes;
@@ -189,9 +206,9 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 			int percentOnTest = (int) (percentOn * 1000);
 
 			if (percentOnTest >= hs->duty * 10) {
-				newHeatPinState = false;
+				newPinState = false;
 			} else {
-				newHeatPinState = true;
+				newPinState = true;
 			}
 			/*
 			 if (hs->controlIo == 10) {
@@ -201,23 +218,23 @@ void updateHeatForStateAndDuty(DutyController * hs) {
 
 		}
 	} else {
-		newHeatPinState = false;
+		newPinState = false;
 	}
 
-	updateForPinState(hs, newHeatPinState);
+	updateForPinState(hs, newPinState);
 
 }
 
 void setHeatDuty(DutyController * hs, int duty) {
-
 	if (duty < 0) {
 		duty = 0;
 	}
-
 	if (duty != hs->duty) {
 		hs->duty = duty;
 		resetDutyState(hs);
 	}
-
+}
+void initHardware() {
+	turnOffSeenControls();
 }
 

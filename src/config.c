@@ -19,6 +19,7 @@
 #include "sensor.h"
 #include "config.h"
 #include "logger.h"
+#include "duty.h"
 
 #include <sys/stat.h>
 #include <sys/socket.h>
@@ -74,6 +75,7 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 
 			json_object_object_add(heater, "name", json_object_new_string(t->heater->name));
 			json_object_object_add(heater, "io", json_object_new_int(t->heater->io));
+			json_object_object_add(heater, "invertIo", json_object_new_boolean(t->heater->invertIo));
 			json_object_object_add(heater, "hasDuty", json_object_new_boolean(t->heater->hasDuty));
 			json_object_object_add(heater, "fullOnAmps", json_object_new_int(t->heater->fullOnAmps));
 
@@ -89,6 +91,7 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 		Pump * t = &pA[i];
 		json_object_object_add(pump, "name", json_object_new_string(t->name));
 		json_object_object_add(pump, "io", json_object_new_int(t->io));
+		json_object_object_add(pump, "invertIo", json_object_new_boolean(t->invertIo));
 		json_object_object_add(pump, "hasDuty", json_object_new_boolean(t->hasDuty));
 
 	}
@@ -215,6 +218,12 @@ HeatElement * parseHeatElement(json_object *layout) {
 			} else {
 				valid = false;
 			}
+		}
+		json_object_object_get_ex(layout, "invertIo", &value);
+		if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
+			s->invertIo = json_object_get_boolean(value);
+		} else {
+			s->invertIo = false;
 		}
 		json_object_object_get_ex(layout, "hasDuty", &value);
 		if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
@@ -520,6 +529,14 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 								break;
 							}
 						}
+
+						json_object_object_get_ex(pump, "invertIo", &value);
+						if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
+							s->invertIo = json_object_get_boolean(value);
+						} else {
+							s->invertIo = false;
+						}
+
 						json_object_object_get_ex(pump, "hasDuty", &value);
 						if (valid && value != NULL && json_object_get_type(value) == json_type_boolean) {
 							s->hasDuty = json_object_get_boolean(value);
@@ -833,7 +850,31 @@ void setConfiguration(Configuration * newConfig) {
 		config = NULL;
 	}
 	config = newConfig;
+
+	// Update invert for each gpio
+	if (config != NULL) {
+		BreweryLayout * bl = config->brewLayout;
+		if (bl != NULL && bl->tanks.data != NULL) {
+			Tank * tA = (Tank *) bl->tanks.data;
+			for (int tankIndex = 0; tankIndex < bl->tanks.count; tankIndex++) {
+				Tank * t = &tA[tankIndex];
+				if (t->heater != NULL) {
+					invertGpio(t->heater->io, t->heater->invertIo);
+				}
+			}
+		}
+		// Turn pumps on if manual.  Off otherwise
+		if (bl != NULL && bl->pumps.data != NULL) {
+			Pump * pA = (Pump *) bl->pumps.data;
+			for (int pumpIndex = 0; pumpIndex < bl->pumps.count; pumpIndex++) {
+				Pump * p = &pA[pumpIndex];
+				invertGpio(p->io, p->invertIo);
+			}
+
+		}
+	}
 }
+
 Configuration * getConfiguration() {
 	return config;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright 2009-2013 Michael Graessle
+    Copyright 2009-2015 Michael Graessle
  
  
  This program is free software: you can redistribute it and/or modify
@@ -39,10 +39,13 @@ typedef struct
 DutyController;
 
 void testOutputs();
+void initHardware();
+void turnOffSeenControls();
+void invertGpio(int io, bool invert);
 
 void setHeatOn(DutyController * hs, bool newState);
-void updateOfOverAmps(DutyController * hs);
-void updateHeatForStateAndDuty(DutyController * hs);
+void updateForOverAmps(DutyController * hs);
+void updateIoForStateAndDuty(DutyController * hs);
 void updateForPinState(DutyController * hs, bool newHeatPinState);
 void setHeatDuty(DutyController * hs, int duty);
 void resetDutyState(DutyController * hs);
