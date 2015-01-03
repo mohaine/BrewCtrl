@@ -207,7 +207,6 @@ void handleVersionRequest(Request * request, Response * response) {
 }
 
 int readParam(char* name, char* paramData, int paramDataLength, char* dest) {
-	int paramSize = -1;
 	int nameLength = strlen(name);
 
 	int index = 0;
@@ -345,7 +344,8 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 	if (valid) {
 		DBG("Parse Step %s\n", cs->name);
 
-		json_object * controlPoints = json_object_object_get(step, "controlPoints");
+		json_object * controlPoints;
+		json_object_object_get_ex(step, "controlPoints", &controlPoints);
 
 		if (controlPoints != NULL && json_object_get_type(controlPoints) == json_type_array) {
 			int controlPointCount = json_object_array_length(controlPoints);
