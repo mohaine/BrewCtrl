@@ -25,7 +25,6 @@
 
 #include "brewctrl.h"
 #include "sensor.h"
-#include "duty.h"
 #include "pid.h"
 #include "comm.h"
 #include "control.h"
