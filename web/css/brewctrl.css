@@ -80,9 +80,12 @@ button {
 }
 
 .step .stepTime {
+	font-size: larger;
 	display: inline-block;
 	min-width: 5em;
 	cursor: pointer;
+	padding: 3px;
+	border: 1px soild red;
 }
 
 .step .stepDelete {

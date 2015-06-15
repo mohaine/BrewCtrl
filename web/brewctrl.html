@@ -2,18 +2,23 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="brewctrl.css"/>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script src="js/jquery.js"></script>
-  <script src="js/underscore.js"></script>
-  <script src="js/backbone-min.js"></script> 
 
- <script type="text/template" id="steplist-template">
-    	<button><b><%= name %></b></button>    	
+
+<link rel="stylesheet" href="css/brewctrl.css" />
+
+<script src="js/jquery.js"></script>
+<script src="js/underscore.js"></script>
+<script src="js/backbone-min.js"></script>
+
+<script type="text/template" id="steplist-template">
+    	<button class="btn btn-default "><b><%= name %></b></button>    	
  </script>
-  
-  
- <script type="text/template" id="step-template">
+
+
+<script type="text/template" id="step-template">
     <div class="step select">    	
     	<span class="stepName" contenteditable="true"><%= name %></span>    	
     	<span class="stepTime"><%= BrewCtrl.formatTime(stepTime) %></span>
@@ -22,48 +27,46 @@
   </script>
 
 
- <script type="text/template" id="config-upload-template">
-    <div class="config-upload">    	
-    
-    <form id="config-upload-form" method="post" action="/cmd/configuration">
-    <div class="row">
-      <label for="configurationToUpload">Select a Configuration File to Upload</label><br />
-      <input type="file" name="configuration" id="configurationToUpload" />
-    </div>
-    <div id="fileName"></div>
-    <div id="fileSize"></div>
-    <div id="fileType"></div>
-    <div class="row">
-      <button  type="button" id="uploadConfiguration" >Upload</button>    </div>
-    <div id="progressNumber"></div>
-  </form>
-    
-    </div>
-  </script>
 
- <script type="text/template" id="sensor-template">
+
+
+<script type="text/template" id="config-upload-template">
+<div class="panel panel-default config-upload">
+	<div class="panel-title">
+	      <label for="configurationToUpload">Select a Configuration File to Upload</label><br />
+	</div>    	
+	<div class="panel-body">
+		<div class="row">
+			<form id="config-upload-form" method="post" action="/cmd/configuration">
+				<div class="col-md-4"><input type="file" name="configuration" id="configurationToUpload" /></div>
+				<div class="col-md-4"><button  class="btn btn-default " type="button" id="uploadConfiguration" >Upload</button></div>
+			</form>
+		</div>
+	</div>
+</div>
+</script>
+
+<script type="text/template" id="sensor-template">
     <div class="sensor">    	            
     	Name: <span contenteditable="true" class="name"/>  Location:  <select class="location"/>  Temp: <span class="temp"></span>   
     </div>
   </script>
 
 
- <script type="text/template" id="mode-template">
+<script type="text/template" id="mode-template">
     <div class="mode">
-       	<button id="modeOn" class="<%= mode=="ON"? "down":"up" %>">On</button>
-		<button id="modeHold" class="<%= mode=="HOLD"? "down":"up" %>">Hold</button>
-		<button id="modeHeatOff" class="<%= mode=="HEAT_OFF"? "down":"up" %>">Heat Off</button>
-		<button id="modeOff" class="<%= mode=="OFF"? "down":"up" %>">Off</button>
+       	<button id="modeOn" class="btn btn-default  <%= mode=="ON"? "down":"up" %>">On</button>
+		<button id="modeHold" class="btn btn-default <%= mode=="HOLD"? "down":"up" %>">Hold</button>
+		<button id="modeHeatOff" class="btn btn-default <%= mode=="HEAT_OFF"? "down":"up" %>">Heat Off</button>
+		<button id="modeOff" class="btn btn-default <%= mode=="OFF"? "down":"up" %>">Off</button>
       </div>
   </script>
-  
-  
-  <script type="text/template" id="duty-template">
+
+
+<script type="text/template" id="duty-template">
     <div class="numberEdit">
   <div class="numberEditIncrement">
    
-
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -107,7 +110,7 @@ if(quickClickValues){
 	for(key in quickClickValues){
 		var quickClick = quickClickValues[key];
 %>      	  
-       	<button id="<%=quickClick.id%>" class="quickClick"><%=quickClick.text%></button><br/>
+       	<button  id="<%=quickClick.id%>" class="quickClick"><%=quickClick.text%></button><br/>
 
 <%      	  
 	}
@@ -117,8 +120,8 @@ if(quickClickValues){
         </div>
       
   </script>
-  
-    <script type="text/template" id="popup-template">
+
+<script type="text/template" id="popup-template">
     	
     	<div class="glass"></div>
     	
@@ -128,7 +131,7 @@ if(quickClickValues){
     	   
         </div>
   </script>
-     <script type="text/template" id="popup-status-loading">
+<script type="text/template" id="popup-status-loading">
     	
     	<div class="statusLoading">
     
@@ -136,11 +139,11 @@ if(quickClickValues){
     
         </div>
   </script>
-  
-  
-  <script src="main.js"></script>
-  <script src="step.js"></script>
-  <script src="tank.js"></script>
+
+
+<script src="main.js"></script>
+<script src="step.js"></script>
+<script src="tank.js"></script>
 
 
 </head>
@@ -148,26 +151,39 @@ if(quickClickValues){
 <body>
 
 
+	<div class="container-fluid">
 
-<div id="brewctrl-main">
-<div id="brewctrl-mode"></div>
-<div id="brewctrl-tanks"></div>
-<div id="brewctrl-pumps"></div>
+		<div id="brewctrl-main">
+
+			<div class="row">
+				<div id="brewctrl-mode"></div>
+			</div>
+			<div class="row">
+				<div id="brewctrl-tanks"></div>
+			</div>
+			<div class="row">
+				<div id="brewctrl-pumps"></div>
+			</div>
+			<div class="row">
 
 
 
-<div id="brewctrl-steps"></div>
-<button id="brewctrl-add-step">Add New Step</button>
+				<div id="brewctrl-steps"></div>
+				<button class="btn btn-default " id="brewctrl-add-step">Add New Step</button>
+			</div>
+			<div class="row">
 
-<br />
-<label> Step Lists </label>
-<div id="brewctrl-steplists"></div>
+				<label> Step Lists </label>
+				<div id="brewctrl-steplists"></div>
+			</div>
+			<div class="row">
+				<div id="brewctrl-config-upload"></div>
+			</div>
+			<div class="row">
+				<div id="brewctrl-sensors"></div>
 
-<br />
-<div id="brewctrl-config-upload"></div>
-<div id="brewctrl-sensors"></div>
-
-</div>
-
+			</div>
+		</div>
+	</div>
 </body>
 </html>
