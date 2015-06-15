@@ -193,10 +193,10 @@ BrewCtrl.Views.Tank = Backbone.View.extend({
 				if (self.model.get("sensorAddress") != "") {
 					popup.quickClickValues.push({
 						text : "Auto",
-						click : function() {							
+						click : function() {
 							controlPoint.set("automaticControl", true);
-							controlPoint.set("tempSensorAddress", self.model.get("sensorAddress"));							
-							controlPoint.set("targetName",self.model.get("name"))
+							controlPoint.set("tempSensorAddress", self.model.get("sensorAddress"));
+							controlPoint.set("targetName", self.model.get("name"))
 
 							BrewCtrl.main.updateStep(selectedStep);
 							popup.completeAction();
@@ -375,19 +375,32 @@ BrewCtrl.Views.Sensor = Backbone.View.extend({
 	},
 	render : function() {
 		var self = this;
-		self.loadedCfg = BrewCtrl.main.get("config");
-		var display = self.template(self.model.toJSON());
-		self.$el.html(display);
 
-		self.$el.find(".name").html(self.model.get("name"));
+		if (!self.rendered && self.$el[0].parentElement) {
+			self.rendered = true;
+			console.log("Render!!!", self.$el[0].parentElement)
+			self.loadedCfg = BrewCtrl.main.get("config");
+			var display = self.template(self.model.toJSON());
+			self.$el.html(display);
 
-		var locationSelect = self.$el.find(".location")[0];
-		var locations = BrewCtrl.main.listSensorLocations();
-		_.each(locations, function(location) {
-			var option = new Option(location.get("name"), location.get("name"));
-			option.selected = self.model.get("location") == location.get("name");
-			locationSelect.options.add(option);
-		});
+			var locationSelect = self.$el.find(".location")[0];
+			var locations = BrewCtrl.main.listSensorLocations();
+			_.each(locations, function(location) {
+				var option = new Option(location.get("name"), location.get("name"));
+				option.selected = self.model.get("location") == location.get("name");
+				locationSelect.options.add(option);
+			});
+			self.$el.find(".name").html(self.model.get("name"));
+		}
+
+		var sensorDiv = self.$el.find(".sensor");
+
+		sensorDiv.toggleClass("present", self.model.get("present"));
+		sensorDiv.toggleClass("notPresent", !self.model.get("present"));
+		sensorDiv.toggleClass("reading", self.model.get("reading"));
+		sensorDiv.toggleClass("notReading", !self.model.get("reading"));
+
+		self.$el.find(".temp").html(BrewCtrl.round(BrewCtrl.convertC2Display(self.model.get("temperatureC")), 1).toFixed(1) + '\xB0')
 
 		return this;
 	},
