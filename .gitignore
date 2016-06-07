@@ -9,3 +9,5 @@ trace.out
 Makefile.local
 *.bak
 BrewControllerConfig.json
+**.log
+node_modules/
