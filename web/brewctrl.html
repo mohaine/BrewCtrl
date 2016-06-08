@@ -5,8 +5,6 @@
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-
 <link rel="stylesheet" href="css/brewctrl.css" />
 
 <script src="js/jquery.js"></script>
@@ -14,15 +12,15 @@
 <script src="js/backbone-min.js"></script>
 
 <script type="text/template" id="steplist-template">
-    	<button class="btn btn-default "><b><%= name %></b></button>    	
+    	<button class="btn btn-default "><b><%= name %></b></button>
  </script>
 
 
 <script type="text/template" id="step-template">
-    <div class="step select">    	
-    	<span class="stepName" contenteditable="true"><%= name %></span>    	
+    <div class="step select">
+    	<span class="stepName" contenteditable="true"><%= name %></span>
     	<span class="stepTime"><%= BrewCtrl.formatTime(stepTime) %></span>
-    	<span class="stepDelete">&#x2297;</span>    
+    	<span class="stepDelete">&#x2297;</span>
       </div>
   </script>
 
@@ -34,7 +32,7 @@
 <div class="panel panel-default config-upload">
 	<div class="panel-title">
 	      <label for="configurationToUpload">Select a Configuration File to Upload</label><br />
-	</div>    	
+	</div>
 	<div class="panel-body">
 		<div class="row">
 			<form id="config-upload-form" method="post" action="/cmd/configuration">
@@ -47,8 +45,8 @@
 </script>
 
 <script type="text/template" id="sensor-template">
-    <div class="sensor">    	            
-    	Name: <span contenteditable="true" class="name"/>  Location:  <select class="location"/>  Temp: <span class="temp"></span>   
+    <div class="sensor">
+    	Name: <span contenteditable="true" class="name"/>  Location:  <select class="location"/>  Temp: <span class="temp"></span>
     </div>
   </script>
 
@@ -66,7 +64,7 @@
 <script type="text/template" id="duty-template">
     <div class="numberEdit">
   <div class="numberEditIncrement">
-   
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -101,42 +99,42 @@
        id="downOne" />
   </g>
 </svg>
- 
-  
+
+
   </div>
       <div class="quickSelect">
       	<%
-if(quickClickValues){      	
+if(quickClickValues){
 	for(key in quickClickValues){
 		var quickClick = quickClickValues[key];
-%>      	  
+%>
        	<button  id="<%=quickClick.id%>" class="quickClick"><%=quickClick.text%></button><br/>
 
-<%      	  
+<%
 	}
 }
 %>
       </div>
         </div>
-      
+
   </script>
 
 <script type="text/template" id="popup-template">
-    	
+
     	<div class="glass"></div>
-    	
-    	<div class="popup"> 
-    	
+
+    	<div class="popup">
+
        	 <div class="content"> </div>
-    	   
+
         </div>
   </script>
 <script type="text/template" id="popup-status-loading">
-    	
+
     	<div class="statusLoading">
-    
+
     Loading Status ....
-    
+
         </div>
   </script>
 
