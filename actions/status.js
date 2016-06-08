@@ -5,32 +5,31 @@ import { buildUrl, userErrorMessage } from '../actions'
 
 import RequestStatus from './RequestStatus'
 
-// let statusLoadInterval = undefined;
-//
-// export const cancelStatusLoad = () => {
-//   if(statusLoadInterval){
-//     clearInterval(statusLoadInterval);
-//     statusLoadInterval = undefined;
-//   }
-// }
-// const rescheduleStatusLoad = (dispatch) => {
-//   if(statusLoadInterval){
-//     cancelStatusLoad();
-//     startStatusLoad();
-//   }
-// }
-// const startStatusLoad = (dispatch) => {
-//   if(!statusLoadInterval){
-//     statusLoadInterval = setInterval(()=>{
-//       requestCurrentStatus();
-//     }, 1000 * 3);
-//   }
-// }
+let statusLoadInterval = undefined;
+
+export const cancelStatusLoad = () => {
+  if(statusLoadInterval){
+    clearInterval(statusLoadInterval);
+    statusLoadInterval = undefined;
+  }
+}
+const rescheduleStatusLoad = (dispatch) => {
+    cancelStatusLoad();
+    startStatusLoad(dispatch);
+}
+const startStatusLoad = (dispatch) => {
+  if(!statusLoadInterval){
+    statusLoadInterval = setInterval(()=>{
+      dispatch(requestStatusNoSchedule());
+    }, 500);
+  }
+}
 
 
-export const requestStatus = (onComplete) => {
+let requestStatusNoSchedule = (onComplete) => {
     let status = new RequestStatus();
     return dispatch => {
+        rescheduleStatusLoad(dispatch);
         dispatch({
             type: 'REQUEST_STATUS',
             status: status.copy()
@@ -52,5 +51,15 @@ export const requestStatus = (onComplete) => {
                     status: status.error(userErrorMessage(e, "Status Load Failed"))
                 })
             })
+    }
+}
+
+
+export const requestStatus = (onComplete) => {
+    let status = new RequestStatus();
+    return dispatch => {
+        rescheduleStatusLoad(dispatch);
+
+        requestStatusNoSchedule()(dispatch)
     }
 }
