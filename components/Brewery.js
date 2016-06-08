@@ -27,7 +27,7 @@ export default class Brewery extends Component {
 
         <div className="container-fluid">
           <div className="row">
-              {brewery.pumps.map(pump=> (<div key={pump.id} className="col-sm-1 col-md-2 col-lg-1"><Pump pump={pump}/></div>))}
+              {brewery.pumps.map(pump=> (<div key={pump.id} className="col-sm-2 col-md-2 col-lg-1"><Pump pump={pump}/></div>))}
           </div>
         </div>
       </div>

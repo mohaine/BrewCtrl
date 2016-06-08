@@ -30,12 +30,12 @@ export default class Tank extends Component {
                 <path
                    id="path2985-0"
                    d="m 96.624878,260.89238 0,225.53144 0.06252,0 c -0.01961,0.23029 -0.06252,0.45575 -0.06252,0.68693 0,22.86125 96.292402,41.40312 215.074092,41.40312 118.78169,0 215.07408,-18.54187 215.07408,-41.40312 0,-0.66194 -0.0904,-1.31277 -0.25008,-1.96712 l 0,-224.25125 -429.898092,0 z"
-                   style={{fill:"#ffffff",fillOpacity:1,fillRule:"evenodd",stroke:"#000000",strokeWidth:"1px",strokeLinecap:"butt",strokeLinejoin:"miter",strokeOpacity:1}} />
+                   style={{fill:"#fff",fillOpacity:1,fillRule:"evenodd",stroke:"#000000",strokeWidth:"1px",strokeLinecap:"butt",strokeLinejoin:"miter",strokeOpacity:1}} />
                 <path
                    transform="matrix(1.0033295,0,0,0.9999941,-0.82767917,-2.4978663)"
                    d="m 525.71428,262.36218 c 0,22.88037 -95.93899,41.42857 -214.28572,41.42857 -118.34674,0 -214.285722,-18.5482 -214.285722,-41.42857 0,-22.88036 95.938982,-41.42857 214.285722,-41.42857 118.34673,0 214.28572,18.54821 214.28572,41.42857 z"
                    id="path2985"
-                   style={{fill:"#ffffff",fillOpacity:1,fillRule:"evenodd",stroke:"#000000",strokeWidth:"1px",strokeLinecap:"butt",strokeLinejoin:"miter",strokeOpacity:1}} />
+                   style={{fill:"#aaa",fillOpacity:1,fillRule:"evenodd",stroke:"#000000",strokeWidth:"1px",strokeLinecap:"butt",strokeLinejoin:"miter",strokeOpacity:1}} />
 
               </g>
               {heater && (
@@ -71,17 +71,8 @@ export default class Tank extends Component {
                     />
               </g>)}
 
-              {sensor && (
-              <g>
-              <text
-                 style={{
-                   fontSize: '40px',
-                   fontStyle: 'normal',
-                   fontVariant: 'normal',
-                   fontWeight: 'normal',
-                   fontStretch: 'normal',
-                   textAlign: 'center',
-                   lineHeight: '125%',
+                <text
+                 style={{fontSize: '40px',fontStyle: 'normal',fontVariant: 'normal',             fontWeight: 'normal',                   fontStretch: 'normal',                   textAlign: 'center',                   lineHeight: '125%',
                    letterSpacing: '0px',
                    wordSpacing: '0px',
                    writingMode: 'lr-tb',
@@ -96,6 +87,9 @@ export default class Tank extends Component {
                    id="tankNameText"
                    x="197.47765"
                    y="262.11508">{tank.name}</tspan></text>
+
+                   {sensor && (
+
                    <g id="temperatures">
                        <path
                  style={{
@@ -155,8 +149,6 @@ export default class Tank extends Component {
                             id="targetTempText"
                             x="99.786003"
                             y="340.66696">{"("+formatTemp(heater.targetTemperatureC)+")"}</tspan></text>)}
-
-                   </g>
            </g>)}
             </g>
           </svg>
