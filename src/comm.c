@@ -447,6 +447,9 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 void handleStatusRequest(Request * request, Response * response) {
 	char tmp[BUFFER_SIZE];
 
+	DBG("request->contentLength %d \n",request->contentLength );
+
+
 	if (request->contentLength > 0) {
 		bool valid = true;
 		int paramSize = readParam("mode", request->contentp, request->contentLength, tmp);
@@ -795,6 +798,8 @@ void * handleClientThread(void *ptr) {
 
 				if (strncmp("Content-Length: ", buffer, strlen("Content-Length: ")) == 0) {
 					sscanf(buffer + strlen("Content-Length: "), "%d", &request->contentLength);
+				} else if (strncmp("content-length: ", buffer, strlen("content-length: ")) == 0) {
+						sscanf(buffer + strlen("content-length: "), "%d", &request->contentLength);
 				}
 
 			}
@@ -970,4 +975,3 @@ void startComm(int port) {
 	pthread_create(&thread, NULL, listenThread, (void*) params);
 
 }
-
