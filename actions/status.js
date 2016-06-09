@@ -19,11 +19,51 @@ const rescheduleStatusLoad = (dispatch) => {
 }
 const startStatusLoad = (dispatch) => {
   if(!statusLoadInterval){
-    statusLoadInterval = setInterval(()=>{
-      dispatch(requestStatusNoSchedule());
-    }, 500);
+    // statusLoadInterval = setInterval(()=>{
+    //   dispatch(requestStatusNoSchedule());
+    // }, 500);
   }
 }
+
+
+
+
+export const changeMode = (mode) => {
+    let status = new RequestStatus();
+    let data = "mode=" + mode;
+
+    let form = new FormData();
+    form.append("mode", mode);
+
+    return dispatch => {
+        dispatch({
+            type: 'REQUEST_CHANGE_MODE',
+            status: status.copy()
+        });
+        return axios( {
+                method: 'POST',
+                url: buildUrl('/cmd/status'),
+                data: data
+            })
+            .then(json => {
+                dispatch(statusMsg(status,json))
+            }).catch(e => {
+                dispatch({
+                    type: "ERROR_CHANGE_MODE",
+                    status: status.error(userErrorMessage(e, "Configuration Load Failed"))
+                })
+            })
+    }
+}
+
+function statusMsg(status,json){
+  return {
+      type: "RECEIVE_STATUS",
+      status: status.success(),
+      data: json.data
+  };
+}
+
 
 
 let requestStatusNoSchedule = (onComplete) => {
@@ -34,13 +74,9 @@ let requestStatusNoSchedule = (onComplete) => {
             type: 'REQUEST_STATUS',
             status: status.copy()
         });
-        return axios.post(buildUrl('/cmd/status'), {})
+        return axios.get(buildUrl('/cmd/status'))
             .then(json => {
-                dispatch({
-                    type: "RECEIVE_STATUS",
-                    status: status.success(),
-                    data: json.data
-                })
+                dispatch(statusMsg(status,json))
                 if (onComplete) {
                     onComplete();
                 }

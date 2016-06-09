@@ -14,7 +14,7 @@ export const requestConfiguration = (onComplete) => {
             type: 'REQUEST_CONFIG',
             status: status.copy()
         });
-        return axios.post(buildUrl('/cmd/configuration'), {})
+        return axios.get(buildUrl('/cmd/configuration'))
             .then(json => {
                 dispatch({
                     type: "RECEIVE_CONFIG",

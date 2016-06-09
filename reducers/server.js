@@ -55,8 +55,9 @@ function buildBreweryView(status,configuration){
         return {id,name, duty, on, automaticControl};
       });
 
+      let mode = status.mode;
 
-      let brewery = {tanks, pumps};
+      let brewery = {mode, tanks, pumps};
       return brewery;
   }
 }

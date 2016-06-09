@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 
 import Tank from '../components/Tank'
 import Pump from '../components/Pump'
+import Mode from '../containers/Mode'
 
 
 export default class Brewery extends Component {
@@ -13,7 +14,9 @@ export default class Brewery extends Component {
   }
   render() {
     let { brewery ,requestState, requestStateStatus } = this.props
-    return (<div> Brewery
+    return (<div>
+
+      <Mode />
 
       {!brewery && requestStateStatus && requestStateStatus.active && (<div>Loading state</div>) }
       { brewery && (
