@@ -148,7 +148,7 @@ export default class Tank extends Component {
                           ><tspan
                             id="targetTempText"
                             x="99.786003"
-                            y="340.66696">{"("+formatTemp(heater.targetTemperatureC)+")"}</tspan></text>)}
+                            y="340.66696">{"("+formatTemp(heater.targetTemp)+")"}</tspan></text>)}
            </g>)}
             </g>
           </svg>

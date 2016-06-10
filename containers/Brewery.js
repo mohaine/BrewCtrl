@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { requestStatus } from '../actions/status.js'
+import { requestStatus,updateStep } from '../actions/status.js'
 import { requestConfiguration } from '../actions/configuration.js'
 
 import Component from '../components/Brewery'
@@ -18,6 +18,10 @@ const mapDispatchToProps = (dispatch) => {
     requestState: () => {
       dispatch(requestConfiguration())
       dispatch(requestStatus())
+    },
+    requestUpdateStep: (step) => {
+
+      dispatch(updateStep(step));
     }
   }
 }
