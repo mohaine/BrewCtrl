@@ -26,14 +26,42 @@ const startStatusLoad = (dispatch) => {
 }
 
 
+export const updateStep = (step) => {
+    let status = new RequestStatus();
+    let data = "modifySteps=" + encodeURI(JSON.stringify([step]));
+
+
+    return dispatch => {
+        dispatch({
+            type: 'REQUEST_CHANGE_STEP',
+            status: status.copy()
+        });
+        return axios( {
+                method: 'POST',
+                url: buildUrl('/cmd/status'),
+                headers: {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
+                data: data
+            })
+            .then(json => {
+              dispatch({
+                  type: "SUCCESS_CHANGE_STEP",
+                  status: status.success()
+              })
+              dispatch(statusMsg(status,json))
+            }).catch(e => {
+                dispatch({
+                    type: "ERROR_CHANGE_STEP",
+                    status: status.error(userErrorMessage(e, "Configuration Load Failed"))
+                })
+            })
+    }
+}
+
 
 
 export const changeMode = (mode) => {
     let status = new RequestStatus();
     let data = "mode=" + mode;
-
-    let form = new FormData();
-    form.append("mode", mode);
 
     return dispatch => {
         dispatch({
@@ -43,10 +71,16 @@ export const changeMode = (mode) => {
         return axios( {
                 method: 'POST',
                 url: buildUrl('/cmd/status'),
+                headers: {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
                 data: data
             })
             .then(json => {
+                dispatch({
+                    type: "SUCCESS_CHANGE_MODE",
+                    status: status.success()
+                })
                 dispatch(statusMsg(status,json))
+
             }).catch(e => {
                 dispatch({
                     type: "ERROR_CHANGE_MODE",

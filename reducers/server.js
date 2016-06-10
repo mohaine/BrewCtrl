@@ -1,4 +1,4 @@
-
+import {findControlPoint} from '../util/step'
 
 function findSensor(status, address){
   if(status && status.sensors){
@@ -6,58 +6,53 @@ function findSensor(status, address){
   }
 }
 
-function findControlPoint(step, io){
-  if(step && step.controlPoints){
-      return step.controlPoints.find(cp=>cp.controlIo === io)
-  }
-}
+
 
 function buildBreweryView(status,configuration){
   if(status && status.steps && configuration){
 
-      let step = status.steps[0];
+      let steps = status.steps.map(step=>{
+        let tanks = configuration.brewLayout.tanks.map(t=>{
+          let name = t.name;
+          let id = "tank" + name;
+          let heater = t.heater;
+          let sensor = t.sensor;
 
-      let tanks = configuration.brewLayout.tanks.map(t=>{
-        let name = t.name;
-        let id = "tank" + name;
-        let heater = t.heater;
-        let sensor = t.sensor;
-
-        if(sensor && sensor.address){
-          sensor = findSensor(status,sensor.address);
-        } else {
-          sensor = undefined;
-        }
-
-
-        if(heater){
-          let id = "heater" + heater.io;
-          let controlPoint = findControlPoint(step, heater.io);
-          let duty = controlPoint ? controlPoint.duty : 0;
-          let on = controlPoint ? controlPoint.on : false;
-          let automaticControl = controlPoint? controlPoint.automaticControl : 0;
-          let targetTemperatureC = controlPoint ? controlPoint.targetTemp : 0;
-          heater = {id, duty, on, automaticControl, targetTemperatureC}
-        }
-
-        return {id,name, heater, sensor};
-      });
-      let pumps = configuration.brewLayout.pumps.map(p=>{
-        let name = p.name;
-        let id = "pump" + p.io;
-
-        let controlPoint = findControlPoint(step, p.io);
-        let duty = controlPoint ? controlPoint.duty : 0;
-        let on = controlPoint ? controlPoint.on : false;
-        let automaticControl = controlPoint? controlPoint.automaticControl : 0;
+          if(sensor && sensor.address){
+            sensor = findSensor(status,sensor.address);
+          } else {
+            sensor = undefined;
+          }
 
 
-        return {id,name, duty, on, automaticControl};
+          if(heater){
+            let id =  step.id + "h" + heater.io;
+            heater = findControlPoint(step, heater.io);
+          }
+
+          return {id,name, heater, sensor};
+        });
+        let pumps = configuration.brewLayout.pumps.map(p=>{
+          let pump = findControlPoint(step, p.io);
+
+          // This shouldn't happen
+          if(!pump){
+            pump = {};
+          }
+          pump.name = p.name
+
+          return pump;
+        });
+
+        let name = step.name;
+        let id = step.id;
+        let controlPoints = step.controlPoints;
+        return {id,name, pumps, tanks,controlPoints, rawStep: step};
       });
 
       let mode = status.mode;
 
-      let brewery = {mode, tanks, pumps};
+      let brewery = {mode, steps};
       return brewery;
   }
 }

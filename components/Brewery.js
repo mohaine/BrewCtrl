@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 
-import Tank from '../components/Tank'
-import Pump from '../components/Pump'
+import Step from '../components/Step'
 import Mode from '../containers/Mode'
 
 
@@ -13,7 +12,7 @@ export default class Brewery extends Component {
     }
   }
   render() {
-    let { brewery ,requestState, requestStateStatus } = this.props
+    let { brewery ,requestState, requestStateStatus, requestUpdateStep } = this.props
     return (<div>
 
       <Mode />
@@ -23,17 +22,12 @@ export default class Brewery extends Component {
       <div>
         <div className="container-fluid">
           <div className="row">
-            {brewery.tanks.map(tank=> (<div key={tank.id} className="col-sm-3 col-md-3 col-lg-2"><Tank tank={tank}  /></div>))}
-          </div>
-        </div>
-
-
-        <div className="container-fluid">
-          <div className="row">
-              {brewery.pumps.map(pump=> (<div key={pump.id} className="col-sm-2 col-md-2 col-lg-1"><Pump pump={pump}/></div>))}
+            {brewery.steps.map(step=> (<div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep} /></div>))}
           </div>
         </div>
       </div>
+
+
     ) }
        </div>)
   }

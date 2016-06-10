@@ -1,16 +1,24 @@
 import React, { Component, PropTypes } from 'react'
 
+import {overlayControlPoint} from '../util/step'
 
 export default class Pump extends Component {
+
+  togglePump() {
+    let { step, pump, requestUpdateStep } = this.props
+    let newDuty = pump.duty > 0 ? 0 : 100;
+    requestUpdateStep(overlayControlPoint(step.rawStep, Object.assign({}, pump, { duty: newDuty }) ));
+  }
+
   render() {
-    let { pump } = this.props
+    let { step, pump, requestUpdateStep } = this.props
 
     let on = pump.duty > 0;
     let actuallyOn = pump.on && on;
 
     return (<div>
         { pump && (
-          <svg
+          <svg onClick={()=>{this.togglePump()}}
              className="tank"
              width="97.796799"
              height="117.54825"
