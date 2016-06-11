@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 
 import Step from '../components/Step'
 import Mode from '../containers/Mode'
+import Sensors from '../components/Sensors'
 
 
 export default class Brewery extends Component {
@@ -12,7 +13,7 @@ export default class Brewery extends Component {
     }
   }
   render() {
-    let { brewery ,requestState, requestStateStatus, requestUpdateStep } = this.props
+    let { brewery ,requestState, requestStateStatus, requestUpdateStep, configuration, updateConfiguration } = this.props
     return (<div>
 
       <Mode />
@@ -25,10 +26,14 @@ export default class Brewery extends Component {
             {brewery.steps.map(step=> (<div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep} /></div>))}
           </div>
         </div>
+
+
+        <Sensors sensors={brewery.sensors} configuration={configuration} updateConfiguration={updateConfiguration}/>
       </div>
 
 
     ) }
+
        </div>)
   }
 }

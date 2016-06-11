@@ -6,8 +6,6 @@ function findSensor(status, address){
   }
 }
 
-
-
 function buildBreweryView(status,configuration){
   if(status && status.steps && configuration){
 
@@ -39,9 +37,12 @@ function buildBreweryView(status,configuration){
           if(!pump){
             pump = {};
           }
-          pump.name = p.name
+          let name = p.name;
+          let id = "pump" +  p.io;
 
-          return pump;
+          return  Object.assign({}, pump, {
+            id, name
+          });
         });
 
         let name = step.name;
@@ -52,7 +53,19 @@ function buildBreweryView(status,configuration){
 
       let mode = status.mode;
 
-      let brewery = {mode, steps};
+      let sensors = status.sensors.map(s=>{
+
+        let cfgSesnsor = configuration.sensors.find(cs=>s.address === cs.address);
+        let name = cfgSesnsor ? cfgSesnsor.name : "";
+        let location = cfgSesnsor ? cfgSesnsor.location : "";
+
+        return Object.assign({}, s, {
+          location, name
+        });
+      });
+
+
+      let brewery = {mode, steps, sensors};
       return brewery;
   }
 }
