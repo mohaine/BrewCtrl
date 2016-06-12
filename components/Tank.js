@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 
 import {formatTemp,convertF2C,formatTempWhole} from '../util/tempature'
 import QuickPick from '../components/QuickPick'
+import {overlayControlPoint} from '../util/step'
 
 export default class Tank extends Component {
 
@@ -15,8 +16,27 @@ export default class Tank extends Component {
       }
   }
   updateTargetTemp(temp){
-    console.log("TARGET TEMP!!!" + temp);
+    let { step, tank, requestUpdateStep } = this.props
+    let heater = tank ? tank.heater : undefined;
+    requestUpdateStep(overlayControlPoint(step.rawStep, Object.assign({}, heater, { targetTemp: temp }) ));
+  }
+  updateElementDuty(duty){
+    let { step, tank, requestUpdateStep } = this.props
+    let sensor = tank ? tank.sensor : undefined;
+    let heater = tank ? tank.heater : undefined;
 
+    let automaticControl = duty === 'AUTO';
+
+    let newControlPoint = Object.assign({}, heater, { automaticControl: automaticControl })
+
+    if(automaticControl){
+      newControlPoint.tempSensorAddress = sensor.address;
+      newControlPoint.targetName = tank.name;
+  } else {
+      newControlPoint.duty = duty;
+    }
+
+    requestUpdateStep(overlayControlPoint(step.rawStep,newControlPoint));
   }
 
   render() {
