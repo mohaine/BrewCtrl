@@ -45,11 +45,10 @@ export default class QuickPick extends Component {
 
   mouseDown(up) {
     let { increment } = this.props
-    let incrementValue = up? increment : increment * -1;
 		let count = 0;
 		let timeoutFunction = () => {
 			this.cancelMouseDown();
-      this.setValue(this.state.value + (incrementValue));
+      this.setValue(increment(this.state.value, up));
 			count++;
 			var delay = 300;
 			if (count > 3) {
@@ -116,7 +115,7 @@ export default class QuickPick extends Component {
               stroke: 'none'}}
             x="59.116882"
             y="89.545815"
-            id="text3001"      ><tspan
+            id="text3001"><tspan
             y="89.545815"
             x="59.116882"
             id="textValue"

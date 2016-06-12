@@ -9,16 +9,16 @@ export default class Tank extends Component {
   constructor(props) {
       super(props);
       this.state = {
-        quickPickTargetTemp: false
+        editTargetTemp: false,
+        editElementDuty: false
+
       }
   }
   updateTargetTemp(temp){
     console.log("TARGET TEMP!!!" + temp);
 
   }
-  changeTargetTemp(){
-    this.setState({quickPickTargetTemp: true })
-  }
+
   render() {
     let { tank } = this.props
 
@@ -26,17 +26,45 @@ export default class Tank extends Component {
     let heater = tank ? tank.heater : undefined;
 
     return (<div>
-        { this.state.quickPickTargetTemp && (<QuickPick close={()=>{this.setState({quickPickTargetTemp: false })}}
+        { this.state.editTargetTemp && (<QuickPick close={()=>{this.setState({editTargetTemp: false })}}
         apply={(value)=>{this.updateTargetTemp(value)}}
         quickPickValues={ [{value:convertF2C(120),text:formatTempWhole(convertF2C(120))},
           {value:convertF2C(140),text:formatTempWhole(convertF2C(140))},
           {value:convertF2C(153),text:formatTempWhole(convertF2C(153))},
           {value:convertF2C(165),text:formatTempWhole(convertF2C(165))},
           {value:convertF2C(205),text:formatTempWhole(convertF2C(205))}]}
-        increment={convertF2C(33)}
+        increment={(value,up)=>value + (up?convertF2C(33):-convertF2C(33))}
+
         value={heater.targetTemp}
         formatValue={(temp)=>formatTempWhole(temp)}
         />)}
+        { this.state.editElementDuty && (<QuickPick close={()=>{this.setState({editElementDuty: false })}}
+        apply={(value)=>{this.updateElementDuty(value)}}
+        quickPickValues={ [
+          {value:0,text:"0%"},
+          {value:33,text:"33%"},
+          {value:66,text:"66%"},
+          {value:100,text:"100%"},
+          {value:"AUTO",text:"Auto"},
+        ]}
+        increment={(value,up)=>{
+          if(value == 'AUTO'){
+            return up? 0: 100;
+          }
+          let newValue = value + (up?1:-1)
+          if(newValue<0) newValue = 0;
+          if(newValue>100) newValue = 100;
+          return newValue;
+        }}
+        value={heater.duty}
+        formatValue={(duty)=>{
+          if(duty == 'AUTO'){
+            return 'Auto'
+          }
+          return duty + "%"}}
+        />)}
+
+
         { tank && (
           <svg
              className="tank"
@@ -63,7 +91,7 @@ export default class Tank extends Component {
 
               </g>
               {heater && (
-              <g id="heatElement">
+              <g id="heatElement"  onClick={()=>  this.setState({editElementDuty: true })}>
                 <text
                    style={{
                      fontSize: '40px',
@@ -151,7 +179,7 @@ export default class Tank extends Component {
                    x="98.446396"
                    y="315.89194">{formatTemp(sensor.temperatureC)}</tspan></text>
 
-                   {heater && heater.automaticControl && (  <text onClick={()=>this.changeTargetTemp()}
+                   {heater && heater.automaticControl && (  <text onClick={()=> this.setState({editTargetTemp: true })}
                           style={{  fontSize: '28px',
                             fontStyle: 'normal',
                             fontVariant: 'normal',
