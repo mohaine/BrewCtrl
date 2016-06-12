@@ -28,9 +28,6 @@ store.dispatch({
     dispatch: store.dispatch
 });
 
-// setRequestConfig(()=>{store.dispatch(requestConfig())});
-
-
 render(<div>
   <Provider store={store}>
         <Router history={history}>
