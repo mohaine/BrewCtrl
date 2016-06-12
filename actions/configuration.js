@@ -6,6 +6,7 @@ import { buildUrl, userErrorMessage } from '../actions'
 import RequestStatus from './RequestStatus'
 
 
+
 export const updateConfiguration = (configuration) => {
     let status = new RequestStatus();
     let data = "configuration=" + encodeURI(JSON.stringify(configuration));

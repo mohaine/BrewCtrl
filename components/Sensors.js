@@ -22,7 +22,6 @@ export default class Sensors extends Component {
 
   render() {
     let { sensors, configuration } = this.props
-    console.log(  configuration.brewLayout.tanks)
   return (<div>
         Sensors
 
