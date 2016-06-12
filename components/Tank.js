@@ -1,20 +1,43 @@
 
 import React, { Component, PropTypes } from 'react'
 
-import {formatTemp} from '../util/tempature'
-import About from '../components/About'
+import {formatTemp,convertF2C,formatTempWhole} from '../util/tempature'
+import QuickPick from '../components/QuickPick'
 
 export default class Tank extends Component {
+
+  constructor(props) {
+      super(props);
+      this.state = {
+        quickPickTargetTemp: false
+      }
+  }
+  updateTargetTemp(temp){
+    console.log("TARGET TEMP!!!" + temp);
+
+  }
+  changeTargetTemp(){
+    this.setState({quickPickTargetTemp: true })
+  }
   render() {
     let { tank } = this.props
 
     let sensor = tank ? tank.sensor : undefined;
     let heater = tank ? tank.heater : undefined;
 
-
     return (<div>
+        { this.state.quickPickTargetTemp && (<QuickPick close={()=>{this.setState({quickPickTargetTemp: false })}}
+        apply={(value)=>{this.updateTargetTemp(value)}}
+        quickPickValues={ [{value:convertF2C(120),text:formatTempWhole(convertF2C(120))},
+          {value:convertF2C(140),text:formatTempWhole(convertF2C(140))},
+          {value:convertF2C(153),text:formatTempWhole(convertF2C(153))},
+          {value:convertF2C(165),text:formatTempWhole(convertF2C(165))},
+          {value:convertF2C(205),text:formatTempWhole(convertF2C(205))}]}
+        increment={convertF2C(33)}
+        value={heater.targetTemp}
+        formatValue={(temp)=>formatTempWhole(temp)}
+        />)}
         { tank && (
-
           <svg
              className="tank"
              width="205.48909"
@@ -128,7 +151,7 @@ export default class Tank extends Component {
                    x="98.446396"
                    y="315.89194">{formatTemp(sensor.temperatureC)}</tspan></text>
 
-                   {heater && heater.automaticControl && (    <text
+                   {heater && heater.automaticControl && (  <text onClick={()=>this.changeTargetTemp()}
                           style={{  fontSize: '28px',
                             fontStyle: 'normal',
                             fontVariant: 'normal',
@@ -142,14 +165,15 @@ export default class Tank extends Component {
                             textAnchor: 'start',
                             fill: '#000000',
                             fillOpacity: '1',
-                            stroke: 'none'}}
+                            stroke: 'none',
+                            cursor: "pointer"}}
                           x="99.786003"
                           y="340.66696"
                           id="targetTemp"
                           ><tspan
                             id="targetTempText"
                             x="99.786003"
-                            y="340.66696">{"("+formatTemp(heater.targetTemp)+")"}</tspan></text>)}
+                            y="340.66696">{"("+formatTempWhole(heater.targetTemp)+")"}</tspan></text>)}
            </g>)}
             </g>
           </svg>

@@ -5,7 +5,7 @@ let convertC2F = function(tempC) {
 }
 
 
-let convertF2C = function(tempF) {
+export const convertF2C = function(tempF) {
   return (5.0 / 9.0) * (tempF - 32);
 }
 
@@ -18,4 +18,8 @@ let round =  function(value, places) {
 
 export const formatTemp =  function(tempC){
   return round(convertC2F(tempC),1).toFixed(1)  + "°"
+}
+
+export const formatTempWhole =  function(tempC){
+  return round(convertC2F(tempC),0)  + "°"
 }
