@@ -32,7 +32,7 @@ export default class Tank extends Component {
     if(automaticControl){
       newControlPoint.tempSensorAddress = sensor.address;
       newControlPoint.targetName = tank.name;
-  } else {
+    } else {
       newControlPoint.duty = duty;
     }
 
@@ -76,7 +76,7 @@ export default class Tank extends Component {
           if(newValue>100) newValue = 100;
           return newValue;
         }}
-        value={heater.duty}
+        value={heater.automaticControl? "AUTO" : heater.duty}
         formatValue={(duty)=>{
           if(duty == 'AUTO'){
             return 'Auto'
