@@ -26,11 +26,39 @@ const startStatusLoad = (dispatch) => {
 }
 
 
+export const updateStepList = (steps) => {
+    let status = new RequestStatus();
+    let data = "steps=" + encodeURI(JSON.stringify(steps));
+    return dispatch => {
+        dispatch({
+            type: 'REQUEST_CHANGE_STEPLIST',
+            status: status.copy()
+        });
+        return axios( {
+                method: 'POST',
+                url: buildUrl('/cmd/status'),
+                headers: {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
+                data: data
+            })
+            .then(json => {
+              dispatch({
+                  type: "SUCCESS_CHANGE_STEPLIST",
+                  status: status.success()
+              })
+              dispatch(statusMsg(status,json))
+            }).catch(e => {
+                dispatch({
+                    type: "ERROR_CHANGE_STEPLIST",
+                    status: status.error(userErrorMessage(e, "Configuration Load Failed"))
+                })
+            })
+    }
+}
+
+
 export const updateStep = (step) => {
     let status = new RequestStatus();
     let data = "modifySteps=" + encodeURI(JSON.stringify([step]));
-
-
     return dispatch => {
         dispatch({
             type: 'REQUEST_CHANGE_STEP',

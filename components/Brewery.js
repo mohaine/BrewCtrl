@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import Step from '../components/Step'
 import Mode from '../containers/Mode'
 import Sensors from '../components/Sensors'
+import AddStep from '../components/AddStep'
 
 
 export default class Brewery extends Component {
@@ -13,7 +14,7 @@ export default class Brewery extends Component {
     }
   }
   render() {
-    let { brewery ,requestState, requestStateStatus, requestUpdateStep, configuration, updateConfiguration } = this.props
+    let { brewery ,requestState, requestStateStatus, requestUpdateStep, configuration, updateConfiguration, requestUpdateStepList } = this.props
     return (<div>
 
       <Mode />
@@ -27,8 +28,10 @@ export default class Brewery extends Component {
           </div>
         </div>
 
+        <AddStep steps={brewery.steps} requestUpdateStepList={requestUpdateStepList} configuration={configuration} />
 
         <Sensors sensors={brewery.sensors} configuration={configuration} updateConfiguration={updateConfiguration}/>
+
       </div>
 
 
