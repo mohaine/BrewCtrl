@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import { requestStatus,updateStep, updateStepList } from '../actions/status.js'
-import { requestConfiguration, updateConfiguration } from '../actions/configuration.js'
+import { requestConfiguration, requestUpdateConfiguration } from '../actions/configuration.js'
 import { selectStepById } from '../actions/ui.js'
 
 import Component from '../components/Brewery'
@@ -28,8 +28,8 @@ const mapDispatchToProps = (dispatch) => {
     requestUpdateStepList: (steps) => {
       dispatch(updateStepList(steps));
     },
-    updateConfiguration: (cfg) => {
-      dispatch(updateConfiguration(cfg));
+    requestUpdateConfiguration: (cfg) => {
+      dispatch(requestUpdateConfiguration(cfg));
     },
     selectStepById: (id)=>{
       dispatch(selectStepById(id));

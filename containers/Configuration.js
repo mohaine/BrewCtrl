@@ -1,14 +1,16 @@
 import { connect } from 'react-redux'
-import { requestConfiguration } from '../actions/configuration.js'
+import { requestConfiguration,requestUpdateConfiguration } from '../actions/configuration.js'
 
 import Component from '../components/Configuration'
 
 const mapStateToProps = (state) => {
-  let configuration = state.configuration.current;
-  let requestConfigurationStatus = state.configuration.requestConfigurationStatus;
+  let configuration = state.server.configuration;
+  let requestConfigurationStatus = state.server.requestConfigurationStatus;
+  let requestUpdateConfigurationStatus = state.server.requestUpdateConfigurationStatus;
   return {
     configuration,
-    requestConfigurationStatus
+    requestConfigurationStatus,
+    requestUpdateConfigurationStatus
   }
 }
 
@@ -16,6 +18,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     requestConfiguration: () => {
       dispatch(requestConfiguration())
+    },
+    requestUpdateConfiguration: (cfg,onComplete) => {
+      dispatch(requestUpdateConfiguration(cfg,onComplete))
     }
   }
 }

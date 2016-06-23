@@ -7,6 +7,7 @@ import { createStore } from 'redux'
 
 import App from './components/App'
 import Default from './components/Default'
+import Configuration from './containers/Configuration'
 import About from './components/About'
 
 import config from 'config'
@@ -34,6 +35,7 @@ render(<div>
           <Route path="/brewctrl" component={App}>
             <IndexRoute component={Default}/>
             <Route path="about" component={About}/>
+            <Route path="configuration" component={Configuration}/>
           </Route>
         </Router>
   </Provider></div>,

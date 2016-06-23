@@ -25,6 +25,6 @@ export const viewDashboard = () => {
 }
 export const viewRoute = (path) => {
     return dispatch => {
-        dispatch(push('/msp/' + path))
+        dispatch(push('/brewctrl/' + path))
     }
 }

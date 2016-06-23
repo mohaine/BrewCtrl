@@ -7,10 +7,9 @@ import RequestStatus from './RequestStatus'
 
 
 
-export const updateConfiguration = (configuration) => {
+export const requestUpdateConfiguration = (configuration,onComplete) => {
     let status = new RequestStatus();
     let data = "configuration=" + encodeURI(JSON.stringify(configuration));
-
     return dispatch => {
         dispatch({
             type: 'REQUEST_CHANGE_CONFIGURATION',
@@ -28,6 +27,7 @@ export const updateConfiguration = (configuration) => {
                   status: status.success()
               })
               dispatch(receiveConfig(status,json))
+              if(onComplete) onComplete();
             }).catch(e => {
                 dispatch({
                     type: "ERROR_CHANGE_CONFIGURATION",

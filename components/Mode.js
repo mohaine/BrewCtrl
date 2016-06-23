@@ -3,8 +3,15 @@ import React, { Component, PropTypes } from 'react'
 
 
 export default class Mode extends Component {
+  componentDidMount() {
+    let { brewery,requestState, requestStateStatus } = this.props
+    if(!brewery){
+        requestState();
+    }
+  }
+
   render() {
-    let { brewery ,changeMode } = this.props
+    let { brewery , changeMode } = this.props
 
     let mode = brewery ? brewery.mode : undefined;
 

@@ -5,7 +5,7 @@ import {formatTemp} from '../util/tempature'
 export default class Sensors extends Component {
 
   updateLocation(sensorToChange, location){
-    let { configuration, updateConfiguration } = this.props
+    let { configuration, requestUpdateConfiguration } = this.props
 
     let sensors = configuration.sensors;
 
@@ -17,7 +17,7 @@ export default class Sensors extends Component {
     });
 
     let newConfig = Object.assign(configuration, { sensors });
-    updateConfiguration(newConfig)
+    requestUpdateConfiguration(newConfig)
   }
 
   render() {
