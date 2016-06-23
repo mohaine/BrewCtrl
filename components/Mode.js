@@ -14,14 +14,12 @@ export default class Mode extends Component {
     }
 
     return (
-
       <div className="mode">
         {(button("On",mode,"ON"))}
         {(button("Hold",mode,"HOLD"))}
         {(button("Heat Off",mode,"HEAT_OFF"))}
         {(button("Off",mode,"OFF"))}
       </div>
-
     )
   }
 }
