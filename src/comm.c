@@ -446,10 +446,6 @@ bool parseJsonStep(json_object *step, ControlStep * cs) {
 
 void handleStatusRequest(Request * request, Response * response) {
 	char tmp[BUFFER_SIZE];
-
-	DBG("request->contentLength %d \n",request->contentLength );
-
-
 	if (request->contentLength > 0) {
 		bool valid = true;
 		int paramSize = readParam("mode", request->contentp, request->contentLength, tmp);
