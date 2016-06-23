@@ -45,6 +45,16 @@ export default class Tank extends Component {
     let sensor = tank ? tank.sensor : undefined;
     let heater = tank ? tank.heater : undefined;
 
+    let dutyQuickPickItems = [
+      {value:0,text:"0%"},
+      {value:33,text:"33%"},
+      {value:66,text:"66%"},
+      {value:100,text:"100%"},
+    ];
+    if(heater  && sensor){
+      dutyQuickPickItems.push({value:"AUTO",text:"Auto"});
+    }
+
     return (<div>
         { this.state.editTargetTemp && (<QuickPick close={()=>{this.setState({editTargetTemp: false })}}
         apply={(value)=>{this.updateTargetTemp(value)}}
@@ -60,13 +70,7 @@ export default class Tank extends Component {
         />)}
         { this.state.editElementDuty && (<QuickPick close={()=>{this.setState({editElementDuty: false })}}
         apply={(value)=>{this.updateElementDuty(value)}}
-        quickPickValues={ [
-          {value:0,text:"0%"},
-          {value:33,text:"33%"},
-          {value:66,text:"66%"},
-          {value:100,text:"100%"},
-          {value:"AUTO",text:"Auto"},
-        ]}
+        quickPickValues={ dutyQuickPickItems}
         increment={(value,up)=>{
           if(value == 'AUTO'){
             return up? 0: 100;
@@ -137,7 +141,8 @@ export default class Tank extends Component {
                 </text>
                 <path
                    className="element"
-                   style={{stroke:"#000000",strokeWidth:"1px",strokeLinecap:"butt",strokeLinejoin:"miter",strokeOpacity:1, fill: heater.on? heater.automaticControl?"#faa": "#f00": "none"}}
+                   style={{stroke:"#000000",strokeWidth:"1px",strokeLinecap:"butt",strokeLinejoin:"miter",strokeOpacity:1,
+                   fill: heater.on? heater.automaticControl?"#faa": "#f00": "#fff"}}
                    d="m 299.7437,398.38955 -8.63379,0 0,4.34469 -125.54539,0 0,4.4293 123.54945,0 0,4.42929 -123.54945,0 0,4.4293 125.54539,0 0,3.31794 8.63379,0 z"
                    id="path3809"
                     />
