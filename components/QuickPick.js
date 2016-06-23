@@ -59,7 +59,6 @@ export default class QuickPick extends Component {
 			this.mouseDownTimeout = setTimeout(timeoutFunction, delay);
 		};
 		timeoutFunction();
-
 	}
   cancelMouseDown(){
     if(this.mouseDownTimeout){
@@ -73,7 +72,7 @@ export default class QuickPick extends Component {
   render() {
     let { quickPickValues, formatValue } = this.props
       return (
-        <div>
+        <div style={{position: "relative", display: "inline-block"}}>
         <div  onClick={(e) => {e.preventDefault(); this.close();}} style={{
           position: 'fixed',
           width: '100%',
@@ -87,7 +86,7 @@ export default class QuickPick extends Component {
           zIndex: 1
         }}>
         </div>
-      <div  style={{backgroundColor: "#fff",position: "absolute", top: "0px",right: "0px", zIndex: 11, border: "1px solid black"}} >
+      <div  style={{backgroundColor: "#fff",position: "absolute", top: "0px",left: "0px", zIndex: 11, border: "1px solid black"}} >
         <div style={{ width: '200px',position: 'relative',height: '190px',display: 'inline-block'}}>
           <div style={{ marginRight: '75px', padding: '7px'}}>
             <svg

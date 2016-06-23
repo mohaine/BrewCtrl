@@ -6,7 +6,7 @@ import Tank from '../components/Tank'
 import Pump from '../components/Pump'
 import Mode from '../containers/Mode'
 import QuickPick from '../components/QuickPick'
-
+import ContentEditable from '../components/ContentEditable'
 
 export default class Step extends Component {
 
@@ -19,8 +19,18 @@ export default class Step extends Component {
   updateTime(time){
     let { step, requestUpdateStep } = this.props
     requestUpdateStep(Object.assign({}, step.rawStep, { stepTime: time }));
-
   }
+
+  updateName(name){
+    let { step, requestUpdateStep } = this.props
+
+    if(this.updateNameTimer){
+      clearTimeout(this.updateNameTimer);
+      this.updateNameTimer = undefined;
+    }
+    this.updateNameTimer = setTimeout(()=>{requestUpdateStep(Object.assign({}, step.rawStep, { name: name }));}, 500);
+  }
+
   render() {
 
     function createEntry(seconds){
@@ -33,7 +43,6 @@ export default class Step extends Component {
 
       { step && (
       <div>
-
       { this.state.editTime && (<QuickPick close={()=>{this.setState({editTime: false })}}
       apply={(value)=>{this.updateTime(value)}}
       quickPickValues={ [
@@ -43,15 +52,23 @@ export default class Step extends Component {
           createEntry(90),
           createEntry(0),
         ]}
-      increment={(value,up)=>value + (up?60:-60)}
+      increment={(value,up)=>{
+        let v = value + (up? 60:-60);
+        if(v < 0){
+           v = 0;
+         }
+        return v;
+      }}
       value={step.time}
       formatValue={(t)=>formatTimeMinutes(t)}
       />)}
 
-        Step: {step.name}
-
-
-        Time: <span onClick={()=>this.setState({editTime: true })} >{formatTime(step.time)}</span>
+        <div>
+          Step: <ContentEditable onChange={(e)=>this.updateName(e.target.value)} html={step.name} />
+        </div>
+        <div>
+          Time: <span onClick={()=>this.setState({editTime: true })} >{formatTime(step.time)}</span>
+        </div>
 
         <div className="container-fluid">
           <div className="row">
