@@ -6,13 +6,11 @@ import QuickPick from '../components/QuickPick'
 import {overlayControlPoint} from '../util/step'
 
 export default class Tank extends Component {
-
   constructor(props) {
       super(props);
       this.state = {
         editTargetTemp: false,
         editElementDuty: false
-
       }
   }
   updateTargetTemp(temp){
