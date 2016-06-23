@@ -23,8 +23,8 @@ const mapDispatchToProps = (dispatch) => {
     requestUpdateStep: (step) => {
       dispatch(updateStep(step));
     },
-    requestUpdateStepList: (step) => {
-      dispatch(updateStepList(step));
+    requestUpdateStepList: (steps) => {
+      dispatch(updateStepList(steps));
     },
     updateConfiguration: (cfg) => {
       dispatch(updateConfiguration(cfg));

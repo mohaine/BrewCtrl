@@ -37,12 +37,15 @@ export default class Step extends Component {
       return {value:seconds*60,text:formatTimeMinutes(seconds*60)};
     }
 
-    let { step, requestUpdateStep } = this.props
+    let { step, requestUpdateStep,requestRemoveStep } = this.props
     return (<div>
 
 
       { step && (
       <div>
+
+      {requestRemoveStep && <button type="button" onClick={()=>requestRemoveStep(step.rawStep)}>Remove</button> }
+
       { this.state.editTime && (<QuickPick close={()=>{this.setState({editTime: false })}}
       apply={(value)=>{this.updateTime(value)}}
       quickPickValues={ [

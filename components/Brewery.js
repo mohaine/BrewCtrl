@@ -15,16 +15,25 @@ export default class Brewery extends Component {
   }
   render() {
     let { brewery ,requestState, requestStateStatus, requestUpdateStep, configuration, updateConfiguration, requestUpdateStepList } = this.props
-    return (<div>
 
+
+    let requestRemoveStep = (step) => {
+      let rawSteps = brewery ? brewery.steps.map(s=> s.rawStep): [];
+      rawSteps = rawSteps.filter(s => s !== step)
+      requestUpdateStepList(rawSteps);
+    }
+
+
+    return (<div>
       <Mode />
+
 
       {!brewery && requestStateStatus && requestStateStatus.active && (<div>Loading state</div>) }
       { brewery && (
       <div>
         <div className="container-fluid">
           <div className="row">
-            {brewery.steps.map(step=> (<div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep} /></div>))}
+            {brewery.steps.map(step=> (<div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep} requestRemoveStep={requestRemoveStep} /></div>))}
           </div>
         </div>
 
