@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 
+import Sensors from '../components/Sensors'
 
 export default class Configuration extends Component {
 
@@ -51,8 +52,8 @@ export default class Configuration extends Component {
   }
 
   render() {
-    let { configuration,requestConfiguration, requestConfigurationStatus ,requestUpdateConfiguration } = this.props
-    return (<div> Configuration:
+    let { brewery ,configuration,requestConfiguration, requestConfigurationStatus ,requestUpdateConfiguration } = this.props
+    return (<div>
 
 
       {this.state.alert && (<div className="alert alert-danger" role="alert">{this.state.alert}</div>)}
@@ -62,12 +63,12 @@ export default class Configuration extends Component {
 
       {!configuration && requestConfigurationStatus && requestConfigurationStatus.active && (<div>Loading configuration</div>) }
       { configuration && (<div>
-        Version {configuration.version}
+       Current Configuration Version: {configuration.version}
       </div>) }
 
       <div className="panel panel-default config-upload">
       	<div className="panel-title">
-      	      <label for="configurationToUpload">Select a Configuration File to Upload</label><br />
+      	      <label forHtml="configurationToUpload">Select a Configuration File to Upload</label><br />
       	</div>
       	<div className="panel-body">
       		<div className="row">
@@ -78,6 +79,8 @@ export default class Configuration extends Component {
       		</div>
       	</div>
       </div>
+
+        { configuration && brewery && <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
 
 
        </div>)

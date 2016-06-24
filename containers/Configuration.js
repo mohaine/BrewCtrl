@@ -4,10 +4,12 @@ import { requestConfiguration,requestUpdateConfiguration } from '../actions/conf
 import Component from '../components/Configuration'
 
 const mapStateToProps = (state) => {
+  let brewery = state.server.brewery
   let configuration = state.server.configuration;
   let requestConfigurationStatus = state.server.requestConfigurationStatus;
   let requestUpdateConfigurationStatus = state.server.requestUpdateConfigurationStatus;
   return {
+    brewery,
     configuration,
     requestConfigurationStatus,
     requestUpdateConfigurationStatus

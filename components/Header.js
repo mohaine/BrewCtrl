@@ -9,11 +9,11 @@ export default class Header extends Component {
   }
   render() {
         return (<div>
+          <div style={{float: "right"}}>
+            <RouteLink route="brew">Brew</RouteLink> &nbsp;
+            <RouteLink route="configuration">Configuration</RouteLink>
+          </div>
           <Mode />
-          <RouteLink route="">Home</RouteLink>
-          <RouteLink route="configuration">Configuration</RouteLink>
-
-
-          </div>)
+        </div>)
   }
 }

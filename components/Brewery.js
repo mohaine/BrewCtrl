@@ -38,7 +38,6 @@ export default class Brewery extends Component {
 
         <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById} />
         <AddStep steps={brewery.steps} requestUpdateStepList={requestUpdateStepList} configuration={configuration} />
-        <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>
       </div>
 
     ) }

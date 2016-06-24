@@ -1,50 +1,16 @@
 import React, { Component, PropTypes } from 'react'
 
 import {formatTemp} from '../util/tempature'
+import ContentEditable from '../components/ContentEditable'
+import Sensor from '../components/Sensor'
+
 
 export default class Sensors extends Component {
-
-  updateLocation(sensorToChange, location){
-    let { configuration, requestUpdateConfiguration } = this.props
-
-    let sensors = configuration.sensors;
-
-    sensors = sensors.map(sensor => {
-      if(sensor.address === sensorToChange.address){
-        return Object.assign({}, sensor, { location });
-      }
-      return sensor;
-    });
-
-    let newConfig = Object.assign(configuration, { sensors });
-    requestUpdateConfiguration(newConfig)
-  }
-
   render() {
-    let { sensors, configuration } = this.props
+    let { sensors, configuration,requestUpdateConfiguration} = this.props
   return (<div>
         Sensors
-
-        {sensors &&  sensors.map(sensor=>(<div key={sensor.address}>
-
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-sm-1">{sensor.name}</div>
-              <div className="col-sm-1">
-
-              <select onChange={(e)=>this.updateLocation(sensor,e.target.value)} value={sensor.location}>
-              <option value=""></option>
-              {configuration.brewLayout.tanks.map(tank=>(<option key={tank.name} value={tank.name} >{tank.name}</option>))}
-              </select>
-              </div>
-              <div className="col-sm-1"
-                style={{
-                  color: (sensor.reading? "#000" : "#f00")
-                }}
-                >{formatTemp(sensor.temperatureC)}</div>
-              </div>
-          </div>
-          </div>))}
+        {sensors &&  sensors.map(sensor=>(<Sensor key={sensor.address} sensor={sensor} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>))}
        </div>)
   }
 }
