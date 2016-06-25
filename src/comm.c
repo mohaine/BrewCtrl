@@ -83,6 +83,13 @@ int checkSuffix(const char *str, const char *suffix) {
 	return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
 }
 
+bool startsWith(const char *pre, const char *str)
+{
+    size_t lenpre = strlen(pre),
+           lenstr = strlen(str);
+    return lenstr < lenpre ? false : strncmp(pre, str, lenpre) == 0;
+}
+
 void handleOtherRequest(Request * request, Response * response) {
 	//ERR("Request Path: '%s'\n", request->path);
 
@@ -98,6 +105,7 @@ void handleOtherRequest(Request * request, Response * response) {
 	fileName[offset++] = 'b';
 	fileName[offset++] = '/';
 
+
 	if (length == 1) {
 		fileName[offset++] = 'b';
 		fileName[offset++] = 'r';
@@ -107,6 +115,26 @@ void handleOtherRequest(Request * request, Response * response) {
 		fileName[offset++] = 't';
 		fileName[offset++] = 'r';
 		fileName[offset++] = 'l';
+		fileName[offset++] = '.';
+		fileName[offset++] = 'h';
+		fileName[offset++] = 't';
+		fileName[offset++] = 'm';
+		fileName[offset++] = 'l';
+	} else if(startsWith("/brewctrl",request->path)) {
+		fileName[offset++] = 'b';
+		fileName[offset++] = 'r';
+		fileName[offset++] = 'e';
+		fileName[offset++] = 'w';
+		fileName[offset++] = 'c';
+		fileName[offset++] = 't';
+		fileName[offset++] = 'r';
+		fileName[offset++] = 'l';
+		fileName[offset++] = '/';
+		fileName[offset++] = 'i';
+		fileName[offset++] = 'n';
+		fileName[offset++] = 'd';
+		fileName[offset++] = 'e';
+		fileName[offset++] = 'x';
 		fileName[offset++] = '.';
 		fileName[offset++] = 'h';
 		fileName[offset++] = 't';
@@ -137,7 +165,7 @@ void handleOtherRequest(Request * request, Response * response) {
 
 	struct stat st;
 	if (stat(fileName, &st) >= 0) {
-//		ERR("Send File %s\n", fileName);
+		DBG("Send File %s\n", fileName);
 
 		ssize_t s = st.st_size;
 
