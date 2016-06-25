@@ -5,13 +5,13 @@ var config = {
     name: packageJson.name,
     versionHash: git.long(),
     buildTime: new Date(),
-    googleAnalyticsId: 'UA-78659637-1'
+    logState: false
 };
 
 module.exports = {
   entry: __dirname + '/index.js',
   output: {
-    path: __dirname + "/public/",
+    path: __dirname + "/web/",
     filename: 'bundle.js'
   },
   externals: [{

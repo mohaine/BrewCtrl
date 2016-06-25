@@ -5,13 +5,26 @@ import rootReducer from '../reducers'
 import { routerMiddleware } from 'react-router-redux'
 import { browserHistory } from 'react-router'
 
-const middlewareR= routerMiddleware(browserHistory)
+import config from 'config'
+
+
+const middlewareR = routerMiddleware(browserHistory)
 
 export default function configureStore(initialState) {
+  let middle;
+
+  console.log(config)
+  if(config.logState){
+    middle = applyMiddleware(thunkMiddleware,middlewareR, createLogger());
+  } else {
+    middle = applyMiddleware(thunkMiddleware,middlewareR);
+  }
+
+
   const store = createStore(
     rootReducer,
     initialState,
-    compose(applyMiddleware(thunkMiddleware,middlewareR, createLogger()),
+    compose(middle,
     window.devToolsExtension ? window.devToolsExtension() : f => f)
   )
 

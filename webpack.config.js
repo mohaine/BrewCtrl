@@ -8,7 +8,7 @@ var config = {
     name: packageJson.name,
     versionHash: git.long(),
     buildTime: new Date(),
-    googleAnalyticsId: 'UA-78659637-2'
+    logState: true
 };
 
 module.exports = {
