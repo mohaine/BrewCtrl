@@ -52,7 +52,7 @@ export default class Sensor extends Component {
   return (<div >
           <div className="container-fluid">
             <div className="row">
-              <div className="col-sm-3">
+              <div className="col-sm-2">
               <ContentEditable onChange={(e)=>this.updateName(e.target.value)} html={sensor.name} />
               </div>
               <div className="col-sm-1">
