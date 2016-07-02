@@ -9,6 +9,7 @@ import App from './components/App'
 import Default from './components/Default'
 import Configuration from './containers/Configuration'
 import Brewery from './containers/Brewery'
+import StepLists from './containers/StepLists'
 import About from './components/About'
 
 import config from 'config'
@@ -38,6 +39,7 @@ render(<div>
             <Route path="about" component={About}/>
             <Route path="configuration" component={Configuration}/>
             <Route path="brew" component={Brewery}/>
+            <Route path="steplists" component={StepLists}/>
           </Route>
         </Router>
   </Provider></div>,

@@ -13,7 +13,6 @@ const middlewareR = routerMiddleware(browserHistory)
 export default function configureStore(initialState) {
   let middle;
 
-  console.log(config)
   if(config.logState){
     middle = applyMiddleware(thunkMiddleware,middlewareR, createLogger());
   } else {

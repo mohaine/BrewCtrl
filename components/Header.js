@@ -11,7 +11,8 @@ export default class Header extends Component {
         return (<div>
           <div style={{float: "right"}}>
             <RouteLink route="brew">Brew</RouteLink> &nbsp;
-            <RouteLink route="configuration">Configuration</RouteLink>
+            <RouteLink route="configuration">Configuration</RouteLink> &nbsp;
+            <RouteLink route="steplists">Step Lists</RouteLink>
           </div>
           <Mode />
         </div>)
