@@ -29507,9 +29507,9 @@
 	};
 	var startStatusLoad = function startStatusLoad(dispatch) {
 	    if (!statusLoadInterval) {
-	        // statusLoadInterval = setInterval(()=>{
-	        //   dispatch(requestStatusNoSchedule());
-	        // }, 500);
+	        statusLoadInterval = setInterval(function () {
+	            dispatch(requestStatusNoSchedule());
+	        }, 500);
 	    }
 	};
 
@@ -51836,7 +51836,7 @@
 /* 683 */
 /***/ function(module, exports) {
 
-	module.exports = {"name":"brewctrl-ui","versionHash":"c38bbe027f13505a58130de4965e9497836c4eb6","buildTime":"2016-07-15T22:56:21.867Z","logState":false};
+	module.exports = {"name":"brewctrl-ui","versionHash":"1557f2df65c5ed7a24d883b6ce7a81f98e109790","buildTime":"2016-07-15T22:59:50.761Z","logState":false};
 
 /***/ },
 /* 684 */
