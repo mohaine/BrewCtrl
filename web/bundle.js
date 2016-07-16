@@ -51836,7 +51836,7 @@
 /* 683 */
 /***/ function(module, exports) {
 
-	module.exports = {"name":"brewctrl-ui","versionHash":"1557f2df65c5ed7a24d883b6ce7a81f98e109790","buildTime":"2016-07-15T22:59:50.761Z","logState":false};
+	module.exports = {"name":"brewctrl-ui","versionHash":"a42d14ed77bb1fdb544fa3dc9f70c49146a1143c","buildTime":"2016-07-16T03:19:36.960Z","logState":false};
 
 /***/ },
 /* 684 */
