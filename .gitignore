@@ -5,6 +5,7 @@ BrewCtrlAndroid/gen/
 WebCtrl/war/WEB-INF/lib/
 obj
 brewctrl
+go
 trace.out
 Makefile.local
 *.bak
