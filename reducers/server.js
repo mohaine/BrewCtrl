@@ -109,6 +109,7 @@ export default (state = {}, action) => {
         status,
         brewery: buildBreweryView(action.data,state.configuration),
         requestStatusStatus: null,
+        lastStatusDate : new Date()
       })
 
 

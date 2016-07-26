@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import Footer from './Footer'
-import Header from './Header'
+import Header from '../containers/Header'
 import { Router, Route, browserHistory } from 'react-router'
 
 
