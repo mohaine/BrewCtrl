@@ -17,7 +17,7 @@ export default class Mode extends Component {
 
     function button(text, current, mode){
       let selected = current === mode;
-      return ( <button id="modeOn" className={"btn " + (selected?"down":"btn-default")} onClick={()=>{if(!selected) changeMode(mode)}} >{text}</button>)
+      return ( <button id="modeOn" style={{marginRight:"3px"}} className={"btn btn-lg " + (selected?"down":"btn-default")} onClick={()=>{if(!selected) changeMode(mode)}} >{text}</button>)
     }
 
     return (

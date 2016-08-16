@@ -13,7 +13,7 @@ export default class Header extends Component {
       let last = this.props.lastStatusDate;
       if(this.props.lastStatusDate){
         let now = new Date()
-        let commLost = now.getTime() - last.getTime()  > 2000
+        let commLost = now.getTime() - last.getTime()  > 5000
         if(commLost!= this.state.commLost){
           this.setState({commLost})
         }
@@ -26,7 +26,7 @@ export default class Header extends Component {
     }
   }
   render() {
-        return (<div className="container-fluid">
+        return (<div className="container-fluid" style={{paddingTop: "15px"}}>
           <div style={{float: "right"}}>
             <RouteLink route="brew">Brew</RouteLink> &nbsp;
             <RouteLink route="configuration">Configuration</RouteLink> &nbsp;
