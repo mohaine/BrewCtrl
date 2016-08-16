@@ -6,19 +6,15 @@ import {emptyGpios} from '../util/gpio'
 import ContentEditable from '../components/ContentEditable'
 
 
-export default class ControlEdit extends Component {
+export default class PumpEdit extends Component {
 
   overlayUpdate(overlay,remove){
-
     if(this.overlay){
       this.overlay = Object.assign({}, this.overlay, overlay);
     }
-
     let { configuration, requestUpdateConfiguration } = this.props
-
     let brewLayout = configuration.brewLayout
-
-    let pumps = brewLayout.pumps.slice();
+    let pumps = brewLayout.pumps;
     if(overlay){
       pumps = pumps.map(control => {
         if(control.id === this.props.control.id){
@@ -48,7 +44,6 @@ export default class ControlEdit extends Component {
   remove(){
     this.overlayUpdate(null,true);
   }
-
 
   updateName(name){
     this.overlayUpdate({name});

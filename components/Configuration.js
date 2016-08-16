@@ -2,9 +2,9 @@ import React, { Component, PropTypes } from 'react'
 
 import Sensors from '../components/Sensors'
 import Pumps from '../components/Pumps'
+import Tanks from '../components/Tanks'
 
 export default class Configuration extends Component {
-
   constructor(props) {
       super(props);
       this.state = {
@@ -64,9 +64,6 @@ export default class Configuration extends Component {
 
 
       {!configuration && requestConfigurationStatus && requestConfigurationStatus.active && (<div>Loading configuration</div>) }
-      { configuration && (<div>
-       Current Configuration Version: {configuration.version}
-      </div>) }
 
       <div className="panel panel-default config-upload">
       	<div className="panel-title">
@@ -84,6 +81,7 @@ export default class Configuration extends Component {
 
       { configuration && brewery && <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
       { configuration && <Pumps pumps={configuration.brewLayout.pumps} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
+      { configuration && <Tanks tanks={configuration.brewLayout.tanks} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
 
 
        </div>)

@@ -14,7 +14,7 @@ function buildBreweryView(status,configuration){
       let steps = status.steps.map(step=>{
         let tanks = configuration.brewLayout.tanks.map(t=>{
           let name = t.name;
-          let id = "tank" + name;
+          let id = t.id
           let heater = t.heater;
           let sensor = t.sensor;
 
@@ -40,7 +40,7 @@ function buildBreweryView(status,configuration){
             pump = {};
           }
           let name = p.name;
-          let id = "pump" +  p.io;
+          let id = p.id
 
           return  Object.assign({}, pump, {
             id, name

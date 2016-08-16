@@ -9,7 +9,7 @@ export default class Sensors extends Component {
   render() {
     let { sensors, configuration,requestUpdateConfiguration} = this.props
   return (<div>
-        Sensors
+        <h2>Sensors</h2>
         {sensors &&  sensors.map(sensor=>(<Sensor key={sensor.address} sensor={sensor} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>))}
        </div>)
   }

@@ -1,4 +1,3 @@
-
 import React, { Component, PropTypes } from 'react'
 
 import {formatTemp,convertF2C,formatTempWhole} from '../util/tempature'

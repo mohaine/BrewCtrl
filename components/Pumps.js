@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 
 import {formatTemp} from '../util/tempature'
 import ContentEditable from '../components/ContentEditable'
-import ControlEdit from '../components/ControlEdit'
+import PumpEdit from '../components/PumpEdit'
 import {emptyGpios} from '../util/gpio'
 
 
@@ -20,9 +20,9 @@ export default class Pumps extends Component {
   render() {
     let { pumps, configuration,requestUpdateConfiguration} = this.props
   return (<div>
-        Pumps
-        {pumps &&  pumps.map(pump=>(<ControlEdit key={pump.id} control={pump} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>))}
-        <button className="btn btn-default" onClick={()=>this.addPump()}>Add Pump</button>
+        <h2>Pumps <button className="btn btn-default" onClick={()=>this.addPump()}>Add</button></h2>
+        {pumps &&  pumps.map(pump=>(<PumpEdit key={pump.id} control={pump} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>))}
+
        </div>)
   }
 }

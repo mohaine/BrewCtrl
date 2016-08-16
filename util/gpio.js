@@ -8,6 +8,10 @@ export const emptyGpios =  function(configuration){
       if(pumps.find(p=>p.io == io)){
         return false;
       }
+      let tanks = brewLayout.tanks;
+      if(tanks.find(t=>t.heater && t.heater.io == io)){
+        return false;
+      }
     }
     return true;
   }).sort((a,b)=> a-b)
