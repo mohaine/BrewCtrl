@@ -20,6 +20,7 @@
 #include "config.h"
 #include "logger.h"
 #include "duty.h"
+#include "brewctrl.h"
 
 #include <sys/stat.h>
 #include <sys/socket.h>
@@ -62,6 +63,7 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 		json_object_array_add(tanks, tank);
 		Tank * t = &tA[i];
 		json_object_object_add(tank, "name", json_object_new_string(t->name));
+		json_object_object_add(tank, "id", json_object_new_string(t->id));
 
 		if (t->sensor != NULL) {
 			json_object *sensor = json_object_new_object();
@@ -72,7 +74,7 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 		if (t->heater != NULL) {
 			json_object *heater = json_object_new_object();
 			json_object_object_add(tank, "heater", heater);
-
+			json_object_object_add(heater, "id", json_object_new_string(t->heater->id));
 			json_object_object_add(heater, "name", json_object_new_string(t->heater->name));
 			json_object_object_add(heater, "io", json_object_new_int(t->heater->io));
 			json_object_object_add(heater, "invertIo", json_object_new_boolean(t->heater->invertIo));
@@ -89,11 +91,11 @@ void appendBrewLayout(json_object *config, BreweryLayout * bl) {
 		json_object *pump = json_object_new_object();
 		json_object_array_add(pumps, pump);
 		Pump * t = &pA[i];
+		json_object_object_add(pump, "id", json_object_new_string(t->id));
 		json_object_object_add(pump, "name", json_object_new_string(t->name));
 		json_object_object_add(pump, "io", json_object_new_int(t->io));
 		json_object_object_add(pump, "invertIo", json_object_new_boolean(t->invertIo));
 		json_object_object_add(pump, "hasDuty", json_object_new_boolean(t->hasDuty));
-
 	}
 
 }
@@ -160,10 +162,8 @@ char* formatJsonConfiguration(Configuration * cfg) {
 						json_object_object_add(controlPoint, "controlName", json_object_new_string(cp->controlName));
 						json_object_object_add(controlPoint, "targetName", json_object_new_string(cp->targetName));
 						json_object_object_add(controlPoint, "targetTemp", json_object_new_double(cp->targetTemp));
-
 					}
 				}
-
 			}
 
 		}
@@ -198,10 +198,17 @@ HeatElement * parseHeatElement(json_object *layout) {
 	bool valid = false;
 	HeatElement * s = malloc(sizeof(HeatElement));
 	s->name = NULL;
+	s->id = NULL;
 
 	if (json_object_get_type(layout) == json_type_object) {
 		valid = true;
 		json_object * value;
+		json_object_object_get_ex(layout, "id", &value);
+		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+			s->id = mallocStringFromJsonString(value);
+		} else {
+			s->id = generateRandomId();
+		}
 		json_object_object_get_ex(layout, "name", &value);
 		if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 			s->name = mallocStringFromJsonString(value);
@@ -237,7 +244,6 @@ HeatElement * parseHeatElement(json_object *layout) {
 		} else {
 			valid = false;
 		}
-
 	}
 	if (!valid) {
 		freeIfNotNull(s->name);
@@ -446,9 +452,17 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 
 					Tank * t = &tA[i];
 
+					t->id = NULL;
 					t->name = NULL;
 					t->sensor = NULL;
 					t->heater = NULL;
+
+					json_object_object_get_ex(tank, "id", &value);
+					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+						t->id = mallocStringFromJsonString(value);
+					} else {
+						t->id = generateRandomId();
+					}
 
 					json_object_object_get_ex(tank, "name", &value);
 					if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
@@ -498,10 +512,17 @@ BreweryLayout * parseBrewLayout(json_object *layout) {
 
 					Pump * s = &pA[i];
 					s->name = NULL;
+					s->id = NULL;
 
 					if (json_object_get_type(pump) == json_type_object) {
 						valid = true;
 						json_object * value;
+						json_object_object_get_ex(pump, "id", &value);
+						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
+							s->id = mallocStringFromJsonString(value);
+						} else {
+							s->id = generateRandomId();
+						}
 						json_object_object_get_ex(pump, "name", &value);
 						if (valid && value != NULL && json_object_get_type(value) == json_type_string) {
 							s->name = mallocStringFromJsonString(value);
@@ -878,4 +899,3 @@ void setConfiguration(Configuration * newConfig) {
 Configuration * getConfiguration() {
 	return config;
 }
-
