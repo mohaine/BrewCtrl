@@ -74,11 +74,11 @@
 
 	var _Brewery2 = _interopRequireDefault(_Brewery);
 
-	var _StepLists = __webpack_require__(694);
+	var _StepLists = __webpack_require__(700);
 
 	var _StepLists2 = _interopRequireDefault(_StepLists);
 
-	var _About = __webpack_require__(696);
+	var _About = __webpack_require__(702);
 
 	var _About2 = _interopRequireDefault(_About);
 
@@ -90,11 +90,11 @@
 
 	var _reactRouterRedux = __webpack_require__(501);
 
-	var _server = __webpack_require__(697);
+	var _server = __webpack_require__(703);
 
 	var _configuration = __webpack_require__(509);
 
-	var _configureStore = __webpack_require__(698);
+	var _configureStore = __webpack_require__(704);
 
 	var _configureStore2 = _interopRequireDefault(_configureStore);
 
@@ -29426,7 +29426,7 @@
 	        var last = _this2.props.lastStatusDate;
 	        if (_this2.props.lastStatusDate) {
 	          var now = new Date();
-	          var commLost = now.getTime() - last.getTime() > 2000;
+	          var commLost = now.getTime() - last.getTime() > 5000;
 	          if (commLost != _this2.state.commLost) {
 	            _this2.setState({ commLost: commLost });
 	          }
@@ -29445,7 +29445,7 @@
 	    value: function render() {
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'container-fluid' },
+	        { className: 'container-fluid', style: { paddingTop: "15px" } },
 	        _react2.default.createElement(
 	          'div',
 	          { style: { float: "right" } },
@@ -31474,7 +31474,7 @@
 	        var selected = current === mode;
 	        return _react2.default.createElement(
 	          "button",
-	          { id: "modeOn", className: "btn " + (selected ? "down" : "btn-default"), onClick: function onClick() {
+	          { id: "modeOn", style: { marginRight: "3px" }, className: "btn btn-lg " + (selected ? "down" : "btn-default"), onClick: function onClick() {
 	              if (!selected) changeMode(mode);
 	            } },
 	          text
@@ -51911,7 +51911,7 @@
 /* 684 */
 /***/ function(module, exports) {
 
-	module.exports = {"name":"brewctrl-ui","versionHash":"a7a86e716bd52580815040b039d4a5b53a31b64e","buildTime":"2016-07-26T22:10:44.187Z","logState":false};
+	module.exports = {"name":"brewctrl-ui","versionHash":"7004f884d5d51def2eb51d1a0a046c0cc9ba1edb","buildTime":"2016-08-16T04:31:14.934Z","logState":false};
 
 /***/ },
 /* 685 */
@@ -52171,10 +52171,15 @@
 	var ContentEditable = function (_Component) {
 	    _inherits(ContentEditable, _Component);
 
-	    function ContentEditable() {
+	    function ContentEditable(props) {
 	        _classCallCheck(this, ContentEditable);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(ContentEditable).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ContentEditable).call(this, props));
+
+	        _this.state = {
+	            html: props.html
+	        };
+	        return _this;
 	    }
 
 	    _createClass(ContentEditable, [{
@@ -52190,20 +52195,20 @@
 	                    return _this2.emitChange(e);
 	                },
 	                contentEditable: true,
-	                dangerouslySetInnerHTML: { __html: this.props.html } });
+	                dangerouslySetInnerHTML: { __html: this.state.html } });
 	        }
 	    }, {
 	        key: "emitChange",
 	        value: function emitChange(e) {
 	            var html = e.target.innerText;
-	            if (this.props.onChange && html !== this.lastHtml) {
+	            if (this.props.onChange && html !== this.state.html) {
 	                this.props.onChange({
 	                    target: {
 	                        value: html
 	                    }
 	                });
 	            }
-	            this.lastHtml = html;
+	            this.setState({ html: html });
 	        }
 	    }]);
 
@@ -52266,7 +52271,11 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        'Sensors',
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Sensors'
+	        ),
 	        sensors && sensors.map(function (sensor) {
 	          return _react2.default.createElement(_Sensor2.default, { key: sensor.address, sensor: sensor, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration });
 	        })
@@ -52347,7 +52356,6 @@
 	      }
 
 	      this.updateCfgTimer = setTimeout(function () {
-	        console.log("UPDATE");
 	        requestUpdateConfiguration(newConfig);
 	        _this2.updateCfgTimer = undefined;
 	      }, 500);
@@ -52633,6 +52641,14 @@
 
 	var _Sensors2 = _interopRequireDefault(_Sensors);
 
+	var _Pumps = __webpack_require__(694);
+
+	var _Pumps2 = _interopRequireDefault(_Pumps);
+
+	var _Tanks = __webpack_require__(697);
+
+	var _Tanks2 = _interopRequireDefault(_Tanks);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -52717,6 +52733,7 @@
 	      var requestConfigurationStatus = _props2.requestConfigurationStatus;
 	      var requestUpdateConfiguration = _props2.requestUpdateConfiguration;
 
+
 	      return _react2.default.createElement(
 	        'div',
 	        null,
@@ -52734,12 +52751,6 @@
 	          'div',
 	          null,
 	          'Loading configuration'
-	        ),
-	        configuration && _react2.default.createElement(
-	          'div',
-	          null,
-	          'Current Configuration Version: ',
-	          configuration.version
 	        ),
 	        _react2.default.createElement(
 	          'div',
@@ -52785,7 +52796,9 @@
 	            )
 	          )
 	        ),
-	        configuration && brewery && _react2.default.createElement(_Sensors2.default, { sensors: brewery.sensors, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration })
+	        configuration && brewery && _react2.default.createElement(_Sensors2.default, { sensors: brewery.sensors, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
+	        configuration && _react2.default.createElement(_Pumps2.default, { pumps: configuration.brewLayout.pumps, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
+	        configuration && _react2.default.createElement(_Tanks2.default, { tanks: configuration.brewLayout.tanks, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration })
 	      );
 	    }
 	  }]);
@@ -52805,13 +52818,758 @@
 	  value: true
 	});
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(299);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _tempature = __webpack_require__(682);
+
+	var _ContentEditable = __webpack_require__(687);
+
+	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
+
+	var _PumpEdit = __webpack_require__(695);
+
+	var _PumpEdit2 = _interopRequireDefault(_PumpEdit);
+
+	var _gpio = __webpack_require__(696);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Pumps = function (_Component) {
+	  _inherits(Pumps, _Component);
+
+	  function Pumps() {
+	    _classCallCheck(this, Pumps);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Pumps).apply(this, arguments));
+	  }
+
+	  _createClass(Pumps, [{
+	    key: 'addPump',
+	    value: function addPump() {
+	      var _props = this.props;
+	      var configuration = _props.configuration;
+	      var requestUpdateConfiguration = _props.requestUpdateConfiguration;
+
+	      var io = (0, _gpio.emptyGpios)(configuration)[0];
+	      var brewLayout = configuration.brewLayout;
+	      var pumps = brewLayout.pumps.slice();
+	      pumps.push({ name: "New Pump", io: io, hasDuty: false, invertIo: false });
+	      brewLayout = Object.assign({}, brewLayout, { pumps: pumps });
+	      configuration = Object.assign({}, configuration, { brewLayout: brewLayout });
+	      requestUpdateConfiguration(configuration);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this2 = this;
+
+	      var _props2 = this.props;
+	      var pumps = _props2.pumps;
+	      var configuration = _props2.configuration;
+	      var requestUpdateConfiguration = _props2.requestUpdateConfiguration;
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Pumps ',
+	          _react2.default.createElement(
+	            'button',
+	            { className: 'btn btn-default', onClick: function onClick() {
+	                return _this2.addPump();
+	              } },
+	            'Add'
+	          )
+	        ),
+	        pumps && pumps.map(function (pump) {
+	          return _react2.default.createElement(_PumpEdit2.default, { key: pump.id, control: pump, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration });
+	        })
+	      );
+	    }
+	  }]);
+
+	  return Pumps;
+	}(_react.Component);
+
+	exports.default = Pumps;
+
+/***/ },
+/* 695 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(299);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _tempature = __webpack_require__(682);
+
+	var _gpio = __webpack_require__(696);
+
+	var _ContentEditable = __webpack_require__(687);
+
+	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var PumpEdit = function (_Component) {
+	  _inherits(PumpEdit, _Component);
+
+	  function PumpEdit() {
+	    _classCallCheck(this, PumpEdit);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(PumpEdit).apply(this, arguments));
+	  }
+
+	  _createClass(PumpEdit, [{
+	    key: 'overlayUpdate',
+	    value: function overlayUpdate(overlay, remove) {
+	      var _this2 = this;
+
+	      if (this.overlay) {
+	        this.overlay = Object.assign({}, this.overlay, overlay);
+	      }
+	      var _props = this.props;
+	      var configuration = _props.configuration;
+	      var requestUpdateConfiguration = _props.requestUpdateConfiguration;
+
+	      var brewLayout = configuration.brewLayout;
+	      var pumps = brewLayout.pumps;
+	      if (overlay) {
+	        pumps = pumps.map(function (control) {
+	          if (control.id === _this2.props.control.id) {
+	            return Object.assign({}, control, overlay);
+	          }
+	          return control;
+	        });
+	      } else if (remove) {
+	        pumps = pumps.filter(function (control) {
+	          return control.id != _this2.props.control.id;
+	        });
+	      }
+
+	      // Create new object tree
+	      brewLayout = Object.assign({}, brewLayout, { pumps: pumps });
+	      configuration = Object.assign({}, configuration, { brewLayout: brewLayout });
+
+	      if (this.updateCfgTimer) {
+	        clearTimeout(this.updateCfgTimer);
+	        this.updateCfgTimer = undefined;
+	      }
+
+	      this.updateCfgTimer = setTimeout(function () {
+	        requestUpdateConfiguration(configuration);
+	        _this2.updateCfgTimer = undefined;
+	      }, 500);
+	    }
+	  }, {
+	    key: 'remove',
+	    value: function remove() {
+	      this.overlayUpdate(null, true);
+	    }
+	  }, {
+	    key: 'updateName',
+	    value: function updateName(name) {
+	      this.overlayUpdate({ name: name });
+	    }
+	  }, {
+	    key: 'updateGpio',
+	    value: function updateGpio(io) {
+	      io = parseInt(io, 10);
+	      this.overlayUpdate({ io: io });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this3 = this;
+
+	      var _props2 = this.props;
+	      var control = _props2.control;
+	      var configuration = _props2.configuration;
+
+	      var gpios = (0, _gpio.emptyGpios)(configuration);
+	      gpios.push(control.io);
+	      gpios.sort(function (a, b) {
+	        return a - b;
+	      });
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'container-fluid' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'row' },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-2' },
+	              _react2.default.createElement(_ContentEditable2.default, { onChange: function onChange(e) {
+	                  return _this3.updateName(e.target.value);
+	                }, html: control.name })
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-1' },
+	              _react2.default.createElement(
+	                'select',
+	                { onChange: function onChange(e) {
+	                    return _this3.updateGpio(e.target.value);
+	                  }, value: control.io },
+	                _react2.default.createElement('option', { value: '' }),
+	                gpios.map(function (io) {
+	                  return _react2.default.createElement(
+	                    'option',
+	                    { key: io, value: io },
+	                    'GPIO ',
+	                    io
+	                  );
+	                })
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-1' },
+	              _react2.default.createElement(
+	                'button',
+	                { className: 'btn btn-default', onClick: function onClick() {
+	                    return _this3.remove();
+	                  } },
+	                'Remove'
+	              )
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return PumpEdit;
+	}(_react.Component);
+
+	exports.default = PumpEdit;
+
+/***/ },
+/* 696 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var emptyGpios = exports.emptyGpios = function emptyGpios(configuration) {
+	  var gpios = [2, 3, 4, 14, 15, 17, 18, 27, 22, 23, 24, 10, 9, 25, 11, 8, 7].filter(function (io) {
+	    var brewLayout = configuration.brewLayout;
+	    if (brewLayout) {
+	      var pumps = brewLayout.pumps;
+	      if (pumps.find(function (p) {
+	        return p.io == io;
+	      })) {
+	        return false;
+	      }
+	      var tanks = brewLayout.tanks;
+	      if (tanks.find(function (t) {
+	        return t.heater && t.heater.io == io;
+	      })) {
+	        return false;
+	      }
+	    }
+	    return true;
+	  }).sort(function (a, b) {
+	    return a - b;
+	  });
+	  return gpios;
+	};
+
+/***/ },
+/* 697 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(299);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _tempature = __webpack_require__(682);
+
+	var _ContentEditable = __webpack_require__(687);
+
+	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
+
+	var _TankEdit = __webpack_require__(698);
+
+	var _TankEdit2 = _interopRequireDefault(_TankEdit);
+
+	var _gpio = __webpack_require__(696);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Tanks = function (_Component) {
+	  _inherits(Tanks, _Component);
+
+	  function Tanks() {
+	    _classCallCheck(this, Tanks);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Tanks).apply(this, arguments));
+	  }
+
+	  _createClass(Tanks, [{
+	    key: 'addTank',
+	    value: function addTank() {
+	      var _props = this.props;
+	      var configuration = _props.configuration;
+	      var requestUpdateConfiguration = _props.requestUpdateConfiguration;
+
+	      var io = (0, _gpio.emptyGpios)(configuration)[0];
+	      var brewLayout = configuration.brewLayout;
+	      var tanks = brewLayout.tanks.slice();
+	      tanks.push({ name: "New Tank", io: io, hasDuty: true, invertIo: false });
+	      brewLayout = Object.assign({}, brewLayout, { tanks: tanks });
+	      configuration = Object.assign({}, configuration, { brewLayout: brewLayout });
+	      requestUpdateConfiguration(configuration);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this2 = this;
+
+	      var _props2 = this.props;
+	      var tanks = _props2.tanks;
+	      var configuration = _props2.configuration;
+	      var requestUpdateConfiguration = _props2.requestUpdateConfiguration;
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Tanks ',
+	          _react2.default.createElement(
+	            'button',
+	            { className: 'btn btn-default', onClick: function onClick() {
+	                return _this2.addTank();
+	              } },
+	            'Add'
+	          )
+	        ),
+	        tanks && tanks.map(function (tank) {
+	          return _react2.default.createElement(
+	            'div',
+	            { key: tank.id },
+	            _react2.default.createElement(_TankEdit2.default, { tank: tank, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration })
+	          );
+	        })
+	      );
+	    }
+	  }]);
+
+	  return Tanks;
+	}(_react.Component);
+
+	exports.default = Tanks;
+
+/***/ },
+/* 698 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(299);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _ContentEditable = __webpack_require__(687);
+
+	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
+
+	var _HeaterElementEdit = __webpack_require__(699);
+
+	var _HeaterElementEdit2 = _interopRequireDefault(_HeaterElementEdit);
+
+	var _gpio = __webpack_require__(696);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Tank = function (_Component) {
+	  _inherits(Tank, _Component);
+
+	  function Tank() {
+	    _classCallCheck(this, Tank);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Tank).apply(this, arguments));
+	  }
+
+	  _createClass(Tank, [{
+	    key: 'overlayUpdate',
+	    value: function overlayUpdate(overlay, remove, addElement) {
+	      var _this2 = this;
+
+	      if (this.overlay) {
+	        this.overlay = Object.assign({}, this.overlay, overlay);
+	      }
+	      var _props = this.props;
+	      var configuration = _props.configuration;
+	      var requestUpdateConfiguration = _props.requestUpdateConfiguration;
+
+	      var brewLayout = configuration.brewLayout;
+	      var tanks = brewLayout.tanks.slice();
+	      if (overlay) {
+	        tanks = tanks.map(function (tank) {
+	          if (tank.id === _this2.props.tank.id) {
+	            return Object.assign({}, tank, overlay);
+	          }
+	          return tank;
+	        });
+	      } else if (remove) {
+	        tanks = tanks.filter(function (tank) {
+	          return tank.id != _this2.props.tank.id;
+	        });
+	      } else if (addElement) {
+	        tanks = tanks.filter(function (tank) {
+	          return tank.id != _this2.props.tank.id;
+	        });
+	      }
+
+	      // Create new object tree
+	      brewLayout = Object.assign({}, brewLayout, { tanks: tanks });
+	      configuration = Object.assign({}, configuration, { brewLayout: brewLayout });
+
+	      if (this.updateCfgTimer) {
+	        clearTimeout(this.updateCfgTimer);
+	        this.updateCfgTimer = undefined;
+	      }
+
+	      this.updateCfgTimer = setTimeout(function () {
+	        requestUpdateConfiguration(configuration);
+	        _this2.updateCfgTimer = undefined;
+	      }, 500);
+	    }
+	  }, {
+	    key: 'remove',
+	    value: function remove() {
+	      this.overlayUpdate(null, true);
+	    }
+	  }, {
+	    key: 'updateName',
+	    value: function updateName(name) {
+	      this.overlayUpdate({ name: name });
+	    }
+	  }, {
+	    key: 'addElement',
+	    value: function addElement() {
+	      var tank = this.props.tank;
+	      var _props2 = this.props;
+	      var configuration = _props2.configuration;
+	      var requestUpdateConfiguration = _props2.requestUpdateConfiguration;
+
+	      var io = (0, _gpio.emptyGpios)(configuration)[0];
+	      this.overlayUpdate({ heater: { name: tank.name + " Heater", io: io, hasDuty: false, invertIo: false, fullOnAmps: 0 } });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this3 = this;
+
+	      var _props3 = this.props;
+	      var tank = _props3.tank;
+	      var configuration = _props3.configuration;
+	      var requestUpdateConfiguration = _props3.requestUpdateConfiguration;
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(_ContentEditable2.default, { onChange: function onChange(e) {
+	            return _this3.updateName(e.target.value);
+	          }, html: tank.name }),
+	        tank.heater && _react2.default.createElement(_HeaterElementEdit2.default, { control: tank.heater, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
+	        !tank.heater && _react2.default.createElement(
+	          'button',
+	          { className: 'btn btn-default', onClick: function onClick() {
+	              return _this3.addElement();
+	            } },
+	          'Add Element'
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'btn btn-default', onClick: function onClick() {
+	              return _this3.remove();
+	            } },
+	          'Remove Tank'
+	        )
+	      );
+	    }
+	  }]);
+
+	  return Tank;
+	}(_react.Component);
+
+	exports.default = Tank;
+
+/***/ },
+/* 699 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(299);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _tempature = __webpack_require__(682);
+
+	var _gpio = __webpack_require__(696);
+
+	var _ContentEditable = __webpack_require__(687);
+
+	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var HeaterElementEdit = function (_Component) {
+	  _inherits(HeaterElementEdit, _Component);
+
+	  function HeaterElementEdit(props) {
+	    _classCallCheck(this, HeaterElementEdit);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HeaterElementEdit).call(this, props));
+
+	    _this.state = {
+	      fullOnAmps: props.control.fullOnAmps
+	    };
+	    return _this;
+	  }
+
+	  _createClass(HeaterElementEdit, [{
+	    key: 'overlayUpdate',
+	    value: function overlayUpdate(overlay, remove) {
+	      var _this2 = this;
+
+	      if (this.overlay) {
+	        this.overlay = Object.assign({}, this.overlay, overlay);
+	      }
+	      var _props = this.props;
+	      var configuration = _props.configuration;
+	      var requestUpdateConfiguration = _props.requestUpdateConfiguration;
+
+	      var brewLayout = configuration.brewLayout;
+	      var tanks = brewLayout.tanks.slice();
+	      if (overlay) {
+	        tanks = tanks.map(function (tank) {
+	          if (tank.heater && tank.heater.id === _this2.props.control.id) {
+	            var heater = Object.assign({}, tank.heater, overlay);
+	            return Object.assign({}, tank, { heater: heater });
+	          }
+	          return tank;
+	        });
+	      } else if (remove) {
+	        tanks = tanks.map(function (tank) {
+	          if (tank.heater && tank.heater.id === _this2.props.control.id) {
+	            return Object.assign({}, tank, { heater: undefined });
+	          }
+	          return tank;
+	        });
+	      }
+
+	      // Create new object tree
+	      brewLayout = Object.assign({}, brewLayout, { tanks: tanks });
+	      configuration = Object.assign({}, configuration, { brewLayout: brewLayout });
+
+	      if (this.updateCfgTimer) {
+	        clearTimeout(this.updateCfgTimer);
+	        this.updateCfgTimer = undefined;
+	      }
+
+	      this.updateCfgTimer = setTimeout(function () {
+	        requestUpdateConfiguration(configuration);
+	        _this2.updateCfgTimer = undefined;
+	      }, 500);
+	    }
+	  }, {
+	    key: 'remove',
+	    value: function remove() {
+	      this.overlayUpdate(null, true);
+	    }
+	  }, {
+	    key: 'updateName',
+	    value: function updateName(name) {
+	      this.overlayUpdate({ name: name });
+	    }
+	  }, {
+	    key: 'updateGpio',
+	    value: function updateGpio(io) {
+	      io = parseInt(io, 10);
+	      this.overlayUpdate({ io: io });
+	    }
+	  }, {
+	    key: 'updateMaxAmps',
+	    value: function updateMaxAmps(fullOnAmps) {
+	      fullOnAmps = parseInt(fullOnAmps, 10);
+	      this.setState({ fullOnAmps: fullOnAmps });
+	      this.overlayUpdate({ fullOnAmps: fullOnAmps });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this3 = this;
+
+	      var _props2 = this.props;
+	      var control = _props2.control;
+	      var configuration = _props2.configuration;
+	      var fullOnAmps = this.state.fullOnAmps;
+
+
+	      var gpios = (0, _gpio.emptyGpios)(configuration);
+	      gpios.push(control.io);
+	      gpios.sort(function (a, b) {
+	        return a - b;
+	      });
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'container-fluid' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'row' },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-2' },
+	              _react2.default.createElement(_ContentEditable2.default, { onChange: function onChange(e) {
+	                  return _this3.updateName(e.target.value);
+	                }, html: control.name })
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-1' },
+	              _react2.default.createElement(
+	                'select',
+	                { onChange: function onChange(e) {
+	                    return _this3.updateGpio(e.target.value);
+	                  }, value: control.io },
+	                _react2.default.createElement('option', { value: '' }),
+	                gpios.map(function (io) {
+	                  return _react2.default.createElement(
+	                    'option',
+	                    { key: io, value: io },
+	                    'GPIO ',
+	                    io
+	                  );
+	                })
+	              )
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-1' },
+	              'Amps: ',
+	              _react2.default.createElement('input', { type: 'number', value: fullOnAmps, onChange: function onChange(e) {
+	                  return _this3.updateMaxAmps(e.target.value);
+	                }, style: { width: "3em" } })
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-1' },
+	              _react2.default.createElement(
+	                'button',
+	                { className: 'btn btn-default', onClick: function onClick() {
+	                    return _this3.remove();
+	                  } },
+	                'Remove Element'
+	              )
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return HeaterElementEdit;
+	}(_react.Component);
+
+	exports.default = HeaterElementEdit;
+
+/***/ },
+/* 700 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
 	var _reactRedux = __webpack_require__(456);
 
 	var _status = __webpack_require__(483);
 
 	var _configuration = __webpack_require__(509);
 
-	var _StepLists = __webpack_require__(695);
+	var _StepLists = __webpack_require__(701);
 
 	var _StepLists2 = _interopRequireDefault(_StepLists);
 
@@ -52837,7 +53595,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_StepLists2.default);
 
 /***/ },
-/* 695 */
+/* 701 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52942,7 +53700,7 @@
 	exports.default = StepsList;
 
 /***/ },
-/* 696 */
+/* 702 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53059,7 +53817,7 @@
 	exports.default = About;
 
 /***/ },
-/* 697 */
+/* 703 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53087,7 +53845,7 @@
 	    var steps = status.steps.map(function (step) {
 	      var tanks = configuration.brewLayout.tanks.map(function (t) {
 	        var name = t.name;
-	        var id = "tank" + name;
+	        var id = t.id;
 	        var heater = t.heater;
 	        var sensor = t.sensor;
 
@@ -53112,7 +53870,7 @@
 	          pump = {};
 	        }
 	        var name = p.name;
-	        var id = "pump" + p.io;
+	        var id = p.id;
 
 	        return Object.assign({}, pump, {
 	          id: id, name: name
@@ -53199,7 +53957,7 @@
 	};
 
 /***/ },
-/* 698 */
+/* 704 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53211,15 +53969,15 @@
 
 	var _redux = __webpack_require__(463);
 
-	var _reduxThunk = __webpack_require__(699);
+	var _reduxThunk = __webpack_require__(705);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(700);
+	var _reduxLogger = __webpack_require__(706);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(701);
+	var _reducers = __webpack_require__(707);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -53260,7 +54018,7 @@
 	}
 
 /***/ },
-/* 699 */
+/* 705 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -53279,7 +54037,7 @@
 	module.exports = thunkMiddleware;
 
 /***/ },
-/* 700 */
+/* 706 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -53512,7 +54270,7 @@
 	module.exports = createLogger;
 
 /***/ },
-/* 701 */
+/* 707 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53523,11 +54281,11 @@
 
 	var _redux = __webpack_require__(463);
 
-	var _server = __webpack_require__(697);
+	var _server = __webpack_require__(703);
 
 	var _server2 = _interopRequireDefault(_server);
 
-	var _ui = __webpack_require__(702);
+	var _ui = __webpack_require__(708);
 
 	var _ui2 = _interopRequireDefault(_ui);
 
@@ -53541,7 +54299,7 @@
 	});
 
 /***/ },
-/* 702 */
+/* 708 */
 /***/ function(module, exports) {
 
 	'use strict';
