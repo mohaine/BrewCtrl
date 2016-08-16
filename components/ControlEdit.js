@@ -2,12 +2,13 @@
 import React, { Component, PropTypes } from 'react'
 
 import {formatTemp} from '../util/tempature'
+import {emptyGpios} from '../util/gpio'
 import ContentEditable from '../components/ContentEditable'
 
 
 export default class ControlEdit extends Component {
 
-  overlayUpdate(overlay){
+  overlayUpdate(overlay,remove){
 
     if(this.overlay){
       this.overlay = Object.assign({}, this.overlay, overlay);
@@ -17,13 +18,17 @@ export default class ControlEdit extends Component {
 
     let brewLayout = configuration.brewLayout
 
-    let pumps = brewLayout.pumps;
-    pumps = pumps.map(control => {
-      if(control.id === this.props.control.id){
-        return Object.assign({}, control, overlay);
-      }
-      return control;
-    });
+    let pumps = brewLayout.pumps.slice();
+    if(overlay){
+      pumps = pumps.map(control => {
+        if(control.id === this.props.control.id){
+          return Object.assign({}, control, overlay);
+        }
+        return control;
+      });
+    } else if(remove){
+      pumps = pumps.filter(control=>control.id != this.props.control.id)
+    }
 
     // Create new object tree
     brewLayout = Object.assign({}, brewLayout, {pumps});
@@ -40,10 +45,14 @@ export default class ControlEdit extends Component {
     },500);
   }
 
+  remove(){
+    this.overlayUpdate(null,true);
+  }
+
+
   updateName(name){
     this.overlayUpdate({name});
   }
-
 
   updateGpio(io){
     io = parseInt(io,10)
@@ -52,17 +61,9 @@ export default class ControlEdit extends Component {
 
   render() {
   let { control, configuration } = this.props
-  let gpios = [2, 3, 4, 14, 15, 17, 18, 27, 22, 23, 24, 10, 9, 25, 11, 8, 7].filter(io=>{
-    let brewLayout = configuration.brewLayout
-    if(brewLayout){
-      let pumps = brewLayout.pumps;
-      if(pumps.find(p=>p.io == io && p.id!=control.id)){
-        return false;
-      }
-    }
-    return true;
-  }).sort((a,b)=> a-b)
-
+  let gpios = emptyGpios(configuration)
+  gpios.push(control.io)
+  gpios.sort((a,b)=> a-b)
 
   return (<div >
           <div className="container-fluid">
@@ -75,6 +76,9 @@ export default class ControlEdit extends Component {
               <option value=""></option>
               {gpios.map(io=>(<option key={io} value={io}>GPIO {io}</option>))}
               </select>
+              </div>
+              <div className="col-sm-1">
+                <button className="btn btn-default" onClick={()=>this.remove()}>Remove</button>
               </div>
               </div>
           </div>
