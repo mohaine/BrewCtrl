@@ -11,7 +11,8 @@ export default class HeaterElementEdit extends Component {
   constructor(props) {
       super(props);
       this.state = {
-        fullOnAmps: props.control.fullOnAmps
+        fullOnAmps: props.control.fullOnAmps,
+        hasDuty: props.control.hasDuty
       }
   }
 
@@ -72,11 +73,15 @@ export default class HeaterElementEdit extends Component {
     this.setState({fullOnAmps})
     this.overlayUpdate({fullOnAmps});
   }
-
+  updateHasDuty(hasDuty){
+    hasDuty = hasDuty ? true : false
+    this.setState({hasDuty})
+    this.overlayUpdate({hasDuty});
+  }
   render() {
   let { control, configuration } = this.props
-  let {fullOnAmps} = this.state
-
+  let {fullOnAmps,hasDuty} = this.state
+  console.log(hasDuty)
   let gpios = emptyGpios(configuration)
   gpios.push(control.io)
   gpios.sort((a,b)=> a-b)
@@ -94,6 +99,9 @@ export default class HeaterElementEdit extends Component {
               </div>
               <div className="col-sm-1">
                 Amps: <input type="number" value={fullOnAmps} onChange={(e)=>this.updateMaxAmps(e.target.value)} style={{width: "3em"}}/>
+              </div>
+              <div className="col-sm-1">
+                Has Duty: <input type="checkbox" checked={hasDuty} onChange={(e)=>this.updateHasDuty(e.target.checked)} style={{width: "3em"}}/>
               </div>
               <div className="col-sm-1">
                 <button className="btn btn-default" onClick={()=>this.remove()}>Remove Element</button>

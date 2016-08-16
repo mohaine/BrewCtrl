@@ -54,7 +54,7 @@ export default class Tank extends Component {
 
     let {configuration,requestUpdateConfiguration} = this.props
     let io = emptyGpios(configuration)[0];
-    this.overlayUpdate({heater:{name:tank.name + " Heater",io, hasDuty:false,invertIo:false, fullOnAmps:0}});
+    this.overlayUpdate({heater:{name:tank.name + " Heater",io, hasDuty:true,invertIo:false, fullOnAmps:0}});
   }
 
   render(){
