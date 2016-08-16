@@ -51911,7 +51911,7 @@
 /* 684 */
 /***/ function(module, exports) {
 
-	module.exports = {"name":"brewctrl-ui","versionHash":"7004f884d5d51def2eb51d1a0a046c0cc9ba1edb","buildTime":"2016-08-16T04:31:14.934Z","logState":false};
+	module.exports = {"name":"brewctrl-ui","versionHash":"ffd9da39e3288bfb160551bc95fc7a5f9f5efe10","buildTime":"2016-08-16T13:57:08.197Z","logState":false};
 
 /***/ },
 /* 685 */
@@ -53316,7 +53316,7 @@
 	      var requestUpdateConfiguration = _props2.requestUpdateConfiguration;
 
 	      var io = (0, _gpio.emptyGpios)(configuration)[0];
-	      this.overlayUpdate({ heater: { name: tank.name + " Heater", io: io, hasDuty: false, invertIo: false, fullOnAmps: 0 } });
+	      this.overlayUpdate({ heater: { name: tank.name + " Heater", io: io, hasDuty: true, invertIo: false, fullOnAmps: 0 } });
 	    }
 	  }, {
 	    key: 'render',
@@ -53399,7 +53399,8 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HeaterElementEdit).call(this, props));
 
 	    _this.state = {
-	      fullOnAmps: props.control.fullOnAmps
+	      fullOnAmps: props.control.fullOnAmps,
+	      hasDuty: props.control.hasDuty
 	    };
 	    return _this;
 	  }
@@ -53473,6 +53474,13 @@
 	      this.overlayUpdate({ fullOnAmps: fullOnAmps });
 	    }
 	  }, {
+	    key: 'updateHasDuty',
+	    value: function updateHasDuty(hasDuty) {
+	      hasDuty = hasDuty ? true : false;
+	      this.setState({ hasDuty: hasDuty });
+	      this.overlayUpdate({ hasDuty: hasDuty });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _this3 = this;
@@ -53480,9 +53488,11 @@
 	      var _props2 = this.props;
 	      var control = _props2.control;
 	      var configuration = _props2.configuration;
-	      var fullOnAmps = this.state.fullOnAmps;
+	      var _state = this.state;
+	      var fullOnAmps = _state.fullOnAmps;
+	      var hasDuty = _state.hasDuty;
 
-
+	      console.log(hasDuty);
 	      var gpios = (0, _gpio.emptyGpios)(configuration);
 	      gpios.push(control.io);
 	      gpios.sort(function (a, b) {
@@ -53529,6 +53539,14 @@
 	              'Amps: ',
 	              _react2.default.createElement('input', { type: 'number', value: fullOnAmps, onChange: function onChange(e) {
 	                  return _this3.updateMaxAmps(e.target.value);
+	                }, style: { width: "3em" } })
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-1' },
+	              'Has Duty: ',
+	              _react2.default.createElement('input', { type: 'checkbox', checked: hasDuty, onChange: function onChange(e) {
+	                  return _this3.updateHasDuty(e.target.checked);
 	                }, style: { width: "3em" } })
 	            ),
 	            _react2.default.createElement(
