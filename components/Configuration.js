@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 
 import Sensors from '../components/Sensors'
+import Pumps from '../components/Pumps'
 
 export default class Configuration extends Component {
 
@@ -53,6 +54,7 @@ export default class Configuration extends Component {
 
   render() {
     let { brewery ,configuration,requestConfiguration, requestConfigurationStatus ,requestUpdateConfiguration } = this.props
+
     return (<div>
 
 
@@ -80,7 +82,8 @@ export default class Configuration extends Component {
       	</div>
       </div>
 
-        { configuration && brewery && <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
+      { configuration && brewery && <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
+      { configuration && <Pumps pumps={configuration.brewLayout.pumps} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
 
 
        </div>)

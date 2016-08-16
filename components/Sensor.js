@@ -30,7 +30,6 @@ export default class Sensor extends Component {
     }
 
     this.updateCfgTimer = setTimeout(()=> {
-      console.log("UPDATE")
       requestUpdateConfiguration(newConfig)
       this.updateCfgTimer = undefined;
     },500);
