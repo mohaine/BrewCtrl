@@ -1,14 +1,10 @@
 .metadata
-MultiResolution
 bin
-BrewCtrlAndroid/gen/
-WebCtrl/war/WEB-INF/lib/
 obj
-brewctrl
-go
-trace.out
+/brewctrl
 Makefile.local
 *.bak
 BrewControllerConfig.json
 **.log
 node_modules/
+pkg
