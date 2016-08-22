@@ -10,13 +10,13 @@ import (
 )
 
 type TempReading struct {
-	tempMilliC int32
-	id string
+	TempMilliC int32
+	Id string
 }
 
 
-func (tr *TempReading) tempC() float32 {
-	return float32(tr.tempMilliC) / 1000.0
+func (tr *TempReading) TempC() float32 {
+	return float32(tr.TempMilliC) / 1000.0
 }
 
 func parseTemp(w1SlaveData string) (temp TempReading, err error) {
@@ -26,7 +26,7 @@ func parseTemp(w1SlaveData string) (temp TempReading, err error) {
 		var temp64 int64
 		temp64, err = strconv.ParseInt(tempString, 10, 32)
 		if err == nil {
-			temp.tempMilliC = int32(temp64)
+			temp.TempMilliC = int32(temp64)
 		}
 	} else {
 		err = errors.New("could not find t= in temp data")
@@ -72,7 +72,7 @@ func SensorLoopDir(interval time.Duration, searchDir string) (read func()([]Temp
 						w1FileName := searchDir + "/" + f.Name() + "/w1_slave"
 						temp, err := readTempSensor(w1FileName)
 						if err == nil {
-							temp.id = f.Name()
+							temp.Id = f.Name()
 							readings = append(readings, temp)
 						}
 					}

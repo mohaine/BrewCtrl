@@ -2,25 +2,34 @@ package main
 
 import (
 	"fmt"
-	"github.com/mohaine/brewctrl/config"
 	"github.com/mohaine/onewire"
+	// "github.com/mohaine/pid"
 	"time"
+	// "encoding/json"
+	// "log"
+	// "bytes"
+	// "os"
 )
 
-func ControlStuff(readSensors func() []onewire.TempReading, cfg config.Configuration) (stopControl func()) {
+func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func()) {
 
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
 	tick := time.Tick(100 * time.Millisecond)
 
-	fmt.Println(cfg.Version)
-  loop := func() {
+	// TODO load old status?
+	state := StateDefault(cfg)
+	fmt.Println(state.ConfigurationVersion)
+	loop := func() {
 		for {
 			select {
 			case <-tick:
-				fmt.Println("tickXXX", readSensors())
+				StateUpdateSensors(&state, readSensors())
+
+				StateUpdateDuty(&state)
+
+				// fmt.Println("tick", readSensors())
 			case <-quit:
-				fmt.Println("QUIT Tick!")
 				return
 			}
 		}

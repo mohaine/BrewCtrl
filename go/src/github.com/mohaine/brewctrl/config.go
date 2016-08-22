@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	// "strings"
 )
 
-type Sensor struct {
+type SensorAddress struct {
 	Address string `json:"address"`
 }
 
@@ -30,10 +30,10 @@ type HeatElement struct {
 }
 
 type Tank struct {
-	Id     string      `json:"id"`
-	Name   string      `json:"name"`
-	Sensor Sensor      `json:"sensor"`
-	Heater HeatElement `json:"heater"`
+	Id     string        `json:"id"`
+	Name   string        `json:"name"`
+	Sensor SensorAddress `json:"sensor"`
+	Heater HeatElement   `json:"heater"`
 }
 type Pump struct {
 	Id       string `json:"id"`
@@ -67,11 +67,11 @@ type StepList struct {
 }
 
 type Configuration struct {
-	Version     string        `json:"version"`
-	LogMessages bool          `json:"logMessages"`
-	BrewLayout  BreweryLayout `json:"brewLayout"`
-	Sensors     []Sensor      `json:"sensors"`
-	StepLists   []StepList    `json:"stepLists"`
+	Version     string         `json:"version"`
+	LogMessages bool           `json:"logMessages"`
+	BrewLayout  BreweryLayout  `json:"brewLayout"`
+	Sensors     []SensorConfig `json:"sensors"`
+	StepLists   []StepList     `json:"stepLists"`
 }
 
 func LoadCfg(path string) (Configuration, error) {
