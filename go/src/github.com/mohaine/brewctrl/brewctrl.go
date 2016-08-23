@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const SYS_PATH = "/home/graessle/source/BrewCtrl/mock/sys/"
+
 func main() {
 	cfg, err := LoadCfg("../BrewControllerConfig.json")
 	if err == nil {
@@ -14,7 +16,7 @@ func main() {
 			panic(err)
 		}
 	}
-	readSensors, stopReading := onewire.SensorLoop(100 * time.Millisecond)
+	readSensors, stopReading := onewire.SensorLoop(100*time.Millisecond, SYS_PATH+"bus/w1/devices/")
 	stopControl := ControlStuff(readSensors, cfg)
 
 	time.Sleep(1 * time.Second)

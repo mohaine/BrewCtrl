@@ -3,12 +3,14 @@ package main
 import (
 	// "encoding/json"
 	// "io"
-	// "io/ioutil"
-	// "log"
+	"io/ioutil"
+	"log"
 	// "os"
 	"fmt"
 	// "strings"
 )
+
+const GPIO_ROOT = SYS_PATH + "class/gpio"
 
 const IO_OUT = false
 const IO_IN = true
@@ -25,60 +27,49 @@ var seenGpios = make([]int32, 0)
 
 func ioMode(io int32, inout bool) {
 	// // #ifdef MOCK
-	if inout == IO_OUT {
-		fmt.Printf("          Pin %v In/Out to OUT\n", io)
-	} else {
-		fmt.Printf("          Pin %v In/Out to IN\n", io)
+	direction := "out"
+	if inout != IO_OUT {
+		direction = "in"
+	}
+	fmt.Printf("  Pin %v In/Out to %v\n", io, direction)
+	// Export pin
+	path := fmt.Sprintf("%v/export", GPIO_ROOT)
+	println(path)
+	err := ioutil.WriteFile(path, []byte(fmt.Sprintf("%v", io)), 0644)
+	if err != nil {
+		log.Panic("Failed export io %v In/Out to %v\n", io, direction)
+	}
+
+	// Set Direction
+	path = fmt.Sprintf("%v/gpio%v/direction", GPIO_ROOT, io)
+	err = ioutil.WriteFile(path, []byte(direction), 0644)
+	if err != nil {
+		log.Panic("Failed to set direction on io %v In/Out to %v\n", io, direction)
 	}
 }
 
-// // #else
-// // 	char tmp[10];
-// // 	char path[PATH_MAX];
-// // 	sprintf(path, "%s/export", GPIO_ROOT);
-// //
-// // 	FILE* f = fopen(path, "wb");
-// // 	if (f) {
-// // 		sprintf(tmp, "%d", io);
-// // 		fwrite(tmp, 1, strlen(tmp), f);
-// // 		fclose(f);
-// // 	} else {
-// // 		ERR("Failed export io %d In/Out to %s\n", io, inout ? "In" : "Out");
-// // 	}
-// // 	sprintf(path, "%s/gpio%d/direction", GPIO_ROOT, io);
-// // 	f = fopen(path, "wb");
-// // 	if (f) {
-// // 		sprintf(tmp, "%s", inout ? "in" : "out");
-// // 		fwrite(tmp, 1, strlen(tmp), f);
-// // 		fclose(f);
-// // 	} else {
-// // 		ERR("Failed to set direction on io %d In/Out to %s\n", io, inout ? "In" : "Out");
-// // 	}
-// // #endif
-// }
 //
 func turnIoTo(io int32, hilow bool) {
-	//
-	// 	if (INVERT_GPIO[io]) {
-	// 		hilow = !hilow;
-	// 	}
-	//
-	// // #ifdef MOCK
+
+	// if (INVERT_GPIO[io]) {
+	// 	hilow = !hilow;
+	// }
+
 	fmt.Printf("Pin %v set to %v\n", io, hilow)
 	// // #else
-	// // 	char tmp[10];
-	// // 	char path[PATH_MAX];
-	// // 	sprintf(path, "%s/gpio%d/value", GPIO_ROOT, io);
-	// // 	FILE* f = fopen(path, "wb");
-	// // 	if (f) {
-	// // 		sprintf(tmp, "%s", hilow ? "1" : "0");
-	// // 		fwrite(tmp, 1, strlen(tmp), f);
-	// // 		fclose(f);
-	// // 	} else {
-	// // 		ERR("Failed to set output on io %d to %s\n", io, hilow ? "On" : "Off");
-	// // 	}
-	// // #endif
-	//
+	oneZero := "0"
+	if hilow {
+		oneZero = "1"
+	}
+	path := fmt.Sprintf("%v/gpio%v/value", GPIO_ROOT, io)
+	err := ioutil.WriteFile(path, []byte(oneZero), 0644)
+	if err != nil {
+		onOff := "off"
+		if hilow {
+			onOff = "on"
+		}
+		log.Panic("Failed to set output on io %v to %v\n", io, onOff)
+	}
 }
 
 //
@@ -207,7 +198,7 @@ func UpdatePinsForSetDuty(state *State, maxAmps int32) {
 		if len(state.Steps) > 0 {
 			controlPoints := state.Steps[0].ControlPoints
 			for i := range controlPoints {
-        cp := &controlPoints[i]
+				cp := &controlPoints[i]
 				// setupControlPoint(cp);
 				duty := cp.Duty
 				if currentAmps+cp.FullOnAmps > maxAmps {
@@ -222,7 +213,7 @@ func UpdatePinsForSetDuty(state *State, maxAmps int32) {
 					currentAmps += cp.FullOnAmps
 				}
 			}
-	}
+		}
 		unlockSteps()
 	}
 	//DBG("***********  updatePinsForSetDuty - END *************** \n");

@@ -43,11 +43,8 @@ func readTempSensor(filename string) (temp TempReading, err error) {
 	return
 }
 
-func SensorLoop(interval time.Duration) (read func()([]TempReading),quit func()) {
-	return SensorLoopDir(interval, "/home/graessle/source/BrewCtrl/mock/sys/bus/w1/devices/")
-}
 
-func SensorLoopDir(interval time.Duration, searchDir string) (read func()([]TempReading), quit func()) {
+func SensorLoop(interval time.Duration, searchDir string) (read func()([]TempReading), quit func()) {
 	quitC := make(chan int)
 	quit = func() { quitC <- 1 }
 	tick := time.Tick(interval)

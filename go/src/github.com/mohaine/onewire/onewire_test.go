@@ -12,14 +12,14 @@ func expectErrorToBe(t *testing.T, expected error,err error) {
 }
 func expectTempToBe(t *testing.T, expected int32, temp *TempReading,err error) {
 	noError(t, err)
-	if temp.tempMilliC != expected {
-		t.Error( fmt.Sprintf("Expected %v, got ",expected), temp.tempMilliC)
+	if temp.TempMilliC != expected {
+		t.Error( fmt.Sprintf("Expected %v, got ",expected), temp.TempMilliC)
 	}
 }
 func expectTempCToBe(t *testing.T, expected float32, temp *TempReading,err error) {
 	noError(t, err)
-	if temp.tempC() != expected {
-		t.Error( fmt.Sprintf("Expected %v, got ",expected), temp.tempC())
+	if temp.TempC() != expected {
+		t.Error( fmt.Sprintf("Expected %v, got ",expected), temp.TempC())
 	}
 }
 
