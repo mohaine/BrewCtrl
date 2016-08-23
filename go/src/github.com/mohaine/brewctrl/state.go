@@ -9,13 +9,14 @@ import (
 	"fmt"
 	// "strings"
 	"github.com/mohaine/id"
-	"github.com/mohaine/pid"
 	"github.com/mohaine/onewire"
+	"github.com/mohaine/pid"
 )
 
 const MODE_OFF = "Off"
 const MODE_ON = "On"
-var NilSensor = Sensor{Address : "", TemperatureC : 0, Reading: false}
+
+var NilSensor = Sensor{Address: "", TemperatureC: 0, Reading: false}
 
 type Sensor struct {
 	Address      string  `json:"address"`
@@ -23,28 +24,22 @@ type Sensor struct {
 	Reading      bool    `json:"reading"`
 }
 
-type DutyController struct {
+type ControlPoint struct {
+	// initComplete bool `json:"initComplete"`;
+	Io                   int32   `json:"controlIo"`
+	Duty                 int32   `json:"duty"`
+	FullOnAmps           int32   `json:"fullOnAmps"`
+	SensorAddress        string  `json:"tempSensorAddress"`
+	TargetTemp           float32 `json:"targetTemp"`
+	HasDuty              bool    `json:"hasDuty"`
+	AutomaticControl     bool    `json:"automaticControl"`
+	On                   bool    `json:"on"`
 	lastUpdateOnOffTimes uint64
 	dutyTimeOn           uint64
 	dutyTimeOff          uint64
 	duty                 int32
-	on                   bool
 	ioState              bool
-	io                   int32
-}
-
-type ControlPoint struct {
-	// initComplete bool `json:"initComplete"`;
-	Io                int32   `json:"controlIo"`
-	Duty              int32   `json:"duty"`
-	FullOnAmps        int32   `json:"fullOnAmps"`
-	SensorAddress string  `json:"tempSensorAddress"`
-	TargetTemp        float32 `json:"targetTemp"`
-	HasDuty           bool    `json:"hasDuty"`
-	AutomaticControl  bool    `json:"automaticControl"`
-	On                bool    `json:"on"`
-	dutyController    DutyController
-	pid pid.Pid
+	pid                  pid.Pid
 }
 
 type ControlStep struct {
@@ -87,7 +82,7 @@ func StepDefault(cfg Configuration) (step ControlStep) {
 		cp.HasDuty = pump.HasDuty
 		cp.On = false
 		cp.Duty = 0
-		setupDutyController(&cp.dutyController, cp.Io)
+		initControlPoint(&cp)
 		step.ControlPoints = append(step.ControlPoints, cp)
 	}
 	return
@@ -106,10 +101,10 @@ func StateUpdateSensors(state *State, sensorReadings []onewire.TempReading) {
 	state.Sensors = sensors
 }
 
-func FindSensor(state *State,address string) Sensor {
+func FindSensor(state *State, address string) Sensor {
 	for i := range state.Sensors {
-		sensor:= state.Sensors[i]
-		if(sensor.Address == address){
+		sensor := state.Sensors[i]
+		if sensor.Address == address {
 			return sensor
 		}
 	}
@@ -118,35 +113,32 @@ func FindSensor(state *State,address string) Sensor {
 
 func StateUpdateDuty(state *State) {
 	fmt.Println("StateUpdateDuty")
-	if(state.Mode == MODE_ON){
-	controlPoints := state.Steps[0].ControlPoints
-	for i := range controlPoints {
-		cp := controlPoints[i]
-		fmt.Printf("CP: %v\n", cp)
-
-		cp.dutyController.on = true;
-		if (cp.AutomaticControl) {
-			sensor := FindSensor(state, cp.SensorAddress);
-			if (sensor != NilSensor) {
-				// if (hasVaildTemp(sensor)) {
-					if (cp.HasDuty) {
-						cp.Duty = pid.GetDuty(&cp.pid, cp.TargetTemp, sensor.TemperatureC);
+	if state.Mode != MODE_OFF && len(state.Steps) > 0 {
+		controlPoints := state.Steps[0].ControlPoints
+		for i := range controlPoints {
+			cp := controlPoints[i]
+			if cp.AutomaticControl {
+				sensor := FindSensor(state, cp.SensorAddress)
+				if sensor != NilSensor {
+					// if (hasVaildTemp(sensor)) {
+					if cp.HasDuty {
+						cp.Duty = pid.GetDuty(&cp.pid, cp.TargetTemp, sensor.TemperatureC)
 					} else {
-						if (sensor.TemperatureC < cp.TargetTemp) {
-							cp.Duty = 100;
+						if sensor.TemperatureC < cp.TargetTemp {
+							cp.Duty = 100
 						} else {
-							cp.Duty = 0;
+							cp.Duty = 0
 						}
 					}
-				// } else {
-				// 	cp.duty = 0;
-				// }
+					// } else {
+					// 	cp.duty = 0;
+					// }
 
-			} else {
-				log.Printf("Failed to find sensor %v\n" , cp.SensorAddress );
+				} else {
+					log.Printf("Failed to find sensor %v\n", cp.SensorAddress)
+				}
 			}
 		}
 	}
-}
 
 }

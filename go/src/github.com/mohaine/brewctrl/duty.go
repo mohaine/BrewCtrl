@@ -26,9 +26,9 @@ var seenGpios = make([]int32, 0)
 func ioMode(io int32, inout bool) {
 	// // #ifdef MOCK
 	if inout == IO_OUT {
-		fmt.Println("          Pin %v In/Out to OUT", io)
+		fmt.Printf("          Pin %v In/Out to OUT\n", io)
 	} else {
-		fmt.Println("          Pin %v In/Out to IN", io)
+		fmt.Printf("          Pin %v In/Out to IN\n", io)
 	}
 }
 
@@ -64,7 +64,7 @@ func turnIoTo(io int32, hilow bool) {
 	// 	}
 	//
 	// // #ifdef MOCK
-	fmt.Println("Pin %v set to %v", io, hilow)
+	fmt.Printf("Pin %v set to %v\n", io, hilow)
 	// // #else
 	// // 	char tmp[10];
 	// // 	char path[PATH_MAX];
@@ -88,27 +88,27 @@ func turnOffSeenControls() {
 	}
 }
 
-func setupDutyController(hs *DutyController, io int32) {
-	seenGpios = append(seenGpios, io)
-	ioMode(io, IO_OUT)
-	turnIoTo(io, false)
-	hs.io = io
+func initControlPoint(hs *ControlPoint) {
+	seenGpios = append(seenGpios, hs.Io)
+	ioMode(hs.Io, IO_OUT)
+	turnIoTo(hs.Io, false)
 	hs.lastUpdateOnOffTimes = millis()
 	hs.dutyTimeOn = 0
 	hs.dutyTimeOff = 0
 	hs.duty = 0
-	hs.on = false
+	hs.On = false
 	hs.ioState = false
 }
 
-func resetDutyState(hs *DutyController) {
+func resetDutyState(hs *ControlPoint) {
 	hs.dutyTimeOn = 0
 	hs.dutyTimeOff = 0
 	hs.lastUpdateOnOffTimes = millis()
 }
 
-func updateForPinState(hs *DutyController, newHeatPinState bool) {
+func updateForPinState(hs *ControlPoint, newHeatPinState bool) {
 	now := millis()
+
 	timeSinceLast := now - hs.lastUpdateOnOffTimes
 	if timeSinceLast > 30000 {
 		// Over 30 seconds since last change. Dump silly values
@@ -124,16 +124,16 @@ func updateForPinState(hs *DutyController, newHeatPinState bool) {
 	}
 	hs.lastUpdateOnOffTimes = now
 
-	newHeatPinState = newHeatPinState && hs.on
+	newHeatPinState = newHeatPinState && hs.On
 	if newHeatPinState != hs.ioState {
 		hs.ioState = newHeatPinState
-		turnIoTo(hs.io, hs.ioState)
+		turnIoTo(hs.Io, hs.ioState)
 	}
 }
 
-func setHeatOn(hs *DutyController, newState bool) {
-	if hs.on != newState {
-		hs.on = newState
+func setHeatOn(hs *ControlPoint, newState bool) {
+	if hs.On != newState {
+		hs.On = newState
 		if newState {
 			resetDutyState(hs)
 		} else {
@@ -142,19 +142,18 @@ func setHeatOn(hs *DutyController, newState bool) {
 	}
 }
 
-func updateForOverAmps(hs *DutyController) {
+func updateForOverAmps(hs *ControlPoint) {
 	updateForPinState(hs, false)
 }
 
-func updateIoForStateAndDuty(hs *DutyController) {
+func updateIoForStateAndDuty(hs *ControlPoint) {
 	newPinState := false
-	if hs.on {
+	if hs.On {
 		if hs.duty == 100 {
 			newPinState = true
 		} else if hs.duty == 0 {
 			newPinState = false
 		} else {
-
 			timeSinceLast := millis() - hs.lastUpdateOnOffTimes
 			timeOn := hs.dutyTimeOn
 			timeOff := hs.dutyTimeOff
@@ -164,11 +163,9 @@ func updateIoForStateAndDuty(hs *DutyController) {
 			} else {
 				timeOff += (timeSinceLast)
 			}
-
 			totalTime := timeOn + timeOff
 			percentOn := float32(timeOn) / float32(totalTime)
 			percentOnTest := int32(percentOn * 1000)
-
 			if percentOnTest >= hs.duty*10 {
 				newPinState = false
 			} else {
@@ -179,7 +176,6 @@ func updateIoForStateAndDuty(hs *DutyController) {
 			 DBG("     On: %s OnTime: %lu Off Time: %lu totalTime:  %lu  Persent ON  : %f\n",(newHeatPinState?"ON " : "OFF"), timeOn , timeOff , totalTime , percentOn * 100);
 			 }
 			*/
-
 		}
 	} else {
 		newPinState = false
@@ -187,7 +183,7 @@ func updateIoForStateAndDuty(hs *DutyController) {
 	updateForPinState(hs, newPinState)
 }
 
-func setHeatDuty(hs *DutyController, duty int32) {
+func setHeatDuty(hs *ControlPoint, duty int32) {
 	if duty < 0 {
 		duty = 0
 	}
@@ -198,4 +194,36 @@ func setHeatDuty(hs *DutyController, duty int32) {
 }
 func initHardware() {
 	turnOffSeenControls()
+}
+
+func lockSteps() {
+}
+func unlockSteps() {
+}
+func UpdatePinsForSetDuty(state *State, maxAmps int32) {
+	if state.Mode != MODE_OFF {
+		currentAmps := int32(0)
+		lockSteps()
+		if len(state.Steps) > 0 {
+			controlPoints := state.Steps[0].ControlPoints
+			for i := range controlPoints {
+        cp := &controlPoints[i]
+				// setupControlPoint(cp);
+				duty := cp.Duty
+				if currentAmps+cp.FullOnAmps > maxAmps {
+					updateForOverAmps(cp)
+				} else if cp.HasDuty {
+					setHeatDuty(cp, duty)
+					updateIoForStateAndDuty(cp)
+				} else {
+					updateForPinState(cp, duty > 0)
+				}
+				if cp.ioState {
+					currentAmps += cp.FullOnAmps
+				}
+			}
+	}
+		unlockSteps()
+	}
+	//DBG("***********  updatePinsForSetDuty - END *************** \n");
 }
