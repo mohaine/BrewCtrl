@@ -6,7 +6,7 @@ import (
 	// "io/ioutil"
 	// "log"
 	"os"
-	// "fmt"
+	"fmt"
 	// "strings"
 )
 
@@ -78,6 +78,7 @@ func LoadCfg(path string) (Configuration, error) {
 	var cfg Configuration
 	var err error
 	var f io.Reader
+	fmt.Print("Load Cfg File %v", path)
 	f, err = os.Open(path)
 	if err == nil {
 		dec := json.NewDecoder(f)

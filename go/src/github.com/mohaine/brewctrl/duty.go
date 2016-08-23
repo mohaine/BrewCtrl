@@ -35,17 +35,18 @@ func ioMode(io int32, inout bool) {
 	// Export pin
 	path := fmt.Sprintf("%v/export", GPIO_ROOT)
 	println(path)
-	err := ioutil.WriteFile(path, []byte(fmt.Sprintf("%v", io)), 0644)
-	if err != nil {
-		log.Panic("Failed export io %v In/Out to %v\n", io, direction)
-	}
+	ioutil.WriteFile(path, []byte(fmt.Sprintf("%v", io)), 0644)
+	// These fail if called twice
+	// if err != nil {
+	// 	log.Panic("Failed export io %v In/Out to %v\n", io, direction)
+	// }
 
 	// Set Direction
 	path = fmt.Sprintf("%v/gpio%v/direction", GPIO_ROOT, io)
-	err = ioutil.WriteFile(path, []byte(direction), 0644)
-	if err != nil {
-		log.Panic("Failed to set direction on io %v In/Out to %v\n", io, direction)
-	}
+	ioutil.WriteFile(path, []byte(direction), 0644)
+	// if err != nil {
+	// 	log.Panic("Failed to set direction on io %v In/Out to %v\n", io, direction)
+	// }
 }
 
 //
