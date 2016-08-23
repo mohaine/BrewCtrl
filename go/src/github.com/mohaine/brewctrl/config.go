@@ -81,6 +81,7 @@ func LoadCfg(path string) (Configuration, error) {
 	fmt.Printf("Load Cfg File %v\n", path)
 	f, err = os.Open(path)
 	if err == nil {
+		fmt.Printf("Failed to open Cfg File %v\n", path)
 		dec := json.NewDecoder(f)
 		err = dec.Decode(&cfg)
 	}
