@@ -10,10 +10,8 @@ const SYS_PATH = "/home/graessle/source/BrewCtrl/mock/sys/"
 
 func main() {
 	cfg, err := LoadCfg("../BrewControllerConfig.json")
-	if err == nil {
-
+	if err != nil {
 		fmt.Printf("Failed to load Cfg File: %v\n", err)
-
 		cfg, err = LoadCfg("../BrewControllerConfig.json.dist")
 		if err != nil {
 			panic(err)
