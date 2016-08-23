@@ -78,7 +78,7 @@ func LoadCfg(path string) (Configuration, error) {
 	var cfg Configuration
 	var err error
 	var f io.Reader
-	fmt.Print("Load Cfg File %v\n", path)
+	fmt.Printf("Load Cfg File %v\n", path)
 	f, err = os.Open(path)
 	if err == nil {
 		dec := json.NewDecoder(f)
