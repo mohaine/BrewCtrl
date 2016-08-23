@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"github.com/mohaine/onewire"
 	"time"
 )
@@ -12,7 +12,7 @@ func main() {
 	cfg, err := LoadCfg("../BrewControllerConfig.json")
 	if err == nil {
 
-		fmt.Printf("Failed to load Cfg File: %v\n", path, err)
+		fmt.Printf("Failed to load Cfg File: %v\n", err)
 
 		cfg, err = LoadCfg("../BrewControllerConfig.json.dist")
 		if err != nil {
