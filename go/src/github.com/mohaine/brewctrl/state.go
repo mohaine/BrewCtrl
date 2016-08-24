@@ -19,21 +19,21 @@ const MODE_ON = "On"
 var NilSensor = Sensor{Address: "", TemperatureC: 0, Reading: false}
 
 type Sensor struct {
-	Address      string  `json:"address"`
-	TemperatureC float32 `json:"temperatureC"`
-	Reading      bool    `json:"reading"`
+	Address      string  `json:"address,omitempty"`
+	TemperatureC float32 `json:"temperatureC,omitempty"`
+	Reading      bool    `json:"reading,omitempty"`
 }
 
 type ControlPoint struct {
-	// initComplete bool `json:"initComplete"`;
-	Io                   int32   `json:"controlIo"`
-	Duty                 int32   `json:"duty"`
-	FullOnAmps           int32   `json:"fullOnAmps"`
-	SensorAddress        string  `json:"tempSensorAddress"`
-	TargetTemp           float32 `json:"targetTemp"`
-	HasDuty              bool    `json:"hasDuty"`
-	AutomaticControl     bool    `json:"automaticControl"`
-	On                   bool    `json:"on"`
+	// initComplete bool `json:"initComplete,omitempty"`;
+	Io                   int32   `json:"controlIo,omitempty"`
+	Duty                 int32   `json:"duty,omitempty"`
+	FullOnAmps           int32   `json:"fullOnAmps,omitempty"`
+	SensorAddress        string  `json:"tempSensorAddress,omitempty"`
+	TargetTemp           float32 `json:"targetTemp,omitempty"`
+	HasDuty              bool    `json:"hasDuty,omitempty"`
+	AutomaticControl     bool    `json:"automaticControl,omitempty"`
+	On                   bool    `json:"on,omitempty"`
 	lastUpdateOnOffTimes uint64
 	dutyTimeOn           uint64
 	dutyTimeOff          uint64
@@ -43,19 +43,19 @@ type ControlPoint struct {
 }
 
 type ControlStep struct {
-	Id            string         `json:"id"`
-	Name          string         `json:"name"`
-	StepTime      int32          `json:"stepTime"`
-	Active        bool           `json:"active"`
-	ControlPoints []ControlPoint `json:"controlPoints"`
+	Id            string         `json:"id,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	StepTime      int32          `json:"stepTime,omitempty"`
+	Active        bool           `json:"active,omitempty"`
+	ControlPoints []ControlPoint `json:"controlPoints,omitempty"`
 }
 
 type State struct {
-	Mode                 string        `json:"mode"`
-	ListName             string        `json:"listName"`
-	ConfigurationVersion string        `json:"configurationVersion"`
-	Sensors              []Sensor      `json:"sensors"`
-	Steps                []ControlStep `json:"steps"`
+	Mode                 string        `json:"mode,omitempty"`
+	ListName             string        `json:"listName,omitempty"`
+	ConfigurationVersion string        `json:"configurationVersion,omitempty"`
+	Sensors              []Sensor      `json:"sensors,omitempty"`
+	Steps                []ControlStep `json:"steps,omitempty"`
 }
 
 func StateDefault(cfg Configuration) (state State) {
@@ -72,19 +72,34 @@ func StepDefault(cfg Configuration) (step ControlStep) {
 	step.StepTime = 0
 	step.Active = true
 
+	tanks := cfg.BrewLayout.Tanks
+	for i := 0; i < len(tanks); i++ {
+		tank := tanks[i]
+		heater := tank.Heater
+		fmt.Printf("Tank: %v\n", tank.Name)
+		fmt.Printf("Heater: %v\n", tank.Heater)
+		if heater.Io > 0 {
+			cp := createControlPoint(heater.Io, heater.HasDuty)
+			step.ControlPoints = append(step.ControlPoints, cp)
+		}
+	}
 	pumps := cfg.BrewLayout.Pumps
 	for i := 0; i < len(pumps); i++ {
 		pump := pumps[i]
-		var cp ControlPoint
-		fmt.Printf("Pump: %s\n", pumps[i].Name)
-		cp.Io = pump.Io
-		cp.FullOnAmps = 0
-		cp.HasDuty = pump.HasDuty
-		cp.On = false
-		cp.Duty = 0
-		initControlPoint(&cp)
+		fmt.Printf("Pump: %v\n", pump.Name)
+		cp := createControlPoint(pump.Io, pump.HasDuty)
 		step.ControlPoints = append(step.ControlPoints, cp)
 	}
+	return
+}
+
+func createControlPoint(io int32, hashDuty bool) (cp ControlPoint) {
+	cp.Io = io
+	cp.FullOnAmps = 0
+	cp.HasDuty = hashDuty
+	cp.On = false
+	cp.Duty = 0
+	initControlPoint(&cp)
 	return
 }
 
@@ -130,12 +145,9 @@ func StateUpdateDuty(state *State) {
 							cp.Duty = 0
 						}
 					}
-					// } else {
-					// 	cp.duty = 0;
-					// }
-
 				} else {
 					log.Printf("Failed to find sensor %v\n", cp.SensorAddress)
+					cp.Duty = 0
 				}
 			}
 		}

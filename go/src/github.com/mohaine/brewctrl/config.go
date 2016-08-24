@@ -5,73 +5,73 @@ import (
 	"io"
 	// "io/ioutil"
 	// "log"
-	"os"
 	"fmt"
+	"os"
 	// "strings"
 )
 
 type SensorAddress struct {
-	Address string `json:"address"`
+	Address string `json:"address,omitempty"`
 }
 
 type SensorConfig struct {
-	Name     string `json:"name"`
-	Address  string `json:"address"`
-	Location string `json:"location"`
+	Name     string `json:"name,omitempty"`
+	Address  string `json:"address,omitempty"`
+	Location string `json:"location,omitempty"`
 }
 
 type HeatElement struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Io         int32  `json:"io"`
-	HasDuty    bool   `json:"hasDuty"`
-	InvertIo   bool   `json:"invertIo"`
-	FullOnAmps int32  `json:"fullOnAmps"`
+	Id         string `json:"id,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Io         int32  `json:"io,omitempty"`
+	HasDuty    bool   `json:"hasDuty,omitempty"`
+	InvertIo   bool   `json:"invertIo,omitempty"`
+	FullOnAmps int32  `json:"fullOnAmps,omitempty"`
 }
 
 type Tank struct {
-	Id     string        `json:"id"`
-	Name   string        `json:"name"`
-	Sensor SensorAddress `json:"sensor"`
-	Heater HeatElement   `json:"heater"`
+	Id     string        `json:"id,omitempty"`
+	Name   string        `json:"name,omitempty"`
+	Sensor SensorAddress `json:"sensor,omitempty"`
+	Heater HeatElement   `json:"heater,omitempty"`
 }
 type Pump struct {
-	Id       string `json:"id"`
-	Name     string `json:"name"`
-	Io       int32  `json:"io"`
-	HasDuty  bool   `json:"hasDuty"`
-	InvertIo bool   `json:"invertIo"`
+	Id       string `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Io       int32  `json:"io,omitempty"`
+	HasDuty  bool   `json:"hasDuty,omitempty"`
+	InvertIo bool   `json:"invertIo,omitempty"`
 }
 
 type BreweryLayout struct {
-	MaxAmps int32  `json:"maxAmps"`
-	Tanks   []Tank `json:"tanks"`
-	Pumps   []Pump `json:"pumps"`
+	MaxAmps int32  `json:"maxAmps,omitempty"`
+	Tanks   []Tank `json:"tanks,omitempty"`
+	Pumps   []Pump `json:"pumps,omitempty"`
 }
 
 type StepControlPoint struct {
-	TargetTemp  float32 `json:"targetTemp"`
-	TargetName  string  `json:"targetName"`
-	ControlName string  `json:"controlName"`
+	TargetTemp  float32 `json:"targetTemp,omitempty"`
+	TargetName  string  `json:"targetName,omitempty"`
+	ControlName string  `json:"controlName,omitempty"`
 }
 
 type Step struct {
-	Name          string             `json:"name"`
-	Time          string             `json:"time"`
-	ControlPoints []StepControlPoint `json:"controlPoints"`
+	Name          string             `json:"name,omitempty"`
+	Time          string             `json:"time,omitempty"`
+	ControlPoints []StepControlPoint `json:"controlPoints,omitempty"`
 }
 
 type StepList struct {
-	Name  string `json:"name"`
-	Steps []Step `json:"steps"`
+	Name  string `json:"name,omitempty"`
+	Steps []Step `json:"steps,omitempty"`
 }
 
 type Configuration struct {
-	Version     string         `json:"version"`
-	LogMessages bool           `json:"logMessages"`
-	BrewLayout  BreweryLayout  `json:"brewLayout"`
-	Sensors     []SensorConfig `json:"sensors"`
-	StepLists   []StepList     `json:"stepLists"`
+	Version     string         `json:"version,omitempty"`
+	LogMessages bool           `json:"logMessages,omitempty"`
+	BrewLayout  BreweryLayout  `json:"brewLayout,omitempty"`
+	Sensors     []SensorConfig `json:"sensors,omitempty"`
+	StepLists   []StepList     `json:"stepLists,omitempty"`
 }
 
 func LoadCfg(path string) (Configuration, error) {
