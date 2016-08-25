@@ -1,18 +1,27 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/mohaine/onewire"
 	"time"
 )
 
-const SYS_PATH = "/home/graessle/source/BrewCtrl/mock/sys/"
+var SYS_PATH = "/sys/"
 
 func main() {
-	cfg, err := LoadCfg("../BrewControllerConfig.json")
+
+	mock := flag.Bool("mock", false, "Use Mock GPIO/Sensors")
+
+	flag.Parse()
+
+	if *mock {
+		SYS_PATH = "mock/sys/"
+	}
+	cfg, err := LoadCfg("BrewControllerConfig.json")
 	if err != nil {
 		fmt.Printf("Failed to load Cfg File: %v\n", err)
-		cfg, err = LoadCfg("../BrewControllerConfig.json.dist")
+		cfg, err = LoadCfg("BrewControllerConfig.json.dist")
 		if err != nil {
 			panic(err)
 		}
