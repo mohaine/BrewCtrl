@@ -8,6 +8,7 @@ import (
 	"time"
 	"errors"
 	"fmt"
+	"os"
 )
 
 type TempReading struct {
