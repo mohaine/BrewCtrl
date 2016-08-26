@@ -50,8 +50,6 @@ func SensorLoop(interval time.Duration, searchDir string) (read func()([]TempRea
 	quit = func() { quitC <- 1 }
 	tick := time.Tick(interval)
 
-	fmt.Printf("searchDir: %v\n",searchDir)
-
 	currReadings := make([]TempReading, 0)
 	read = func () ([]TempReading) {
 		 now:= currReadings
