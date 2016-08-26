@@ -11,7 +11,7 @@ import (
 	// "os"
 )
 
-func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration) {
+func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string)) {
 
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
@@ -32,10 +32,13 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 		cfg := <-receiveCfg
 		return cfg
 	}
+	setModeC := make(chan string)
+	setMode = func(mode string) {
+		setModeC <- mode
+	}
 
 	// TODO load old status?
 	state := StateDefault(cfg)
-
 	state.Mode = MODE_ON
 
 	controlPoints := state.Steps[0].ControlPoints
@@ -59,6 +62,8 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 				receiveState <- state
 			case <-requestCfg:
 				receiveCfg <- cfg
+			case mode := <-setModeC:
+				state.Mode = mode
 			case <-quit:
 				return
 			}

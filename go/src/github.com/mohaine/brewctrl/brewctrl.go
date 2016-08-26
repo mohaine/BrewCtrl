@@ -31,9 +31,15 @@ func main() {
 		}
 	}
 	readSensors, stopReading := onewire.SensorLoop(100*time.Millisecond, SYS_PATH+"bus/w1/devices/")
-	stopControl, getState, getConfig := ControlStuff(readSensors, cfg)
+	stopControl, getState, getConfig, setMode := ControlStuff(readSensors, cfg)
 
 	http.HandleFunc("/cmd/status", func(w http.ResponseWriter, r *http.Request) {
+
+		mode := r.FormValue("mode")
+		if len(mode) > 0 {
+			setMode(mode)
+		}
+
 		state := getState()
 		j, err := json.Marshal(state)
 		if err != nil {
@@ -55,8 +61,6 @@ func main() {
 		http.ServeFile(w, r, "web/brewctrl/index.html")
 	})
 	http.Handle("/", http.FileServer(http.Dir("web/")))
-
-	//
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", *port), nil))
 
