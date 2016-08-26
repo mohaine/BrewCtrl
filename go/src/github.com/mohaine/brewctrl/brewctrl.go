@@ -24,7 +24,7 @@ func main() {
 
 	cfg, err := LoadCfg("BrewControllerConfig.json")
 	if err != nil {
-		fmt.Printf("Failed tXXXo load Cfg File: %v\n", "TREST")
+		fmt.Printf("Failed to load cfg File: %v\n", err)
 		cfg, err = LoadCfg("BrewControllerConfig.json.dist")
 		if err != nil {
 			panic(err)
