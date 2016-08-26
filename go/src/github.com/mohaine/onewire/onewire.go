@@ -69,9 +69,10 @@ func SensorLoop(interval time.Duration, searchDir string) (read func()([]TempRea
 				readings := make([]TempReading, 0, len(files))
 				for _, f := range files {
 					fmt.Printf("File: %v\n",f)
-					if f.IsDir() {
-						w1FileName := searchDir + "/" + f.Name() + "/w1_slave"
-						fmt.Printf("w1FileName: %v\n",w1FileName)
+					w1FileName := searchDir + "/" + f.Name() + "/w1_slave"
+					fmt.Printf("w1FileName: %v\n",w1FileName)
+					if os.IsExist(w1FileName) {
+						fmt.Printf("Exists: %v\n",w1FileName)
 						temp, err := readTempSensor(w1FileName)
 						if err == nil {
 							temp.Id = f.Name()
