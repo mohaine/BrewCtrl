@@ -11,12 +11,27 @@ import (
 	// "os"
 )
 
-func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func()) {
+func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration) {
 
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
 	tickPins := time.Tick(100 * time.Millisecond)
 	tickDuty := time.Tick(1000 * time.Millisecond)
+
+	requestState := make(chan int)
+	receiveState := make(chan State)
+	getState = func() State {
+		requestState <- 1
+		state := <-receiveState
+		return state
+	}
+	requestCfg := make(chan int)
+	receiveCfg := make(chan Configuration)
+	getCfg = func() Configuration {
+		requestCfg <- 1
+		cfg := <-receiveCfg
+		return cfg
+	}
 
 	// TODO load old status?
 	state := StateDefault(cfg)
@@ -40,6 +55,10 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 				StateUpdateDuty(&state)
 			case <-tickPins:
 				UpdatePinsForSetDuty(&state, cfg.BrewLayout.MaxAmps)
+			case <-requestState:
+				receiveState <- state
+			case <-requestCfg:
+				receiveCfg <- cfg
 			case <-quit:
 				return
 			}

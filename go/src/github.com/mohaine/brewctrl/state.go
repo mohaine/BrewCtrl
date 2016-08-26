@@ -13,8 +13,8 @@ import (
 	"github.com/mohaine/pid"
 )
 
-const MODE_OFF = "Off"
-const MODE_ON = "On"
+const MODE_OFF = "OFF"
+const MODE_ON = "ON"
 
 var NilSensor = Sensor{Address: "", TemperatureC: 0, Reading: false}
 
@@ -43,19 +43,19 @@ type ControlPoint struct {
 }
 
 type ControlStep struct {
-	Id            string         `json:"id,omitempty"`
-	Name          string         `json:"name,omitempty"`
-	StepTime      int32          `json:"stepTime,omitempty"`
-	Active        bool           `json:"active,omitempty"`
-	ControlPoints []ControlPoint `json:"controlPoints,omitempty"`
+	Id            string         `json:"id"`
+	Name          string         `json:"name"`
+	StepTime      int32          `json:"stepTime"`
+	Active        bool           `json:"active"`
+	ControlPoints []ControlPoint `json:"controlPoints"`
 }
 
 type State struct {
-	Mode                 string        `json:"mode,omitempty"`
-	ListName             string        `json:"listName,omitempty"`
-	ConfigurationVersion string        `json:"configurationVersion,omitempty"`
-	Sensors              []Sensor      `json:"sensors,omitempty"`
-	Steps                []ControlStep `json:"steps,omitempty"`
+	Mode                 string        `json:"mode"`
+	ListName             string        `json:"listName"`
+	ConfigurationVersion string        `json:"configurationVersion"`
+	Sensors              []Sensor      `json:"sensors"`
+	Steps                []ControlStep `json:"steps"`
 }
 
 func StateDefault(cfg Configuration) (state State) {
@@ -127,7 +127,6 @@ func FindSensor(state *State, address string) Sensor {
 }
 
 func StateUpdateDuty(state *State) {
-	fmt.Println("StateUpdateDuty")
 	if state.Mode != MODE_OFF && len(state.Steps) > 0 {
 		controlPoints := state.Steps[0].ControlPoints
 		for i := range controlPoints {
