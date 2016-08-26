@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 	"errors"
+	"fmt"
 )
 
 type TempReading struct {
@@ -67,6 +68,7 @@ func SensorLoop(interval time.Duration, searchDir string) (read func()([]TempRea
 				files, _ := ioutil.ReadDir(searchDir)
 				readings := make([]TempReading, 0, len(files))
 				for _, f := range files {
+					fmt.Printf("File: %v\n",f)
 					if f.IsDir() {
 						w1FileName := searchDir + "/" + f.Name() + "/w1_slave"
 						fmt.Printf("w1FileName: %v\n",w1FileName)
