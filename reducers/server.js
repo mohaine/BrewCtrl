@@ -40,7 +40,7 @@ function buildBreweryView(status,configuration){
             pump = {};
           }
           let name = p.name;
-          let id = p.id
+          let id = pump.id || p.id
 
           return  Object.assign({}, pump, {
             id, name
