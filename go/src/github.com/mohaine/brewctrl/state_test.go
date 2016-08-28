@@ -20,13 +20,19 @@ func expectIntToBe(t *testing.T, expected int, actual int) {
 		t.Error(fmt.Sprintf("Expected %v, got %v", expected, actual))
 	}
 }
+
 func expectStringToBe(t *testing.T, expected string, actual string) {
 	if actual != expected {
 		t.Error(fmt.Sprintf("Expected %v, got %v", expected, actual))
 	}
 }
-
+func expectStringToNotBe(t *testing.T, expected string, actual string) {
+	if actual == expected {
+		t.Error(fmt.Sprintf("Expected anything but %v, got %v", expected, actual))
+	}
+}
 func SimpleTestCfg() (cfg Configuration) {
+	SYS_PATH = "mock/sys/"
 	var pump Pump
 	pump.Io = 10
 	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump)
@@ -34,6 +40,7 @@ func SimpleTestCfg() (cfg Configuration) {
 }
 
 func TestDefaultState(t *testing.T) {
+	fmt.Printf("*****************************************\n")
 	cfg := SimpleTestCfg()
 	state := StateDefault(cfg)
 	expectStringToBe(t, state.Mode, MODE_OFF)
@@ -53,9 +60,6 @@ func TestStateUpdateDuty(t *testing.T) {
 	steps := state.Steps
 	controlPoints := steps[0].ControlPoints
 	pump := controlPoints[0]
-
 	expectInt32ToBe(t, pump.Duty, 0)
-
 	StateUpdateDuty(&state)
-
 }

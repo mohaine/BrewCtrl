@@ -72,7 +72,7 @@ func turnIoTo(io int32, hilow bool) {
 		if hilow {
 			onOff = "on"
 		}
-		log.Panic("Failed to set output on io %v to %v\n", io, onOff)
+		log.Printf(fmt.Sprintf("Failed to set output on io %v to %v (%v): %v\n", io, onOff, path, err))
 	}
 }
 

@@ -23,6 +23,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	stopControl = func() { quit <- 1 }
 	tickPins := time.Tick(100 * time.Millisecond)
 	tickDuty := time.Tick(1000 * time.Millisecond)
+	tickUpdateTimes := time.Tick(250 * time.Millisecond)
 
 	requestState := make(chan int)
 	receiveState := make(chan State)
@@ -67,6 +68,8 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 			case <-tickDuty:
 				StateUpdateSensors(&state, readSensors())
 				StateUpdateDuty(&state)
+			case <-tickUpdateTimes:
+				UpdateStepTimer(&state, &cfg)
 			case <-tickPins:
 				UpdatePinsForSetDuty(&state, cfg.BrewLayout.MaxAmps)
 			case <-requestState:
@@ -85,6 +88,44 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	}
 	go loop()
 	return
+}
+
+func UpdateStepTimer(state *State, cfg *Configuration) {
+	lockSteps()
+	if len(state.Steps) > 0 {
+		step := &state.Steps[0]
+		if state.Mode == MODE_ON || state.Mode == MODE_HEAT_OFF {
+			now := millis()
+			if !step.Active {
+				step.lastOnTime = now
+				step.Active = true
+			}
+			stepTime := step.StepTime
+			if stepTime > 0 {
+				onTime := now - step.lastOnTime
+				if onTime > 0 {
+					for onTime > 1000 {
+						newStepTime := stepTime - 1
+						onTime -= 1000
+						step.lastOnTime += 1000
+						if newStepTime <= 0 {
+							// Step is complete.  Go to next
+							state.Steps = state.Steps[1:]
+						} else {
+							step.StepTime = newStepTime
+						}
+					}
+				}
+			}
+		} else if state.Mode == MODE_HOLD || state.Mode == MODE_OFF {
+			step.lastOnTime = 0
+			step.Active = true
+		}
+	}
+	if len(state.Steps) == 0 {
+		state.Steps = append(state.Steps, StepDefault(*cfg))
+	}
+	unlockSteps()
 }
 
 func updateControlPoints(modPoints []ControlPoint, points []ControlPoint) {

@@ -15,6 +15,8 @@ import (
 
 const MODE_OFF = "OFF"
 const MODE_ON = "ON"
+const MODE_HOLD = "HOLD"
+const MODE_HEAT_OFF = "HEAT_OFF"
 
 var NilSensor = Sensor{Address: "", TemperatureC: 0, Reading: false}
 
@@ -49,6 +51,7 @@ type ControlStep struct {
 	StepTime      int32          `json:"stepTime"`
 	Active        bool           `json:"active"`
 	ControlPoints []ControlPoint `json:"controlPoints"`
+	lastOnTime    uint64
 }
 
 type State struct {
