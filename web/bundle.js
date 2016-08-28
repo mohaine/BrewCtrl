@@ -51911,7 +51911,7 @@
 /* 684 */
 /***/ function(module, exports) {
 
-	module.exports = {"name":"brewctrl-ui","versionHash":"ffd9da39e3288bfb160551bc95fc7a5f9f5efe10","buildTime":"2016-08-16T13:57:08.197Z","logState":false};
+	module.exports = {"name":"brewctrl-ui","versionHash":"2f086cc151dc5a3ea63343e62ce290c818f82f62","buildTime":"2016-08-28T03:37:05.884Z","logState":false};
 
 /***/ },
 /* 685 */
@@ -53888,7 +53888,7 @@
 	          pump = {};
 	        }
 	        var name = p.name;
-	        var id = p.id;
+	        var id = pump.id || p.id;
 
 	        return Object.assign({}, pump, {
 	          id: id, name: name
