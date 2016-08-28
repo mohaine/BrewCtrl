@@ -26,14 +26,15 @@ type Sensor struct {
 
 type ControlPoint struct {
 	// initComplete bool `json:"initComplete,omitempty"`;
-	Io                   int32   `json:"controlIo,omitempty"`
-	Duty                 int32   `json:"duty,omitempty"`
+	Id                   string  `json:"id,omitempty"`
+	Io                   int32   `json:"controlIo"`
+	Duty                 int32   `json:"duty"`
 	FullOnAmps           int32   `json:"fullOnAmps,omitempty"`
 	SensorAddress        string  `json:"tempSensorAddress,omitempty"`
 	TargetTemp           float32 `json:"targetTemp,omitempty"`
-	HasDuty              bool    `json:"hasDuty,omitempty"`
+	HasDuty              bool    `json:"hasDuty"`
 	AutomaticControl     bool    `json:"automaticControl,omitempty"`
-	On                   bool    `json:"on,omitempty"`
+	On                   bool    `json:"on"`
 	lastUpdateOnOffTimes uint64
 	dutyTimeOn           uint64
 	dutyTimeOff          uint64
@@ -94,12 +95,13 @@ func StepDefault(cfg Configuration) (step ControlStep) {
 }
 
 func createControlPoint(io int32, hashDuty bool) (cp ControlPoint) {
+	cp.Id = id.RandomId()
 	cp.Io = io
 	cp.FullOnAmps = 0
 	cp.HasDuty = hashDuty
 	cp.On = false
 	cp.Duty = 0
-	initControlPoint(&cp)
+	initControlPointDuty(&cp)
 	return
 }
 

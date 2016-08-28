@@ -9,9 +9,15 @@ import (
 	// "log"
 	// "bytes"
 	// "os"
+	// "errors"
 )
 
-func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string)) {
+type StepModify struct {
+	FullList bool
+	Steps    []ControlStep
+}
+
+func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify)) {
 
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
@@ -35,6 +41,11 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	setModeC := make(chan string)
 	setMode = func(mode string) {
 		setModeC <- mode
+	}
+
+	modifyStepsC := make(chan StepModify)
+	modifySteps = func(stepModify StepModify) {
+		modifyStepsC <- stepModify
 	}
 
 	// TODO load old status?
@@ -64,6 +75,9 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 				receiveCfg <- cfg
 			case mode := <-setModeC:
 				state.Mode = mode
+				//TODO Handle mode change
+			case stepModify := <-modifyStepsC:
+				updateStateForSteps(stepModify, &state)
 			case <-quit:
 				return
 			}
@@ -71,5 +85,47 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	}
 	go loop()
 	return
+}
 
+func updateControlPoints(modPoints []ControlPoint, points []ControlPoint) {
+	for i := range modPoints {
+		modPoint := &modPoints[i]
+		found := false
+		for j := range points {
+			point := &points[j]
+			if point.Id == modPoint.Id {
+				found = true
+				copyControlPointDuty(point, modPoint)
+				break
+			}
+		}
+		if !found {
+			initControlPointDuty(modPoint)
+		}
+	}
+}
+
+func updateStateForSteps(stepModify StepModify, state *State) {
+	modSteps := stepModify.Steps
+	// if first step is the same, overlay control point state
+	if len(modSteps) > 0 && len(state.Steps) > 0 {
+		modStep1 := &modSteps[0]
+		step1 := &state.Steps[0]
+		if step1.Id == modStep1.Id {
+			updateControlPoints(modStep1.ControlPoints, step1.ControlPoints)
+		}
+	}
+	if stepModify.FullList {
+		state.Steps = modSteps
+	} else {
+		for i := range state.Steps {
+			step := &state.Steps[i]
+			for j := range modSteps {
+				modStep := modSteps[j]
+				if modStep.Id == step.Id {
+					state.Steps[i] = modStep
+				}
+			}
+		}
+	}
 }

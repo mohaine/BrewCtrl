@@ -83,7 +83,7 @@ func turnOffSeenControls() {
 	}
 }
 
-func initControlPoint(hs *ControlPoint) {
+func initControlPointDuty(hs *ControlPoint) {
 	seenGpios = append(seenGpios, hs.Io)
 	ioMode(hs.Io, IO_OUT)
 	turnIoTo(hs.Io, false)
@@ -93,6 +93,15 @@ func initControlPoint(hs *ControlPoint) {
 	hs.duty = 0
 	hs.On = false
 	hs.ioState = false
+}
+
+func copyControlPointDuty(from *ControlPoint, to *ControlPoint) {
+	to.lastUpdateOnOffTimes = from.lastUpdateOnOffTimes
+	to.dutyTimeOn = from.dutyTimeOn
+	to.dutyTimeOff = from.dutyTimeOff
+	to.duty = from.duty
+	to.On = from.On
+	to.ioState = from.ioState
 }
 
 func resetDutyState(hs *ControlPoint) {
