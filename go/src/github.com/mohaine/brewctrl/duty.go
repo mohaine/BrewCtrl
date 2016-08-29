@@ -242,6 +242,9 @@ func UpdatePinsForSetDuty(cfg *Configuration, state *State) {
 				if cp.ioState {
 					currentAmps += cp.FullOnAmps
 				}
+			} else if(cp.ioState) {
+				turnIoTo(cp.Io, false)
+
 			}
 		}
 	}
