@@ -78,7 +78,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 				receiveCfg <- cfg
 			case mode := <-setModeC:
 				state.Mode = mode
-				//TODO Handle mode change
+				turnOff(&state, state.Mode != MODE_OFF);
 			case stepModify := <-modifyStepsC:
 				updateStateForSteps(stepModify, &state)
 			case <-quit:
@@ -88,6 +88,17 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	}
 	go loop()
 	return
+}
+
+func turnOff(state *State, on bool){
+	if len(state.Steps) > 0 {
+		controlPoints := state.Steps[0].ControlPoints
+		for i := range controlPoints {
+			cp := &controlPoints[i]
+			cp.On = on
+		}
+	}
+
 }
 
 func UpdateStepTimer(state *State, cfg *Configuration) {
