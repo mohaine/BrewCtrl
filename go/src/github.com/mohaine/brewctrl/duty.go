@@ -97,10 +97,16 @@ func initControlPointDuty(hs *ControlPoint) {
 
 func copyControlPointDuty(from *ControlPoint, to *ControlPoint) {
 	to.lastUpdateOnOffTimes = from.lastUpdateOnOffTimes
-	to.dutyTimeOn = from.dutyTimeOn
-	to.dutyTimeOff = from.dutyTimeOff
-	to.duty = from.duty
-	to.On = from.On
+
+	if from.On == to.On {
+		to.dutyTimeOn = from.dutyTimeOn
+		to.dutyTimeOff = from.dutyTimeOff
+		to.duty = from.duty
+	} else {
+		to.On = from.On
+		resetDutyState(to)
+	}
+
 	to.ioState = from.ioState
 }
 

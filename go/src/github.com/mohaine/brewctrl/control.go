@@ -67,7 +67,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 			select {
 			case <-tickDuty:
 				StateUpdateSensors(&state, readSensors())
-				StateUpdateDuty(&state) 
+				StateUpdateDuty(&state)
 			case <-tickUpdateTimes:
 				UpdateStepTimer(&state, &cfg)
 			case <-tickPins:
@@ -95,10 +95,10 @@ func UpdateOnOff(state *State, on bool){
 		controlPoints := state.Steps[0].ControlPoints
 		for i := range controlPoints {
 			cp := &controlPoints[i]
-			if on && ! cp.On {
+			if on != cp.On {
 				resetDutyState(&cp)
+				cp.On = on
 			}
-			cp.On = on
 		}
 	}
 
