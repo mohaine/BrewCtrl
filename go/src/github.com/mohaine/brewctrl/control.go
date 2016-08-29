@@ -70,7 +70,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 				receiveCfg <- cfg
 			case mode := <-setModeC:
 				state.Mode = mode
-				// UpdateOnOff(&state, state.Mode != MODE_OFF);
+				UpdatePinsForSetDuty(&cfg, &state)
 			case stepModify := <-modifyStepsC:
 				updateStateForSteps(stepModify, &state)
 			case <-quit:
