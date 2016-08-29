@@ -51,15 +51,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 
 	// TODO load old status?
 	state := StateDefault(cfg)
-	state.Mode = MODE_ON
-
-	controlPoints := state.Steps[0].ControlPoints
-	for i := range controlPoints {
-		cp := &controlPoints[i]
-		cp.Duty = 33
-		cp.On = true
-		cp.HasDuty = true
-	}
+	state.Mode = MODE_OFF
 
 	fmt.Println(state.ConfigurationVersion)
 	loop := func() {
@@ -71,14 +63,14 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 			case <-tickUpdateTimes:
 				UpdateStepTimer(&state, &cfg)
 			case <-tickPins:
-				UpdatePinsForSetDuty(&state, cfg.BrewLayout.MaxAmps)
+				UpdatePinsForSetDuty(&cfg, &state)
 			case <-requestState:
 				receiveState <- state
 			case <-requestCfg:
 				receiveCfg <- cfg
 			case mode := <-setModeC:
 				state.Mode = mode
-				UpdateOnOff(&state, state.Mode != MODE_OFF);
+				// UpdateOnOff(&state, state.Mode != MODE_OFF);
 			case stepModify := <-modifyStepsC:
 				updateStateForSteps(stepModify, &state)
 			case <-quit:
@@ -90,19 +82,18 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	return
 }
 
-func UpdateOnOff(state *State, on bool){
-	if len(state.Steps) > 0 {
-		controlPoints := state.Steps[0].ControlPoints
-		for i := range controlPoints {
-			cp := &controlPoints[i]
-			if on != cp.On {
-				resetDutyState(cp)
-				cp.On = on
-			}
-		}
-	}
-
-}
+// func UpdateOnOff(state *State, on bool){
+// 	if len(state.Steps) > 0 {
+// 		controlPoints := state.Steps[0].ControlPoints
+// 		for i := range controlPoints {
+// 			cp := &controlPoints[i]
+// 			if on != cp.On {
+// 				resetDutyState(cp)
+// 				cp.On = on
+// 			}
+// 		}
+// 	}
+// }
 
 func UpdateStepTimer(state *State, cfg *Configuration) {
 	lockSteps()

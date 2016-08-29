@@ -6,7 +6,7 @@ import (
 	// "io/ioutil"
 	"log"
 	// "os"
-	"fmt"
+	// "fmt"
 	// "strings"
 	"github.com/mohaine/id"
 	"github.com/mohaine/onewire"
@@ -36,7 +36,7 @@ type ControlPoint struct {
 	TargetTemp           float32 `json:"targetTemp,omitempty"`
 	HasDuty              bool    `json:"hasDuty"`
 	AutomaticControl     bool    `json:"automaticControl,omitempty"`
-	On                   bool    `json:"on"`
+	ActuallyOn           bool    `json:"on"`
 	lastUpdateOnOffTimes uint64
 	dutyTimeOn           uint64
 	dutyTimeOff          uint64
@@ -70,6 +70,18 @@ func StateDefault(cfg Configuration) (state State) {
 	return
 }
 
+func IsHeater(cfg *Configuration, io int32) bool {
+	tanks := cfg.BrewLayout.Tanks
+	for i := 0; i < len(tanks); i++ {
+		tank := tanks[i]
+		heater := tank.Heater
+		if heater.Io > 0 && heater.Io == io {
+			return true
+		}
+	}
+	return false
+}
+
 func StepDefault(cfg Configuration) (step ControlStep) {
 	step.Name = "Manual Step"
 	step.Id = id.RandomId()
@@ -80,8 +92,6 @@ func StepDefault(cfg Configuration) (step ControlStep) {
 	for i := 0; i < len(tanks); i++ {
 		tank := tanks[i]
 		heater := tank.Heater
-		fmt.Printf("Tank: %v\n", tank.Name)
-		fmt.Printf("Heater: %v\n", tank.Heater)
 		if heater.Io > 0 {
 			cp := createControlPoint(heater.Io, heater.HasDuty)
 			step.ControlPoints = append(step.ControlPoints, cp)
@@ -90,19 +100,18 @@ func StepDefault(cfg Configuration) (step ControlStep) {
 	pumps := cfg.BrewLayout.Pumps
 	for i := 0; i < len(pumps); i++ {
 		pump := pumps[i]
-		fmt.Printf("Pump: %v\n", pump.Name)
 		cp := createControlPoint(pump.Io, pump.HasDuty)
 		step.ControlPoints = append(step.ControlPoints, cp)
 	}
 	return
 }
 
-func createControlPoint(io int32, hashDuty bool) (cp ControlPoint) {
+func createControlPoint(io int32, hasDuty bool) (cp ControlPoint) {
 	cp.Id = id.RandomId()
 	cp.Io = io
 	cp.FullOnAmps = 0
-	cp.HasDuty = hashDuty
-	cp.On = false
+	cp.HasDuty = hasDuty
+	// cp.On = false
 	cp.Duty = 0
 	initControlPointDuty(&cp)
 	return
