@@ -96,7 +96,7 @@ func UpdateOnOff(state *State, on bool){
 		for i := range controlPoints {
 			cp := &controlPoints[i]
 			if on != cp.On {
-				resetDutyState(&cp)
+				resetDutyState(cp)
 				cp.On = on
 			}
 		}
