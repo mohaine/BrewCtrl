@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"log"
 	"github.com/mohaine/id"
 	"io"
 	"io/ioutil"
-	"fmt"
 	"os"
-	"bytes"
 )
 
 type SensorAddress struct {
@@ -115,13 +115,13 @@ func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
 func WriteConfiguration(cfg *Configuration) {
 	j, err := json.Marshal(cfg)
 	if err != nil {
-		fmt.Println("error:", err)
+		log.Println("error:", err)
 	}
 	var out bytes.Buffer
 	json.Indent(&out, j, "", "  ")
-  err = ioutil.WriteFile(CFG_FILE, out.Bytes(), 0644)
+	err = ioutil.WriteFile(CFG_FILE, out.Bytes(), 0644)
 	if err != nil {
-		fmt.Println("Failed to write to ", CFG_FILE," error ", err)
+		log.Println("Failed to write to ", CFG_FILE, " error ", err)
 	}
 }
 
@@ -129,7 +129,7 @@ func LoadCfg(path string) (Configuration, error) {
 	var cfg Configuration
 	var err error
 	var f io.Reader
-	fmt.Printf("Load Cfg File %v\n", path)
+	log.Printf("Load Cfg File %v\n", path)
 	f, err = os.Open(path)
 	if err == nil {
 		dec := json.NewDecoder(f)

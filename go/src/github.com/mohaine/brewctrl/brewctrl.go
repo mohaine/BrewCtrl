@@ -31,7 +31,7 @@ func main() {
 
 	cfg, err := LoadCfg(CFG_FILE)
 	if err != nil {
-		fmt.Printf("Failed to load cfg File: %v\n", err)
+		log.Printf("Failed to load cfg File: %v\n", err)
 		cfg, err = LoadCfg("BrewControllerConfig.json.dist")
 		if err != nil {
 			panic(err)
@@ -86,7 +86,7 @@ func main() {
 		state := getState()
 		j, err := json.Marshal(state)
 		if err != nil {
-			fmt.Println("error:", err)
+			log.Println("error:", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(j)
@@ -113,7 +113,7 @@ func main() {
 		cfg := getConfig()
 		j, err := json.Marshal(cfg)
 		if err != nil {
-			fmt.Println("error:", err)
+			log.Println("error:", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(j)

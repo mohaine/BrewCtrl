@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"github.com/mohaine/id"
 	"github.com/mohaine/onewire"
 	"time"
 	// "encoding/json"
-	// "log"
+	"log"
 	// "bytes"
 	// "os"
 	// "errors"
@@ -59,7 +59,6 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	state := StateDefault(cfg)
 	state.Mode = MODE_OFF
 
-	fmt.Println(state.ConfigurationVersion)
 	loop := func() {
 		for {
 			select {
@@ -108,7 +107,7 @@ func SelectReadingSensors(cfg *Configuration, state *State, sensorReadings []one
 		}
 
 		if !found {
-			fmt.Println("Add Sensor: ", reading.Id)
+			log.Printf("Add Sensor: %v", reading.Id)
 			var cSensor SensorConfig
 			cSensor.Address = reading.Id
 			cfg.Sensors = append(cfg.Sensors, cSensor)
@@ -135,7 +134,7 @@ func SelectReadingSensors(cfg *Configuration, state *State, sensorReadings []one
 					cSensor := cfg.Sensors[j]
 					if cSensor.Address == tank.Sensor.Address {
 						if cSensor.Location != tank.Name {
-							fmt.Println("Clear Tank Sensor: ", tank.Sensor.Address)
+							log.Printf("Clear Tank Sensor %v for tank %v", tank.Sensor.Address, tank.Name)
 							tank.Sensor.Address = ""
 							configDirty = true
 							ChangeSpepControlSensorTo(state, tank.Heater.Io, "")
@@ -155,7 +154,7 @@ func SelectReadingSensors(cfg *Configuration, state *State, sensorReadings []one
 					for k := range sensorReadings {
 						reading := sensorReadings[k]
 						if cSensor.Address == reading.Id {
-							fmt.Println("Select Tank Sensor: ", cSensor.Address, " for tank ", tank.Name)
+							log.Printf("Select Tank Sensor %v for tank %v", cSensor.Address, tank.Name)
 							tank.Sensor.Address = cSensor.Address
 							// Change Control Points As well
 							ChangeSpepControlSensorTo(state, tank.Heater.Io, cSensor.Address)

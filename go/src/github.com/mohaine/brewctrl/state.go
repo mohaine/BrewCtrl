@@ -153,7 +153,6 @@ func StateUpdateDuty(state *State) {
 				if sensor != NilSensor {
 					// if (hasVaildTemp(sensor)) {
 					if cp.HasDuty {
-
 						cp.Duty = pid.GetDuty(&cp.pid, cp.TargetTemp, sensor.TemperatureC)
 						// log.Printf("Target %v but at %v duty: %v\n", cp.TargetTemp, sensor.TemperatureC,cp.Duty)
 					} else {

@@ -103,6 +103,7 @@ func copyControlPointDuty(from *ControlPoint, to *ControlPoint) {
 	// 	to.On = from.On
 	// 	resetDutyState(to)
 	// }
+	to.pid = from.pid
 	to.ioState = from.ioState
 }
 
