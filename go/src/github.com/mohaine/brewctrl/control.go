@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/mohaine/onewire"
 	"github.com/mohaine/id"
+	"github.com/mohaine/onewire"
 	"time"
 	// "encoding/json"
 	// "log"
@@ -17,7 +17,7 @@ type StepModify struct {
 	Steps    []ControlStep
 }
 
-func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify), modifyCfg  func(Configuration)) {
+func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify), modifyCfg func(Configuration)) {
 
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
@@ -91,19 +91,41 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 }
 
 func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configuration) {
-	fmt.Printf("%v %v %v", state)
-	// TODO Turn off IOs that are no longer inuse
-	// TODO Create new Control Points on all steps for new Ios
 	// TODO Update target sensors
 
-   cfg.Version = id.RandomId()
-	 cfg.LogMessages = newCfg.LogMessages
-	 cfg.BrewLayout = newCfg.BrewLayout
-	 cfg.Sensors = newCfg.Sensors
-	 cfg.StepLists = newCfg.StepLists
+	IdEverything(newCfg)
 
+	oldMap := IoToOwnerIdMap(cfg)
+	newMap := IoToOwnerIdMap(newCfg)
+
+	if newCfg.Version == cfg.Version {
+		cfg.Version = id.RandomId()
+	} else {
+		cfg.Version = newCfg.Version
+	}
+	cfg.LogMessages = newCfg.LogMessages
+	cfg.BrewLayout = newCfg.BrewLayout
+	cfg.Sensors = newCfg.Sensors
+	cfg.StepLists = newCfg.StepLists
+
+	modifiedIos := false
+	for k := range oldMap {
+		if newMap[k] != oldMap[k] {
+			modifiedIos = true
+		}
+	}
+	for k := range newMap {
+		if newMap[k] != oldMap[k] {
+			modifiedIos = true
+		}
+	}
+	if modifiedIos {
+		// Moved an IO. Shouldn't happen while ON, if it does, clear everything
+		turnOffSeenControls()
+		state.Steps = state.Steps[:0]
+		SetToStateDefault(*cfg, state)
+	}
 }
-
 
 func UpdateStepTimer(state *State, cfg *Configuration) {
 	if len(state.Steps) > 0 {

@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/mohaine/id"
 	"io"
-	// "io/ioutil"
 	// "log"
 	"fmt"
 	"os"
@@ -72,6 +72,44 @@ type Configuration struct {
 	BrewLayout  BreweryLayout  `json:"brewLayout,omitempty"`
 	Sensors     []SensorConfig `json:"sensors,omitempty"`
 	StepLists   []StepList     `json:"stepLists,omitempty"`
+}
+
+func IdEverything(cfg *Configuration) {
+	idMap := make(map[string]bool)
+	tanks := cfg.BrewLayout.Tanks
+	for i := 0; i < len(tanks); i++ {
+		tank := &tanks[i]
+		if len(tank.Id) == 0 || idMap[tank.Id] {
+			tank.Id = id.RandomId()
+		}
+		idMap[tank.Id] = true
+	}
+	pumps := cfg.BrewLayout.Pumps
+	for i := 0; i < len(pumps); i++ {
+		pump := &pumps[i]
+		if len(pump.Id) == 0 || idMap[pump.Id] {
+			pump.Id = id.RandomId()
+		}
+		idMap[pump.Id] = true
+	}
+}
+
+func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
+	ioMap = make(map[int32]string)
+	tanks := cfg.BrewLayout.Tanks
+	for i := 0; i < len(tanks); i++ {
+		tank := tanks[i]
+		heater := tank.Heater
+		if heater.Io > 0 {
+			ioMap[heater.Io] = tank.Id
+		}
+	}
+	pumps := cfg.BrewLayout.Pumps
+	for i := 0; i < len(pumps); i++ {
+		pump := pumps[i]
+		ioMap[pump.Io] = pump.Id
+	}
+	return
 }
 
 func LoadCfg(path string) (Configuration, error) {

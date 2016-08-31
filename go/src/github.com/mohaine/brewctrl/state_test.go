@@ -31,8 +31,17 @@ func expectStringToNotBe(t *testing.T, expected string, actual string) {
 		t.Error(fmt.Sprintf("Expected anything but %v, got %v", expected, actual))
 	}
 }
+
+func InitMockPath() {
+	SYS_PATH = "../../../../../mock/sys/"
+	// dir, err := filepath.Abs(filepath.Dir(SYS_PATH))
+	//  if err != nil {
+	//      log.Fatal(err)
+	//  }
+	//  fmt.Println("*******************" , dir)
+}
 func SimpleTestCfg() (cfg Configuration) {
-	SYS_PATH = "mock/sys/"
+	InitMockPath()
 	var pump Pump
 	pump.Io = 10
 	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump)
@@ -40,7 +49,6 @@ func SimpleTestCfg() (cfg Configuration) {
 }
 
 func TestDefaultState(t *testing.T) {
-	fmt.Printf("*****************************************\n")
 	cfg := SimpleTestCfg()
 	state := StateDefault(cfg)
 	expectStringToBe(t, state.Mode, MODE_OFF)

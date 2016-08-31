@@ -34,7 +34,7 @@ class App:
         for gpio in gpios:
             bgColor = "white"
             if gpio.isOn():
-                bgColor = "yellow"
+                bgColor = "orange"
             gpio.button = Button(
                 self.frame, text=str(gpio.number) , bg=bgColor
             )

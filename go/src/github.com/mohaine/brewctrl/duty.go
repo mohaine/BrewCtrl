@@ -204,14 +204,9 @@ func initHardware() {
 	turnOffSeenControls()
 }
 
-func lockSteps() {
-}
-func unlockSteps() {
-}
 func UpdatePinsForSetDuty(cfg *Configuration, state *State) {
 	maxAmps := cfg.BrewLayout.MaxAmps
 	currentAmps := int32(0)
-	lockSteps()
 	if len(state.Steps) > 0 {
 		controlPoints := state.Steps[0].ControlPoints
 		for i := range controlPoints {
@@ -244,11 +239,10 @@ func UpdatePinsForSetDuty(cfg *Configuration, state *State) {
 				}
 			} else if cp.ioState {
 				turnIoTo(cp.Io, false)
-
+				cp.ioState = false
 			}
 		}
 	}
-	unlockSteps()
 
 	//DBG("***********  updatePinsForSetDuty - END *************** \n");
 }

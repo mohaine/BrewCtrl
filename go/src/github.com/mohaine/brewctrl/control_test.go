@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"testing"
-	// "fmt"
 )
 
 func TestUpdateStepTimer_ON(t *testing.T) {
@@ -66,18 +66,9 @@ func TestUpdateStepTimer_HOLD(t *testing.T) {
 	expectStringToBe(t, state.Steps[0].Id, stepId)
 }
 
-
 func ComplexConfig1() (cfg Configuration) {
-	SYS_PATH = "mock/sys/"
+	InitMockPath()
 	cfg.Version = "ComplexConfig1"
-	var pump1 Pump
-	pump1.Io = 10
-	pump1.Id = "pump1"
-	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump1)
-	var pump2 Pump
-	pump2.Io = 11
-	pump2.Id = "pump2"
-	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump2)
 	var tank1 Tank
 	tank1.Heater.Io = 12
 	tank1.Id = "tank1"
@@ -86,19 +77,20 @@ func ComplexConfig1() (cfg Configuration) {
 	tank2.Heater.Io = 13
 	tank2.Id = "tank2"
 	cfg.BrewLayout.Tanks = append(cfg.BrewLayout.Tanks, tank2)
+	var pump1 Pump
+	pump1.Io = 10
+	pump1.Id = "pump1"
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump1)
+	var pump2 Pump
+	pump2.Io = 11
+	pump2.Id = "pump2"
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump2)
 	return
 }
 
 func ComplexConfig2() (cfg Configuration) {
-	SYS_PATH = "mock/sys/"
-	var pump1 Pump
-	pump1.Io = 10
-	pump1.Id = "Pump1"
+	InitMockPath()
 	cfg.Version = "ComplexConfig2"
-	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump1)
-	var pump2 Pump
-	pump2.Io = 17
-	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump2)
 	var tank1 Tank
 	tank1.Heater.Io = 13
 	tank1.Id = "tank1"
@@ -107,18 +99,42 @@ func ComplexConfig2() (cfg Configuration) {
 	tank2.Heater.Io = 12
 	tank2.Id = "tank2"
 	cfg.BrewLayout.Tanks = append(cfg.BrewLayout.Tanks, tank2)
+	var pump1 Pump
+	pump1.Io = 10
+	pump1.Id = "Pump1"
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump1)
+	var pump2 Pump
+	pump2.Io = 17
+	pump2.Id = "pump2"
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump2)
 	return
 }
 
 func TestNewCfg(t *testing.T) {
 	cfg := ComplexConfig1()
+	cfgNew := ComplexConfig2()
+
+	origVersion := cfg.Version
+
 	state := StateDefault(cfg)
 	state.Mode = MODE_HOLD
 
-	cfgNew := ComplexConfig2()
-	expectStringToBe(t, state.ConfigurationVersion, cfg.Version)
+	expectStringToBe(t, origVersion, state.ConfigurationVersion)
+	stepBefore := state.Steps[0]
+	fmt.Printf("%v,%v,%v,%v\n", stepBefore.ControlPoints[0].Io, stepBefore.ControlPoints[1].Io, stepBefore.ControlPoints[2].Io, stepBefore.ControlPoints[3].Io)
+	expectInt32ToBe(t, 12, stepBefore.ControlPoints[0].Io)
+	expectInt32ToBe(t, 13, stepBefore.ControlPoints[1].Io)
+	expectInt32ToBe(t, 10, stepBefore.ControlPoints[2].Io)
+	expectInt32ToBe(t, 11, stepBefore.ControlPoints[3].Io)
 
-	updateForNewConfiguration(&cfgNew,&state,&cfg)
-	expectStringToNotBe(t, state.ConfigurationVersion, cfg.Version)
+	updateForNewConfiguration(&cfgNew, &state, &cfg)
+	expectStringToNotBe(t, origVersion, state.ConfigurationVersion)
+
+	stepAfter := state.Steps[0]
+	fmt.Printf("%v,%v,%v,%v\n", stepAfter.ControlPoints[0].Io, stepAfter.ControlPoints[1].Io, stepAfter.ControlPoints[2].Io, stepAfter.ControlPoints[3].Io)
+	expectInt32ToBe(t, 13, stepAfter.ControlPoints[0].Io)
+	expectInt32ToBe(t, 12, stepAfter.ControlPoints[1].Io)
+	expectInt32ToBe(t, 10, stepAfter.ControlPoints[2].Io)
+	expectInt32ToBe(t, 17, stepAfter.ControlPoints[3].Io)
 
 }

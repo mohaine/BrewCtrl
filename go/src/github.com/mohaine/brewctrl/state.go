@@ -63,13 +63,16 @@ type State struct {
 }
 
 func StateDefault(cfg Configuration) (state State) {
+	SetToStateDefault(cfg, &state)
+	return
+}
+func SetToStateDefault(cfg Configuration, state *State) {
 	state.Mode = MODE_OFF
 	state.ConfigurationVersion = cfg.Version
 	state.ListName = "Default List"
 	state.Steps = append(state.Steps, StepDefault(cfg))
 	return
 }
-
 func IsHeater(cfg *Configuration, io int32) bool {
 	tanks := cfg.BrewLayout.Tanks
 	for i := 0; i < len(tanks); i++ {
