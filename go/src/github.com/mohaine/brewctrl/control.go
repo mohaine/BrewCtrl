@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/mohaine/onewire"
-	// "github.com/mohaine/pid"
+	"github.com/mohaine/id"
 	"time"
 	// "encoding/json"
 	// "log"
@@ -17,7 +17,7 @@ type StepModify struct {
 	Steps    []ControlStep
 }
 
-func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify)) {
+func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify), modifyCfg  func(Configuration)) {
 
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
@@ -32,6 +32,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 		state := <-receiveState
 		return state
 	}
+
 	requestCfg := make(chan int)
 	receiveCfg := make(chan Configuration)
 	getCfg = func() Configuration {
@@ -47,6 +48,11 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	modifyStepsC := make(chan StepModify)
 	modifySteps = func(stepModify StepModify) {
 		modifyStepsC <- stepModify
+	}
+
+	requestModifyCfgC := make(chan Configuration)
+	modifyCfg = func(cfg Configuration) {
+		requestModifyCfgC <- cfg
 	}
 
 	// TODO load old status?
@@ -73,6 +79,8 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 				UpdatePinsForSetDuty(&cfg, &state)
 			case stepModify := <-modifyStepsC:
 				updateStateForSteps(stepModify, &state)
+			case newCfg := <-requestModifyCfgC:
+				updateForNewConfiguration(&newCfg, &state, &cfg)
 			case <-quit:
 				return
 			}
@@ -82,21 +90,22 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	return
 }
 
-// func UpdateOnOff(state *State, on bool){
-// 	if len(state.Steps) > 0 {
-// 		controlPoints := state.Steps[0].ControlPoints
-// 		for i := range controlPoints {
-// 			cp := &controlPoints[i]
-// 			if on != cp.On {
-// 				resetDutyState(cp)
-// 				cp.On = on
-// 			}
-// 		}
-// 	}
-// }
+func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configuration) {
+	fmt.Printf("%v %v %v", state)
+	// TODO Turn off IOs that are no longer inuse
+	// TODO Create new Control Points on all steps for new Ios
+	// TODO Update target sensors
+
+   cfg.Version = id.RandomId()
+	 cfg.LogMessages = newCfg.LogMessages
+	 cfg.BrewLayout = newCfg.BrewLayout
+	 cfg.Sensors = newCfg.Sensors
+	 cfg.StepLists = newCfg.StepLists
+
+}
+
 
 func UpdateStepTimer(state *State, cfg *Configuration) {
-	lockSteps()
 	if len(state.Steps) > 0 {
 		step := &state.Steps[0]
 		if state.Mode == MODE_ON || state.Mode == MODE_HEAT_OFF {
@@ -130,7 +139,6 @@ func UpdateStepTimer(state *State, cfg *Configuration) {
 	if len(state.Steps) == 0 {
 		state.Steps = append(state.Steps, StepDefault(*cfg))
 	}
-	unlockSteps()
 }
 
 func updateControlPoints(modPoints []ControlPoint, points []ControlPoint) {

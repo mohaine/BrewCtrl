@@ -65,3 +65,60 @@ func TestUpdateStepTimer_HOLD(t *testing.T) {
 	UpdateStepTimer(&state, &cfg)
 	expectStringToBe(t, state.Steps[0].Id, stepId)
 }
+
+
+func ComplexConfig1() (cfg Configuration) {
+	SYS_PATH = "mock/sys/"
+	cfg.Version = "ComplexConfig1"
+	var pump1 Pump
+	pump1.Io = 10
+	pump1.Id = "pump1"
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump1)
+	var pump2 Pump
+	pump2.Io = 11
+	pump2.Id = "pump2"
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump2)
+	var tank1 Tank
+	tank1.Heater.Io = 12
+	tank1.Id = "tank1"
+	cfg.BrewLayout.Tanks = append(cfg.BrewLayout.Tanks, tank1)
+	var tank2 Tank
+	tank2.Heater.Io = 13
+	tank2.Id = "tank2"
+	cfg.BrewLayout.Tanks = append(cfg.BrewLayout.Tanks, tank2)
+	return
+}
+
+func ComplexConfig2() (cfg Configuration) {
+	SYS_PATH = "mock/sys/"
+	var pump1 Pump
+	pump1.Io = 10
+	pump1.Id = "Pump1"
+	cfg.Version = "ComplexConfig2"
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump1)
+	var pump2 Pump
+	pump2.Io = 17
+	cfg.BrewLayout.Pumps = append(cfg.BrewLayout.Pumps, pump2)
+	var tank1 Tank
+	tank1.Heater.Io = 13
+	tank1.Id = "tank1"
+	cfg.BrewLayout.Tanks = append(cfg.BrewLayout.Tanks, tank1)
+	var tank2 Tank
+	tank2.Heater.Io = 12
+	tank2.Id = "tank2"
+	cfg.BrewLayout.Tanks = append(cfg.BrewLayout.Tanks, tank2)
+	return
+}
+
+func TestNewCfg(t *testing.T) {
+	cfg := ComplexConfig1()
+	state := StateDefault(cfg)
+	state.Mode = MODE_HOLD
+
+	cfgNew := ComplexConfig2()
+	expectStringToBe(t, state.ConfigurationVersion, cfg.Version)
+
+	updateForNewConfiguration(&cfgNew,&state,&cfg)
+	expectStringToNotBe(t, state.ConfigurationVersion, cfg.Version)
+
+}

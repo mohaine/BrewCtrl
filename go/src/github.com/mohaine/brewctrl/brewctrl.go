@@ -37,7 +37,7 @@ func main() {
 		}
 	}
 	readSensors, stopReading := onewire.SensorLoop(100*time.Millisecond, SYS_PATH+"bus/w1/devices/")
-	stopControl, getState, getConfig, setMode, modifySteps := ControlStuff(readSensors, cfg)
+	stopControl, getState, getConfig, setMode, modifySteps, modifyConfig := ControlStuff(readSensors, cfg)
 
 	http.HandleFunc("/cmd/status", func(w http.ResponseWriter, r *http.Request) {
 
@@ -91,6 +91,24 @@ func main() {
 		w.Write(j)
 	})
 	http.HandleFunc("/cmd/configuration", func(w http.ResponseWriter, r *http.Request) {
+
+		configurationParam := r.FormValue("configuration")
+		if len(configurationParam) > 0 {
+			var newCfg Configuration
+			dec := json.NewDecoder(strings.NewReader(configurationParam))
+			err := dec.Decode(&newCfg)
+			if err != nil {
+				sendError(w, "Failed to parse Configuration", http.StatusBadRequest)
+				return
+			} else {
+				modifyConfig(newCfg)
+				// if err != nil {
+				// 	sendError(w,fmt.Sprintf("Failed to parse steps:%v",err),http.StatusBadRequest)
+				// 	return
+				// }
+			}
+		}
+
 		cfg := getConfig()
 		j, err := json.Marshal(cfg)
 		if err != nil {
