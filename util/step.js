@@ -38,7 +38,7 @@ export const findControlPointByName = function(configuration,name){
   });
   brewLayout.pumps.forEach(p=>{
     if(p.name === name){
-      controlPoint = heater;
+      controlPoint = p;
     }
   });
   return controlPoint;

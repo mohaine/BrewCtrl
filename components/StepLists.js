@@ -30,8 +30,6 @@ export default class StepsList extends Component {
       return step
     });
     requestUpdateStepList(steps)
-
-
   }
 
   render() {
@@ -41,8 +39,8 @@ export default class StepsList extends Component {
         {stepLists && (stepLists.map(stepList=> (
           <div key={stepList.name}  >
             {stepList.name}
-&nbsp;
-            <button type="button" onClick={()=>this.loadList(stepList)} >Load</button>
+            &nbsp;
+            <button type="button" className="btn btn-default" onClick={()=>this.loadList(stepList)} >Load</button>
 
           </div>
            )))}
