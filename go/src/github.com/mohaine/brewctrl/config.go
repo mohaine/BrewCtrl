@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"github.com/mohaine/id"
 	"io"
-	// "log"
+	"io/ioutil"
 	"fmt"
 	"os"
-	// "strings"
+	"bytes"
 )
 
 type SensorAddress struct {
@@ -113,7 +113,16 @@ func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
 }
 
 func WriteConfiguration(cfg *Configuration) {
-	fmt.Println(cfg.Version)
+	j, err := json.Marshal(cfg)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	var out bytes.Buffer
+	json.Indent(&out, j, "", "  ")
+  err = ioutil.WriteFile(CFG_FILE, out.Bytes(), 0644)
+	if err != nil {
+		fmt.Println("Failed to write to ", CFG_FILE," error ", err)
+	}
 }
 
 func LoadCfg(path string) (Configuration, error) {

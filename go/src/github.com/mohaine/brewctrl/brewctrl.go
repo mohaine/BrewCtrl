@@ -13,6 +13,7 @@ import (
 )
 
 var SYS_PATH = "/sys/"
+var CFG_FILE = "BrewControllerConfig.json"
 
 func sendError(w http.ResponseWriter, msg string, code int) {
 	http.Error(w, msg, code)
@@ -28,7 +29,7 @@ func main() {
 		SYS_PATH = "mock/sys/"
 	}
 
-	cfg, err := LoadCfg("BrewControllerConfig.json")
+	cfg, err := LoadCfg(CFG_FILE)
 	if err != nil {
 		fmt.Printf("Failed to load cfg File: %v\n", err)
 		cfg, err = LoadCfg("BrewControllerConfig.json.dist")

@@ -221,6 +221,7 @@ func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configu
 		state.Steps = state.Steps[:0]
 		SetToStateDefault(*cfg, state)
 	}
+	WriteConfiguration(cfg)
 }
 
 func UpdateStepTimer(state *State, cfg *Configuration) {
