@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	// "bytes"
+	"bytes"
 )
 
 var SYS_PATH = "/sys/"
@@ -116,7 +116,11 @@ func main() {
 			log.Println("error:", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(j)
+
+		var out bytes.Buffer
+		json.Indent(&out, j, "", "  ")
+
+		w.Write(out.Bytes())
 	})
 	http.HandleFunc("/brewctrl/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "web/brewctrl/index.html")
