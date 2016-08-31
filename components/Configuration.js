@@ -55,7 +55,7 @@ export default class Configuration extends Component {
   render() {
     let { brewery ,configuration,requestConfiguration, requestConfigurationStatus ,requestUpdateConfiguration } = this.props
 
-    return (<div>
+    return (<div >
 
 
       {this.state.alert && (<div className="alert alert-danger" role="alert">{this.state.alert}</div>)}
@@ -65,23 +65,33 @@ export default class Configuration extends Component {
 
       {!configuration && requestConfigurationStatus && requestConfigurationStatus.active && (<div>Loading configuration</div>) }
 
-      <div className="panel panel-default config-upload">
-      	<div className="panel-title">
-      	      <label forHtml="configurationToUpload">Select a Configuration File to Upload</label><br />
-      	</div>
-      	<div className="panel-body">
-      		<div className="row">
-      			<form id="config-upload-form" method="post" action="/cmd/configuration">
-      				<div className="col-md-4"><input type="file" name="configuration" id="configurationToUpload" onChange={(e)=>this.onChangeFile(e.target) }/></div>
-      				<div className="col-md-4"><button  className="btn btn-default " type="button" onClick={(e)=>this.upload(e.target.form)} >Upload</button></div>
-      			</form>
-      		</div>
-      	</div>
-      </div>
-
       { configuration && brewery && <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
       { configuration && <Pumps pumps={configuration.brewLayout.pumps} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
       { configuration && <Tanks tanks={configuration.brewLayout.tanks} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
+
+
+
+      <hr />
+      <div className="row">
+        <div className="col-md-6 container">
+        <div className="panel panel-default config-upload">
+          <div className="panel-title">
+          <label forHtml="configurationToUpload">Select a Configuration File to Upload</label><br />
+          </div>
+          <div className="panel-body">
+            <div className="row">
+              <form id="config-upload-form" method="post" action="/cmd/configuration">
+                <div className="col-md-8"><input type="file" name="configuration" id="configurationToUpload" onChange={(e)=>this.onChangeFile(e.target) }/></div>
+                <div className="col-md-4"><button  className="btn btn-default " type="button" onClick={(e)=>this.upload(e.target.form)} >Upload</button></div>
+              </form>
+            </div>
+          </div>
+        </div>
+        </div>
+        <div className="col-md-6">
+            <a href="/cmd/configuration" download="BrewControllerConfig.json">Download Current Configuration</a>
+        </div>
+      </div>
 
 
        </div>)

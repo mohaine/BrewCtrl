@@ -37340,13 +37340,6 @@
 	        step && _react2.default.createElement(
 	          'div',
 	          null,
-	          requestRemoveStep && _react2.default.createElement(
-	            'button',
-	            { type: 'button', onClick: function onClick() {
-	                return requestRemoveStep(step.rawStep);
-	              } },
-	            'Remove'
-	          ),
 	          this.state.editTime && _react2.default.createElement(_QuickPick2.default, { close: function close() {
 	              _this2.setState({ editTime: false });
 	            },
@@ -37395,7 +37388,7 @@
 	              step.tanks.map(function (tank) {
 	                return _react2.default.createElement(
 	                  'div',
-	                  { key: tank.id, className: 'col-sm-3 col-md-3 col-lg-2' },
+	                  { key: tank.id, className: 'col-sm-4 col-md-4 col-lg-2' },
 	                  _react2.default.createElement(_Tank2.default, { step: step, tank: tank, requestUpdateStep: requestUpdateStep })
 	                );
 	              })
@@ -37416,7 +37409,17 @@
 	              })
 	            )
 	          )
-	        )
+	        ),
+	        requestRemoveStep && _react2.default.createElement(
+	          'button',
+	          { type: 'button', className: 'btn btn-default', onClick: function onClick() {
+	              return requestRemoveStep(step.rawStep);
+	            } },
+	          'Remove Step ',
+	          step.name
+	        ),
+	        _react2.default.createElement('br', null),
+	        _react2.default.createElement('br', null)
 	      );
 	    }
 	  }]);
@@ -51911,7 +51914,7 @@
 /* 684 */
 /***/ function(module, exports) {
 
-	module.exports = {"name":"brewctrl-ui","versionHash":"2f086cc151dc5a3ea63343e62ce290c818f82f62","buildTime":"2016-08-28T03:37:05.884Z","logState":false};
+	module.exports = {"name":"brewctrl-ui","versionHash":"dc0329cf556a9b0023aec49c07677997825a2ebd","buildTime":"2016-08-31T20:47:29.738Z","logState":false};
 
 /***/ },
 /* 685 */
@@ -52496,10 +52499,10 @@
 
 	      return _react2.default.createElement(
 	        'div',
-	        null,
+	        { className: 'addStep' },
 	        _react2.default.createElement(
 	          'button',
-	          { type: 'button', onClick: function onClick() {
+	          { type: 'button', className: 'btn btn-default', onClick: function onClick() {
 	              return _this2.addStep();
 	            } },
 	          'Add Step'
@@ -52752,53 +52755,71 @@
 	          null,
 	          'Loading configuration'
 	        ),
+	        configuration && brewery && _react2.default.createElement(_Sensors2.default, { sensors: brewery.sensors, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
+	        configuration && _react2.default.createElement(_Pumps2.default, { pumps: configuration.brewLayout.pumps, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
+	        configuration && _react2.default.createElement(_Tanks2.default, { tanks: configuration.brewLayout.tanks, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
+	        _react2.default.createElement('hr', null),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'panel panel-default config-upload' },
+	          { className: 'row' },
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'panel-title' },
-	            _react2.default.createElement(
-	              'label',
-	              { forHtml: 'configurationToUpload' },
-	              'Select a Configuration File to Upload'
-	            ),
-	            _react2.default.createElement('br', null)
-	          ),
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'panel-body' },
+	            { className: 'col-md-6 container' },
 	            _react2.default.createElement(
 	              'div',
-	              { className: 'row' },
+	              { className: 'panel panel-default config-upload' },
 	              _react2.default.createElement(
-	                'form',
-	                { id: 'config-upload-form', method: 'post', action: '/cmd/configuration' },
+	                'div',
+	                { className: 'panel-title' },
 	                _react2.default.createElement(
-	                  'div',
-	                  { className: 'col-md-4' },
-	                  _react2.default.createElement('input', { type: 'file', name: 'configuration', id: 'configurationToUpload', onChange: function onChange(e) {
-	                      return _this3.onChangeFile(e.target);
-	                    } })
+	                  'label',
+	                  { forHtml: 'configurationToUpload' },
+	                  'Select a Configuration File to Upload'
 	                ),
+	                _react2.default.createElement('br', null)
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'panel-body' },
 	                _react2.default.createElement(
 	                  'div',
-	                  { className: 'col-md-4' },
+	                  { className: 'row' },
 	                  _react2.default.createElement(
-	                    'button',
-	                    { className: 'btn btn-default ', type: 'button', onClick: function onClick(e) {
-	                        return _this3.upload(e.target.form);
-	                      } },
-	                    'Upload'
+	                    'form',
+	                    { id: 'config-upload-form', method: 'post', action: '/cmd/configuration' },
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: 'col-md-8' },
+	                      _react2.default.createElement('input', { type: 'file', name: 'configuration', id: 'configurationToUpload', onChange: function onChange(e) {
+	                          return _this3.onChangeFile(e.target);
+	                        } })
+	                    ),
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: 'col-md-4' },
+	                      _react2.default.createElement(
+	                        'button',
+	                        { className: 'btn btn-default ', type: 'button', onClick: function onClick(e) {
+	                            return _this3.upload(e.target.form);
+	                          } },
+	                        'Upload'
+	                      )
+	                    )
 	                  )
 	                )
 	              )
 	            )
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-md-6' },
+	            _react2.default.createElement(
+	              'a',
+	              { href: '/cmd/configuration', download: 'BrewControllerConfig.json' },
+	              'Download Current Configuration'
+	            )
 	          )
-	        ),
-	        configuration && brewery && _react2.default.createElement(_Sensors2.default, { sensors: brewery.sensors, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
-	        configuration && _react2.default.createElement(_Pumps2.default, { pumps: configuration.brewLayout.pumps, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration }),
-	        configuration && _react2.default.createElement(_Tanks2.default, { tanks: configuration.brewLayout.tanks, configuration: configuration, requestUpdateConfiguration: requestUpdateConfiguration })
+	        )
 	      );
 	    }
 	  }]);

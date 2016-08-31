@@ -22,9 +22,5 @@ export default class AddStep extends Component {
 
 
   render() {
-      return (
-        <div >
-      <button type="button" onClick={()=>this.addStep()} >Add Step</button>
-    </div>)
-  }
+      return (<div className="addStep"><button type="button" className="btn btn-default" onClick={()=>this.addStep()}>Add Step</button></div>)}
 }

@@ -3,3 +3,7 @@ button.down {
 	background-color: #88f;
 	color: white;
 }
+
+.addStep{
+	padding: 3px;
+}
