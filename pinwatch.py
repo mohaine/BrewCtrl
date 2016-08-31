@@ -14,8 +14,19 @@ class Gpio:
         f = open(self.file,'r')
         contents = f.read().strip()
         return contents == "1"
+    def turnTo(self,state):
+        f = open(self.file,'w')
+        if state:
+            contents = "1"
+        else:
+            contents = "0"
+        f.write(contents)
+    def toggle(self):
+        self.turnTo(not self.isOn())
 
 base_dir = "mock/sys/class/gpio/"
+
+
 
 class App:
     def __init__(self, master):
@@ -35,11 +46,23 @@ class App:
             bgColor = "white"
             if gpio.isOn():
                 bgColor = "orange"
+
+            def buildCallback(gpio):
+                return lambda : gpio.toggle()
             gpio.button = Button(
-                self.frame, text=str(gpio.number) , bg=bgColor
+                self.frame, text=str(gpio.number) , bg=bgColor, command=buildCallback(gpio)
             )
             gpio.button.pack(side=LEFT)
 
+        def allOff():
+            for gpio in gpios:
+                gpio.turnTo(False)
+
+
+        allOffButton = Button(
+            self.frame, text="Clear" , bg="white", command=allOff
+        )
+        allOffButton.pack(side=LEFT)
 
     def updateButtons(self):
         for gpio in self.gpios:
