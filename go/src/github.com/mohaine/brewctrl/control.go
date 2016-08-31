@@ -64,7 +64,9 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 		for {
 			select {
 			case <-tickDuty:
-				StateUpdateSensors(&state, readSensors())
+				sensors := readSensors()
+				StateUpdateSensors(&state, sensors)
+				SelectReadingSensors(&cfg, &state, sensors)
 				StateUpdateDuty(&state)
 			case <-tickUpdateTimes:
 				UpdateStepTimer(&state, &cfg)
@@ -88,6 +90,100 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	}
 	go loop()
 	return
+}
+
+func SelectReadingSensors(cfg *Configuration, state *State, sensorReadings []onewire.TempReading) {
+
+	configDirty := false
+	// Add to cfg list
+	for i := range sensorReadings {
+		reading := sensorReadings[i]
+		found := false
+		for j := range cfg.Sensors {
+			cSensor := cfg.Sensors[j]
+			if cSensor.Address == reading.Id {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			fmt.Println("Add Sensor: ", reading.Id)
+			var cSensor SensorConfig
+			cSensor.Address = reading.Id
+			cfg.Sensors = append(cfg.Sensors, cSensor)
+			configDirty = true
+		}
+	}
+
+	// Update Tank selected Sensors
+	tanks := cfg.BrewLayout.Tanks
+	for i := range tanks {
+		tank := &tanks[i]
+		if len(tank.Sensor.Address) > 0 {
+			found := false
+			for j := range sensorReadings {
+				reading := sensorReadings[j]
+				if tank.Sensor.Address == reading.Id {
+					found = true
+					break
+				}
+			}
+			if found {
+				// Sensor for this tank is being read. Make sure it is still for this tank
+				for j := range cfg.Sensors {
+					cSensor := cfg.Sensors[j]
+					if cSensor.Address == tank.Sensor.Address {
+						if cSensor.Location != tank.Name {
+							fmt.Println("Clear Tank Sensor: ", tank.Sensor.Address)
+							tank.Sensor.Address = ""
+							configDirty = true
+							ChangeSpepControlSensorTo(state, tank.Heater.Io, "")
+						}
+					}
+				}
+			} else {
+				tank.Sensor.Address = ""
+				configDirty = true
+			}
+		}
+
+		if len(tank.Sensor.Address) == 0 {
+			for j := range cfg.Sensors {
+				cSensor := cfg.Sensors[j]
+				if cSensor.Location == tank.Name {
+					for k := range sensorReadings {
+						reading := sensorReadings[k]
+						if cSensor.Address == reading.Id {
+							fmt.Println("Select Tank Sensor: ", cSensor.Address, " for tank ", tank.Name)
+							tank.Sensor.Address = cSensor.Address
+							// Change Control Points As well
+							ChangeSpepControlSensorTo(state, tank.Heater.Io, cSensor.Address)
+							configDirty = true
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+	if configDirty {
+		cfg.Version = id.RandomId()
+		state.ConfigurationVersion = cfg.Version
+		WriteConfiguration(cfg)
+	}
+}
+
+func ChangeSpepControlSensorTo(state *State, io int32, address string) {
+	for l := range state.Steps {
+		step := &state.Steps[l]
+		for m := range step.ControlPoints {
+			cp := &step.ControlPoints[m]
+			if cp.AutomaticControl && cp.Io == io {
+				cp.SensorAddress = address
+			}
+		}
+	}
 }
 
 func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configuration) {

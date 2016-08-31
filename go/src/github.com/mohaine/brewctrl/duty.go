@@ -7,7 +7,7 @@ import (
 	"log"
 	// "os"
 	"fmt"
-	// "strings"
+	"github.com/mohaine/pid"
 )
 
 const IO_OUT = false
@@ -86,9 +86,7 @@ func initControlPointDuty(hs *ControlPoint) {
 	seenGpios = append(seenGpios, hs.Io)
 	ioMode(hs.Io, IO_OUT)
 	turnIoTo(hs.Io, false)
-	hs.lastUpdateOnOffTimes = millis()
-	hs.dutyTimeOn = 0
-	hs.dutyTimeOff = 0
+	resetDutyState(hs)
 	hs.duty = 0
 	// hs.On = false
 	hs.ioState = false
@@ -109,6 +107,7 @@ func copyControlPointDuty(from *ControlPoint, to *ControlPoint) {
 }
 
 func resetDutyState(hs *ControlPoint) {
+	pid.InitPid(&hs.pid, 78.2577, 269.7192, 0.9532, 0, 100)
 	hs.dutyTimeOn = 0
 	hs.dutyTimeOff = 0
 	hs.lastUpdateOnOffTimes = millis()

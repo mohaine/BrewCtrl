@@ -28,12 +28,12 @@ type Sensor struct {
 
 type ControlPoint struct {
 	// initComplete bool `json:"initComplete,omitempty"`;
-	Id                   string  `json:"id,omitempty"`
-	Io                   int32   `json:"controlIo"`
-	Duty                 int32   `json:"duty"`
-	FullOnAmps           int32   `json:"fullOnAmps,omitempty"`
-	SensorAddress        string  `json:"tempSensorAddress,omitempty"`
-	TargetTemp           float32 `json:"targetTemp,omitempty"`
+	Id                   string `json:"id,omitempty"`
+	Io                   int32  `json:"controlIo"`
+	Duty                 int32  `json:"duty"`
+	FullOnAmps           int32
+	SensorAddress        string  `json:"tempSensorAddress"`
+	TargetTemp           float32 `json:"targetTemp"`
 	HasDuty              bool    `json:"hasDuty"`
 	AutomaticControl     bool    `json:"automaticControl,omitempty"`
 	ActuallyOn           bool    `json:"on"`
@@ -147,13 +147,15 @@ func StateUpdateDuty(state *State) {
 	if state.Mode != MODE_OFF && len(state.Steps) > 0 {
 		controlPoints := state.Steps[0].ControlPoints
 		for i := range controlPoints {
-			cp := controlPoints[i]
+			cp := &controlPoints[i]
 			if cp.AutomaticControl {
 				sensor := FindSensor(state, cp.SensorAddress)
 				if sensor != NilSensor {
 					// if (hasVaildTemp(sensor)) {
 					if cp.HasDuty {
+
 						cp.Duty = pid.GetDuty(&cp.pid, cp.TargetTemp, sensor.TemperatureC)
+						// log.Printf("Target %v but at %v duty: %v\n", cp.TargetTemp, sensor.TemperatureC,cp.Duty)
 					} else {
 						if sensor.TemperatureC < cp.TargetTemp {
 							cp.Duty = 100

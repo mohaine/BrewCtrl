@@ -112,6 +112,10 @@ func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
 	return
 }
 
+func WriteConfiguration(cfg *Configuration) {
+	fmt.Println(cfg.Version)
+}
+
 func LoadCfg(path string) (Configuration, error) {
 	var cfg Configuration
 	var err error

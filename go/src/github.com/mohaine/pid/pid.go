@@ -1,8 +1,6 @@
 package pid
 
-import (
-	"fmt"
-)
+import ()
 
 type Pid struct {
 	Kp            float32
@@ -16,6 +14,11 @@ type Pid struct {
 }
 
 func CreatePid(Kp float32, Kd float32, Ki float32, MinOutput float32, MaxOutput float32) (pid Pid) {
+	InitPid(&pid, Kp, Kd, Ki, MinOutput, MaxOutput)
+	return
+}
+
+func InitPid(pid *Pid, Kp float32, Kd float32, Ki float32, MinOutput float32, MaxOutput float32) {
 	pid.Kp = Kp
 	pid.Kd = Kd
 	pid.Ki = Ki
@@ -35,8 +38,6 @@ func GetDuty(pid *Pid, targetTemp float32, currentTemp float32) (duty int32) {
 	// println(fmt.Sprintf("pid.previousError %v",pid.previousError))
 
 	pid.integral = pid.integral + (error * dt * pid.Ki)
-
-	println(fmt.Sprintf("*** pid.integral %v", pid.integral))
 
 	if pid.integral > pid.MaxOutput {
 		pid.integral = pid.MaxOutput
