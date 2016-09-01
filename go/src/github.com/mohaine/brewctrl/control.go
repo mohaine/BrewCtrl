@@ -198,6 +198,7 @@ func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configu
 	} else {
 		cfg.Version = newCfg.Version
 	}
+	state.ConfigurationVersion = cfg.Version
 	cfg.LogMessages = newCfg.LogMessages
 	cfg.BrewLayout = newCfg.BrewLayout
 	cfg.Sensors = newCfg.Sensors

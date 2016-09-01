@@ -89,7 +89,7 @@ export default class Tank extends Component {
         { tank && (
 
           <svg
-             class="tank"
+             className="tank"
              width="233.05785"
              height="266.55518"
              id="svg2"
@@ -131,7 +131,7 @@ export default class Tank extends Component {
                  d="m 231.75349,205.38902 -9.82673,0 0,4.945 -142.892138,0 0,5.0413 140.620418,0 0,5.04129 -140.620418,0 0,5.04131 142.892138,0 0,3.77638 9.82673,0 z"
                  style={{"stroke":"#000000","strokeWidth":"1.13817108px","strokeLinecap":"butt","strokeLinejoin":"miter","strokeOpacity":"1",
                  fill: heater.on? heater.automaticControl?"#faa": "#f00": "#fff" }}
-                 class="element" />
+                 className="element" />
             </g>)}
             <text
                id="tankName"
@@ -154,7 +154,7 @@ export default class Tank extends Component {
                  d="m 3.3299614,58.894094 143.9283286,0 0,71.039176 -143.9283286,0 z"
                  style={{"fill":"#ffffff"}} />
               <text
-                 class="temp"
+                 className="temp"
                  id="text3809-4"
                  y="315.89194"
                  x="98.446396"

@@ -53,6 +53,7 @@ type StepControlPoint struct {
 	TargetTemp  float32 `json:"targetTemp,omitempty"`
 	TargetName  string  `json:"targetName,omitempty"`
 	ControlName string  `json:"controlName,omitempty"`
+	Duty 				int32   `json:"duty,omitempty"`
 }
 
 type Step struct {
@@ -62,6 +63,7 @@ type Step struct {
 }
 
 type StepList struct {
+	Id  string `json:"id,omitempty"`
 	Name  string `json:"name,omitempty"`
 	Steps []Step `json:"steps,omitempty"`
 }
@@ -76,6 +78,16 @@ type Configuration struct {
 
 func IdEverything(cfg *Configuration) {
 	idMap := make(map[string]bool)
+
+	stepLists := cfg.StepLists
+	for i := 0; i < len(stepLists); i++ {
+		stepList := &stepLists[i]
+		if len(stepList.Id) == 0 || idMap[stepList.Id] {
+			stepList.Id = id.RandomId()
+		}
+		idMap[stepList.Id] = true
+	}
+
 	tanks := cfg.BrewLayout.Tanks
 	for i := 0; i < len(tanks); i++ {
 		tank := &tanks[i]
@@ -134,6 +146,8 @@ func LoadCfg(path string) (Configuration, error) {
 	if err == nil {
 		dec := json.NewDecoder(f)
 		err = dec.Decode(&cfg)
+	} else {
+		IdEverything(&cfg)
 	}
 	return cfg, err
 }

@@ -81,7 +81,6 @@ export default class HeaterElementEdit extends Component {
   render() {
   let { control, configuration } = this.props
   let {fullOnAmps,hasDuty} = this.state
-  console.log(hasDuty)
   let gpios = emptyGpios(configuration)
   gpios.push(control.io)
   gpios.sort((a,b)=> a-b)

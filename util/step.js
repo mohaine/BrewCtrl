@@ -17,12 +17,12 @@ export const findControlPoint = function (step, io){
   }
 }
 
-
-
 export const findTempSensorByLocationName = function(configuration,status,name){
-  let sensors = configuration.sensors.filter(s=>s.location === name);
-  let activeSensors = sensors.filter(s=> status.sensors.find(rs => rs.address === s.address));
-  return activeSensors.length>0 ? activeSensors[0] : undefined;
+  if(name){
+    let sensors = configuration.sensors.filter(s=>s.location === name);
+    let activeSensors = sensors.filter(s=> status.sensors.find(rs => rs.address === s.address));
+    return activeSensors.length>0 ? activeSensors[0] : undefined;
+  }
 }
 
 export const findControlPointByName = function(configuration,name){
@@ -42,6 +42,40 @@ export const findControlPointByName = function(configuration,name){
     }
   });
   return controlPoint;
+}
+
+export const findTargetByAddress = function(configuration,address){
+  let brewLayout = configuration.brewLayout;
+  let target = undefined;
+  brewLayout.tanks.forEach(t=>{
+      let sensor = t.sensor;
+      if(sensor){
+        if(sensor.address == address){
+          target = t
+        }
+      }
+  });
+
+  return target
+}
+
+export const findControlByIo = function(configuration,io){
+  let brewLayout = configuration.brewLayout;
+  let target = undefined;
+  brewLayout.tanks.forEach(t=>{
+      let heater = t.heater;
+      if(heater){
+        if(heater.io == io){
+          target = heater
+        }
+      }
+  });
+  brewLayout.pumps.forEach(p=>{
+    if(p.io == io){
+      target =  p
+    }
+  });
+  return target
 }
 
 

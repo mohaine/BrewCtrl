@@ -44,7 +44,6 @@ export default class Step extends Component {
       { step && (
       <div>
 
-
       { this.state.editTime && (<QuickPick close={()=>{this.setState({editTime: false })}}
       apply={(value)=>{this.updateTime(value)}}
       quickPickValues={ [
@@ -74,7 +73,7 @@ export default class Step extends Component {
 
         <div className="container-fluid">
           <div className="row">
-            {step.tanks.map(tank=>(<div key={tank.id} className="col-sm-4 col-md-4 col-lg-2"><Tank step={step} tank={tank} requestUpdateStep={requestUpdateStep}/></div>))}
+            {step.tanks.map(tank=>(<div key={tank.id} className="col-sm-4 col-md-4 col-lg-3"><Tank step={step} tank={tank} requestUpdateStep={requestUpdateStep}/></div>))}
           </div>
         </div>
 
@@ -86,7 +85,6 @@ export default class Step extends Component {
         </div>
       </div>
     ) }
-    {requestRemoveStep && <button type="button" className="btn btn-default" onClick={()=>requestRemoveStep(step.rawStep)}>Remove Step {step.name}</button> }
 
     <br/>
     <br/>

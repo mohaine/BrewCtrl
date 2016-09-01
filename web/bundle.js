@@ -66,7 +66,7 @@
 
 	var _Default2 = _interopRequireDefault(_Default);
 
-	var _Configuration = __webpack_require__(692);
+	var _Configuration = __webpack_require__(691);
 
 	var _Configuration2 = _interopRequireDefault(_Configuration);
 
@@ -74,11 +74,11 @@
 
 	var _Brewery2 = _interopRequireDefault(_Brewery);
 
-	var _StepLists = __webpack_require__(700);
+	var _StepLists = __webpack_require__(699);
 
 	var _StepLists2 = _interopRequireDefault(_StepLists);
 
-	var _About = __webpack_require__(702);
+	var _About = __webpack_require__(701);
 
 	var _About2 = _interopRequireDefault(_About);
 
@@ -90,11 +90,11 @@
 
 	var _reactRouterRedux = __webpack_require__(501);
 
-	var _server = __webpack_require__(703);
+	var _server = __webpack_require__(702);
 
 	var _configuration = __webpack_require__(509);
 
-	var _configureStore = __webpack_require__(704);
+	var _configureStore = __webpack_require__(703);
 
 	var _configureStore2 = _interopRequireDefault(_configureStore);
 
@@ -36991,7 +36991,7 @@
 
 	var _Brewery2 = _interopRequireDefault(_Brewery);
 
-	var _Configuration = __webpack_require__(692);
+	var _Configuration = __webpack_require__(691);
 
 	var _Configuration2 = _interopRequireDefault(_Configuration);
 
@@ -37134,11 +37134,7 @@
 
 	var _Sensors2 = _interopRequireDefault(_Sensors);
 
-	var _AddStep = __webpack_require__(690);
-
-	var _AddStep2 = _interopRequireDefault(_AddStep);
-
-	var _StepList = __webpack_require__(691);
+	var _StepList = __webpack_require__(690);
 
 	var _StepList2 = _interopRequireDefault(_StepList);
 
@@ -37219,12 +37215,11 @@
 	              _react2.default.createElement(
 	                'div',
 	                { key: step.id, className: 'col-sm-12 col-md-12 col-lg-12' },
-	                _react2.default.createElement(_Step2.default, { step: step, requestUpdateStep: requestUpdateStep, requestRemoveStep: requestRemoveStep })
+	                _react2.default.createElement(_Step2.default, { step: step, requestUpdateStep: requestUpdateStep })
 	              )
 	            )
 	          ),
-	          _react2.default.createElement(_StepList2.default, { steps: brewery.steps, selectedStepId: selectedStepId, selectStepById: selectStepById }),
-	          _react2.default.createElement(_AddStep2.default, { steps: brewery.steps, requestUpdateStepList: requestUpdateStepList, configuration: configuration })
+	          _react2.default.createElement(_StepList2.default, { steps: brewery.steps, selectedStepId: selectedStepId, selectStepById: selectStepById, requestUpdateStepList: requestUpdateStepList, configuration: configuration, requestRemoveStep: requestRemoveStep, requestUpdateConfiguration: requestUpdateConfiguration })
 	        )
 	      );
 	    }
@@ -37388,7 +37383,7 @@
 	              step.tanks.map(function (tank) {
 	                return _react2.default.createElement(
 	                  'div',
-	                  { key: tank.id, className: 'col-sm-4 col-md-4 col-lg-2' },
+	                  { key: tank.id, className: 'col-sm-4 col-md-4 col-lg-3' },
 	                  _react2.default.createElement(_Tank2.default, { step: step, tank: tank, requestUpdateStep: requestUpdateStep })
 	                );
 	              })
@@ -37409,14 +37404,6 @@
 	              })
 	            )
 	          )
-	        ),
-	        requestRemoveStep && _react2.default.createElement(
-	          'button',
-	          { type: 'button', className: 'btn btn-default', onClick: function onClick() {
-	              return requestRemoveStep(step.rawStep);
-	            } },
-	          'Remove Step ',
-	          step.name
 	        ),
 	        _react2.default.createElement('br', null),
 	        _react2.default.createElement('br', null)
@@ -51436,7 +51423,7 @@
 	        tank && _react2.default.createElement(
 	          'svg',
 	          {
-	            'class': 'tank',
+	            className: 'tank',
 	            width: '233.05785',
 	            height: '266.55518',
 	            id: 'svg2',
@@ -51489,7 +51476,7 @@
 	              d: 'm 231.75349,205.38902 -9.82673,0 0,4.945 -142.892138,0 0,5.0413 140.620418,0 0,5.04129 -140.620418,0 0,5.04131 142.892138,0 0,3.77638 9.82673,0 z',
 	              style: { "stroke": "#000000", "strokeWidth": "1.13817108px", "strokeLinecap": "butt", "strokeLinejoin": "miter", "strokeOpacity": "1",
 	                fill: heater.on ? heater.automaticControl ? "#faa" : "#f00" : "#fff" },
-	              'class': 'element' })
+	              className: 'element' })
 	          ),
 	          _react2.default.createElement(
 	            'text',
@@ -51520,7 +51507,7 @@
 	            _react2.default.createElement(
 	              'text',
 	              {
-	                'class': 'temp',
+	                className: 'temp',
 	                id: 'text3809-4',
 	                y: '315.89194',
 	                x: '98.446396',
@@ -51858,7 +51845,7 @@
 /* 684 */
 /***/ function(module, exports) {
 
-	module.exports = {"name":"brewctrl-ui","versionHash":"98cf7adf72b5a62e6f5522b2d43b5b43d76bb535","buildTime":"2016-08-31T21:39:48.932Z","logState":false};
+	module.exports = {"name":"brewctrl-ui","versionHash":"647039a555984429cba3635d3bc545ae124cfe0b","buildTime":"2016-09-01T04:08:50.989Z","logState":false};
 
 /***/ },
 /* 685 */
@@ -51869,7 +51856,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.createManualStep = exports.findControlPointByName = exports.findTempSensorByLocationName = exports.findControlPoint = exports.overlayControlPoint = undefined;
+	exports.createManualStep = exports.findControlByIo = exports.findTargetByAddress = exports.findControlPointByName = exports.findTempSensorByLocationName = exports.findControlPoint = exports.overlayControlPoint = undefined;
 
 	var _id = __webpack_require__(508);
 
@@ -51892,15 +51879,17 @@
 	};
 
 	var findTempSensorByLocationName = exports.findTempSensorByLocationName = function findTempSensorByLocationName(configuration, status, name) {
-	  var sensors = configuration.sensors.filter(function (s) {
-	    return s.location === name;
-	  });
-	  var activeSensors = sensors.filter(function (s) {
-	    return status.sensors.find(function (rs) {
-	      return rs.address === s.address;
+	  if (name) {
+	    var sensors = configuration.sensors.filter(function (s) {
+	      return s.location === name;
 	    });
-	  });
-	  return activeSensors.length > 0 ? activeSensors[0] : undefined;
+	    var activeSensors = sensors.filter(function (s) {
+	      return status.sensors.find(function (rs) {
+	        return rs.address === s.address;
+	      });
+	    });
+	    return activeSensors.length > 0 ? activeSensors[0] : undefined;
+	  }
 	};
 
 	var findControlPointByName = exports.findControlPointByName = function findControlPointByName(configuration, name) {
@@ -51916,10 +51905,44 @@
 	  });
 	  brewLayout.pumps.forEach(function (p) {
 	    if (p.name === name) {
-	      controlPoint = heater;
+	      controlPoint = p;
 	    }
 	  });
 	  return controlPoint;
+	};
+
+	var findTargetByAddress = exports.findTargetByAddress = function findTargetByAddress(configuration, address) {
+	  var brewLayout = configuration.brewLayout;
+	  var target = undefined;
+	  brewLayout.tanks.forEach(function (t) {
+	    var sensor = t.sensor;
+	    if (sensor) {
+	      if (sensor.address == address) {
+	        target = t;
+	      }
+	    }
+	  });
+
+	  return target;
+	};
+
+	var findControlByIo = exports.findControlByIo = function findControlByIo(configuration, io) {
+	  var brewLayout = configuration.brewLayout;
+	  var target = undefined;
+	  brewLayout.tanks.forEach(function (t) {
+	    var heater = t.heater;
+	    if (heater) {
+	      if (heater.io == io) {
+	        target = heater;
+	      }
+	    }
+	  });
+	  brewLayout.pumps.forEach(function (p) {
+	    if (p.io == io) {
+	      target = p;
+	    }
+	  });
+	  return target;
 	};
 
 	var createManualStep = exports.createManualStep = function createManualStep(configuration) {
@@ -52398,84 +52421,6 @@
 
 	var _step = __webpack_require__(685);
 
-	var _config = __webpack_require__(684);
-
-	var _config2 = _interopRequireDefault(_config);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var AddStep = function (_Component) {
-	  _inherits(AddStep, _Component);
-
-	  function AddStep() {
-	    _classCallCheck(this, AddStep);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(AddStep).apply(this, arguments));
-	  }
-
-	  _createClass(AddStep, [{
-	    key: 'addStep',
-	    value: function addStep() {
-	      var _props = this.props;
-	      var configuration = _props.configuration;
-	      var steps = _props.steps;
-	      var requestUpdateStepList = _props.requestUpdateStepList;
-
-
-	      var step = (0, _step.createManualStep)(configuration);
-
-	      var stepsRaw = steps.map(function (s) {
-	        return s.rawStep;
-	      });
-	      stepsRaw.push(step);
-	      requestUpdateStepList(stepsRaw);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _this2 = this;
-
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'addStep' },
-	        _react2.default.createElement(
-	          'button',
-	          { type: 'button', className: 'btn btn-default', onClick: function onClick() {
-	              return _this2.addStep();
-	            } },
-	          'Add Step'
-	        )
-	      );
-	    }
-	  }]);
-
-	  return AddStep;
-	}(_react.Component);
-
-	exports.default = AddStep;
-
-/***/ },
-/* 691 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(299);
-
-	var _react2 = _interopRequireDefault(_react);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -52494,25 +52439,117 @@
 	  }
 
 	  _createClass(StepList, [{
-	    key: "render",
-	    value: function render() {
+	    key: 'addStep',
+	    value: function addStep() {
 	      var _props = this.props;
+	      var configuration = _props.configuration;
 	      var steps = _props.steps;
-	      var selectedStepId = _props.selectedStepId;
-	      var selectStepById = _props.selectStepById;
+	      var requestUpdateStepList = _props.requestUpdateStepList;
+
+	      var step = (0, _step.createManualStep)(configuration);
+	      var stepsRaw = steps.map(function (s) {
+	        return s.rawStep;
+	      });
+	      stepsRaw.push(step);
+	      requestUpdateStepList(stepsRaw);
+	    }
+	  }, {
+	    key: 'saveAsList',
+	    value: function saveAsList() {
+	      var _props2 = this.props;
+	      var configuration = _props2.configuration;
+	      var steps = _props2.steps;
+	      var requestUpdateStepList = _props2.requestUpdateStepList;
+	      var requestUpdateConfiguration = _props2.requestUpdateConfiguration;
+
+
+	      var listSteps = steps.map(function (s) {
+	        var name = s.name;
+	        var time = "" + s.time;
+	        var controlPoints = s.controlPoints.filter(function (cp) {
+	          return cp.automaticControl || cp.duty > 0;
+	        }).map(function (cp) {
+	          var duty = cp.duty;
+	          var control = (0, _step.findControlByIo)(configuration, cp.controlIo);
+	          var controlName = control.name;
+	          var listCp = { duty: duty, controlName: controlName };
+	          if (cp.automaticControl) {
+	            var target = (0, _step.findTargetByAddress)(configuration, cp.tempSensorAddress);
+	            listCp.targetName = target.name;
+	            listCp.targetTemp = cp.targetTemp;
+	          }
+	          return listCp;
+	        });
+	        return { name: name, time: time, controlPoints: controlPoints };
+	      });
+	      var list = { name: "New List", steps: listSteps };
+	      var stepLists = configuration.stepLists.map(function (s) {
+	        return s;
+	      });
+	      stepLists.push(list);
+	      var cfgNew = Object.assign({}, configuration, { stepLists: stepLists });
+	      requestUpdateConfiguration(cfgNew);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this2 = this;
+
+	      var _props3 = this.props;
+	      var steps = _props3.steps;
+	      var selectedStepId = _props3.selectedStepId;
+	      var selectStepById = _props3.selectStepById;
+	      var requestRemoveStep = _props3.requestRemoveStep;
+
+
+	      var selectedStep = steps.find(function (s) {
+	        return s.id == selectedStepId;
+	      });
 
 	      return _react2.default.createElement(
-	        "div",
+	        'div',
 	        null,
-	        steps && steps.map(function (step) {
-	          return _react2.default.createElement(
-	            "button",
-	            { type: "button", className: "btn " + (selectedStepId === step.id ? "down" : "btn-default"), key: step.id, onClick: function onClick() {
-	                return selectStepById(step.id);
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'btn-group' },
+	          steps && steps.map(function (step) {
+	            return _react2.default.createElement(
+	              'button',
+	              { type: 'button', className: "btn " + (selectedStepId === step.id ? "down" : "btn-default"), key: step.id, onClick: function onClick() {
+	                  return selectStepById(step.id);
+	                } },
+	              step.name
+	            );
+	          })
+	        ),
+	        _react2.default.createElement('br', null),
+	        _react2.default.createElement('br', null),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'btn-group' },
+	          _react2.default.createElement(
+	            'button',
+	            { type: 'button', className: 'btn btn-default', onClick: function onClick() {
+	                return _this2.addStep();
 	              } },
-	            step.name
-	          );
-	        })
+	            'Add Step'
+	          ),
+	          selectedStep && requestRemoveStep && _react2.default.createElement(
+	            'button',
+	            { type: 'button', className: 'btn btn-default', onClick: function onClick() {
+	                return requestRemoveStep(selectedStep.rawStep);
+	              } },
+	            'Remove Step ',
+	            selectedStep.name
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { type: 'button', className: 'btn btn-default', onClick: function onClick() {
+	                return _this2.saveAsList();
+	              } },
+	            'Save List'
+	          )
+	        )
 	      );
 	    }
 	  }]);
@@ -52523,7 +52560,7 @@
 	exports.default = StepList;
 
 /***/ },
-/* 692 */
+/* 691 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52536,7 +52573,7 @@
 
 	var _configuration = __webpack_require__(509);
 
-	var _Configuration = __webpack_require__(693);
+	var _Configuration = __webpack_require__(692);
 
 	var _Configuration2 = _interopRequireDefault(_Configuration);
 
@@ -52569,7 +52606,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_Configuration2.default);
 
 /***/ },
-/* 693 */
+/* 692 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52588,11 +52625,11 @@
 
 	var _Sensors2 = _interopRequireDefault(_Sensors);
 
-	var _Pumps = __webpack_require__(694);
+	var _Pumps = __webpack_require__(693);
 
 	var _Pumps2 = _interopRequireDefault(_Pumps);
 
-	var _Tanks = __webpack_require__(697);
+	var _Tanks = __webpack_require__(696);
 
 	var _Tanks2 = _interopRequireDefault(_Tanks);
 
@@ -52774,7 +52811,7 @@
 	exports.default = Configuration;
 
 /***/ },
-/* 694 */
+/* 693 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52795,11 +52832,11 @@
 
 	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
 
-	var _PumpEdit = __webpack_require__(695);
+	var _PumpEdit = __webpack_require__(694);
 
 	var _PumpEdit2 = _interopRequireDefault(_PumpEdit);
 
-	var _gpio = __webpack_require__(696);
+	var _gpio = __webpack_require__(695);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -52871,7 +52908,7 @@
 	exports.default = Pumps;
 
 /***/ },
-/* 695 */
+/* 694 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -52888,7 +52925,7 @@
 
 	var _tempature = __webpack_require__(682);
 
-	var _gpio = __webpack_require__(696);
+	var _gpio = __webpack_require__(695);
 
 	var _ContentEditable = __webpack_require__(687);
 
@@ -53041,7 +53078,7 @@
 	exports.default = PumpEdit;
 
 /***/ },
-/* 696 */
+/* 695 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -53074,7 +53111,7 @@
 	};
 
 /***/ },
-/* 697 */
+/* 696 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53095,11 +53132,11 @@
 
 	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
 
-	var _TankEdit = __webpack_require__(698);
+	var _TankEdit = __webpack_require__(697);
 
 	var _TankEdit2 = _interopRequireDefault(_TankEdit);
 
-	var _gpio = __webpack_require__(696);
+	var _gpio = __webpack_require__(695);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53175,7 +53212,7 @@
 	exports.default = Tanks;
 
 /***/ },
-/* 698 */
+/* 697 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53194,11 +53231,11 @@
 
 	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
 
-	var _HeaterElementEdit = __webpack_require__(699);
+	var _HeaterElementEdit = __webpack_require__(698);
 
 	var _HeaterElementEdit2 = _interopRequireDefault(_HeaterElementEdit);
 
-	var _gpio = __webpack_require__(696);
+	var _gpio = __webpack_require__(695);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53324,7 +53361,7 @@
 	exports.default = Tank;
 
 /***/ },
-/* 699 */
+/* 698 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53341,7 +53378,7 @@
 
 	var _tempature = __webpack_require__(682);
 
-	var _gpio = __webpack_require__(696);
+	var _gpio = __webpack_require__(695);
 
 	var _ContentEditable = __webpack_require__(687);
 
@@ -53457,7 +53494,6 @@
 	      var fullOnAmps = _state.fullOnAmps;
 	      var hasDuty = _state.hasDuty;
 
-	      console.log(hasDuty);
 	      var gpios = (0, _gpio.emptyGpios)(configuration);
 	      gpios.push(control.io);
 	      gpios.sort(function (a, b) {
@@ -53537,7 +53573,7 @@
 	exports.default = HeaterElementEdit;
 
 /***/ },
-/* 700 */
+/* 699 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53552,7 +53588,7 @@
 
 	var _configuration = __webpack_require__(509);
 
-	var _StepLists = __webpack_require__(701);
+	var _StepLists = __webpack_require__(700);
 
 	var _StepLists2 = _interopRequireDefault(_StepLists);
 
@@ -53571,6 +53607,9 @@
 	  return {
 	    requestUpdateStepList: function requestUpdateStepList(steps) {
 	      dispatch((0, _status.updateStepList)(steps));
+	    },
+	    requestUpdateConfiguration: function requestUpdateConfiguration(cfg) {
+	      dispatch((0, _configuration.requestUpdateConfiguration)(cfg));
 	    }
 	  };
 	};
@@ -53578,7 +53617,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_StepLists2.default);
 
 /***/ },
-/* 701 */
+/* 700 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53596,6 +53635,10 @@
 	var _step = __webpack_require__(685);
 
 	var _date = __webpack_require__(577);
+
+	var _ContentEditable = __webpack_require__(687);
+
+	var _ContentEditable2 = _interopRequireDefault(_ContentEditable);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53615,35 +53658,76 @@
 	  }
 
 	  _createClass(StepsList, [{
-	    key: 'loadList',
-	    value: function loadList(stepList) {
+	    key: 'deleteList',
+	    value: function deleteList(stepList) {
 	      var _props = this.props;
 	      var configuration = _props.configuration;
-	      var status = _props.status;
-	      var requestUpdateStepList = _props.requestUpdateStepList;
+	      var requestUpdateConfiguration = _props.requestUpdateConfiguration;
+
+	      var stepLists = configuration.stepLists.filter(function (s) {
+	        return s.id != stepList.id;
+	      });
+	      var cfgNew = Object.assign({}, configuration, { stepLists: stepLists });
+	      requestUpdateConfiguration(cfgNew);
+	    }
+	  }, {
+	    key: 'updateName',
+	    value: function updateName(stepList, name) {
+	      var _props2 = this.props;
+	      var configuration = _props2.configuration;
+	      var requestUpdateConfiguration = _props2.requestUpdateConfiguration;
+
+	      var stepLists = configuration.stepLists.map(function (s) {
+	        if (s.id == stepList.id) {
+	          return Object.assign({}, s, { name: name });
+	        }
+	        return s;
+	      });
+	      var cfgNew = Object.assign({}, configuration, { stepLists: stepLists });
+
+	      if (this.updateNameTimer) {
+	        clearTimeout(this.updateNameTimer);
+	        this.updateNameTimer = undefined;
+	      }
+	      this.updateNameTimer = setTimeout(function () {
+	        requestUpdateConfiguration(cfgNew);
+	      }, 500);
+	    }
+	  }, {
+	    key: 'loadList',
+	    value: function loadList(stepList) {
+	      var _props3 = this.props;
+	      var configuration = _props3.configuration;
+	      var status = _props3.status;
+	      var requestUpdateStepList = _props3.requestUpdateStepList;
 
 	      var steps = stepList.steps.map(function (s) {
 	        var step = (0, _step.createManualStep)(configuration);
 	        step.name = s.name;
 	        step.stepTime = (0, _date.parseTime)(s.time);
 	        var controlPoints = step.controlPoints;
-	        s.controlPoints.forEach(function (cp) {
-	          var controlPointDef = (0, _step.findControlPointByName)(configuration, cp.controlName);
-	          if (controlPointDef) {
-	            var controlPoint = controlPoints.find(function (cp) {
-	              return cp.controlIo === controlPointDef.io;
-	            });
-	            // console.log(cp, "=>",controlPoint)
-	            if (controlPoint) {
-	              var sensor = (0, _step.findTempSensorByLocationName)(configuration, status, cp.targetName);
-	              if (sensor) {
-	                controlPoint.automaticControl = true;
-	                controlPoint.targetTemp = cp.targetTemp;
-	                controlPoint.tempSensorAddress = sensor.address;
+	        if (s.controlPoints) {
+	          s.controlPoints.forEach(function (cp) {
+	            var controlPointDef = (0, _step.findControlPointByName)(configuration, cp.controlName);
+	            if (controlPointDef) {
+	              var controlPoint = controlPoints.find(function (cp) {
+	                return cp.controlIo === controlPointDef.io;
+	              });
+	              if (controlPoint) {
+	                if (cp.targetName) {
+	                  var sensor = (0, _step.findTempSensorByLocationName)(configuration, status, cp.targetName);
+	                  if (sensor) {
+	                    controlPoint.automaticControl = true;
+	                    controlPoint.targetTemp = cp.targetTemp;
+	                    controlPoint.tempSensorAddress = sensor.address;
+	                  }
+	                } else {
+	                  controlPoint.duty = cp.duty;
+	                }
 	              }
 	            }
-	          }
-	        });
+	          });
+	        }
 	        return step;
 	      });
 	      requestUpdateStepList(steps);
@@ -53657,19 +53741,39 @@
 
 	      return _react2.default.createElement(
 	        'div',
-	        null,
+	        { className: 'container-fluid' },
 	        stepLists && stepLists.map(function (stepList) {
 	          return _react2.default.createElement(
 	            'div',
-	            { key: stepList.name },
-	            stepList.name,
-	            ' ',
+	            { className: 'row', key: stepList.id },
 	            _react2.default.createElement(
-	              'button',
-	              { type: 'button', onClick: function onClick() {
-	                  return _this2.loadList(stepList);
-	                } },
-	              'Load'
+	              'div',
+	              { className: 'col-sm-6' },
+	              _react2.default.createElement(_ContentEditable2.default, { onChange: function onChange(e) {
+	                  return _this2.updateName(stepList, e.target.value);
+	                }, html: stepList.name })
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'col-sm-6' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'btn-grouip' },
+	                _react2.default.createElement(
+	                  'button',
+	                  { type: 'button', className: 'btn btn-default', onClick: function onClick() {
+	                      return _this2.loadList(stepList);
+	                    } },
+	                  'Load'
+	                ),
+	                _react2.default.createElement(
+	                  'button',
+	                  { type: 'button', className: 'btn btn-default', onClick: function onClick() {
+	                      return _this2.deleteList(stepList);
+	                    } },
+	                  'Delete'
+	                )
+	              )
 	            )
 	          );
 	        })
@@ -53683,7 +53787,7 @@
 	exports.default = StepsList;
 
 /***/ },
-/* 702 */
+/* 701 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53800,7 +53904,7 @@
 	exports.default = About;
 
 /***/ },
-/* 703 */
+/* 702 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53940,7 +54044,7 @@
 	};
 
 /***/ },
-/* 704 */
+/* 703 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -53952,15 +54056,15 @@
 
 	var _redux = __webpack_require__(463);
 
-	var _reduxThunk = __webpack_require__(705);
+	var _reduxThunk = __webpack_require__(704);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(706);
+	var _reduxLogger = __webpack_require__(705);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(707);
+	var _reducers = __webpack_require__(706);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -54001,7 +54105,7 @@
 	}
 
 /***/ },
-/* 705 */
+/* 704 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -54020,7 +54124,7 @@
 	module.exports = thunkMiddleware;
 
 /***/ },
-/* 706 */
+/* 705 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -54253,7 +54357,7 @@
 	module.exports = createLogger;
 
 /***/ },
-/* 707 */
+/* 706 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -54264,11 +54368,11 @@
 
 	var _redux = __webpack_require__(463);
 
-	var _server = __webpack_require__(703);
+	var _server = __webpack_require__(702);
 
 	var _server2 = _interopRequireDefault(_server);
 
-	var _ui = __webpack_require__(708);
+	var _ui = __webpack_require__(707);
 
 	var _ui2 = _interopRequireDefault(_ui);
 
@@ -54282,7 +54386,7 @@
 	});
 
 /***/ },
-/* 708 */
+/* 707 */
 /***/ function(module, exports) {
 
 	'use strict';

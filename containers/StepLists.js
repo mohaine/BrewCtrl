@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import { changeMode } from '../actions/status.js'
-import { requestConfiguration } from '../actions/configuration.js'
+import { requestConfiguration,requestUpdateConfiguration} from '../actions/configuration.js'
 import { requestStatus,updateStepList } from '../actions/status.js'
 
 import Component from '../components/StepLists'
@@ -18,6 +18,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     requestUpdateStepList: (steps) => {
       dispatch(updateStepList(steps));
+    },
+    requestUpdateConfiguration: (cfg) => {
+      dispatch(requestUpdateConfiguration(cfg));
     }
   }
 }

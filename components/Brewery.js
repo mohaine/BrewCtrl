@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 
 import Step from '../components/Step'
 import Sensors from '../components/Sensors'
-import AddStep from '../components/AddStep'
 import StepList from '../components/StepList'
 
 
@@ -31,13 +30,12 @@ export default class Brewery extends Component {
         <div className="container-fluid">
           {step && (
           <div className="row">
-            <div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep} requestRemoveStep={requestRemoveStep} /></div>
+            <div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep}  /></div>
           </div>
           )}
         </div>
 
-        <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById} />
-        <AddStep steps={brewery.steps} requestUpdateStepList={requestUpdateStepList} configuration={configuration} />
+        <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById}  requestUpdateStepList={requestUpdateStepList} configuration={configuration} requestRemoveStep={requestRemoveStep} requestUpdateConfiguration={requestUpdateConfiguration} />
       </div>
 
     ) }
