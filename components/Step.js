@@ -7,20 +7,28 @@ import Pump from '../components/Pump'
 import Mode from '../containers/Mode'
 import QuickPick from '../components/QuickPick'
 import ContentEditable from '../components/ContentEditable'
+import {generateAlpahId}  from '../util/id'
 
 export default class Step extends Component {
 
   constructor(props) {
     super(props);
+    let waitForTargetTemp  = props.step.waitForTargetTemp ? true : false;
+    let waitForId = generateAlpahId()
     this.state = {
-      editTime: false
+      editTime: false,
+      waitForTargetTemp,waitForId
     }
   }
   updateTime(time){
     let { step, requestUpdateStep } = this.props
     requestUpdateStep(Object.assign({}, step.rawStep, { stepTime: time }));
   }
-
+  updateWaitForTargetTemp(waitForTargetTemp){
+    let { step, requestUpdateStep } = this.props
+    this.setState({ waitForTargetTemp })
+    requestUpdateStep(Object.assign({}, step.rawStep, { waitForTargetTemp }));
+  }
   updateName(name){
     let { step, requestUpdateStep } = this.props
 
@@ -32,6 +40,7 @@ export default class Step extends Component {
   }
 
   render() {
+    let { waitForTargetTemp, waitForId } = this.state
 
     function createEntry(seconds){
       return {value:seconds*60,text:formatTimeMinutes(seconds*60)};
@@ -39,11 +48,8 @@ export default class Step extends Component {
 
     let { step, requestUpdateStep,requestRemoveStep } = this.props
     return (<div>
-
-
       { step && (
       <div>
-
       { this.state.editTime && (<QuickPick close={()=>{this.setState({editTime: false })}}
       apply={(value)=>{this.updateTime(value)}}
       quickPickValues={ [
@@ -62,13 +68,18 @@ export default class Step extends Component {
       }}
       value={step.time}
       formatValue={(t)=>formatTimeMinutes(t)}
-      />)}
+      ></QuickPick>)}
 
         <div>
-          Step: <ContentEditable onChange={(e)=>this.updateName(e.target.value)} html={step.name} />
+          <label>Step:</label> <ContentEditable onChange={(e)=>this.updateName(e.target.value)} html={step.name} />
         </div>
         <div>
-          Time: <span onClick={()=>this.setState({editTime: true })} >{formatTime(step.time)}</span>
+        <label>Time:</label> <span onClick={()=>this.setState({editTime: true })} >{formatTime(step.time)}</span>
+        </div>
+        <div>
+        <input id={waitForId} type="checkbox" checked={waitForTargetTemp} onChange={(e)=>this.updateWaitForTargetTemp(e.target.checked)} />
+        <label htmlFor={waitForId}> Wait for Target Temp </label>
+
         </div>
 
         <div className="container-fluid">

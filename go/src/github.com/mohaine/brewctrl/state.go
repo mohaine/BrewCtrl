@@ -46,12 +46,14 @@ type ControlPoint struct {
 }
 
 type ControlStep struct {
-	Id            string         `json:"id"`
-	Name          string         `json:"name"`
-	StepTime      int32          `json:"stepTime"`
-	Active        bool           `json:"active"`
-	ControlPoints []ControlPoint `json:"controlPoints"`
-	lastOnTime    uint64
+	Id                string         `json:"id"`
+	Name              string         `json:"name"`
+	StepTime          int32          `json:"stepTime"`
+	Active            bool           `json:"active"`
+	WaitForTargetTemp bool           `json:"waitForTargetTemp"`
+	ControlPoints     []ControlPoint `json:"controlPoints"`
+	pastTargetTemp    bool
+	lastOnTime        uint64
 }
 
 type State struct {

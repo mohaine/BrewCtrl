@@ -228,28 +228,50 @@ func UpdateStepTimer(state *State, cfg *Configuration) {
 	if len(state.Steps) > 0 {
 		step := &state.Steps[0]
 		if state.Mode == MODE_ON || state.Mode == MODE_HEAT_OFF {
-			now := millis()
-			if !step.Active {
-				step.lastOnTime = now
-				step.Active = true
-			}
-			stepTime := step.StepTime
-			if stepTime > 0 {
-				onTime := now - step.lastOnTime
-				if onTime > 0 {
-					for onTime > 1000 {
-						newStepTime := stepTime - 1
-						onTime -= 1000
-						step.lastOnTime += 1000
-						if newStepTime <= 0 {
-							// Step is complete.  Go to next
-							state.Steps = state.Steps[1:]
-						} else {
-							step.StepTime = newStepTime
+			if !step.WaitForTargetTemp || step.pastTargetTemp {
+				// Active step counting down
+				now := millis()
+				if !step.Active {
+					step.lastOnTime = now
+					step.Active = true
+				}
+				stepTime := step.StepTime
+				if stepTime > 0 {
+					onTime := now - step.lastOnTime
+					if onTime > 0 {
+						for onTime > 1000 {
+							newStepTime := stepTime - 1
+							onTime -= 1000
+							step.lastOnTime += 1000
+							if newStepTime <= 0 {
+								// Step is complete.  Go to next
+								state.Steps = state.Steps[1:]
+							} else {
+								step.StepTime = newStepTime
+							}
 						}
 					}
 				}
+			} else {
+				// Check for pastTargetTemp
+				allAboveTarget := true
+				for m := range step.ControlPoints {
+					cp := &step.ControlPoints[m]
+					if cp.AutomaticControl {
+						cpAboveTarget := false
+						sensor := FindSensor(state, cp.SensorAddress)
+						if sensor != NilSensor {
+							cpAboveTarget =  sensor.TemperatureC >= cp.TargetTemp
+						}
+						allAboveTarget = allAboveTarget && cpAboveTarget
+					}
+					step.pastTargetTemp = allAboveTarget
+					if(allAboveTarget){
+						UpdateStepTimer(state,cfg)
+					}
+				}
 			}
+
 		} else if state.Mode == MODE_HOLD || state.Mode == MODE_OFF {
 			step.lastOnTime = 0
 			step.Active = true

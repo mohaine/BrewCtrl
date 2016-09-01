@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"bytes"
 )
 
 var SYS_PATH = "/sys/"

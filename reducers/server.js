@@ -50,7 +50,7 @@ function buildBreweryView(status,configuration){
         let name = step.name;
         let id = step.id;
         let controlPoints = step.controlPoints;
-        return {id,name, pumps, tanks,controlPoints, rawStep: step, time: step.stepTime};
+        return {id,name, pumps, tanks,controlPoints, rawStep: step, time: step.stepTime, waitForTargetTemp: step.waitForTargetTemp};
       });
 
       let mode = status.mode;

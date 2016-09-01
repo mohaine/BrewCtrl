@@ -3,10 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"github.com/mohaine/id"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -53,7 +53,7 @@ type StepControlPoint struct {
 	TargetTemp  float32 `json:"targetTemp,omitempty"`
 	TargetName  string  `json:"targetName,omitempty"`
 	ControlName string  `json:"controlName,omitempty"`
-	Duty 				int32   `json:"duty,omitempty"`
+	Duty        int32   `json:"duty,omitempty"`
 }
 
 type Step struct {
@@ -63,7 +63,7 @@ type Step struct {
 }
 
 type StepList struct {
-	Id  string `json:"id,omitempty"`
+	Id    string `json:"id,omitempty"`
 	Name  string `json:"name,omitempty"`
 	Steps []Step `json:"steps,omitempty"`
 }

@@ -21,7 +21,7 @@ const startStatusLoad = (dispatch) => {
   if(!statusLoadInterval){
     statusLoadInterval = setInterval(()=>{
       dispatch(requestStatusNoSchedule());
-    }, 500);
+    }, 5000);
   }
 }
 

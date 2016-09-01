@@ -70,7 +70,7 @@ export default class QuickPick extends Component {
     this.cancelMouseDown();
 	}
   render() {
-    let { quickPickValues, formatValue } = this.props
+    let { quickPickValues, formatValue, children } = this.props
       return (
         <div style={{position: "relative", display: "inline-block"}}>
         <div  onClick={(e) => {e.preventDefault(); this.close();}} style={{
@@ -155,6 +155,9 @@ export default class QuickPick extends Component {
                border: "none"}}
               >{quickPick.text}</button>))}
           </div>
+        </div>
+        <div>
+          {children}
         </div>
         </div>
         </div>
