@@ -65,15 +65,15 @@ type Step struct {
 type StepList struct {
 	Id    string `json:"id,omitempty"`
 	Name  string `json:"name,omitempty"`
-	Steps []Step `json:"steps,omitempty"`
+	Steps []Step `json:"steps"`
 }
 
 type Configuration struct {
 	Version     string         `json:"version,omitempty"`
 	LogMessages bool           `json:"logMessages,omitempty"`
-	BrewLayout  BreweryLayout  `json:"brewLayout,omitempty"`
-	Sensors     []SensorConfig `json:"sensors,omitempty"`
-	StepLists   []StepList     `json:"stepLists,omitempty"`
+	BrewLayout  BreweryLayout  `json:"brewLayout"`
+	Sensors     []SensorConfig `json:"sensors"`
+	StepLists   []StepList     `json:"stepLists"`
 }
 
 func IdEverything(cfg *Configuration) {
