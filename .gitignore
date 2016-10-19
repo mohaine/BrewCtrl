@@ -9,3 +9,4 @@ BrewControllerConfig.json
 node_modules/
 pkg
 mock/sys/class
+web/bundle.js
