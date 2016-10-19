@@ -11,6 +11,9 @@ function findSensor(status, address){
 
 function buildBreweryView(status,configuration){
   if(status && status.steps && configuration){
+
+
+
       let steps = status.steps.map(step=>{
         let tanks = configuration.brewLayout.tanks.map(t=>{
           let name = t.name;
@@ -55,6 +58,8 @@ function buildBreweryView(status,configuration){
 
       let mode = status.mode;
 
+      if(status.sensors == null) status.sensors = []
+
       let sensors = status.sensors.map(s=>{
         let cfgSesnsor = configuration.sensors.find(cs=>s.address === cs.address);
         let name = cfgSesnsor ? cfgSesnsor.name : "";
@@ -64,6 +69,7 @@ function buildBreweryView(status,configuration){
         });
       });
 
+      console.log("CM<!!!")
 
       let brewery = {mode, steps, sensors};
       return brewery;
