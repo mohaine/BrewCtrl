@@ -72,7 +72,7 @@ export default class QuickPick extends Component {
   render() {
     let { quickPickValues, formatValue, children } = this.props
       return (
-        <div style={{position: "relative", display: "inline-block"}}>
+        <div style={{position: "relative", display: "inline"}}>
         <div  onClick={(e) => {e.preventDefault(); this.close();}} style={{
           position: 'fixed',
           width: '100%',
