@@ -2,8 +2,8 @@
 Description=BrewCtrl
 
 [Service]
-ExecStart=/opt/BrewCtrl/brewctrl
-WorkingDirectory=/opt/BrewCtrl
+ExecStart=/opt/brewctrl/brewctrl
+WorkingDirectory=/opt/brewctrl
 
 
 [Install]
