@@ -56,7 +56,7 @@ export default class StepList extends Component {
            <div className="btn-group">
              <button type="button" className="btn btn-default" onClick={()=>this.addStep()}>Add Step</button>
              {selectedStep && requestRemoveStep && <button type="button" className="btn btn-default" onClick={()=>requestRemoveStep(selectedStep.rawStep)}>Remove Step {selectedStep.name}</button> }
-             <button type="button" className="btn btn-default" onClick={()=>this.saveAsList()}>Save List</button>
+             <button type="button" className="btn btn-default" onClick={()=>this.saveAsList()}>Save As List</button>
            </div>
        </div>)
   }

@@ -27,15 +27,15 @@ export default class Brewery extends Component {
       {!brewery && requestStateStatus && requestStateStatus.active && (<div>Loading state</div>) }
       { brewery && (
       <div>
-        <div className="container-fluid">
           {step && (
           <div className="row">
             <div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep}  /></div>
           </div>
           )}
-        </div>
 
-        <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById}  requestUpdateStepList={requestUpdateStepList} configuration={configuration} requestRemoveStep={requestRemoveStep} requestUpdateConfiguration={requestUpdateConfiguration} />
+
+          <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById}  requestUpdateStepList={requestUpdateStepList} configuration={configuration} requestRemoveStep={requestRemoveStep} requestUpdateConfiguration={requestUpdateConfiguration} />
+        
       </div>
 
     ) }

@@ -66,6 +66,9 @@ export default class StepsList extends Component {
 
     let { stepLists} = this.props
     return (<div className="container-fluid">
+
+      <h2>Step Lists</h2>
+
         {stepLists && (stepLists.map(stepList=> (
           <div className="row" key={stepList.id}  >
             <div className="col-sm-6">

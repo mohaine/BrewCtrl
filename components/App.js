@@ -8,7 +8,11 @@ export default class App extends Component {
 
   render() {
     const {children} = this.props
-    return  (<div><Header/>{children}<Footer/></div>)
+    return  (<div><Header/>
+      <div className="container-fluid">
+        {children}
+      </div>
+      <Footer/></div>)
   }
 }
 
