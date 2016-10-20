@@ -95,6 +95,11 @@ func IdEverything(cfg *Configuration) {
 			tank.Id = id.RandomId()
 		}
 		idMap[tank.Id] = true
+
+		if len(tank.Heater.Id) == 0 || idMap[tank.Heater.Id] {
+			tank.Heater.Id = id.RandomId()
+		}
+		idMap[tank.Heater.Id] = true
 	}
 	pumps := cfg.BrewLayout.Pumps
 	for i := 0; i < len(pumps); i++ {
