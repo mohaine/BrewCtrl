@@ -151,7 +151,8 @@ func LoadCfg(path string) (Configuration, error) {
 	if err == nil {
 		dec := json.NewDecoder(f)
 		err = dec.Decode(&cfg)
-	} else {
+	}
+	if err == nil {
 		IdEverything(&cfg)
 	}
 	return cfg, err
