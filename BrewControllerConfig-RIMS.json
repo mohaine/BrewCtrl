@@ -11,7 +11,7 @@
             },
             "heater":{
                "name":"RIMS Element",
-               "pin":11,
+               "io":11,
                "duty":0,
                "hasDuty":true,
                "fullOnAmps":18
@@ -29,7 +29,7 @@
             "name":"Kettle",
             "heater":{
                "name":"Kettle Element",
-               "pin":10,
+               "io":10,
                "duty":0,
                "hasDuty":true,
                "fullOnAmps":23
@@ -39,13 +39,13 @@
       "pumps":[
          {
             "name":"HLT Loop",
-            "pin":7,
+            "io":7,
             "duty":0,
             "hasDuty":false
          },
          {
             "name":"Main",
-            "pin":8,
+            "io":8,
             "duty":0,
             "hasDuty":false
          }
