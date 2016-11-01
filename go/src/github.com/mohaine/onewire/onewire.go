@@ -22,8 +22,9 @@ func (tr *TempReading) TempC() float32 {
 
 func parseTemp(w1SlaveData string) (temp TempReading, err error) {
 	index := strings.LastIndex(w1SlaveData, " t=")
-	if index > -1 {
-		tempString := w1SlaveData[index+3 : index+8]
+	if index > -1 && index + 3 < len(w1SlaveData) {
+		tempString := strings.Trim(w1SlaveData[index+3 : ],"\n ")
+	  	
 		var temp64 int64
 		temp64, err = strconv.ParseInt(tempString, 10, 32)
 		if err == nil {

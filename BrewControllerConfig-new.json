@@ -1,0 +1,310 @@
+{
+  "version": "4xctNLijPt",
+  "brewLayout": {
+    "maxAmps": 25,
+    "tanks": [
+      {
+        "id": "TUqwt5jFuH",
+        "name": "HLT",
+        "sensor": {},
+        "heater": {
+          "id": "Rusw4XqLXU",
+          "name": "HLT Element",
+          "io": 17,
+          "hasDuty": true,
+          "fullOnAmps": 18
+        }
+      },
+      {
+        "id": "572uLaPDrH",
+        "name": "TU",
+        "sensor": {},
+        "heater": {
+          "id": "CWbtVPDzat",
+          "io": 27,
+          "hasDuty": true
+        }
+      },
+      {
+        "id": "M9RPfznBx9",
+        "name": "Kettle",
+        "sensor": {},
+        "heater": {
+          "id": "W2FXQXwsC3",
+          "name": "Kettle Element",
+          "io": 22,
+          "hasDuty": true,
+          "fullOnAmps": 23
+        }
+      }
+    ],
+    "pumps": [
+      {
+        "id": "8SyNrbDP6V",
+        "name": "HLT Loop",
+        "io": 23
+      },
+      {
+        "id": "TvMkG3sQe7",
+        "name": "Main",
+        "io": 24
+      }
+    ]
+  },
+  "sensors": [
+    {
+      "address": "28d00c7d02000081",
+      "location": "TUN"
+    },
+    {
+      "address": "28b5af8e0200002d",
+      "location": "HLT"
+    },
+    {
+      "name": "Test",
+      "address": "289e167d02000048",
+      "location": "HLT"
+    },
+    {
+      "name": "asdf",
+      "address": "289c167d02000048",
+      "location": "TUN"
+    },
+    {
+      "address": "28-00000494beb9",
+      "location": "HLT"
+    },
+    {
+      "address": "28-000004953423",
+      "location": "TU"
+    },
+    {
+      "address": "28-0000027d0cd0"
+    }
+  ],
+  "stepLists": [
+    {
+      "id": "zm48NRPkA3",
+      "name": "1 Step Mash",
+      "steps": [
+        {
+          "name": "Mash In",
+          "time": "0",
+          "controlPoints": [
+            {
+              "targetTemp": 76.6667,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 73.8889,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            }
+          ]
+        },
+        {
+          "name": "Mash",
+          "time": "60:00",
+          "controlPoints": [
+            {
+              "targetTemp": 71.1111,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 67.2222,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            }
+          ]
+        },
+        {
+          "name": "Mash Out",
+          "time": "0",
+          "controlPoints": [
+            {
+              "targetTemp": 82.2222,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 79.4444,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            }
+          ]
+        },
+        {
+          "name": "Bring To Boil",
+          "time": "0",
+          "controlPoints": [
+            {
+              "targetTemp": 95.5556,
+              "targetName": "Kettle",
+              "controlName": "Kettle Element"
+            }
+          ]
+        },
+        {
+          "name": "Boil",
+          "time": "0"
+        }
+      ]
+    },
+    {
+      "id": "ry2H7knqkm",
+      "name": "3 Step Mash",
+      "steps": [
+        {
+          "name": "Mash In",
+          "time": "0",
+          "controlPoints": [
+            {
+              "targetTemp": 76.6667,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 73.8889,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            },
+            {
+              "controlName": "Kettle Element"
+            },
+            {
+              "controlName": "Main"
+            }
+          ]
+        },
+        {
+          "name": "Mash",
+          "time": "60:00",
+          "controlPoints": [
+            {
+              "targetTemp": 71.1111,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 40.2222,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            },
+            {
+              "controlName": "Kettle Element"
+            },
+            {
+              "controlName": "Main"
+            }
+          ]
+        },
+        {
+          "name": "Mash",
+          "time": "60:00",
+          "controlPoints": [
+            {
+              "targetTemp": 71.1111,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 67.2222,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            },
+            {
+              "controlName": "Kettle Element"
+            },
+            {
+              "controlName": "Main"
+            }
+          ]
+        },
+        {
+          "name": "Mash",
+          "time": "60:00",
+          "controlPoints": [
+            {
+              "targetTemp": 71.1111,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 67.2222,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            },
+            {
+              "controlName": "Kettle Element"
+            },
+            {
+              "controlName": "Main"
+            }
+          ]
+        },
+        {
+          "name": "Mash Out",
+          "time": "0",
+          "controlPoints": [
+            {
+              "targetTemp": 82.2222,
+              "targetName": "HLT",
+              "controlName": "HLT Element"
+            },
+            {
+              "targetTemp": 79.4444,
+              "targetName": "TUN",
+              "controlName": "HLT Loop"
+            },
+            {
+              "controlName": "Kettle Element"
+            },
+            {
+              "controlName": "Main"
+            }
+          ]
+        },
+        {
+          "name": "Bring To Boil",
+          "time": "0",
+          "controlPoints": [
+            {
+              "targetTemp": 95.5556,
+              "targetName": "Kettle",
+              "controlName": "Kettle Element"
+            },
+            {
+              "controlName": "HLT Element"
+            },
+            {
+              "controlName": "HLT Loop"
+            },
+            {
+              "controlName": "Main"
+            }
+          ]
+        },
+        {
+          "name": "Boil",
+          "time": "0",
+          "controlPoints": [
+            {
+              "controlName": "HLT Element"
+            },
+            {
+              "controlName": "Kettle Element"
+            },
+            {
+              "controlName": "HLT Loop"
+            },
+            {
+              "controlName": "Main"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

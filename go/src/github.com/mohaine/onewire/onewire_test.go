@@ -36,14 +36,16 @@ func TestReadFile(t *testing.T) {
 	temp, err = parseTemp("this should work t=22222")
 	expectTempToBe(t,22222,&temp,err)
 
-	temp, err = parseTemp("this should work t=11111X")
+	temp, err = parseTemp("this should work t=2222")
+	expectTempToBe(t,2222,&temp,err)
+	
+	temp, err = parseTemp("this should work t=11111")
 	expectTempToBe(t,11111,&temp,err)
 	expectTempCToBe(t,11.111,&temp,err)
 
+
 	temp, err = parseTemp("this should not work t11111X")
-
 	fmt.Println(err)
-
 	expectErrorToBe(t,err,errors.New("could not find t= in temp data"))
 
 }
