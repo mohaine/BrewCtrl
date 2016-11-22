@@ -1,40 +1,32 @@
-# Install requirements
+To install on Rasbian:
 
-sudo apt-get install git gcc make pkg-config systemd-sysv libjson0 libjson0-dbg libjson0-dev systemd-sysv 
+# Enter Root
+sudo -
 
-sudo shutdown -r now
-
-# Check out code
-
-
-cd /usr/lib/arm-linux-gnueabihf/pkgconfig 
-sudo ln -s json-c.pc json.pc
-
+apt-get install golang
 cd /opt/
-git clone https://github.com/mohaine/BrewCtrl.git
-cd /opt/BrewCtrl/
+git clone https://github.com/mohaine/BrewCtrl.git brewctrl
+cd brewctrl
 
-# Compile
-PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
-make brewctrl
+export GOPATH=/opt/brewctrl/go/
+go build github.com/mohaine/brewctrl
 
-# Load 1-Wire modules
-modprobe w1-therm
-
-  ## Systemctl would not work until I added the .service suffix to BrewCtrl
 
 # Make sure everything starts on boot
 echo w1-gpio > /etc/modules-load.d/brewctrl.conf
 echo w1-therm >> /etc/modules-load.d/brewctrl.conf
-cp BrewCtrl.service /etc/systemd/system/
-systemctl enable BrewCtrl.service
+cp brewctrl.service /etc/systemd/system/
+systemctl enable brewctrl.service
 
+# Enable one wire support in raspi-config (Advanced Options)
+sudo raspi-config
 
-# Update install
-cd /opt/BrewCtrl/
+Reboot
+sudo shutdown -r now
+
+# To update at a later date:
+cd /opt/brewctrl/
 git pull
-PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
-make clean brewctrl
-systemctl restart BrewCtrl.service
-
-
+export GOPATH=/opt/brewctrl/go/
+go build github.com/mohaine/brewctrl
+systemctl restart brewctrl.service
