@@ -129,8 +129,7 @@ export default class QuickPick extends Component {
               strokeOpacity: '1',
               cursor: "pointer"}}
             d="M 61.622007,2.8866864 9.0592677,45.924629 l 105.1254723,0 z"
-            id="upOne" onMouseDown={()=>this.mouseDown(true)} onMouseUp={()=>this.mouseUp()}
-            />
+            id="upOne" onMouseDown={()=>this.mouseDown(true)} onMouseUp={()=>this.mouseUp()} onContextMenu={(e)=>{e.preventDefault()}} />
             <path
             style={{  fill: '#000000',
               fillOpacity: '1',
@@ -141,7 +140,7 @@ export default class QuickPick extends Component {
               strokeOpacity: '1',
               cursor: "pointer"}}
             d="m 61.622007,151.40286 -52.5627393,-43.03795 105.1254623,0 z"
-            id="downOne" onMouseDown={()=>this.mouseDown(false)} onMouseUp={()=>this.mouseUp()} />
+            id="downOne" onMouseDown={()=>this.mouseDown(false)} onMouseUp={()=>this.mouseUp()} onContextMenu={(e)=>{e.preventDefault()}} />
             </g>
             </svg>
           </div>
