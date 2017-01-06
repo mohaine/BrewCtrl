@@ -9,6 +9,7 @@ export default class QuickPick extends Component {
       super(props);
       this.state = {
         value: props.value
+        // ,msg:""
       }
   }
 
@@ -44,6 +45,7 @@ export default class QuickPick extends Component {
   }
 
   mouseDown(up) {
+    // this.setState({msg: this.state.msg + "D"})
     let { increment } = this.props
 		let count = 0;
 		let timeoutFunction = () => {
@@ -51,10 +53,12 @@ export default class QuickPick extends Component {
       this.setValue(increment(this.state.value, up));
 			count++;
 			var delay = 300;
-			if (count > 3) {
-				delay = 200;
-			} else if (count > 7) {
+      if (count > 14) {
+				delay = 25;
+      } else if (count > 7) {
 				delay = 100;
+      } else if (count > 3) {
+				delay = 200;
 			}
 			this.mouseDownTimeout = setTimeout(timeoutFunction, delay);
 		};
@@ -67,10 +71,15 @@ export default class QuickPick extends Component {
     }
   }
   mouseUp() {
+    // this.setState({msg: this.state.msg + "U"})
     this.cancelMouseDown();
 	}
   touchEnd() {
+    // this.setState({msg: this.state.msg + "E"})
     this.cancelMouseDown();
+  }
+  touchStart() {
+    // this.setState({msg: this.state.msg + "S"})
   }
   render() {
     let { quickPickValues, formatValue, children } = this.props
@@ -90,62 +99,68 @@ export default class QuickPick extends Component {
         }}>
         </div>
       <div  style={{backgroundColor: "#fff",position: "absolute", top: "0px",left: "0px", zIndex: 11, border: "1px solid black"}} >
-        <div style={{ width: '200px',position: 'relative',height: '190px',display: 'inline-block'}}>
+        <div style={{ width: '210px',position: 'relative',height: '190px',display: 'inline-block'}}>
           <div style={{ marginRight: '75px', padding: '7px'}}>
-            <svg
-            className="tank"
-            width="120.29716"
-            height="154.28125"
-            id="svg2"
-            version="1.1" >
-            <g
-            id="g2985">
-            <text
-            style={{  fontSize: '43.14793015px',
-              fontStyle: 'normal',
-              fontVariant: 'normal',
-              fontWeight: 'normal',
-              fontStretch: 'normal',
-              textAlign: 'center',
-              lineHeight: '125%',
-              letterSpacing: '0px',
-              wordSpacing: '0px',
-              writingMode: 'lr-tb',
-              textAnchor: 'middle',
-              fill: '#000000',
-              fillOpacity: '1',
-              stroke: 'none'}}
-            x="59.116882"
-            y="89.545815"
-            id="text3001"><tspan
-            y="89.545815"
-            x="59.116882"
-            id="textValue"
-            >{formatValue(this.state.value)}</tspan></text>
-            <path
-            style={{  fill: '#000000',
-              fillOpacity: '1',
-              stroke: '#000000',
-              strokeWidth: '1.34837282px',
-              strokeLinecap: 'butt',
-              strokeLinejoin: 'miter',
-              strokeOpacity: '1',
-              cursor: "pointer"}}
-            d="M 61.622007,2.8866864 9.0592677,45.924629 l 105.1254723,0 z"
-            id="upOne" onMouseDown={()=>this.mouseDown(true)} onMouseUp={()=>this.mouseUp()} onTouchEnd={()=>this.touchEnd()} onContextMenu={(e)=>{e.preventDefault()}} />
-            <path
-            style={{  fill: '#000000',
-              fillOpacity: '1',
-              stroke: '#000000',
-              strokeWidth: '1.34837282px',
-              strokeLinecap: 'butt',
-              strokeLinejoin: 'miter',
-              strokeOpacity: '1',
-              cursor: "pointer"}}
-            d="m 61.622007,151.40286 -52.5627393,-43.03795 105.1254623,0 z"
-            id="downOne" onMouseDown={()=>this.mouseDown(false)} onMouseUp={()=>this.mouseUp()} onTouchEnd={()=>this.touchEnd()} onContextMenu={(e)=>{e.preventDefault()}} />
-            </g>
-            </svg>
+
+          <button style={{
+            border:"none",
+            padding:"2px",
+            inset:"none",
+            backgroundColor:"#fff",
+            margin: "0px"
+          }}
+          onMouseDown={()=>this.mouseDown(true)} onMouseUp={()=>this.mouseUp()} onTouchStart={(e)=>{this.touchStart(e)}} onTouchEnd={(e)=>{this.touchEnd(e)}}>
+          <svg
+          width="120"
+          height="60"
+          id="svg2"
+          version="1.1" >
+          <path
+          style={{  fill: '#000000',
+            fillOpacity: '1',
+            stroke: '#000000',
+            strokeWidth: '1.34837282px',
+            strokeLinecap: 'butt',
+            strokeLinejoin: 'miter',
+            strokeOpacity: '1',
+            cursor: "pointer"}}
+          d="M 60,0 0,60 l 120,0 z"
+          id="upOne"  />
+          </svg>
+          </button>
+          <div style={{ fontSize: '30px',
+                        fontWeight: 'bold',
+                        width: "120px",
+                        textAlign: "center",
+                        marginLeft: "3px;"
+                       }}
+          >{formatValue(this.state.value)}</div>
+          <button style={{
+            border:"none",
+            padding:"0px",
+            inset:"none",
+            backgroundColor:"#fff",
+            margin: "0px"
+          }}
+          onMouseDown={()=>this.mouseDown(false)} onMouseUp={()=>this.mouseUp()} onTouchStart={(e)=>{this.touchStart(e)}} onTouchEnd={(e)=>{this.touchEnd(e)}}>
+          <svg
+          width="120"
+          height="60"
+          id="svg2"
+          version="1.1" >
+          <path
+          style={{  fill: '#000000',
+            fillOpacity: '1',
+            stroke: '#000000',
+            strokeWidth: '1.34837282px',
+            strokeLinecap: 'butt',
+            strokeLinejoin: 'miter',
+            strokeOpacity: '1',
+            cursor: "pointer"}}
+            d="M 0,0 120,0 l -60,60 z"
+          id="upDown"  />
+          </svg>
+          </button>
           </div>
           <div style={{position: 'absolute',top: '0px',right: '0px', width: '75px'}}>
             {quickPickValues && quickPickValues.map(quickPick => (<button type="button" onClick={()=>{this.setValue(quickPick.value)}} key={quickPick.value}
