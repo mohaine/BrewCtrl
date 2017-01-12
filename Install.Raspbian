@@ -3,7 +3,9 @@ To install on Rasbian:
 # Enter Root
 sudo -
 
-apt-get install golang git npm
+
+curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+apt-get install golang git npm nodejs
 cd /opt/
 git clone https://github.com/mohaine/BrewCtrl.git brewctrl
 cd brewctrl
