@@ -3,7 +3,7 @@ To install on Rasbian:
 # Enter Root
 sudo -
 
-apt-get install golang
+apt-get install golang git npm
 cd /opt/
 git clone https://github.com/mohaine/BrewCtrl.git brewctrl
 cd brewctrl
@@ -11,12 +11,17 @@ cd brewctrl
 export GOPATH=/opt/brewctrl/go/
 go build github.com/mohaine/brewctrl
 
+npm install
+npm run build-prod
+
 
 # Make sure everything starts on boot
 echo w1-gpio > /etc/modules-load.d/brewctrl.conf
 echo w1-therm >> /etc/modules-load.d/brewctrl.conf
 cp brewctrl.service /etc/systemd/system/
 systemctl enable brewctrl.service
+systemctl start brewctrl.service
+
 
 # Enable one wire support in raspi-config (Advanced Options)
 sudo raspi-config
