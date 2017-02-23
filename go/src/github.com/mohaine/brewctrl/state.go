@@ -64,17 +64,19 @@ type State struct {
 	Steps                []ControlStep `json:"steps"`
 }
 
-func StateDefault(cfg Configuration) (state State) {
-	SetToStateDefault(cfg, &state)
+func StateDefault(cfg Configuration, initIo func(int32)) (state State) {
+	SetToStateDefault(cfg, &state, initIo)
 	return
 }
-func SetToStateDefault(cfg Configuration, state *State) {
+
+func SetToStateDefault(cfg Configuration, state *State, initIo func(int32)) {
 	state.Mode = MODE_OFF
 	state.ConfigurationVersion = cfg.Version
 	state.ListName = "Default List"
-	state.Steps = append(state.Steps, StepDefault(cfg))
+	state.Steps = append(state.Steps, StepDefault(cfg, initIo))
 	return
 }
+
 func IsHeater(cfg *Configuration, io int32) bool {
 	tanks := cfg.BrewLayout.Tanks
 	for i := 0; i < len(tanks); i++ {
@@ -87,7 +89,7 @@ func IsHeater(cfg *Configuration, io int32) bool {
 	return false
 }
 
-func StepDefault(cfg Configuration) (step ControlStep) {
+func StepDefault(cfg Configuration, initIo func(int32)) (step ControlStep) {
 	step.Name = "Manual Step"
 	step.Id = id.RandomId()
 	step.StepTime = 0
@@ -98,27 +100,27 @@ func StepDefault(cfg Configuration) (step ControlStep) {
 		tank := tanks[i]
 		heater := tank.Heater
 		if heater.Io > 0 {
-			cp := createControlPoint(heater.Io, heater.HasDuty)
+			cp := createControlPoint(heater.Io, heater.HasDuty, initIo)
 			step.ControlPoints = append(step.ControlPoints, cp)
 		}
 	}
 	pumps := cfg.BrewLayout.Pumps
 	for i := 0; i < len(pumps); i++ {
 		pump := pumps[i]
-		cp := createControlPoint(pump.Io, pump.HasDuty)
+		cp := createControlPoint(pump.Io, pump.HasDuty, initIo)
 		step.ControlPoints = append(step.ControlPoints, cp)
 	}
 	return
 }
 
-func createControlPoint(io int32, hasDuty bool) (cp ControlPoint) {
+func createControlPoint(io int32, hasDuty bool, initIo func(int32)) (cp ControlPoint) {
 	cp.Id = id.RandomId()
 	cp.Io = io
 	cp.FullOnAmps = 0
 	cp.HasDuty = hasDuty
 	// cp.On = false
 	cp.Duty = 0
-	initControlPointDuty(&cp)
+	initControlPointDuty(&cp, initIo)
 	return
 }
 

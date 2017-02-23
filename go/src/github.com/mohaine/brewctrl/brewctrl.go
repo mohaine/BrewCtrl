@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/mohaine/gpio"
 	"github.com/mohaine/onewire"
 	"log"
 	"net/http"
@@ -12,7 +13,6 @@ import (
 	"time"
 )
 
-var SYS_PATH = "/sys/"
 var CFG_FILE = "BrewControllerConfig.json"
 
 func sendError(w http.ResponseWriter, msg string, code int) {
@@ -20,14 +20,9 @@ func sendError(w http.ResponseWriter, msg string, code int) {
 }
 
 func main() {
-
 	mock := flag.Bool("mock", false, "Use Mock GPIO/Sensors")
 	port := flag.Uint("port", 80, "Web Server Port")
 	flag.Parse()
-
-	if *mock {
-		SYS_PATH = "mock/sys/"
-	}
 
 	cfg, err := LoadCfg(CFG_FILE)
 	if err != nil {
@@ -37,11 +32,28 @@ func main() {
 			panic(err)
 		}
 	}
-	readSensors, stopReading := onewire.SensorLoop(100*time.Millisecond, SYS_PATH+"bus/w1/devices/")
-	stopControl, getState, getConfig, setMode, modifySteps, modifyConfig := ControlStuff(readSensors, cfg)
+
+	var readSensors func() []onewire.TempReading = nil
+	var stopReading func() = nil
+	var initIo func(int32) = nil
+	var turnIoTo func(int32, bool) = nil
+
+	if *mock {
+		readSensors, stopReading, initIo, turnIoTo = SensorLoopMock(100*time.Millisecond, cfg)
+	} else {
+		readSensors, stopReading = onewire.SensorLoop(100*time.Millisecond, "/sys/bus/w1/devices/")
+		initIo = func(io int32) {
+			gpio.IoMode(io, gpio.IO_OUT)
+			gpio.TurnIoTo(io, false)
+		}
+		turnIoTo = func(io int32, inout bool) {
+			gpio.TurnIoTo(io, inout)
+		}
+	}
+
+	stopControl, getState, getConfig, setMode, modifySteps, modifyConfig := ControlStuff(readSensors, cfg, initIo, turnIoTo)
 
 	http.HandleFunc("/cmd/status", func(w http.ResponseWriter, r *http.Request) {
-
 		mode := r.FormValue("mode")
 		if len(mode) > 0 {
 			setMode(mode)
@@ -58,10 +70,6 @@ func main() {
 				return
 			} else {
 				modifySteps(StepModify{true, steps})
-				// if err != nil {
-				// 	sendError(w,fmt.Sprintf("Failed to parse steps:%v",err),http.StatusBadRequest)
-				// 	return
-				// }
 			}
 		}
 
@@ -76,10 +84,6 @@ func main() {
 				return
 			} else {
 				modifySteps(StepModify{false, steps})
-				// if err != nil {
-				// 	sendError(w,fmt.Sprintf("Failed to parse steps:%v",err),http.StatusBadRequest)
-				// 	return
-				// }
 			}
 		}
 
@@ -122,6 +126,7 @@ func main() {
 
 		w.Write(out.Bytes())
 	})
+
 	http.HandleFunc("/brewctrl/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "web/brewctrl/index.html")
 	})

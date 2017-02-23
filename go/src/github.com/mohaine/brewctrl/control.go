@@ -17,7 +17,7 @@ type StepModify struct {
 	Steps    []ControlStep
 }
 
-func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify), modifyCfg func(Configuration)) {
+func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration, initIo func(int32), turnIoTo func(int32, bool)) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify), modifyCfg func(Configuration)) {
 
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
@@ -56,7 +56,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 	}
 
 	// TODO load old status?
-	state := StateDefault(cfg)
+	state := StateDefault(cfg, initIo)
 	state.Mode = MODE_OFF
 
 	loop := func() {
@@ -68,20 +68,20 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 				SelectReadingSensors(&cfg, &state, sensors)
 				StateUpdateDuty(&state)
 			case <-tickUpdateTimes:
-				UpdateStepTimer(&state, &cfg)
+				UpdateStepTimer(&state, &cfg, initIo)
 			case <-tickPins:
-				UpdatePinsForSetDuty(&cfg, &state)
+				UpdatePinsForSetDuty(&cfg, &state, turnIoTo)
 			case <-requestState:
 				receiveState <- state
 			case <-requestCfg:
 				receiveCfg <- cfg
 			case mode := <-setModeC:
 				state.Mode = mode
-				UpdatePinsForSetDuty(&cfg, &state)
+				UpdatePinsForSetDuty(&cfg, &state, turnIoTo)
 			case stepModify := <-modifyStepsC:
-				updateStateForSteps(stepModify, &state)
+				updateStateForSteps(stepModify, &state, initIo)
 			case newCfg := <-requestModifyCfgC:
-				updateForNewConfiguration(&newCfg, &state, &cfg)
+				updateForNewConfiguration(&newCfg, &state, &cfg, initIo, turnIoTo)
 			case <-quit:
 				return
 			}
@@ -92,7 +92,6 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration) (
 }
 
 func SelectReadingSensors(cfg *Configuration, state *State, sensorReadings []onewire.TempReading) {
-
 	configDirty := false
 	// Add to cfg list
 	for i := range sensorReadings {
@@ -185,7 +184,7 @@ func ChangeSpepControlSensorTo(state *State, io int32, address string) {
 	}
 }
 
-func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configuration) {
+func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configuration, initIo func(int32), turnIoTo func(int32, bool)) {
 	// TODO Update target sensors
 
 	IdEverything(newCfg)
@@ -217,14 +216,14 @@ func updateForNewConfiguration(newCfg *Configuration, state *State, cfg *Configu
 	}
 	if modifiedIos {
 		// Moved an IO. Shouldn't happen while ON, if it does, clear everything
-		turnOffSeenControls()
+		turnOffSeenControls(turnIoTo)
 		state.Steps = state.Steps[:0]
-		SetToStateDefault(*cfg, state)
+		SetToStateDefault(*cfg, state, initIo)
 	}
 	WriteConfiguration(cfg)
 }
 
-func UpdateStepTimer(state *State, cfg *Configuration) {
+func UpdateStepTimer(state *State, cfg *Configuration, initIo func(int32)) {
 	if len(state.Steps) > 0 {
 		step := &state.Steps[0]
 		if state.Mode == MODE_ON || state.Mode == MODE_HEAT_OFF {
@@ -261,13 +260,13 @@ func UpdateStepTimer(state *State, cfg *Configuration) {
 						cpAboveTarget := false
 						sensor := FindSensor(state, cp.SensorAddress)
 						if sensor != NilSensor {
-							cpAboveTarget =  sensor.TemperatureC >= cp.TargetTemp
+							cpAboveTarget = sensor.TemperatureC >= cp.TargetTemp
 						}
 						allAboveTarget = allAboveTarget && cpAboveTarget
 					}
 					step.pastTargetTemp = allAboveTarget
-					if(allAboveTarget){
-						UpdateStepTimer(state,cfg)
+					if allAboveTarget {
+						UpdateStepTimer(state, cfg, initIo)
 					}
 				}
 			}
@@ -278,11 +277,11 @@ func UpdateStepTimer(state *State, cfg *Configuration) {
 		}
 	}
 	if len(state.Steps) == 0 {
-		state.Steps = append(state.Steps, StepDefault(*cfg))
+		state.Steps = append(state.Steps, StepDefault(*cfg, initIo))
 	}
 }
 
-func updateControlPoints(modPoints []ControlPoint, points []ControlPoint) {
+func updateControlPoints(modPoints []ControlPoint, points []ControlPoint, initIo func(int32)) {
 	for i := range modPoints {
 		modPoint := &modPoints[i]
 		found := false
@@ -295,19 +294,19 @@ func updateControlPoints(modPoints []ControlPoint, points []ControlPoint) {
 			}
 		}
 		if !found {
-			initControlPointDuty(modPoint)
+			initControlPointDuty(modPoint, initIo)
 		}
 	}
 }
 
-func updateStateForSteps(stepModify StepModify, state *State) {
+func updateStateForSteps(stepModify StepModify, state *State, initIo func(int32)) {
 	modSteps := stepModify.Steps
 	// if first step is the same, overlay control point state
 	if len(modSteps) > 0 && len(state.Steps) > 0 {
 		modStep1 := &modSteps[0]
 		step1 := &state.Steps[0]
 		if step1.Id == modStep1.Id {
-			updateControlPoints(modStep1.ControlPoints, step1.ControlPoints)
+			updateControlPoints(modStep1.ControlPoints, step1.ControlPoints, initIo)
 		}
 	}
 	if stepModify.FullList {
