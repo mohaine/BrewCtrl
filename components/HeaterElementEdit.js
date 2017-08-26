@@ -84,22 +84,19 @@ export default class HeaterElementEdit extends Component {
   let gpios = emptyGpios(configuration)
   gpios.push(control.io)
   gpios.sort((a,b)=> a-b)
-  return (<div >
+  return (<div>
           <div className="container-fluid">
             <div className="row">
-              <div className="col-sm-2">
-              <ContentEditable onChange={(e)=>this.updateName(e.target.value)} html={control.name} />
-              </div>
               <div className="col-sm-1">
               <select onChange={(e)=>this.updateGpio(e.target.value)} value={control.io}>
               <option value=""></option>
               {gpios.map(io=>(<option key={io} value={io}>GPIO {io}</option>))}
               </select>
               </div>
-              <div className="col-sm-1">
+              <div className="col-sm-2">
                 Amps: <input type="number" value={fullOnAmps} onChange={(e)=>this.updateMaxAmps(e.target.value)} style={{width: "3em"}}/>
               </div>
-              <div className="col-sm-1">
+              <div className="col-sm-2">
                 Has Duty: <input type="checkbox" checked={hasDuty} onChange={(e)=>this.updateHasDuty(e.target.checked)} style={{width: "3em"}}/>
               </div>
               <div className="col-sm-1">

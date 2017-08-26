@@ -10,15 +10,21 @@ export default class ContentEditable extends Component {
 
 
   render(){
-      return <div style={{display: "inline-block"}}
+      let text = this.state.html
+      let placeholder = this.props.placeholder
+      if(placeholder == undefined){
+        placeholder = "Click to enter"
+      }
+
+      return <input style={{display: "inline-block"}}
           onInput={(e) => this.emitChange(e)}
           onBlur={(e) => this.emitChange(e)}
-          contentEditable
-          dangerouslySetInnerHTML={{__html: this.state.html}}></div>;
+          value={text} placeholder={placeholder} style={{"border":"none"}}
+          />;
   }
 
   emitChange(e){
-      var html =  e.target.innerText;
+      var html =  e.target.value;
       if (this.props.onChange && html !== this.state.html) {
           this.props.onChange({
               target: {

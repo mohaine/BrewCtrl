@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import Sensors from '../components/Sensors'
 import Pumps from '../components/Pumps'
 import Tanks from '../components/Tanks'
+import ConfigTopEdit from '../components/ConfigTopEdit'
 
 export default class Configuration extends Component {
   constructor(props) {
@@ -10,6 +11,8 @@ export default class Configuration extends Component {
       this.state = {
       }
   }
+
+
   componentDidMount() {
     let { configuration,requestConfiguration, requestConfigurationStatus } = this.props
     if(!configuration){
@@ -55,15 +58,15 @@ export default class Configuration extends Component {
   render() {
     let { brewery ,configuration,requestConfiguration, requestConfigurationStatus ,requestUpdateConfiguration } = this.props
 
-    return (<div >
-
+    return (<div>
 
       {this.state.alert && (<div className="alert alert-danger" role="alert">{this.state.alert}</div>)}
       {this.state.info && (<div className="alert alert-info" role="alert">{this.state.info}</div>)}
 
-
-
       {!configuration && requestConfigurationStatus && requestConfigurationStatus.active && (<div>Loading configuration</div>) }
+
+      { configuration && (<ConfigTopEdit configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>) }
+
 
       { configuration && brewery && <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
       { configuration && <Pumps pumps={configuration.brewLayout.pumps} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }

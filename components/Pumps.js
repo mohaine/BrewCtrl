@@ -19,10 +19,17 @@ export default class Pumps extends Component {
   }
   render() {
     let { pumps, configuration,requestUpdateConfiguration} = this.props
-  return (<div>
-        <h2>Pumps <button className="btn btn-default" onClick={()=>this.addPump()}>Add</button></h2>
-        {pumps &&  pumps.map(pump=>(<PumpEdit key={pump.id} control={pump} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>))}
-
-       </div>)
+  return (
+    <div className="container-fluid">
+      <div className="panel">
+        <div className="panel-heading">
+          <h2>Pumps <button className="btn btn-default" onClick={()=>this.addPump()}>Add</button></h2>
+        </div>
+        <div className="panel-body">
+          {pumps &&  pumps.map(pump=>(<PumpEdit key={pump.id} control={pump} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>))}
+        </div>
+      </div>
+    </div>
+     )
   }
 }

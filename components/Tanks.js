@@ -19,10 +19,17 @@ export default class Tanks extends Component {
   }
   render() {
     let { tanks, configuration,requestUpdateConfiguration} = this.props
-  return (<div>
-        <h2>Tanks <button className="btn btn-default" onClick={()=>this.addTank()}>Add</button></h2>
-        {tanks &&  tanks.map(tank=>(<div key={tank.id}><TankEdit tank={tank} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/></div>))}
-
-       </div>)
+  return (
+    <div className="container-fluid">
+      <div className="panel">
+        <div className="panel-heading">
+          <h2>Tanks <button className="btn btn-default" onClick={()=>this.addTank()}>Add</button></h2>
+        </div>
+        <div className="panel-body">
+          {tanks &&  tanks.map(tank=>(<div key={tank.id}><TankEdit tank={tank} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/></div>))}
+        </div>
+      </div>
+    </div>
+)
   }
 }
