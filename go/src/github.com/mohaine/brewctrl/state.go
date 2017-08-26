@@ -100,23 +100,23 @@ func StepDefault(cfg Configuration, initIo func(int32)) (step ControlStep) {
 		tank := tanks[i]
 		heater := tank.Heater
 		if heater.Io > 0 {
-			cp := createControlPoint(heater.Io, heater.HasDuty, initIo)
+			cp := createControlPoint(heater.Io, heater.HasDuty, heater.FullOnAmps, initIo)
 			step.ControlPoints = append(step.ControlPoints, cp)
 		}
 	}
 	pumps := cfg.BrewLayout.Pumps
 	for i := 0; i < len(pumps); i++ {
 		pump := pumps[i]
-		cp := createControlPoint(pump.Io, pump.HasDuty, initIo)
+		cp := createControlPoint(pump.Io, pump.HasDuty, 0, initIo)
 		step.ControlPoints = append(step.ControlPoints, cp)
 	}
 	return
 }
 
-func createControlPoint(io int32, hasDuty bool, initIo func(int32)) (cp ControlPoint) {
+func createControlPoint(io int32, hasDuty bool, fullOnAmps int32, initIo func(int32)) (cp ControlPoint) {
 	cp.Id = id.RandomId()
 	cp.Io = io
-	cp.FullOnAmps = 0
+	cp.FullOnAmps = fullOnAmps
 	cp.HasDuty = hasDuty
 	// cp.On = false
 	cp.Duty = 0
