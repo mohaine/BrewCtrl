@@ -5,15 +5,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/mohaine/gpio"
-	"github.com/mohaine/onewire"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/mohaine/gpio"
+	"github.com/mohaine/onewire"
 )
 
-var CFG_FILE = "BrewControllerConfig.json"
+var CFG_FILE = "cfg.json"
+var CFG_FILE_OLD = "BrewControllerConfig.json"
 
 func sendError(w http.ResponseWriter, msg string, code int) {
 	http.Error(w, msg, code)
@@ -26,10 +28,14 @@ func main() {
 
 	cfg, err := LoadCfg(CFG_FILE)
 	if err != nil {
-		log.Printf("Failed to load cfg File: %v\n", err)
-		cfg, err = LoadCfg("BrewControllerConfig.json.dist")
+		log.Printf("Failed to load cfg file: %v\n", err)
+		cfg, err = LoadCfg(fmt.Sprintf("%s.dist", CFG_FILE))
 		if err != nil {
-			panic(err)
+			log.Printf("Failed to load cfg file: %v\n", err)
+			cfg, err = LoadCfg(CFG_FILE_OLD)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 

@@ -11,3 +11,4 @@ pkg
 mock/sys/class
 web/bundle.js
 package-lock.json
+cfg.json
