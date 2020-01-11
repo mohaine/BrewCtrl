@@ -42,6 +42,7 @@ type ControlPoint struct {
 	dutyTimeOff          uint64
 	duty                 int32
 	ioState              bool
+	ioStateKnow          bool
 	pid                  pid.Pid
 }
 

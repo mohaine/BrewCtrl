@@ -245,6 +245,7 @@ func UpdateStepTimer(state *State, cfg *Configuration, initIo func(int32)) {
 							if newStepTime <= 0 {
 								// Step is complete.  Go to next
 								state.Steps = state.Steps[1:]
+								//TODO FIX ME
 							} else {
 								step.StepTime = newStepTime
 							}

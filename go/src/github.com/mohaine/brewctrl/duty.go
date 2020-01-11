@@ -56,7 +56,8 @@ func updateForPinState(hs *ControlPoint, newHeatPinState bool, turnIoTo func(int
 	hs.lastUpdateOnOffTimes = now
 
 	newHeatPinState = newHeatPinState // && hs.On
-	if newHeatPinState != hs.ioState {
+	if newHeatPinState != hs.ioState || !hs.ioStateKnow {
+		hs.ioStateKnow = true
 		hs.ioState = newHeatPinState
 		turnIoTo(hs.Io, hs.ioState)
 	}
