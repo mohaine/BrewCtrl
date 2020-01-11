@@ -13,12 +13,14 @@ To create an image:
    4) Enable 1-Wire (Interface Options)
 
 4) If using a minimal install, and you would like to run in kiosk mode
-   1) apt-get install chromium-browser unclutter lightdm lwm
-   2) copy .Xsession to you home directory
+    apt-get install chromium-browser unclutter lightdm lwm
+    cp .Xsession ~/
 
 5) Complete install
-	bash -e `curl https://raw.githubusercontent.com/mohaine/BrewCtrl/master/easy.sh`
-
+    sudo apt-get update && sudo apt-get install git -y
+    git clone https://github.com/mohaine/BrewCtrl.git ~/brewctrl
+    cd ~/brewctrl
+    ./rpi-install.sh
 
 
 
