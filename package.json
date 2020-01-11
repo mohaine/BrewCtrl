@@ -16,7 +16,7 @@
   "license": "GPL",
   "homepage": "https://github.com/mohaine/BrewCtrl",
   "dependencies": {
-    "axios": "^0.10.0",
+    "axios": "^0.19.1",
     "babel-polyfill": "^6.3.14",
     "connect-timeout": "1.7.0",
     "express-http-proxy": "^0.6.0",
