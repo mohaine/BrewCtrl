@@ -16,10 +16,6 @@ run  "sudo raspi-config"
    3) Enable SSH (Interface Options)
    4) Enable 1-Wire (Interface Options)
 
-If using a minimal install, and you would like to run in kiosk mode:
-
-    apt-get install chromium-browser unclutter lightdm lwm
-    cp .Xsession ~/
 
 Build and install on Raspbian:
 
@@ -28,6 +24,10 @@ Build and install on Raspbian:
     cd ~/brewctrl
     ./rpi-install.sh
 
+If using a minimal install, and you would like to run in kiosk mode:
+
+    apt-get install chromium-browser unclutter lightdm lwm
+    cp .Xsession ~/
 
 
 
