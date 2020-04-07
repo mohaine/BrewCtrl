@@ -19,7 +19,7 @@ run  "sudo raspi-config"
 
 Build and install on Raspbian:
 
-    sudo apt-get update && sudo apt-get install git -y
+    sudo apt-get update && sudo apt-get install git golang npm -y
     git clone https://github.com/mohaine/BrewCtrl.git ~/brewctrl
     cd ~/brewctrl
     ./rpi-install.sh
@@ -34,6 +34,7 @@ If using a minimal install, and you would like to run in kiosk mode:
 # To Develop on a Desktop Machine
     
     npm install
+    npm start
     
     export GOPATH=$PWD/go
     go run github.com/mohaine/brewctrl --mock --port 2739

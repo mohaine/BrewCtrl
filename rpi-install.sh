@@ -3,7 +3,7 @@ make rpi
 sudo mkdir -p /opt/brewctrl
 sudo cp -r brewctrl brewctrl.service web cfg.json.dist /opt/brewctrl/
 sudo chown -R pi /opt/brewctrl
-sudo ln -s /opt/brewctrl/brewctrl.service  /etc/systemd/system
+[ ! -f /etc/systemd/system/brewctrl.service ] sudo ln -s /opt/brewctrl/brewctrl.service  /etc/systemd/system
 sudo systemctl enable brewctrl
 sudo systemctl restart brewctrl
 

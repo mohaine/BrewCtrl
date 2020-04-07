@@ -227,12 +227,14 @@ func UpdateStepTimer(state *State, cfg *Configuration, initIo func(int32)) {
 	if len(state.Steps) > 0 {
 		step := &state.Steps[0]
 		if state.Mode == MODE_ON || state.Mode == MODE_HEAT_OFF {
+			// fmt.Printf("WaitForTargetTemp: %v pastTargetTemp: %v\n", step.WaitForTargetTemp, step.pastTargetTemp)
 			if !step.WaitForTargetTemp || step.pastTargetTemp {
 				// Active step counting down
 				now := millis()
 				if !step.Active {
 					step.lastOnTime = now
 					step.Active = true
+					step.pastTargetTemp = false					
 				}
 				stepTime := step.StepTime
 				if stepTime > 0 {
