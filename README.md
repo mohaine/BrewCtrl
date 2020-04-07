@@ -30,4 +30,14 @@ Complete install
 
 
 
+# To Develop on a Desktop Machine
+    
+    npm install
+    
+    export GOPATH=$PWD/go
+    go run github.com/mohaine/brewctrl --mock --port 2739
+
+    load http://localhost:3000/ in your browser
+
+
 
