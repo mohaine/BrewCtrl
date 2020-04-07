@@ -16,11 +16,12 @@ run  "sudo raspi-config"
    3) Enable SSH (Interface Options)
    4) Enable 1-Wire (Interface Options)
 
-If using a minimal install, and you would like to run in kiosk mode
+If using a minimal install, and you would like to run in kiosk mode:
+
     apt-get install chromium-browser unclutter lightdm lwm
     cp .Xsession ~/
 
-Complete install
+Build and install on Raspbian:
 
     sudo apt-get update && sudo apt-get install git -y
     git clone https://github.com/mohaine/BrewCtrl.git ~/brewctrl
