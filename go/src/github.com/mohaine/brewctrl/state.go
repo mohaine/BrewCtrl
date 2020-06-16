@@ -32,6 +32,7 @@ type ControlPoint struct {
 	Io                   int32  `json:"controlIo"`
 	Duty                 int32  `json:"duty"`
 	FullOnAmps           int32
+	MaxDuty              int32
 	SensorAddress        string  `json:"tempSensorAddress"`
 	TargetTemp           float32 `json:"targetTemp"`
 	HasDuty              bool    `json:"hasDuty"`
@@ -101,23 +102,24 @@ func StepDefault(cfg Configuration, initIo func(int32)) (step ControlStep) {
 		tank := tanks[i]
 		heater := tank.Heater
 		if heater.Io > 0 {
-			cp := createControlPoint(heater.Io, heater.HasDuty, heater.FullOnAmps, initIo)
+			cp := createControlPoint(heater.Io, heater.HasDuty, heater.FullOnAmps, heater.MaxDuty, initIo)
 			step.ControlPoints = append(step.ControlPoints, cp)
 		}
 	}
 	pumps := cfg.BrewLayout.Pumps
 	for i := 0; i < len(pumps); i++ {
 		pump := pumps[i]
-		cp := createControlPoint(pump.Io, pump.HasDuty, 0, initIo)
+		cp := createControlPoint(pump.Io, pump.HasDuty, 0,100,initIo)
 		step.ControlPoints = append(step.ControlPoints, cp)
 	}
 	return
 }
 
-func createControlPoint(io int32, hasDuty bool, fullOnAmps int32, initIo func(int32)) (cp ControlPoint) {
+func createControlPoint(io int32, hasDuty bool, fullOnAmps int32, maxDuty int32, initIo func(int32)) (cp ControlPoint) {
 	cp.Id = id.RandomId()
 	cp.Io = io
 	cp.FullOnAmps = fullOnAmps
+	cp.MaxDuty = maxDuty
 	cp.HasDuty = hasDuty
 	// cp.On = false
 	cp.Duty = 0
@@ -148,6 +150,13 @@ func FindSensor(state *State, address string) Sensor {
 	return NilSensor
 }
 
+func Min(x,y int32)  int32 {
+	if x > y {
+		return y
+	}
+	return x
+}
+
 func StateUpdateDuty(state *State) {
 	if state.Mode != MODE_OFF && len(state.Steps) > 0 {
 		controlPoints := state.Steps[0].ControlPoints
@@ -157,8 +166,8 @@ func StateUpdateDuty(state *State) {
 				sensor := FindSensor(state, cp.SensorAddress)
 				if sensor != NilSensor {
 					// if (hasVaildTemp(sensor)) {
-					if cp.HasDuty {
-						cp.Duty = pid.GetDuty(&cp.pid, cp.TargetTemp, sensor.TemperatureC)
+					if cp.HasDuty {						
+						cp.Duty = Min(cp.MaxDuty, pid.GetDuty(&cp.pid, cp.TargetTemp, sensor.TemperatureC))
 						// log.Printf("Target %v but at %v duty: %v\n", cp.TargetTemp, sensor.TemperatureC,cp.Duty)
 					} else {
 						if sensor.TemperatureC < cp.TargetTemp {

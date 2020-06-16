@@ -27,6 +27,7 @@ type HeatElement struct {
 	HasDuty    bool   `json:"hasDuty,omitempty"`
 	InvertIo   bool   `json:"invertIo,omitempty"`
 	FullOnAmps int32  `json:"fullOnAmps,omitempty"`
+	MaxDuty    int32  `json:"maxDuty,omitempty"`
 }
 
 type Tank struct {
@@ -111,6 +112,16 @@ func IdEverything(cfg *Configuration) {
 	}
 }
 
+func SetMaxDutyIfNot(cfg *Configuration) {
+	tanks := cfg.BrewLayout.Tanks
+	for i := 0; i < len(tanks); i++ {
+		tank := &tanks[i]
+		if tank.Heater.MaxDuty == 0 {
+			tank.Heater.MaxDuty = 100
+		}
+	}	
+}
+
 func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
 	ioMap = make(map[int32]string)
 	tanks := cfg.BrewLayout.Tanks
@@ -154,6 +165,7 @@ func LoadCfg(path string) (Configuration, error) {
 	}
 	if err == nil {
 		IdEverything(&cfg)
+		SetMaxDutyIfNot(&cfg)
 	}
 	return cfg, err
 }

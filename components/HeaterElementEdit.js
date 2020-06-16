@@ -11,6 +11,7 @@ export default class HeaterElementEdit extends Component {
   constructor(props) {
       super(props);
       this.state = {
+        maxDuty: props.control.maxDuty,
         fullOnAmps: props.control.fullOnAmps,
         hasDuty: props.control.hasDuty
       }
@@ -68,11 +69,17 @@ export default class HeaterElementEdit extends Component {
     io = parseInt(io,10)
     this.overlayUpdate({io});
   }
-  updateMaxAmps(fullOnAmps){
+  updateFullOnAmps(fullOnAmps){
     fullOnAmps = parseInt(fullOnAmps,10)
     this.setState({fullOnAmps})
     this.overlayUpdate({fullOnAmps});
   }
+  updateMaxDuty(maxDuty){
+    maxDuty = parseInt(maxDuty,10)
+    this.setState({maxDuty})
+    this.overlayUpdate({maxDuty});
+  }
+  
   updateHasDuty(hasDuty){
     hasDuty = hasDuty ? true : false
     this.setState({hasDuty})
@@ -80,7 +87,7 @@ export default class HeaterElementEdit extends Component {
   }
   render() {
   let { control, configuration } = this.props
-  let {fullOnAmps,hasDuty} = this.state
+  let {maxDuty,fullOnAmps,hasDuty} = this.state
   let gpios = emptyGpios(configuration)
   gpios.push(control.io)
   gpios.sort((a,b)=> a-b)
@@ -94,7 +101,10 @@ export default class HeaterElementEdit extends Component {
               </select>
               </div>
               <div className="col-sm-2">
-                Amps: <input type="number" value={fullOnAmps} onChange={(e)=>this.updateMaxAmps(e.target.value)} style={{width: "3em"}}/>
+                Amps: <input type="number" value={fullOnAmps} onChange={(e)=>this.updateFullOnAmps(e.target.value)} style={{width: "3em"}}/>
+              </div>
+              <div className="col-sm-2">
+                Max Duty: <input type="number" min="1" max="100" value={maxDuty} onChange={(e)=>this.updateMaxDuty(e.target.value)} style={{width: "4em"}}/>
               </div>
               <div className="col-sm-2">
                 Has Duty: <input type="checkbox" checked={hasDuty} onChange={(e)=>this.updateHasDuty(e.target.checked)} style={{width: "3em"}}/>
