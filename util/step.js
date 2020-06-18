@@ -86,6 +86,7 @@ export const createManualStep = function(configuration){
     cp.targetTemp = 0;
     cp.automaticControl = false;
     if(cp.fullOnAmps === undefined) cp.fullOnAmps = 0;
+    if(cp.maxDuty === undefined) cp.maxDuty = 100;
     return cp;
   }
 
@@ -94,7 +95,7 @@ export const createManualStep = function(configuration){
   brewLayout.tanks.forEach(t=>{
       let heater = t.heater;
       if(heater){
-        let controlPoint = initCp({controlIo: heater.io, hasDuty: heater.hasDuty,fullOnAmps: heater.fullOnAmps});
+        let controlPoint = initCp({controlIo: heater.io, hasDuty: heater.hasDuty,fullOnAmps: heater.fullOnAmps, maxDuty: heater.maxDuty});
         controlPoints.push(controlPoint)
       }
   });
