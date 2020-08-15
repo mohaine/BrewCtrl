@@ -45,9 +45,9 @@ type Pump struct {
 }
 
 type BreweryLayout struct {
-	MaxAmps int32  `json:"maxAmps,omitempty"`
-	Tanks   []Tank `json:"tanks,omitempty"`
-	Pumps   []Pump `json:"pumps,omitempty"`
+	MaxAmps int32  `json:"maxAmps"`
+	Tanks   []Tank `json:"tanks"`
+	Pumps   []Pump `json:"pumps"`
 }
 
 type StepControlPoint struct {
