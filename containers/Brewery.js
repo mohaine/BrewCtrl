@@ -7,11 +7,13 @@ import Component from '../components/Brewery'
 
 const mapStateToProps = (state) => {
   let brewery = state.server.brewery
+  let status = state.server.status
   let configuration = state.server.configuration
   let requestStateStatus = state.server.requestStateStatus;
   let selectedStepId = state.ui.selectedStepId;
+
   return {
-    brewery,configuration,
+    brewery,status,configuration,
     requestStateStatus,selectedStepId
   }
 }

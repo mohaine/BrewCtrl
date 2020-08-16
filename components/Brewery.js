@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import Step from '../components/Step'
 import Sensors from '../components/Sensors'
 import StepList from '../components/StepList'
+import ControlPoints from '../components/ControlPoints'
 
 
 export default class Brewery extends Component {
@@ -13,7 +14,7 @@ export default class Brewery extends Component {
     }
   }
   render() {
-    let { brewery ,requestState, requestStateStatus, requestUpdateStep, configuration, requestUpdateConfiguration, requestUpdateStepList,selectedStepId, selectStepById } = this.props
+    let { brewery ,status ,requestState, requestStateStatus, requestUpdateStep, configuration, requestUpdateConfiguration, requestUpdateStepList,selectedStepId, selectStepById } = this.props
 
     let requestRemoveStep = (step) => {
       let rawSteps = brewery ? brewery.steps.map(s=> s.rawStep): [];
@@ -32,11 +33,11 @@ export default class Brewery extends Component {
             <div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep}  /></div>
           </div>
           )}
-
-
           <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById}  requestUpdateStepList={requestUpdateStepList} configuration={configuration} requestRemoveStep={requestRemoveStep} requestUpdateConfiguration={requestUpdateConfiguration} />
-        
+          <ControlPoints steps={brewery.steps} status={status} selectedStepId={selectedStepId} selectStepById={selectStepById}  requestUpdateStepList={requestUpdateStepList} configuration={configuration} requestUpdateStep={requestUpdateStep} requestUpdateConfiguration={requestUpdateConfiguration} />
       </div>
+
+
 
     ) }
 
