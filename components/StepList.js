@@ -43,8 +43,6 @@ export default class StepList extends Component {
 
   updateName(step,name){
     let { requestUpdateStep } = this.props
-    console.log("Update Name!!!!", name)
-
     if(this.updateNameTimer){
       clearTimeout(this.updateNameTimer);
       this.updateNameTimer = undefined;
@@ -54,8 +52,6 @@ export default class StepList extends Component {
 
 
   render() {
-    console.log("&&&&&&&&&&&&&&&&&&&&&&&&")
-
     let { steps, selectedStepId, selectStepById, requestRemoveStep} = this.props
 
     let selectedStep = steps.find((s)=> s.id == selectedStepId)
@@ -65,10 +61,9 @@ export default class StepList extends Component {
         <ul className="nav nav-tabs">
           {steps && (steps.map(step=> {
             let activeStep = selectedStepId === step.id;
-            console.log("Name!!!!", step.name, activeStep)
 
             return (
-            <li className="nav-item  clickable" onClick={()=>{console.log(step.id);selectStepById(step.id)}} >
+            <li className="nav-item  clickable" onClick={()=>{selectStepById(step.id)}} >
               
               <span className={"nav-link" + (activeStep ?" active":"")}>
               <span>
@@ -76,9 +71,7 @@ export default class StepList extends Component {
               { !activeStep && (<span>{step.name}</span>)}
               </span>  
             {requestRemoveStep && ( <strong className="hoverable" onClick={()=>requestRemoveStep(step.rawStep)} style={{float: "right", padding: "0px 4px 0px 4px", marginLeft: "20px" }}> &#215; </strong>   ) }
-
             </span>     
-
             </li>
         )}))}
 

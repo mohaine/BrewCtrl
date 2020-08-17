@@ -1,15 +1,27 @@
 import React, { Component, PropTypes } from 'react'
-
+import QuickPickTemp from '../components/QuickPickTemp'
 import {overlayControlPoint} from '../util/step'
 
 export default class Pump extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      editTargetTemp: false,
+    }
+  }
+
+  updateTargetTemp(temp){
+    let { step, pump, requestUpdateStep } = this.props
+    requestUpdateStep(overlayControlPoint(step.rawStep, Object.assign({}, pump, { targetTemp: temp }) ));
+  }
 
   togglePump() {
     let { step, pump, requestUpdateStep } = this.props
-    if(!pump.automaticControl){
+    if(pump.automaticControl){
+      this.setState({editTargetTemp: true } )
+    } else {
       let newDuty = pump.duty > 0 ? 0 : 100;
       requestUpdateStep(overlayControlPoint(step.rawStep, Object.assign({}, pump, { duty: newDuty }) ));
-  
     }
   }
 
@@ -21,9 +33,12 @@ export default class Pump extends Component {
 
     let onColor = automaticControl? "#cfc": "#0f0"
     let offColor = automaticControl? "#fcc":  "#f00"
-
+    if(automaticControl) {
+      console.log(pump)
+    }
 
     return (<div>
+        {this.state.editTargetTemp && (<QuickPickTemp close={() => {this.setState({editTargetTemp:false})}} apply={(value) => { this.updateTargetTemp(value) }} value={pump.targetTemp}/>)}
         { pump && (
           <svg onClick={()=>{this.togglePump()}}
              className="tank"

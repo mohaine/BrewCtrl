@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react'
 
 import {formatTemp,convertF2C,formatTempWhole} from '../util/tempature'
 import QuickPick from '../components/QuickPick'
+import QuickPickTemp from '../components/QuickPickTemp'
+
 import {overlayControlPoint} from '../util/step'
 
 export default class Tank extends Component {
@@ -53,18 +55,8 @@ export default class Tank extends Component {
     }
 
     return (<div>
-        { this.state.editTargetTemp && (<QuickPick close={()=>{this.setState({editTargetTemp: false })}}
-        apply={(value)=>{this.updateTargetTemp(value)}}
-        quickPickValues={ [{value:convertF2C(120),text:formatTempWhole(convertF2C(120))},
-          {value:convertF2C(140),text:formatTempWhole(convertF2C(140))},
-          {value:convertF2C(153),text:formatTempWhole(convertF2C(153))},
-          {value:convertF2C(165),text:formatTempWhole(convertF2C(165))},
-          {value:convertF2C(205),text:formatTempWhole(convertF2C(205))}]}
-        increment={(value,up)=>value + (up?convertF2C(33):-convertF2C(33))}
+        {this.state.editTargetTemp && (<QuickPickTemp close={() => {this.setState({editTargetTemp:false})}} apply={(value) => { this.updateTargetTemp(value) }} value={heater.targetTemp}/>)}
 
-        value={heater.targetTemp}
-        formatValue={(temp)=>formatTempWhole(temp)}
-        />)}
         { this.state.editElementDuty && (<QuickPick close={()=>{this.setState({editElementDuty: false })}}
         apply={(value)=>{this.updateElementDuty(value)}}
         quickPickValues={ dutyQuickPickItems}

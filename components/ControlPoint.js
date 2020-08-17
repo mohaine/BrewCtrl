@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 
 import { createManualStep, findControlByIo, findTargetByAddress } from '../util/step'
 import { formatTemp, convertF2C, formatTempWhole } from '../util/tempature'
-import QuickPick from '../components/QuickPick'
+import QuickPickTemp from '../components/QuickPickTemp'
 import { overlayControlPoint } from '../util/step'
 
 
@@ -45,7 +45,7 @@ export default class ControlPoint extends Component {
     let { configuration, controlPoint, status } = this.props
 
     let whatToControl = findControlByIo(configuration, controlPoint.controlIo)
-    if(!whatToControl){
+    if (!whatToControl) {
       whatToControl = {}
     }
 
@@ -79,39 +79,23 @@ export default class ControlPoint extends Component {
     }
 
     return (<div>
-      {this.state.editTargetTemp && (<QuickPick close={() => { this.setState({ editTargetTemp: false }) }}
-        apply={(value) => { this.updateTargetTemp(value) }}
-        quickPickValues={[{ value: convertF2C(120), text: formatTempWhole(convertF2C(120)) },
-        { value: convertF2C(140), text: formatTempWhole(convertF2C(140)) },
-        { value: convertF2C(153), text: formatTempWhole(convertF2C(153)) },
-        { value: convertF2C(165), text: formatTempWhole(convertF2C(165)) },
-        { value: convertF2C(205), text: formatTempWhole(convertF2C(205)) }]}
-        increment={(value, up) => value + (up ? convertF2C(33) : -convertF2C(33))}
+      {this.state.editTargetTemp && (<QuickPickTemp close={() => {this.setState({editTargetTemp:false})}} apply={(value) => { this.updateTargetTemp(value) }} value={targetTemp}/>)}
 
-        value={targetTemp}
-        formatValue={(temp) => formatTempWhole(temp)}
-      />)}
+      <li className="list-group-item">
+        <strong>{whatToControl.name}</strong>
 
-      <div className="card-deck">
-        <div className="card">
-          <h5 class="card-title">{whatToControl.name}</h5>
-          <div className="card-body">
-          
-            {automaticControl && (<span>Keep</span>)}
-            {!automaticControl && (<span>Control</span>)}
-            <span> </span>              
-            <select onChange={(e) => this.updateControl(e.target.value)} value={controlPoint.tempSensorAddress}>
-              <option value=""> Manual</option>
-              {sensors.map(s => (<option key={s.address} value={s.address}>{s.name}</option>))}
-            </select>
+        {automaticControl && (<span> keeps </span>)}
+        {!automaticControl && (<span> is </span>)}
+        <span> </span>
+        <select onChange={(e) => this.updateControl(e.target.value)} value={controlPoint.tempSensorAddress}>
+          <option value=""> Manual</option>
+          {sensors.map(s => (<option key={s.address} value={s.address}>{s.name}</option>))}
+        </select>
 
-              {automaticControl && (<span>
-                <span></span><span> at <text onClick={() => this.setState({ editTargetTemp: true })}> {formatTempWhole(targetTemp)} </text></span> <span></span>
-            </span>)}
-
-          </div>
-        </div>
-      </div>
+        {automaticControl && (<span>
+          <span></span><span> at <text className="clickable" onClick={() => this.setState({ editTargetTemp: true })}> {formatTempWhole(targetTemp)} </text></span> <span></span>
+        </span>)}
+      </li>
     </div>)
   }
 }

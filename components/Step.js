@@ -71,9 +71,6 @@ export default class Step extends Component {
       ></QuickPick>)}
 
         <div>
-          <label>Step:</label> <ContentEditable onChange={(e)=>this.updateName(e.target.value)} html={step.name} />
-        </div>
-        <div>
         <label>Time:</label> <span onClick={()=>this.setState({editTime: true })} >{formatTime(step.time)}</span>
         </div>
         <div>

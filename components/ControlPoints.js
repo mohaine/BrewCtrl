@@ -27,21 +27,16 @@ export default class ControlPoints extends Component {
     if (selectedStep && selectedStep.rawStep) {
       controlPoints = selectedStep.rawStep.controlPoints
     }
+    controlPoints = controlPoints.filter(c => c.controlIo > 0)
+
     return (
       <div className="container-fluid">
-        <div className="panel">
-          <div className="panel-heading">
-            <h2>Control Points</h2>
-          </div>
-          <div className="panel-body">
-          <div class="container">
-            {controlPoints && (controlPoints.map(cp => (
-              <ControlPoint configuration={configuration} controlPoint={cp} step={selectedStep} status={status} requestUpdateStep={requestUpdateStep}/>
-            )))}
-          </div>
-          </div>
-        </div>
+        <ul className="list-group">
+          {controlPoints && (controlPoints.map(cp => (
+            <ControlPoint configuration={configuration} controlPoint={cp} step={selectedStep} status={status} requestUpdateStep={requestUpdateStep} />
+          )))}
+        </ul>
       </div>
-                )
+    )
   }
 }
