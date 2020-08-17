@@ -38,6 +38,7 @@ export default class Brewery extends Component {
                   <div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep} /></div>
                 </div>
               )}
+
             </div>
           </div>
 

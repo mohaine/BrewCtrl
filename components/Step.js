@@ -97,8 +97,6 @@ export default class Step extends Component {
 
         </div>
       )}
-
-      <br />
       <br />
     </div>)
   }

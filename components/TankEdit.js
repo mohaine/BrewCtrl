@@ -71,7 +71,6 @@ export default class Tank extends Component {
       <div className="card">
         <div className="card-body">
           <h5 className="card-title"><ContentEditable onChange={(e) => this.updateName(e.target.value)} html={tank.name} />
-
             <strong className="hoverable" onClick={() => this.remove()} style={{ float: "right", padding: "0px 4px 0px 4px", marginLeft: "20px" }}> &#215; </strong>
           </h5>
           {heater && <HeaterElementEdit control={heater} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration} />}

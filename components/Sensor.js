@@ -48,8 +48,10 @@ export default class Sensor extends Component {
 
   render() {
     let { sensor, configuration } = this.props
-    return (<div >
 
+    let tankNames = Array.from(new Set(configuration.brewLayout.tanks.map(tank => tank.name)));
+
+    return (<div >
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">
@@ -59,7 +61,7 @@ export default class Sensor extends Component {
           <div>
             Sensor location is <select onChange={(e) => this.updateLocation(e.target.value)} value={sensor.location}>
               <option value=""></option>
-              {configuration.brewLayout.tanks.map(tank => (<option key={tank.name} value={tank.name} >{tank.name}</option>))}
+              {tankNames.map(tank => (<option key={tank} value={tank} >{tank}</option>))}
             </select>
             <span>
               <span> and is </span>

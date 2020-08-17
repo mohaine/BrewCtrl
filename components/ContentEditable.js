@@ -19,6 +19,7 @@ export default class ContentEditable extends Component {
       return <input style={{display: "inline-block"}}
           onInput={(e) => this.emitChange(e)}
           onBlur={(e) => this.emitChange(e)}
+          onChange={(e) => {}}
           value={text} placeholder={placeholder} style={{"border":"none"}}
           />;
   }

@@ -64,14 +64,10 @@ export default class Configuration extends Component {
       {this.state.info && (<div className="alert alert-info" role="alert">{this.state.info}</div>)}
 
       {!configuration && requestConfigurationStatus && requestConfigurationStatus.active && (<div>Loading configuration</div>) }
-
       { configuration && (<ConfigTopEdit configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/>) }
-
-
       { configuration && brewery && <Sensors sensors={brewery.sensors} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
       { configuration && <Pumps pumps={configuration.brewLayout.pumps} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
       { configuration && <Tanks tanks={configuration.brewLayout.tanks} configuration={configuration} requestUpdateConfiguration={requestUpdateConfiguration}/> }
-
 
 
       <hr />
