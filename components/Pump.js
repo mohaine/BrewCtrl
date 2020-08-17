@@ -15,9 +15,6 @@ export default class Pump extends Component {
 
   render() {
     let { step, pump, requestUpdateStep } = this.props
-
-
-    console.log(pump)
     let automaticControl = pump.automaticControl;
     let on = pump.duty > 0 ;
     let actuallyOn = pump.on && on;

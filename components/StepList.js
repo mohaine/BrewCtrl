@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 
 import {createManualStep,findControlByIo,findTargetByAddress} from '../util/step'
+import ContentEditable from '../components/ContentEditable'
 
 
 export default class StepList extends Component {
@@ -40,24 +41,54 @@ export default class StepList extends Component {
     requestUpdateConfiguration(cfgNew)
   }
 
+  updateName(step,name){
+    let { requestUpdateStep } = this.props
+    console.log("Update Name!!!!", name)
+
+    if(this.updateNameTimer){
+      clearTimeout(this.updateNameTimer);
+      this.updateNameTimer = undefined;
+    }
+    this.updateNameTimer = setTimeout(()=>{requestUpdateStep(Object.assign({}, step.rawStep, { name: name }));}, 500);
+  }
+
+
   render() {
+    console.log("&&&&&&&&&&&&&&&&&&&&&&&&")
 
     let { steps, selectedStepId, selectStepById, requestRemoveStep} = this.props
 
     let selectedStep = steps.find((s)=> s.id == selectedStepId)
 
     return (<div>
-            <div className="btn-group">
-          {steps && (steps.map(step=> (
-          <button type="button" className={"btn " + (selectedStepId === step.id ?"down":"btn-default")} key={step.id} onClick={()=>selectStepById(step.id)} >
-            {step.name}
-          </button>
-        )))}</div><br/><br/>
-           <div className="btn-group">
-             <button type="button" className="btn btn-default" onClick={()=>this.addStep()}>Add Step</button>
-             {selectedStep && requestRemoveStep && <button type="button" className="btn btn-default" onClick={()=>requestRemoveStep(selectedStep.rawStep)}>Remove Step {selectedStep.name}</button> }
-             <button type="button" className="btn btn-default" onClick={()=>this.saveAsList()}>Save As List</button>
-           </div>
+
+        <ul className="nav nav-tabs">
+          {steps && (steps.map(step=> {
+            let activeStep = selectedStepId === step.id;
+            console.log("Name!!!!", step.name, activeStep)
+
+            return (
+            <li className="nav-item  clickable" onClick={()=>{console.log(step.id);selectStepById(step.id)}} >
+              
+              <span className={"nav-link" + (activeStep ?" active":"")}>
+              <span>
+              { activeStep && (<ContentEditable onChange={(e)=>this.updateName(step, e.target.value)} html={step.name} />)}
+              { !activeStep && (<span>{step.name}</span>)}
+              </span>  
+            {requestRemoveStep && ( <strong className="hoverable" onClick={()=>requestRemoveStep(step.rawStep)} style={{float: "right", padding: "0px 4px 0px 4px", marginLeft: "20px" }}> &#215; </strong>   ) }
+
+            </span>     
+
+            </li>
+        )}))}
+
+        <li className="nav-item clickable">
+            <span className="nav-link" onClick={()=>this.addStep()}><strong>  &#43; </strong></span>            
+          </li>
+          <li className="nav-item clickable" style={{float: "right", position:"relative"}}>
+          <button type="button" className="btn btn-default" onClick={()=>this.saveAsList()}>Save As List</button>
+          </li>
+        </ul>
        </div>)
   }
 }

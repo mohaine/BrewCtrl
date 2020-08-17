@@ -1,14 +1,32 @@
 body{
-	background-color: #fafafa;
-
+	background-color: #fff;
 }
 
+.clickable {
+	cursor: pointer;
+}
+
+.hoverable {
+	border: 1px solid rgba(0, 0, 0, 0);
+}
+.hoverable:hover {
+	border: 1px solid black;
+}
+
+button.btn:hover {
+	border: 1px solid #88f;
+	background-color: #99f;
+	color: white;
+}
+
+button.btn {
+	border: 1px solid #88f;
+	color: black;
+	background-color: #fff;
+}
 button.down {
 	border: 1px solid #88f;
 	background-color: #88f;
 	color: white;
 }
 
-.addStep{
-	padding: 3px;
-}

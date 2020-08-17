@@ -45,6 +45,9 @@ export default class ControlPoint extends Component {
     let { configuration, controlPoint, status } = this.props
 
     let whatToControl = findControlByIo(configuration, controlPoint.controlIo)
+    if(!whatToControl){
+      whatToControl = {}
+    }
 
     let sensorAddress = controlPoint.tempSensorAddress
 
