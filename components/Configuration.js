@@ -76,22 +76,20 @@ export default class Configuration extends Component {
 
       <hr />
       <div className="row">
-        <div className="col-md-6 container">
+        <div className="col-6 container">
         <div className="panel panel-default config-upload">
           <div className="panel-title">
           <label forHtml="configurationToUpload">Select a Configuration File to Upload</label><br />
           </div>
           <div className="panel-body">
-            <div className="row">
               <form id="config-upload-form" method="post" action="/cmd/configuration">
-                <div className="col-md-8"><input type="file" name="configuration" id="configurationToUpload" onChange={(e)=>this.onChangeFile(e.target) }/></div>
-                <div className="col-md-4"><button  className="btn btn-default " type="button" onClick={(e)=>this.upload(e.target.form)} >Upload</button></div>
+                <input type="file" name="configuration" id="configurationToUpload" onChange={(e)=>this.onChangeFile(e.target) }/>
+                <button  className="btn btn-default " type="button" onClick={(e)=>this.upload(e.target.form)} >Upload</button>
               </form>
-            </div>
           </div>
         </div>
         </div>
-        <div className="col-md-6">
+        <div className="col-6">
             <a href="/cmd/configuration" download="BrewControllerConfig.json">Download Current Configuration</a>
         </div>
       </div>

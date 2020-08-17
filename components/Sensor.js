@@ -1,15 +1,15 @@
 
 import React, { Component, PropTypes } from 'react'
 
-import {formatTemp} from '../util/tempature'
+import { formatTemp } from '../util/tempature'
 import ContentEditable from '../components/ContentEditable'
 
 
 export default class Sensor extends Component {
 
-  overlayUpdate(overlay){
+  overlayUpdate(overlay) {
 
-    if(this.overlay){
+    if (this.overlay) {
       this.overlay = Object.assign({}, this.overlay, overlay);
     }
 
@@ -17,56 +17,59 @@ export default class Sensor extends Component {
     let sensorToChange = this.props.sensor;
     let sensors = configuration.sensors;
     sensors = sensors.map(sensor => {
-      if(sensor.address === sensorToChange.address){
+      if (sensor.address === sensorToChange.address) {
         return Object.assign({}, sensor, overlay);
       }
       return sensor;
     });
     let newConfig = Object.assign(configuration, { sensors });
 
-    if(this.updateCfgTimer){
+    if (this.updateCfgTimer) {
       clearTimeout(this.updateCfgTimer);
       this.updateCfgTimer = undefined;
     }
 
-    this.updateCfgTimer = setTimeout(()=> {
+    this.updateCfgTimer = setTimeout(() => {
       requestUpdateConfiguration(newConfig)
       this.updateCfgTimer = undefined;
-    },500);
+    }, 500);
 
 
   }
 
-  updateName(name){
-    this.overlayUpdate({name});
+  updateName(name) {
+    this.overlayUpdate({ name });
   }
 
 
-  updateLocation( location){
-    this.overlayUpdate({location});
+  updateLocation(location) {
+    this.overlayUpdate({ location });
   }
 
   render() {
-  let { sensor, configuration } = this.props
-  return (<div >
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-sm-2">
-              <ContentEditable onChange={(e)=>this.updateName(e.target.value)} html={sensor.name} />
-              </div>
-              <div className="col-sm-1">
-              <select onChange={(e)=>this.updateLocation(e.target.value)} value={sensor.location}>
+    let { sensor, configuration } = this.props
+    return (<div >
+
+      <div className="card">
+        <div className="card-body">
+          <h5 className="card-title">
+            <ContentEditable onChange={(e) => this.updateName(e.target.value)} html={sensor.name} placeholder="click to enter a name" />
+            <strong className="hoverable" onClick={() => this.remove()} style={{ float: "right", padding: "0px 4px 0px 4px", marginLeft: "20px" }}> &#215; </strong>
+          </h5>
+          <div>
+            Sensor location is <select onChange={(e) => this.updateLocation(e.target.value)} value={sensor.location}>
               <option value=""></option>
-              {configuration.brewLayout.tanks.map(tank=>(<option key={tank.name} value={tank.name} >{tank.name}</option>))}
-              </select>
-              </div>
-              <div className="col-sm-1"
-                style={{
-                  color: (sensor.reading? "#000" : "#f00")
-                }}
-                >{formatTemp(sensor.temperatureC)}</div>
-              </div>
+              {configuration.brewLayout.tanks.map(tank => (<option key={tank.name} value={tank.name} >{tank.name}</option>))}
+            </select>
+            <span>
+              <span> and is </span>
+              {sensor.reading && (<span> reading {formatTemp(sensor.temperatureC)}</span>)}
+              {!sensor.reading && (<span> not currently reading</span>)}
+            </span>
           </div>
-          </div>)
+
+        </div>
+      </div>
+    </div>)
   }
 }
