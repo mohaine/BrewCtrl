@@ -12,3 +12,4 @@ mock/sys/class
 web/bundle.js
 package-lock.json
 cfg.json
+bc.code-workspace
