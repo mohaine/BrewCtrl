@@ -9,7 +9,7 @@ var config = {
 };
 
 module.exports = {
-  entry: __dirname + '/index.js',
+  entry: __dirname + '/ui/index.js',
   output: {
     path: __dirname + "/web/",
     filename: 'bundle.js'
