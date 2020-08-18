@@ -41,5 +41,7 @@ If using a minimal install, and you would like to run in kiosk mode:
 
     load http://localhost:3000/ in your browser
 
+# To view GPIO states in mock mode  
 
+    python pinwatch.py 
 
