@@ -21,13 +21,14 @@ type SensorConfig struct {
 }
 
 type HeatElement struct {
-	Id         string `json:"id,omitempty"`
-	Name       string `json:"name,omitempty"`
-	Io         int32  `json:"io,omitempty"`
-	HasDuty    bool   `json:"hasDuty,omitempty"`
-	InvertIo   bool   `json:"invertIo,omitempty"`
-	FullOnAmps int32  `json:"fullOnAmps,omitempty"`
-	MaxDuty    int32  `json:"maxDuty,omitempty"`
+	Id                    string `json:"id,omitempty"`
+	Name                  string `json:"name,omitempty"`
+	Io                    int32  `json:"io,omitempty"`
+	HasDuty               bool   `json:"hasDuty,omitempty"`
+	MinStateChangeSeconds int32  `json:"minStateChangeSeconds,omitempty"`
+	InvertIo              bool   `json:"invertIo,omitempty"`
+	FullOnAmps            int32  `json:"fullOnAmps,omitempty"`
+	MaxDuty               int32  `json:"maxDuty,omitempty"`
 }
 
 type Tank struct {
@@ -37,11 +38,12 @@ type Tank struct {
 	Heater HeatElement   `json:"heater,omitempty"`
 }
 type Pump struct {
-	Id       string `json:"id,omitempty"`
-	Name     string `json:"name,omitempty"`
-	Io       int32  `json:"io,omitempty"`
-	HasDuty  bool   `json:"hasDuty,omitempty"`
-	InvertIo bool   `json:"invertIo,omitempty"`
+	Id                    string `json:"id,omitempty"`
+	Name                  string `json:"name,omitempty"`
+	Io                    int32  `json:"io,omitempty"`
+	HasDuty               bool   `json:"hasDuty,omitempty"`
+	MinStateChangeSeconds int32  `json:"minStateChangeSeconds,omitempty"`
+	InvertIo              bool   `json:"invertIo,omitempty"`
 }
 
 type BreweryLayout struct {
@@ -119,7 +121,19 @@ func SetMaxDutyIfNot(cfg *Configuration) {
 		if tank.Heater.MaxDuty == 0 {
 			tank.Heater.MaxDuty = 100
 		}
-	}	
+	}
+}
+
+func SetPumpsMinChangeTime(cfg *Configuration) {
+	pumps := cfg.BrewLayout.Pumps
+	for i := 0; i < len(pumps); i++ {
+		pump := &pumps[i]
+		if !pump.HasDuty && pump.MinStateChangeSeconds <= 0 {
+			pump.MinStateChangeSeconds = 15
+			log.Println("Update pump ", pump.Name, "min time change to default of 15 seconds")
+
+		}
+	}
 }
 
 func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
@@ -166,6 +180,7 @@ func LoadCfg(path string) (Configuration, error) {
 	if err == nil {
 		IdEverything(&cfg)
 		SetMaxDutyIfNot(&cfg)
+		SetPumpsMinChangeTime(&cfg)
 	}
 	return cfg, err
 }

@@ -234,7 +234,7 @@ func UpdateStepTimer(state *State, cfg *Configuration, initIo func(int32)) {
 				if !step.Active {
 					step.lastOnTime = now
 					step.Active = true
-					step.pastTargetTemp = false					
+					step.pastTargetTemp = false
 				}
 				stepTime := step.StepTime
 				if stepTime > 0 {

@@ -8,5 +8,5 @@ local:
 
 rpi:
 	env GOPATH=$(pwd)/go GOOS=linux GOARCH=arm GOARM=5 go build github.com/mohaine/brewctrl
-	npm install
-	npm run build-prod
+	yarn install
+	yarn run build-prod

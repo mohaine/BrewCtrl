@@ -28,23 +28,25 @@ type Sensor struct {
 
 type ControlPoint struct {
 	// initComplete bool `json:"initComplete,omitempty"`;
-	Id                   string `json:"id,omitempty"`
-	Io                   int32  `json:"controlIo"`
-	Duty                 int32  `json:"duty"`
-	FullOnAmps           int32
-	MaxDuty              int32
-	SensorAddress        string  `json:"tempSensorAddress"`
-	TargetTemp           float32 `json:"targetTemp"`
-	HasDuty              bool    `json:"hasDuty"`
-	AutomaticControl     bool    `json:"automaticControl,omitempty"`
-	ActuallyOn           bool    `json:"on"`
-	lastUpdateOnOffTimes uint64
-	dutyTimeOn           uint64
-	dutyTimeOff          uint64
-	duty                 int32
-	ioState              bool
-	ioStateKnow          bool
-	pid                  pid.Pid
+	Id                    string `json:"id,omitempty"`
+	Io                    int32  `json:"controlIo"`
+	Duty                  int32  `json:"duty"`
+	FullOnAmps            int32
+	MaxDuty               int32
+	SensorAddress         string  `json:"tempSensorAddress"`
+	TargetTemp            float32 `json:"targetTemp"`
+	HasDuty               bool    `json:"hasDuty"`
+	MinStateChangeSeconds int32
+	LastStateChangeTime   uint64
+	AutomaticControl      bool `json:"automaticControl,omitempty"`
+	ActuallyOn            bool `json:"on"`
+	lastUpdateOnOffTimes  uint64
+	dutyTimeOn            uint64
+	dutyTimeOff           uint64
+	duty                  int32
+	ioState               bool
+	ioStateKnow           bool
+	pid                   pid.Pid
 }
 
 type ControlStep struct {
@@ -102,25 +104,26 @@ func StepDefault(cfg Configuration, initIo func(int32)) (step ControlStep) {
 		tank := tanks[i]
 		heater := tank.Heater
 		if heater.Io > 0 {
-			cp := createControlPoint(heater.Io, heater.HasDuty, heater.FullOnAmps, heater.MaxDuty, initIo)
+			cp := createControlPoint(heater.Io, heater.HasDuty, heater.MinStateChangeSeconds, heater.FullOnAmps, heater.MaxDuty, initIo)
 			step.ControlPoints = append(step.ControlPoints, cp)
 		}
 	}
 	pumps := cfg.BrewLayout.Pumps
 	for i := 0; i < len(pumps); i++ {
 		pump := pumps[i]
-		cp := createControlPoint(pump.Io, pump.HasDuty, 0,100,initIo)
+		cp := createControlPoint(pump.Io, pump.HasDuty, pump.MinStateChangeSeconds, 0, 100, initIo)
 		step.ControlPoints = append(step.ControlPoints, cp)
 	}
 	return
 }
 
-func createControlPoint(io int32, hasDuty bool, fullOnAmps int32, maxDuty int32, initIo func(int32)) (cp ControlPoint) {
+func createControlPoint(io int32, hasDuty bool, minStateChangeSeconds int32, fullOnAmps int32, maxDuty int32, initIo func(int32)) (cp ControlPoint) {
 	cp.Id = id.RandomId()
 	cp.Io = io
 	cp.FullOnAmps = fullOnAmps
 	cp.MaxDuty = maxDuty
 	cp.HasDuty = hasDuty
+	cp.MinStateChangeSeconds = minStateChangeSeconds
 	// cp.On = false
 	cp.Duty = 0
 	initControlPointDuty(&cp, initIo)
@@ -150,7 +153,7 @@ func FindSensor(state *State, address string) Sensor {
 	return NilSensor
 }
 
-func Min(x,y int32)  int32 {
+func Min(x, y int32) int32 {
 	if x > y {
 		return y
 	}
@@ -166,14 +169,23 @@ func StateUpdateDuty(state *State) {
 				sensor := FindSensor(state, cp.SensorAddress)
 				if sensor != NilSensor {
 					// if (hasVaildTemp(sensor)) {
-					if cp.HasDuty {						
+					if cp.HasDuty {
 						cp.Duty = Min(cp.MaxDuty, pid.GetDuty(&cp.pid, cp.TargetTemp, sensor.TemperatureC))
 						// log.Printf("Target %v but at %v duty: %v\n", cp.TargetTemp, sensor.TemperatureC,cp.Duty)
 					} else {
+
+						newDuty := int32(0)
 						if sensor.TemperatureC < cp.TargetTemp {
-							cp.Duty = 100
-						} else {
-							cp.Duty = 0
+							newDuty = 100
+						}
+						if newDuty != cp.Duty {
+							// Only change state if > MinStateChangeSeconds since last
+							now := millis()
+							timeSinceLast := millis() - cp.LastStateChangeTime
+							if timeSinceLast/1000 > uint64(cp.MinStateChangeSeconds) {
+								cp.LastStateChangeTime = now
+								cp.Duty = newDuty
+							}
 						}
 					}
 				} else {
