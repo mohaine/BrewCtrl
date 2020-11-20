@@ -132,7 +132,7 @@ export default class QuickPick extends Component {
                         fontWeight: 'bold',
                         width: "120px",
                         textAlign: "center",
-                        marginLeft: "3px;"
+                        marginLeft: "3px"
                        }}
           >{formatValue(this.state.value)}</div>
           <button style={{

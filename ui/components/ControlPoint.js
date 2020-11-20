@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import { createManualStep, findControlByIo, findTargetByAddress } from '../util/step'
 import { formatTemp, convertF2C, formatTempWhole } from '../util/tempature'
 import QuickPickTemp from '../components/QuickPickTemp'
+import QuickPickPercent from '../components/QuickPickPercent'
 import { overlayControlPoint } from '../util/step'
 
 
@@ -11,8 +12,14 @@ export default class ControlPoint extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      editTargetTemp: false
+      editTargetTemp: false,
+      editMaxDuty: false
     }
+  }
+
+  updateMaxDuty(temp) {
+    let { step, controlPoint, requestUpdateStep } = this.props
+    requestUpdateStep(overlayControlPoint(step.rawStep, Object.assign({}, controlPoint, { MaxDuty: temp })));
   }
   updateTargetTemp(temp) {
     let { step, controlPoint, requestUpdateStep } = this.props
@@ -44,10 +51,16 @@ export default class ControlPoint extends Component {
 
     let { configuration, controlPoint, status } = this.props
 
+    console.log(controlPoint)
+
     let whatToControl = findControlByIo(configuration, controlPoint.controlIo)
     if (!whatToControl) {
       whatToControl = {}
     }
+
+
+    let hasDuty = controlPoint.hasDuty
+    let maxDuty = controlPoint.MaxDuty
 
     let sensorAddress = controlPoint.tempSensorAddress
 
@@ -80,6 +93,7 @@ export default class ControlPoint extends Component {
 
     return (<div>
       {this.state.editTargetTemp && (<QuickPickTemp close={() => {this.setState({editTargetTemp:false})}} apply={(value) => { this.updateTargetTemp(value) }} value={targetTemp}/>)}
+      {this.state.editMaxDuty && (<QuickPickPercent close={() => {this.setState({editMaxDuty:false})}} apply={(value) => { this.updateMaxDuty(value) }} value={maxDuty}/>)}
 
       <li className="list-group-item">
         <strong>{whatToControl.name}</strong>
@@ -95,6 +109,12 @@ export default class ControlPoint extends Component {
         {automaticControl && (<span>
           <span></span><span> at <text className="clickable" onClick={() => this.setState({ editTargetTemp: true })}> {formatTempWhole(targetTemp)} </text></span> <span></span>
         </span>)}
+
+        { hasDuty && (<span>
+          <span></span><span> Max Power: <text className="clickable" onClick={() => this.setState({ editMaxDuty: true })}> {maxDuty} </text> %</span> <span></span>
+        </span>)}
+
+
       </li>
     </div>)
   }

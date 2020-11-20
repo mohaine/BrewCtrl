@@ -9,7 +9,6 @@ export default class QuickPickTemp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      editTargetTemp: false
     }
   }
  

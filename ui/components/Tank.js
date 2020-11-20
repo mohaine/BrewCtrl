@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import {formatTemp,convertF2C,formatTempWhole} from '../util/tempature'
 import QuickPick from '../components/QuickPick'
 import QuickPickTemp from '../components/QuickPickTemp'
+import QuickPickPercent from '../components/QuickPickPercent'
 
 import {overlayControlPoint} from '../util/step'
 
@@ -44,38 +45,18 @@ export default class Tank extends Component {
     let sensor = tank ? tank.sensor : undefined;
     let heater = tank ? tank.heater : undefined;
 
-    let dutyQuickPickItems = [
-      {value:0,text:"0%"},
-      {value:33,text:"33%"},
-      {value:66,text:"66%"},
-      {value:100,text:"100%"},
-    ];
+
+    let extraItems = []
     if(heater  && sensor){
-      dutyQuickPickItems.push({value:"AUTO",text:"Auto"});
+      extraItems.push({value:"AUTO",text:"Auto"});
     }
 
     return (<div>
         {this.state.editTargetTemp && (<QuickPickTemp close={() => {this.setState({editTargetTemp:false})}} apply={(value) => { this.updateTargetTemp(value) }} value={heater.targetTemp}/>)}
 
-        { this.state.editElementDuty && (<QuickPick close={()=>{this.setState({editElementDuty: false })}}
-        apply={(value)=>{this.updateElementDuty(value)}}
-        quickPickValues={ dutyQuickPickItems}
-        increment={(value,up)=>{
-          if(value == 'AUTO'){
-            return up? 0: 100;
-          }
-          let newValue = value + (up?1:-1)
-          if(newValue<0) newValue = 0;
-          if(newValue>100) newValue = 100;
-          return newValue;
-        }}
-        value={heater.automaticControl? "AUTO" : heater.duty}
-        formatValue={(duty)=>{
-          if(duty == 'AUTO'){
-            return 'Auto'
-          }
-          return duty + "%"}}
-        />)}
+        { this.state.editElementDuty && (<QuickPickPercent close={()=>{this.setState({editElementDuty: false })}} apply={(value)=>{this.updateElementDuty(value)}}
+            value={heater.automaticControl? "AUTO" : heater.duty} extraItems={extraItems}
+          />)}
 
 
         { tank && (
