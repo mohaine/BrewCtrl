@@ -20,33 +20,6 @@ The above are very simualar to the dafault Raspbian images.  For install instruc
 https://www.raspberrypi.org/documentation/raspbian/
 
 
-# To install to Raspberry Pi - Manual Install
-
-Write base system image to SD Card (These directions are for RASPBIAN STRETCH LITE)
-
-Boot to system
-
-run  "sudo raspi-config"
-   1) Setup WIFI if needed (Network Options)
-   2) Change Hostname to brewctrl (Network Options)
-   3) Enable SSH (Interface Options)
-   4) Enable 1-Wire (Interface Options)
-
-
-Build and install on Raspbian:
-
-    sudo apt-get update && sudo apt-get install git golang npm -y
-    git clone https://github.com/mohaine/BrewCtrl.git ~/brewctrl
-    cd ~/brewctrl
-    ./rpi-install.sh
-
-If using a minimal install, and you would like to run in kiosk mode:
-
-    apt-get install chromium-browser unclutter lightdm lwm
-    cp .Xsession ~/
-
-
-
 # To Develop on a Desktop Machine
     
     npm install
