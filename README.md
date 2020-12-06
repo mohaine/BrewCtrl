@@ -4,7 +4,19 @@
 Software for automated brew mash control
 -------------
 
-# To install to Raspberry Pi
+# Raspberry Pi Images
+
+Strandard Raspberry Pi images can be downloaded from here:
+
+https://www.graessle.net/beer/brewctrl/releases/
+
+There are two flavors:
+
+    1) headless - Brings up web server UI only.  Meant for use only remotely via other devices on network
+    2) kiosk - Same as above, but also boots directly into a Chromium with UI loaded.
+
+
+# To install to Raspberry Pi - Manual Install
 
 Write base system image to SD Card (These directions are for RASPBIAN STRETCH LITE)
 

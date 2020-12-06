@@ -82,7 +82,7 @@ export default class Step extends Component {
 
           <div className="container-fluid">
             <div className="row">
-              {step.pumps.map(pump => (<div key={pump.id} className="col-sm-2 col-md-2 col-lg-1"><Pump step={step} pump={pump} requestUpdateStep={requestUpdateStep} /></div>))}
+              {step.pumps.map(pump => (<div key={pump.id} className="col-sm-3 col-md-3 col-lg-2"><Pump step={step} pump={pump} requestUpdateStep={requestUpdateStep} /></div>))}
             </div>
           </div>
 
