@@ -64,7 +64,7 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration, i
 			select {
 			case <-tickDuty:
 				sensors := readSensors()
-				StateUpdateSensors(&state, sensors)
+				StateUpdateSensors(cfg, &state, sensors)
 				SelectReadingSensors(&cfg, &state, sensors)
 				StateUpdateDuty(&state)
 			case <-tickUpdateTimes:

@@ -39,7 +39,10 @@ app.get('/', function(req, res) {
 app.use(express.static('web'));
 
 app.get("/brewctrl/*", function(req, res) {
-    res.sendFile(__dirname + '/web/brewctrl/index.html')
+
+    baseDir = __dirname.replace("/ui","")
+
+    res.sendFile(baseDir + '/web/brewctrl/index.html')
 })
 
 app.get('*', function(req, res) {

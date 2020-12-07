@@ -1,11 +1,19 @@
 
 import React, { Component, PropTypes } from 'react'
 
-import { formatTemp } from '../util/tempature'
+import { formatTemp, scaleC2F, scaleF2C, round } from '../util/tempature'
 import ContentEditable from '../components/ContentEditable'
-
+ 
 
 export default class Sensor extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      correctionC: props.sensor.correctionC,
+    }
+  }
+
 
   overlayUpdate(overlay) {
 
@@ -33,9 +41,15 @@ export default class Sensor extends Component {
       requestUpdateConfiguration(newConfig)
       this.updateCfgTimer = undefined;
     }, 500);
-
-
   }
+
+
+  updateCorrection(correction) {
+    let correctionC = scaleF2C(parseFloat(correction))
+    this.setState({ correctionC })
+    this.overlayUpdate({ correctionC });
+  }
+
 
   updateName(name) {
     this.overlayUpdate({ name });
@@ -48,6 +62,8 @@ export default class Sensor extends Component {
 
   render() {
     let { sensor, configuration } = this.props
+    let { correctionC } = this.state
+
 
     let tankNames = Array.from(new Set(configuration.brewLayout.tanks.map(tank => tank.name)));
 
@@ -63,9 +79,12 @@ export default class Sensor extends Component {
               <option value=""></option>
               {tankNames.map(tank => (<option key={tank} value={tank} >{tank}</option>))}
             </select>
+
+            <span> with correction: </span><input type="number" min="-100" max="100" step="0.1" value={round(scaleC2F(correctionC),1)} onChange={(e) => this.updateCorrection(e.target.value)} style={{ width: "4em" }} />
+
             <span>
               <span> and is </span>
-              {sensor.reading && (<span> reading {formatTemp(sensor.temperatureC)}</span>)}
+              {sensor.reading && (<span> reading {formatTemp(sensor.temperatureC)} with correction</span>)}
               {!sensor.reading && (<span> not currently reading</span>)}
             </span>
           </div>

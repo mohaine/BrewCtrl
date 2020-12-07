@@ -61,9 +61,10 @@ function buildBreweryView(status,configuration){
       let sensors = status.sensors.map(s=>{
         let cfgSesnsor = configuration.sensors.find(cs=>s.address === cs.address);
         let name = cfgSesnsor ? cfgSesnsor.name : "";
+        let correctionC = cfgSesnsor ? cfgSesnsor.correctionC : 0.0;
         let location = cfgSesnsor ? cfgSesnsor.location : "";
         return Object.assign({}, s, {
-          location, name
+          location, name, correctionC
         });
       });
 

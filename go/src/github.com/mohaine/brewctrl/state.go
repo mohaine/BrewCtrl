@@ -19,6 +19,7 @@ const MODE_HOLD = "HOLD"
 const MODE_HEAT_OFF = "HEAT_OFF"
 
 var NilSensor = Sensor{Address: "", TemperatureC: 0, Reading: false}
+var NilSensorConfig = SensorConfig{Address: "", Name: "", Location: "", CorrectionC: 0}
 
 type Sensor struct {
 	Address      string  `json:"address,omitempty"`
@@ -130,17 +131,29 @@ func createControlPoint(io int32, hasDuty bool, minStateChangeSeconds int32, ful
 	return
 }
 
-func StateUpdateSensors(state *State, sensorReadings []onewire.TempReading) {
+func StateUpdateSensors(cfg Configuration, state *State, sensorReadings []onewire.TempReading) {
 	var sensors []Sensor
 	for i := range sensorReadings {
 		reading := sensorReadings[i]
+		sensorCfg := FindSensorConfig(cfg,reading.Id)
 		var sensor Sensor
 		sensor.Address = reading.Id
-		sensor.TemperatureC = reading.TempC()
+		sensor.TemperatureC = reading.TempC() + sensorCfg.CorrectionC
 		sensor.Reading = true
 		sensors = append(sensors, sensor)
 	}
 	state.Sensors = sensors
+}
+
+
+func FindSensorConfig(cfg Configuration, address string) SensorConfig {
+	for i := range cfg.Sensors {
+		sensor := cfg.Sensors[i]
+		if sensor.Address == address {
+			return sensor
+		}
+	}
+	return NilSensorConfig
 }
 
 func FindSensor(state *State, address string) Sensor {
