@@ -59,10 +59,6 @@ export default class StepList extends Component {
       <ul className="nav nav-tabs">
         {steps && (steps.map(step => {
           let activeStep = selectedStepId === step.id;
-          if(activeStep){
-            console.log("activeStep: ",step)
-          }
-
           let stepName = step.name
 
           return (
