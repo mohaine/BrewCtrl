@@ -59,14 +59,19 @@ export default class StepList extends Component {
       <ul className="nav nav-tabs">
         {steps && (steps.map(step => {
           let activeStep = selectedStepId === step.id;
+          if(activeStep){
+            console.log("activeStep: ",step)
+          }
+
+          let stepName = step.name
 
           return (
-            <li className="nav-item  clickable" onClick={() => { selectStepById(step.id) }} >
+            <li key={step.id} className="nav-item  clickable" onClick={() => { selectStepById(step.id) }} >
 
               <span className={"nav-link" + (activeStep ? " active" : "")}>
                 <span>
-                  {activeStep && (<ContentEditable onChange={(e) => this.updateName(step, e.target.value)} html={step.name} />)}
-                  {!activeStep && (<span>{step.name}</span>)}
+                  {activeStep && (<ContentEditable onChange={(e) => this.updateName(step, e.target.value)} html={stepName} />)}
+                  {!activeStep && (<span>{stepName}</span>)}
                 </span>
                 {requestRemoveStep && (<strong className="hoverable" onClick={() => requestRemoveStep(step.rawStep)} style={{ float: "right", padding: "0px 4px 0px 4px", marginLeft: "20px" }}> &#215; </strong>)}
               </span>

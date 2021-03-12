@@ -33,7 +33,7 @@ export default class ControlPoints extends Component {
       <div className="container-fluid">
         <ul className="list-group" style={{ width: "30em" }}>
           {controlPoints && (controlPoints.map(cp => (
-            <ControlPoint configuration={configuration} controlPoint={cp} step={selectedStep} status={status} requestUpdateStep={requestUpdateStep} />
+            <ControlPoint key={cp.controlIo} configuration={configuration} controlPoint={cp} step={selectedStep} status={status} requestUpdateStep={requestUpdateStep} />
           )))}
         </ul>
       </div>

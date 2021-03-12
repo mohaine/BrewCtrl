@@ -30,8 +30,8 @@ export default class Brewery extends Component {
           <div style={{ paddingTop: "3px" }}></div>
           <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById} requestUpdateStep={requestUpdateStep} requestUpdateStepList={requestUpdateStepList} configuration={configuration} requestRemoveStep={requestRemoveStep} requestUpdateConfiguration={requestUpdateConfiguration} />
 
-          <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+          <div className="tab-content" id="nav-tabContent">
+            <div className="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
               {step && (
                 <div className="row">
                   <div key={step.id} className="col-sm-12 col-md-12 col-lg-12"><Step step={step} requestUpdateStep={requestUpdateStep} /></div>
