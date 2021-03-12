@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import Footer from './Footer'
 import Header from '../containers/Header'
 import Default from '../components/Default'

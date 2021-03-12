@@ -1,9 +1,9 @@
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
 import { formatTemp, scaleC2F, scaleF2C, round } from '../util/tempature'
 import ContentEditable from '../components/ContentEditable'
- 
+
 
 export default class Sensor extends Component {
 
@@ -80,7 +80,7 @@ export default class Sensor extends Component {
               {tankNames.map(tank => (<option key={tank} value={tank} >{tank}</option>))}
             </select>
 
-            <span> with correction: </span><input type="number" min="-100" max="100" step="0.1" value={round(scaleC2F(correctionC),1)} onChange={(e) => this.updateCorrection(e.target.value)} style={{ width: "4em" }} />
+            <span> with correction: </span><input type="number" min="-100" max="100" step="0.1" value={round(scaleC2F(correctionC), 1)} onChange={(e) => this.updateCorrection(e.target.value)} style={{ width: "4em" }} />
 
             <span>
               <span> and is </span>

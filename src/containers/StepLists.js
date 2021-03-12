@@ -1,15 +1,14 @@
 import { connect } from 'react-redux'
-import { changeMode } from '../actions/status.js'
-import { requestConfiguration,requestUpdateConfiguration} from '../actions/configuration.js'
-import { requestStatus,updateStepList } from '../actions/status.js'
+import { requestUpdateConfiguration } from '../actions/configuration.js'
+import { updateStepList } from '../actions/status.js'
 
 import Component from '../components/StepLists'
 
 const mapStateToProps = (state) => {
-  let stepLists = state.server.configuration ?  state.server.configuration.stepLists : undefined;
+  let stepLists = state.server.configuration ? state.server.configuration.stepLists : undefined;
   return {
     stepLists,
-    configuration: state.server.configuration ,
+    configuration: state.server.configuration,
     status: state.server.status
   }
 }

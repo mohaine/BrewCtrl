@@ -1,12 +1,10 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
 import { formatTime, formatTimeMinutes } from '../util/date'
 
 import Tank from '../components/Tank'
 import Pump from '../components/Pump'
-import Mode from '../containers/Mode'
 import QuickPick from '../components/QuickPick'
-import ContentEditable from '../components/ContentEditable'
 import { generateAlpahId } from '../util/id'
 
 export default class Step extends Component {
@@ -46,7 +44,7 @@ export default class Step extends Component {
       return { value: seconds * 60, text: formatTimeMinutes(seconds * 60) };
     }
 
-    let { step, requestUpdateStep, requestRemoveStep } = this.props
+    let { step, requestUpdateStep } = this.props
     return (<div>
       {step && (
         <div>

@@ -1,6 +1,6 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
-import { createManualStep, findControlByIo, findTargetByAddress } from '../util/step'
+import { createManualStep } from '../util/step'
 import ControlPoint from '../components/ControlPoint'
 
 
@@ -19,9 +19,9 @@ export default class ControlPoints extends Component {
 
   render() {
 
-    let { configuration, steps, status, selectedStepId, selectStepById, requestUpdateStep } = this.props
+    let { configuration, steps, status, selectedStepId, requestUpdateStep } = this.props
 
-    let selectedStep = steps.find((s) => s.id == selectedStepId)
+    let selectedStep = steps.find((s) => s.id === selectedStepId)
     let controlPoints = []
 
     if (selectedStep && selectedStep.rawStep) {
@@ -31,7 +31,7 @@ export default class ControlPoints extends Component {
 
     return (
       <div className="container-fluid">
-        <ul className="list-group" style={{width: "30em"}}>
+        <ul className="list-group" style={{ width: "30em" }}>
           {controlPoints && (controlPoints.map(cp => (
             <ControlPoint configuration={configuration} controlPoint={cp} step={selectedStep} status={status} requestUpdateStep={requestUpdateStep} />
           )))}

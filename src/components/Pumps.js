@@ -1,7 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
-import { formatTemp } from '../util/tempature'
-import ContentEditable from '../components/ContentEditable'
 import PumpEdit from '../components/PumpEdit'
 import { emptyGpios } from '../util/gpio'
 

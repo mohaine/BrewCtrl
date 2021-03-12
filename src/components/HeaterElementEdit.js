@@ -1,9 +1,7 @@
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
-import { formatTemp } from '../util/tempature'
 import { emptyGpios } from '../util/gpio'
-import ContentEditable from '../components/ContentEditable'
 
 
 export default class HeaterElementEdit extends Component {
@@ -96,9 +94,9 @@ export default class HeaterElementEdit extends Component {
         Element control is <select onChange={(e) => this.updateGpio(e.target.value)} value={control.io}>
           {gpios.map(io => (<option key={io} value={io}>GPIO {io}</option>))}
         </select>
-                <span> Amps: </span><input type="number" value={fullOnAmps} onChange={(e) => this.updateFullOnAmps(e.target.value)} style={{ width: "3em" }} />
-                <span> Max Duty: </span><input type="number" min="1" max="100" value={maxDuty} onChange={(e) => this.updateMaxDuty(e.target.value)} style={{ width: "4em" }} />
-                <span> Has Duty: </span><input type="checkbox" checked={hasDuty} onChange={(e) => this.updateHasDuty(e.target.checked)} style={{ width: "3em" }} />
+        <span> Amps: </span><input type="number" value={fullOnAmps} onChange={(e) => this.updateFullOnAmps(e.target.value)} style={{ width: "3em" }} />
+        <span> Max Duty: </span><input type="number" min="1" max="100" value={maxDuty} onChange={(e) => this.updateMaxDuty(e.target.value)} style={{ width: "4em" }} />
+        <span> Has Duty: </span><input type="checkbox" checked={hasDuty} onChange={(e) => this.updateHasDuty(e.target.checked)} style={{ width: "3em" }} />
         <button className="btn btn-default" onClick={() => this.remove()}>Remove Element</button>
       </div>
     </div>)

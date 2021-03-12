@@ -1,7 +1,7 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
-import { createManualStep, findControlByIo, findTargetByAddress } from '../util/step'
-import { formatTemp, convertF2C, formatTempWhole } from '../util/tempature'
+import { findControlByIo, findTargetByAddress } from '../util/step'
+import { formatTempWhole } from '../util/tempature'
 import QuickPickTemp from '../components/QuickPickTemp'
 import QuickPickPercent from '../components/QuickPickPercent'
 import { overlayControlPoint } from '../util/step'
@@ -64,20 +64,8 @@ export default class ControlPoint extends Component {
 
     let automaticControl = !!sensorAddress
 
-    let targetName = ""
     let targetTemp = ""
     if (automaticControl) {
-      let target = findTargetByAddress(configuration, sensorAddress)
-      if (target) {
-        targetName = target.name
-      } else {
-        let targetSensor = status.sensors.find(s => s.address == sensorAddress)
-        if (targetSensor) {
-          targetName = this.findSensorName(targetSensor)
-        } else {
-          targetName = sensorAddress
-        }
-      }
       targetTemp = controlPoint.targetTemp
     }
 
@@ -90,8 +78,8 @@ export default class ControlPoint extends Component {
     }
 
     return (<div>
-      {this.state.editTargetTemp && (<QuickPickTemp close={() => {this.setState({editTargetTemp:false})}} apply={(value) => { this.updateTargetTemp(value) }} value={targetTemp}/>)}
-      {this.state.editMaxDuty && (<QuickPickPercent close={() => {this.setState({editMaxDuty:false})}} apply={(value) => { this.updateMaxDuty(value) }} value={maxDuty}/>)}
+      {this.state.editTargetTemp && (<QuickPickTemp close={() => { this.setState({ editTargetTemp: false }) }} apply={(value) => { this.updateTargetTemp(value) }} value={targetTemp} />)}
+      {this.state.editMaxDuty && (<QuickPickPercent close={() => { this.setState({ editMaxDuty: false }) }} apply={(value) => { this.updateMaxDuty(value) }} value={maxDuty} />)}
 
       <li className="list-group-item">
         <strong>{whatToControl.name}</strong>
@@ -108,7 +96,7 @@ export default class ControlPoint extends Component {
           <span></span><span> at <span className="clickable" onClick={() => this.setState({ editTargetTemp: true })}> {formatTempWhole(targetTemp)} </span></span> <span></span>
         </span>)}
 
-        { hasDuty && (<span>
+        {hasDuty && (<span>
           <span></span><span> Max Power: <span className="clickable" onClick={() => this.setState({ editMaxDuty: true })}> {maxDuty} </span> %</span> <span></span>
         </span>)}
 

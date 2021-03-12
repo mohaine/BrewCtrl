@@ -30,3 +30,12 @@ button.down {
 	color: white;
 }
 
+.clickable_link {
+	background: none!important;
+	border: none;
+	padding: 0!important;
+	font-family: arial, sans-serif;
+	color: #069;
+	text-decoration: underline;
+	cursor: pointer;
+  }

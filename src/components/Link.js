@@ -1,15 +1,14 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
 
 const Link = ({ className, children, onClick }) => {
   return (
-    <a className={className} href="#"
-       onClick={e => {
-         e.preventDefault()
-         onClick()
-       }}
+    <span className={className + " clickable_link"} style={{cursor:"pointer"}}
+      onClick={e => {
+        onClick()
+      }}
     >
       {children}
-    </a>
+    </span>
   )
 }
 

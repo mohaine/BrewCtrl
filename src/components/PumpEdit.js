@@ -1,7 +1,6 @@
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
-import { formatTemp } from '../util/tempature'
 import { emptyGpios } from '../util/gpio'
 import ContentEditable from '../components/ContentEditable'
 
@@ -23,7 +22,7 @@ export default class PumpEdit extends Component {
         return control;
       });
     } else if (remove) {
-      pumps = pumps.filter(control => control.id != this.props.control.id)
+      pumps = pumps.filter(control => control.id !== this.props.control.id)
     }
 
     // Create new object tree
@@ -68,7 +67,7 @@ export default class PumpEdit extends Component {
             <strong className="hoverable" onClick={() => this.remove()} style={{ float: "right", padding: "0px 4px 0px 4px", marginLeft: "20px" }}> &#215; </strong>
           </h5>
           <div>
-          Pump control is  <select onChange={(e) => this.updateGpio(e.target.value)} value={control.io}>
+            Pump control is  <select onChange={(e) => this.updateGpio(e.target.value)} value={control.io}>
               <option value=""></option>
               {gpios.map(io => (<option key={io} value={io}>GPIO {io}</option>))}
             </select>

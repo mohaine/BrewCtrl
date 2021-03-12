@@ -1,34 +1,33 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
 import Step from '../components/Step'
-import Sensors from '../components/Sensors'
 import StepList from '../components/StepList'
 import ControlPoints from '../components/ControlPoints'
 
 
 export default class Brewery extends Component {
   componentDidMount() {
-    let { brewery, requestState, requestStateStatus } = this.props
+    let { brewery, requestState } = this.props
     if (!brewery) {
       requestState();
     }
   }
   render() {
-    let { brewery, status, requestState, requestStateStatus, requestUpdateStep, configuration, requestUpdateConfiguration, requestUpdateStepList, selectedStepId, selectStepById } = this.props
+    let { brewery, status, requestStateStatus, requestUpdateStep, configuration, requestUpdateConfiguration, requestUpdateStepList, selectedStepId, selectStepById } = this.props
 
     let requestRemoveStep = (step) => {
       let rawSteps = brewery ? brewery.steps.map(s => s.rawStep) : [];
       rawSteps = rawSteps.filter(s => s !== step)
       requestUpdateStepList(rawSteps);
     }
-    let step = brewery ? brewery.steps.find(s => s.id == selectedStepId) : undefined;
+    let step = brewery ? brewery.steps.find(s => s.id === selectedStepId) : undefined;
 
     return (<div>
 
       {!brewery && requestStateStatus && requestStateStatus.active && (<div>Loading state</div>)}
       {brewery && (
         <div>
-          <div style={{paddingTop: "3px"}}></div>
+          <div style={{ paddingTop: "3px" }}></div>
           <StepList steps={brewery.steps} selectedStepId={selectedStepId} selectStepById={selectStepById} requestUpdateStep={requestUpdateStep} requestUpdateStepList={requestUpdateStepList} configuration={configuration} requestRemoveStep={requestRemoveStep} requestUpdateConfiguration={requestUpdateConfiguration} />
 
           <div class="tab-content" id="nav-tabContent">

@@ -1,5 +1,5 @@
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 
 import ContentEditable from '../components/ContentEditable'
 import HeaterElementEdit from '../components/HeaterElementEdit'
@@ -22,9 +22,9 @@ export default class Tank extends Component {
         return tank;
       });
     } else if (remove) {
-      tanks = tanks.filter(tank => tank.id != this.props.tank.id)
+      tanks = tanks.filter(tank => tank.id !== this.props.tank.id)
     } else if (addElement) {
-      tanks = tanks.filter(tank => tank.id != this.props.tank.id)
+      tanks = tanks.filter(tank => tank.id !== this.props.tank.id)
     }
 
     // Create new object tree
@@ -55,7 +55,7 @@ export default class Tank extends Component {
   addElement() {
     let { tank } = this.props;
 
-    let { configuration, requestUpdateConfiguration } = this.props
+    let { configuration } = this.props
     let io = emptyGpios(configuration)[0];
     this.overlayUpdate({ heater: { name: tank.name + " Heater", io, hasDuty: true, invertIo: false, fullOnAmps: 0 } });
   }

@@ -7,21 +7,21 @@ import RequestStatus from './RequestStatus'
 let statusLoadInterval = undefined;
 
 export const cancelStatusLoad = () => {
-  if(statusLoadInterval){
-    clearInterval(statusLoadInterval);
-    statusLoadInterval = undefined;
-  }
+    if (statusLoadInterval) {
+        clearInterval(statusLoadInterval);
+        statusLoadInterval = undefined;
+    }
 }
 const rescheduleStatusLoad = (dispatch) => {
     cancelStatusLoad();
     startStatusLoad(dispatch);
 }
 const startStatusLoad = (dispatch) => {
-  if(!statusLoadInterval){
-    statusLoadInterval = setInterval(()=>{
-      dispatch(requestStatusNoSchedule());
-    }, 5000);
-  }
+    if (!statusLoadInterval) {
+        statusLoadInterval = setInterval(() => {
+            dispatch(requestStatusNoSchedule());
+        }, 5000);
+    }
 }
 
 
@@ -33,18 +33,18 @@ export const updateStepList = (steps) => {
             type: 'REQUEST_CHANGE_STEPLIST',
             status: status.copy()
         });
-        return axios( {
-                method: 'POST',
-                url: buildUrl('/cmd/status'),
-                headers: {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
-                data: data
-            })
+        return axios({
+            method: 'POST',
+            url: buildUrl('/cmd/status'),
+            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+            data: data
+        })
             .then(json => {
-              dispatch({
-                  type: "SUCCESS_CHANGE_STEPLIST",
-                  status: status.success()
-              })
-              dispatch(statusMsg(status,json))
+                dispatch({
+                    type: "SUCCESS_CHANGE_STEPLIST",
+                    status: status.success()
+                })
+                dispatch(statusMsg(status, json))
             }).catch(e => {
                 dispatch({
                     type: "ERROR_CHANGE_STEPLIST",
@@ -63,18 +63,18 @@ export const updateStep = (step) => {
             type: 'REQUEST_CHANGE_STEP',
             status: status.copy()
         });
-        return axios( {
-                method: 'POST',
-                url: buildUrl('/cmd/status'),
-                headers: {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
-                data: data
-            })
+        return axios({
+            method: 'POST',
+            url: buildUrl('/cmd/status'),
+            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+            data: data
+        })
             .then(json => {
-              dispatch({
-                  type: "SUCCESS_CHANGE_STEP",
-                  status: status.success()
-              })
-              dispatch(statusMsg(status,json))
+                dispatch({
+                    type: "SUCCESS_CHANGE_STEP",
+                    status: status.success()
+                })
+                dispatch(statusMsg(status, json))
             }).catch(e => {
                 dispatch({
                     type: "ERROR_CHANGE_STEP",
@@ -95,18 +95,18 @@ export const changeMode = (mode) => {
             type: 'REQUEST_CHANGE_MODE',
             status: status.copy()
         });
-        return axios( {
-                method: 'POST',
-                url: buildUrl('/cmd/status'),
-                headers: {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
-                data: data
-            })
+        return axios({
+            method: 'POST',
+            url: buildUrl('/cmd/status'),
+            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+            data: data
+        })
             .then(json => {
                 dispatch({
                     type: "SUCCESS_CHANGE_MODE",
                     status: status.success()
                 })
-                dispatch(statusMsg(status,json))
+                dispatch(statusMsg(status, json))
 
             }).catch(e => {
                 dispatch({
@@ -117,12 +117,12 @@ export const changeMode = (mode) => {
     }
 }
 
-function statusMsg(status,json){
-  return {
-      type: "RECEIVE_STATUS",
-      status: status.success(),
-      data: json.data
-  };
+function statusMsg(status, json) {
+    return {
+        type: "RECEIVE_STATUS",
+        status: status.success(),
+        data: json.data
+    };
 }
 
 
@@ -137,7 +137,7 @@ let requestStatusNoSchedule = (onComplete) => {
         });
         return axios.get(buildUrl('/cmd/status'))
             .then(json => {
-                dispatch(statusMsg(status,json))
+                dispatch(statusMsg(status, json))
                 if (onComplete) {
                     onComplete();
                 }
@@ -153,7 +153,6 @@ let requestStatusNoSchedule = (onComplete) => {
 
 
 export const requestStatus = (onComplete) => {
-    let status = new RequestStatus();
     return dispatch => {
         rescheduleStatusLoad(dispatch);
 
