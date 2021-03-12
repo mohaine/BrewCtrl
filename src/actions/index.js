@@ -1,6 +1,7 @@
 
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
+import {config} from '../config'
 
 
 export const userErrorMessage = (e,defaultMessage) => {
@@ -15,16 +16,14 @@ export const userErrorMessage = (e,defaultMessage) => {
 }
 
 export const buildUrl = (relative) => {
-    return document.location.protocol +"//"+ document.location.host + relative
+    //return document.location.protocol +"//"+ document.location.host + relative
+    return config.baseUrl + relative
 };
 
-export const viewDashboard = () => {
-    return dispatch => {
-        dispatch(push('/msp/dashboard'))
-    }
-}
+
 export const viewRoute = (path) => {
-    return dispatch => {
+  console.log("Dispatch " + path)
+  return dispatch => {
         dispatch(push('/brewctrl/' + path))
     }
 }

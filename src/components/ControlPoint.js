@@ -51,8 +51,6 @@ export default class ControlPoint extends Component {
 
     let { configuration, controlPoint, status } = this.props
 
-    console.log(controlPoint)
-
     let whatToControl = findControlByIo(configuration, controlPoint.controlIo)
     if (!whatToControl) {
       whatToControl = {}
@@ -107,11 +105,11 @@ export default class ControlPoint extends Component {
         </select>
 
         {automaticControl && (<span>
-          <span></span><span> at <text className="clickable" onClick={() => this.setState({ editTargetTemp: true })}> {formatTempWhole(targetTemp)} </text></span> <span></span>
+          <span></span><span> at <span className="clickable" onClick={() => this.setState({ editTargetTemp: true })}> {formatTempWhole(targetTemp)} </span></span> <span></span>
         </span>)}
 
         { hasDuty && (<span>
-          <span></span><span> Max Power: <text className="clickable" onClick={() => this.setState({ editMaxDuty: true })}> {maxDuty} </text> %</span> <span></span>
+          <span></span><span> Max Power: <span className="clickable" onClick={() => this.setState({ editMaxDuty: true })}> {maxDuty} </span> %</span> <span></span>
         </span>)}
 
 

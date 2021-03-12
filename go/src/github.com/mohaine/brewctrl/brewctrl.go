@@ -14,6 +14,10 @@ import (
 	"github.com/mohaine/onewire"
 )
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 var CFG_FILE = "cfg.json"
 var CFG_FILE_OLD = "BrewControllerConfig.json"
 
@@ -99,6 +103,9 @@ func main() {
 			log.Println("error:", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
+		if *mock {
+			enableCors(&w)
+		}
 		w.Write(j)
 	})
 	http.HandleFunc("/cmd/configuration", func(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +133,9 @@ func main() {
 			log.Println("error:", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
-
+		if *mock {
+			enableCors(&w)
+		}
 		var out bytes.Buffer
 		json.Indent(&out, j, "", "  ")
 

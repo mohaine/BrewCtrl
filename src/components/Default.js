@@ -5,6 +5,6 @@ import Configuration from '../containers/Configuration'
 
 export default class Default extends Component {
   render() {
-      return (<Brewery/>)
+      return (<div><Brewery/> </div>)
     }
 }

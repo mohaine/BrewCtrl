@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { push } from 'react-router-redux'
 
 import { buildUrl, userErrorMessage } from '../actions'
 
@@ -21,7 +20,7 @@ const startStatusLoad = (dispatch) => {
   if(!statusLoadInterval){
     statusLoadInterval = setInterval(()=>{
       dispatch(requestStatusNoSchedule());
-    }, 500);
+    }, 5000);
   }
 }
 
