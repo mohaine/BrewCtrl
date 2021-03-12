@@ -1,4 +1,3 @@
-let dispatch = undefined;
 
 function selectStepById(steps, selectedStepId) {
   let selectedStepValid = steps.find(s => s.id === selectedStepId)
@@ -8,10 +7,10 @@ function selectStepById(steps, selectedStepId) {
   return selectedStepId;
 }
 
-export default (state = {}, action) => {
+
+function uiReducer (state = {}, action) {
   switch (action.type) {
     case 'DISPATCH':
-      dispatch = action.dispatch;
       return state;
     case 'SELECT_STEP':
       {
@@ -32,3 +31,6 @@ export default (state = {}, action) => {
       return state
   }
 }
+
+
+export default uiReducer

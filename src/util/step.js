@@ -47,7 +47,7 @@ export const findTargetByAddress = function (configuration, address) {
   brewLayout.tanks.forEach(t => {
     let sensor = t.sensor;
     if (sensor) {
-      if (sensor.address == address) {
+      if (sensor.address === address) {
         target = t
       }
     }
@@ -62,13 +62,13 @@ export const findControlByIo = function (configuration, io) {
   brewLayout.tanks.forEach(t => {
     let heater = t.heater;
     if (heater) {
-      if (heater.io == io) {
+      if (heater.io === io) {
         target = heater
       }
     }
   });
   brewLayout.pumps.forEach(p => {
-    if (p.io == io) {
+    if (p.io === io) {
       target = p
     }
   });

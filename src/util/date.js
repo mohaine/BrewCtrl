@@ -30,7 +30,7 @@ export const parseTime = function(time) {
 }
 
 export const formatTime = (time) => {
-  if (time == 0) {
+  if (time === 0) {
     return "\u221E";
   }
 
@@ -47,7 +47,7 @@ export const formatTime = (time) => {
 
 
 export const formatTimeMinutes = (time) => {
-  if (time == 0) {
+  if (time === 0) {
     return "\u221E";
   }
 

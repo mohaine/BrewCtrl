@@ -5,11 +5,11 @@ export const emptyGpios =  function(configuration){
     let brewLayout = configuration.brewLayout
     if(brewLayout){
       let pumps = brewLayout.pumps;
-      if(pumps.find(p=>p.io == io)){
+      if(pumps.find(p=>p.io === io)){
         return false;
       }
       let tanks = brewLayout.tanks;
-      if(tanks.find(t=>t.heater && t.heater.io == io)){
+      if(tanks.find(t=>t.heater && t.heater.io === io)){
         return false;
       }
     }
