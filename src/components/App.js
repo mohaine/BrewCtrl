@@ -12,10 +12,14 @@ import { Switch, Route } from 'react-router-dom'
 export default class App extends Component {
 
   render() {
+    let { location, route } = this.props
+
+    if (location && location.pathname && !location.pathname.startsWith("/brewctrl")) {
+      route("")
+    }
 
     return (<div><Header />
       <div className="container-fluid">
-
         <Route path="/brewctrl">
           <Switch>
             <Route path="/brewctrl/about"><About /></Route>

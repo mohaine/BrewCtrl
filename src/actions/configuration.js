@@ -6,7 +6,7 @@ import RequestStatus from './RequestStatus'
 
 
 
-export const requestUpdateConfiguration = (configuration,onComplete) => {
+export const requestUpdateConfiguration = (configuration, onComplete) => {
     let status = new RequestStatus();
     let data = "configuration=" + encodeURI(JSON.stringify(configuration));
     return dispatch => {
@@ -14,19 +14,19 @@ export const requestUpdateConfiguration = (configuration,onComplete) => {
             type: 'REQUEST_CHANGE_CONFIGURATION',
             status: status.copy()
         });
-        return axios( {
-                method: 'POST',
-                url: buildUrl('/cmd/configuration'),
-                headers: {"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},
-                data: data
-            })
+        return axios({
+            method: 'POST',
+            url: buildUrl('/cmd/configuration'),
+            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+            data: data
+        })
             .then(json => {
-              dispatch({
-                  type: "SUCCESS_CHANGE_CONFIGURATION",
-                  status: status.success()
-              })
-              dispatch(receiveConfig(status,json))
-              if(onComplete) onComplete();
+                dispatch({
+                    type: "SUCCESS_CHANGE_CONFIGURATION",
+                    status: status.success()
+                })
+                dispatch(receiveConfig(status, json))
+                if (onComplete) onComplete();
             }).catch(e => {
                 dispatch({
                     type: "ERROR_CHANGE_CONFIGURATION",
@@ -36,16 +36,22 @@ export const requestUpdateConfiguration = (configuration,onComplete) => {
     }
 }
 
-function receiveConfig(status,json){
-  return {
-      type: "RECEIVE_CONFIG",
-      status: status.success(),
-      configuration: json.data
-  }
+function receiveConfig(status, json) {
+    return {
+        type: "RECEIVE_CONFIG",
+        status: status.success(),
+        configuration: json.data
+    }
 }
 
+let currentlyRequestingConfiguration = false
 
 export const requestConfiguration = (onComplete) => {
+    if (currentlyRequestingConfiguration) {
+        return { type: 'SKIP' }
+    }
+    currentlyRequestingConfiguration = true
+
     let status = new RequestStatus();
     return dispatch => {
         dispatch({
@@ -54,12 +60,14 @@ export const requestConfiguration = (onComplete) => {
         });
         return axios.get(buildUrl('/cmd/configuration'))
             .then(json => {
-                dispatch(receiveConfig(status,json))
+                currentlyRequestingConfiguration = false
+                dispatch(receiveConfig(status, json))
                 if (onComplete) {
                     onComplete();
                 }
             })
             .catch(e => {
+                currentlyRequestingConfiguration = false
                 dispatch({
                     type: "ERROR_CONFIG",
                     status: status.error(userErrorMessage(e, "Configuration Load Failed"))

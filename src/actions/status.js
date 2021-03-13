@@ -126,10 +126,16 @@ function statusMsg(status, json) {
 }
 
 
-
+let currentlyRequestingStatus = false
 let requestStatusNoSchedule = (onComplete) => {
     let status = new RequestStatus();
     return dispatch => {
+
+        if (currentlyRequestingStatus) {
+            return { type: 'SKIP' }
+        }
+        currentlyRequestingStatus = true
+
         rescheduleStatusLoad(dispatch);
         dispatch({
             type: 'REQUEST_STATUS',
@@ -137,12 +143,14 @@ let requestStatusNoSchedule = (onComplete) => {
         });
         return axios.get(buildUrl('/cmd/status'))
             .then(json => {
+                currentlyRequestingStatus = false
                 dispatch(statusMsg(status, json))
                 if (onComplete) {
                     onComplete();
                 }
             })
             .catch(e => {
+                currentlyRequestingStatus = false
                 dispatch({
                     type: "ERROR_STATUS",
                     status: status.error(userErrorMessage(e, "Status Load Failed"))
@@ -155,7 +163,6 @@ let requestStatusNoSchedule = (onComplete) => {
 export const requestStatus = (onComplete) => {
     return dispatch => {
         rescheduleStatusLoad(dispatch);
-
         requestStatusNoSchedule()(dispatch)
     }
 }

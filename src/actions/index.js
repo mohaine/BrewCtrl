@@ -16,7 +16,6 @@ export const userErrorMessage = (e,defaultMessage) => {
 }
 
 export const buildUrl = (relative) => {
-    //return document.location.protocol +"//"+ document.location.host + relative
     return config.baseUrl + relative
 };
 

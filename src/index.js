@@ -3,19 +3,13 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
 
-import App from './components/App'
+import App from './containers/App'
 import { ConnectedRouter } from 'connected-react-router'
 
 
 import configureStore, { history } from './store/configureStore'
 
 const store = configureStore()
-
-store.dispatch({
-  type: "DISPATCH",
-  dispatch: store.dispatch
-});
-
 
 render(<div>
   <Provider store={store}>

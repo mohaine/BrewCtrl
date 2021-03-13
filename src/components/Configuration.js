@@ -75,7 +75,7 @@ export default class Configuration extends Component {
         <div className="col-6 container">
           <div className="panel panel-default config-upload">
             <div className="panel-title">
-              <label forHtml="configurationToUpload">Select a Configuration File to Upload</label><br />
+              <label forhtml="configurationToUpload">Select a Configuration File to Upload</label><br />
             </div>
             <div className="panel-body">
               <form id="config-upload-form" method="post" action="/cmd/configuration">

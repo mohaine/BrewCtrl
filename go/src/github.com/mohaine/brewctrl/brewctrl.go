@@ -143,7 +143,7 @@ func main() {
 	})
 
 	http.HandleFunc("/brewctrl/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/brewctrl/index.html")
+		http.ServeFile(w, r, "web/index.html")
 	})
 	http.Handle("/", http.FileServer(http.Dir("web/")))
 
