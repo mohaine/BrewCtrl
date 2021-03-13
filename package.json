@@ -16,11 +16,11 @@
     "react-scripts": "4.0.3",
     "axios": "^0.21.1",
     "moment": "^2.29.1",
-    "history": "4.10.1"    
+    "history": "4.10.1"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "echo REACT_APP_VERSION_HASH=`git rev-parse HEAD` > .env.production ; echo REACT_APP_BUILD_TIME=`date`>> .env.production ; react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

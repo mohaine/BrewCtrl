@@ -15,3 +15,5 @@ cfg.json
 bc.code-workspace
 yarn.lock
 build/
+package
+.env.production

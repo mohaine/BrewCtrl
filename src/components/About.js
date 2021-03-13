@@ -19,14 +19,6 @@ export default class About extends Component {
           </div>
           <div className="row">
             <div className="col-md-2">
-              Name
-              </div>
-            <div className="col-md-4">
-              {config.name}
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-2">
               Version Hash
               </div>
             <div className="col-md-4">
