@@ -14,9 +14,6 @@ function getConfig() {
         cfg["logState"] = true
         cfg["baseUrl"] = "http://localhost:2739"
     }
-
-    console.log(cfg)
-
     return cfg
 }
 
