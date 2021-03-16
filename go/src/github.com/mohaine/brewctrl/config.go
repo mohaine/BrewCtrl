@@ -15,10 +15,10 @@ type SensorAddress struct {
 }
 
 type SensorConfig struct {
-	Name     string `json:"name,omitempty"`
+	Name        string  `json:"name,omitempty"`
 	CorrectionC float32 `json:"correctionC,omitempty"`
-	Address  string `json:"address,omitempty"`
-	Location string `json:"location,omitempty"`
+	Address     string  `json:"address,omitempty"`
+	Location    string  `json:"location,omitempty"`
 }
 
 type HeatElement struct {

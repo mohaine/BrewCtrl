@@ -135,7 +135,7 @@ func StateUpdateSensors(cfg Configuration, state *State, sensorReadings []onewir
 	var sensors []Sensor
 	for i := range sensorReadings {
 		reading := sensorReadings[i]
-		sensorCfg := FindSensorConfig(cfg,reading.Id)
+		sensorCfg := FindSensorConfig(cfg, reading.Id)
 		var sensor Sensor
 		sensor.Address = reading.Id
 		sensor.TemperatureC = reading.TempC() + sensorCfg.CorrectionC
@@ -144,7 +144,6 @@ func StateUpdateSensors(cfg Configuration, state *State, sensorReadings []onewir
 	}
 	state.Sensors = sensors
 }
-
 
 func FindSensorConfig(cfg Configuration, address string) SensorConfig {
 	for i := range cfg.Sensors {

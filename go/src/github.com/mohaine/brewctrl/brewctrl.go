@@ -63,6 +63,13 @@ func main() {
 
 	stopControl, getState, getConfig, setMode, modifySteps, modifyConfig := ControlStuff(readSensors, cfg, initIo, turnIoTo)
 
+	hub := newHub()
+	go hub.run(getState)
+
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		serveWs(hub, w, r, getState)
+	})
+
 	http.HandleFunc("/cmd/status", func(w http.ResponseWriter, r *http.Request) {
 		mode := r.FormValue("mode")
 		if len(mode) > 0 {
@@ -109,7 +116,6 @@ func main() {
 		w.Write(j)
 	})
 	http.HandleFunc("/cmd/configuration", func(w http.ResponseWriter, r *http.Request) {
-
 		configurationParam := r.FormValue("configuration")
 		if len(configurationParam) > 0 {
 			var newCfg Configuration

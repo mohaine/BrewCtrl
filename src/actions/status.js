@@ -1,10 +1,13 @@
 import axios from 'axios'
 
 import { buildUrl, userErrorMessage } from '../actions'
-
+import { config } from '../config'
 import RequestStatus from './RequestStatus'
 
+
+
 let statusLoadInterval = undefined;
+
 
 export const cancelStatusLoad = () => {
     if (statusLoadInterval) {
@@ -16,14 +19,27 @@ const rescheduleStatusLoad = (dispatch) => {
     cancelStatusLoad();
     startStatusLoad(dispatch);
 }
+
 const startStatusLoad = (dispatch) => {
+    const client = new WebSocket(config.wsUrl);
+    
+    client.onopen = () => {
+        console.log('WebSocket Client Connected');
+    };
+    client.onmessage = (message) => {
+        console.log("Message*****", message);
+        let status = new RequestStatus();
+        let json = JSON.parse(message.data)
+        console.log(json)
+        dispatch(statusMsg(status, { "data": json }))
+    };
+
     if (!statusLoadInterval) {
         statusLoadInterval = setInterval(() => {
             dispatch(requestStatusNoSchedule());
-        }, 500);
+        }, 500000);
     }
 }
-
 
 export const updateStepList = (steps) => {
     let status = new RequestStatus();

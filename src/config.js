@@ -6,6 +6,7 @@ function getConfig() {
         buildTime: process.env.REACT_APP_BUILD_TIME,
         versionHash: process.env.REACT_APP_VERSION_HASH,
         baseUrl: document.location.protocol + "//" + document.location.host,
+        wsUrl: "ws//" + document.location.host + "/ws",
         logState: false
     }
 
@@ -13,6 +14,7 @@ function getConfig() {
     if (development) {
         cfg["logState"] = true
         cfg["baseUrl"] = "http://localhost:2739"
+        cfg["wsUrl"] = "ws://localhost:2739/ws"
     }
     return cfg
 }

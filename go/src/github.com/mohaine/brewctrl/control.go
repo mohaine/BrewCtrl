@@ -18,7 +18,6 @@ type StepModify struct {
 }
 
 func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration, initIo func(int32), turnIoTo func(int32, bool)) (stopControl func(), getState func() State, getCfg func() Configuration, setMode func(string), modifySteps func(StepModify), modifyCfg func(Configuration)) {
-
 	quit := make(chan int)
 	stopControl = func() { quit <- 1 }
 	tickPins := time.Tick(100 * time.Millisecond)
@@ -55,7 +54,6 @@ func ControlStuff(readSensors func() []onewire.TempReading, cfg Configuration, i
 		requestModifyCfgC <- cfg
 	}
 
-	// TODO load old status?
 	state := StateDefault(cfg, initIo)
 	state.Mode = MODE_OFF
 
