@@ -26,6 +26,7 @@ https://www.raspberrypi.org/documentation/raspbian/
     npm start
     
     export GOPATH=$PWD/go
+    go get github.com/gorilla/websocket
     go run github.com/mohaine/brewctrl --mock --port 2739
 
     load http://localhost:3000/ in your browser
