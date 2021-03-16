@@ -4,7 +4,8 @@ import Component from '../components/Header'
 
 const mapStateToProps = (state) => {
   let lastStatusDate = state.server.lastStatusDate;
-  return {lastStatusDate}
+  let webSocketActive = state.server.webSocketActive;
+  return {lastStatusDate,webSocketActive}
 }
 
 const mapDispatchToProps = (dispatch) => {

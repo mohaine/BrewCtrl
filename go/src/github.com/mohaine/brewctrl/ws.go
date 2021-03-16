@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/json"
 	"github.com/gorilla/websocket"
@@ -37,7 +36,7 @@ func newHub() *Hub {
 
 func (h *Hub) run(getState func() State) {
 
-	tickerStatus := time.NewTicker(200 * time.Millisecond)
+	tickerStatus := time.NewTicker(100 * time.Millisecond)
 	defer func() {
 		tickerStatus.Stop()
 	}()
@@ -120,37 +119,8 @@ type Client struct {
 	send chan []byte
 }
 
-// readPump pumps messages from the websocket connection to the hub.
-//
-// The application runs readPump in a per-connection goroutine. The application
-// ensures that there is at most one reader on a connection by executing all
-// reads from this goroutine.
-func (c *Client) readPump() {
-	defer func() {
-		c.hub.unregister <- c
-		c.conn.Close()
-	}()
-	c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
-	for {
-		_, message, err := c.conn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
-			break
-		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
-	}
-}
 
-// writePump pumps messages from the hub to the websocket connection.
-//
-// A goroutine running writePump is started for each connection. The
-// application ensures that there is at most one writer to a connection by
-// executing all writes from this goroutine.
+
 func (c *Client) writePump(getState func() State) {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -194,7 +164,6 @@ func (c *Client) writePump(getState func() State) {
 
 // serveWs handles websocket requests from the peer.
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, getState func() State) {
-	// TODO FIX ME
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -208,6 +177,5 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, getState func() S
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
-	go client.writePump(getState)
-	go client.readPump()
+	go client.writePump(getState)	
 }

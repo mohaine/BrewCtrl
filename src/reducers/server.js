@@ -114,6 +114,10 @@ function serverReducer(state = {}, action) {
         requestStatusStatus: null,
         lastStatusDate: new Date()
       })
+      case 'WEB_SOCKET':
+        return Object.assign({}, state, {
+          webSocketActive: action.active
+        })
 
 
     default:

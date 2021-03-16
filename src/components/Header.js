@@ -10,7 +10,7 @@ export default class Header extends Component {
   }
   componentDidMount() {
     this.statusCheckInterval = setInterval(() => {
-      let last = this.props.lastStatusDate;
+      let last = this.props.lastStatusDate;      
       if (this.props.lastStatusDate) {
         let now = new Date()
         let commLost = now.getTime() - last.getTime() > 5000
@@ -26,15 +26,19 @@ export default class Header extends Component {
     }
   }
   render() {
+    let commsGood = this.props.webSocketActive || !this.state.commLost 
     return (<div className="container-fluid" style={{ paddingTop: "15px" }}>
       <div style={{ float: "right" }}>
+        { this.props.webSocketActive  && (<span> &#x0226B; </span>)}
         <RouteLink route="brew">Brew</RouteLink> &nbsp;
             <RouteLink route="configuration">Configuration</RouteLink> &nbsp;
             <RouteLink route="steplists">Step Lists</RouteLink>
       </div>
       <Mode />
 
-      {this.state.commLost && (<div>
+      
+
+      {!commsGood && (<div>
         <div style={{ zIndex: 20, position: "absolute", top: 0, left: 0, height: "100%", width: "100%", background: "#fff", opacity: 0.75 }}>
         </div>
         <div style={{ zIndex: 21, position: "absolute", top: 20, left: 20, background: "#fff", opacity: 1 }}>

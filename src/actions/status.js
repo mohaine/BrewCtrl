@@ -8,6 +8,8 @@ import RequestStatus from './RequestStatus'
 
 let statusLoadInterval = undefined;
 
+let wsClient = undefined
+let webSocketActive = false
 
 export const cancelStatusLoad = () => {
     if (statusLoadInterval) {
@@ -21,23 +23,37 @@ const rescheduleStatusLoad = (dispatch) => {
 }
 
 const startStatusLoad = (dispatch) => {
-    const client = new WebSocket(config.wsUrl);
-    
-    client.onopen = () => {
-        console.log('WebSocket Client Connected');
-    };
-    client.onmessage = (message) => {
-        console.log("Message*****", message);
-        let status = new RequestStatus();
-        let json = JSON.parse(message.data)
-        console.log(json)
-        dispatch(statusMsg(status, { "data": json }))
-    };
+    if (wsClient === undefined) {
+        wsClient = new WebSocket(config.wsUrl);
+        wsClient.onopen = () => {
+            webSocketActive = true
+            dispatch({ type: "WEB_SOCKET", active: true })
+        };
+        wsClient.onmessage = (message) => {
+            let status = new RequestStatus();
+            let json = JSON.parse(message.data)
+            dispatch(statusMsg(status, { "data": json }))
+        };
+        wsClient.onerror = (event) => {
+            console.error("WebSocket error observed:", event);
+        };
+        wsClient.onclose = (event) => {
+            console.log('WebSocket Client Closed');
+            dispatch({ type: "WEB_SOCKET", active: false})
+            webSocketActive = false
+            wsClient = undefined
+            rescheduleStatusLoad(dispatch);
+        };
+    }
 
     if (!statusLoadInterval) {
         statusLoadInterval = setInterval(() => {
-            dispatch(requestStatusNoSchedule());
-        }, 500000);
+            if(webSocketActive){
+                cancelStatusLoad()
+            } else {
+                dispatch(requestStatusNoSchedule());
+            }
+        }, 500);
     }
 }
 

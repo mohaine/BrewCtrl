@@ -19,7 +19,6 @@ export const buildUrl = (relative) => {
     return config.baseUrl + relative
 };
 
-
 export const viewRoute = (path) => {
   return dispatch => {
         dispatch(push('/brewctrl/' + path))
