@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#BUILD_DIR=../pi-gen/stage2/05-brewctrl/files/
-BUILD_DIR=package
+BUILD_DIR=../pi-gen/stage2/05-brewctrl/files/
+#BUILD_DIR=package
 
 
 make rpi

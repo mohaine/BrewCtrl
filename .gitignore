@@ -17,5 +17,3 @@ yarn.lock
 build/
 package
 .env.production
-go/src/github.com/gorilla/
-go.sum
