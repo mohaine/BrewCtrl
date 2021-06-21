@@ -1,12 +1,17 @@
 
 
 function getConfig() {
+    let wsProtocol = "ws"
+    if( document.location.protocol === "httts" ){
+        wsProtocol="wss"
+    }
+
 
     let cfg = {
         buildTime: process.env.REACT_APP_BUILD_TIME,
         versionHash: process.env.REACT_APP_VERSION_HASH,
         baseUrl: document.location.protocol + "//" + document.location.host,
-        wsUrl: "ws//" + document.location.host + "/ws",
+        wsUrl: wsProtocol + "://" + document.location.host + "/ws",
         logState: false
     }
 
