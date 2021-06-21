@@ -1,9 +1,9 @@
-package main
+package service
 
 import (
 	// "fmt"
-	"github.com/mohaine/id"
-	"github.com/mohaine/onewire"
+	"github.com/mohaine/brewctrl/id"
+	"github.com/mohaine/brewctrl/onewire"
 	"time"
 	// "encoding/json"
 	"log"

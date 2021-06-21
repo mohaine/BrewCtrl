@@ -1,7 +1,7 @@
-package main
+package service
 
 import (
-	"github.com/mohaine/pid"
+	"github.com/mohaine/brewctrl/pid"
 )
 
 var seenGpios = make([]int32, 0)

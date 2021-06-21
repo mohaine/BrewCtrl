@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	// "encoding/json"
@@ -8,9 +8,9 @@ import (
 	// "os"
 	// "fmt"
 	// "strings"
-	"github.com/mohaine/id"
-	"github.com/mohaine/onewire"
-	"github.com/mohaine/pid"
+	"github.com/mohaine/brewctrl/id"
+	"github.com/mohaine/brewctrl/onewire"
+	"github.com/mohaine/brewctrl/pid"
 )
 
 const MODE_OFF = "OFF"

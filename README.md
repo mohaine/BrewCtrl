@@ -25,9 +25,9 @@ https://www.raspberrypi.org/documentation/raspbian/
     npm install
     npm start
     
-    export GOPATH=$PWD/go
+
     go get github.com/gorilla/websocket
-    go run github.com/mohaine/brewctrl --mock --port 2739
+    go run main.go --mock --port 2739
 
     load http://localhost:3000/ in your browser
 

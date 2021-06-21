@@ -1,17 +1,16 @@
-package main
+package service
 
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/mohaine/gpio"
-	"github.com/mohaine/onewire"
+	"github.com/mohaine/brewctrl/gpio"
+	"github.com/mohaine/brewctrl/onewire"
 )
 
 func enableCors(w *http.ResponseWriter) {
@@ -25,10 +24,8 @@ func sendError(w http.ResponseWriter, msg string, code int) {
 	http.Error(w, msg, code)
 }
 
-func main() {
-	mock := flag.Bool("mock", false, "Use Mock GPIO/Sensors")
-	port := flag.Uint("port", 80, "Web Server Port")
-	flag.Parse()
+func StartServer(mock bool, port uint) {
+
 
 	cfg, err := LoadCfg(CFG_FILE)
 	if err != nil {
@@ -48,7 +45,7 @@ func main() {
 	var initIo func(int32) = nil
 	var turnIoTo func(int32, bool) = nil
 
-	if *mock {
+	if mock {
 		readSensors, stopReading, initIo, turnIoTo = SensorLoopMock(100*time.Millisecond, cfg)
 	} else {
 		readSensors, stopReading = onewire.SensorLoop(100*time.Millisecond, "/sys/bus/w1/devices/")
@@ -110,7 +107,7 @@ func main() {
 			log.Println("error:", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if *mock {
+		if mock {
 			enableCors(&w)
 		}
 		w.Write(j)
@@ -139,7 +136,7 @@ func main() {
 			log.Println("error:", err)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if *mock {
+		if mock {
 			enableCors(&w)
 		}
 		var out bytes.Buffer
@@ -153,7 +150,7 @@ func main() {
 	})
 	http.Handle("/", http.FileServer(http.Dir("web/")))
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", *port), nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 
 	time.Sleep(1 * time.Second)
 	stopControl()

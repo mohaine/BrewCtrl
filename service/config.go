@@ -1,9 +1,9 @@
-package main
+package service
 
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/mohaine/id"
+	"github.com/mohaine/brewctrl/id"
 	"io"
 	"io/ioutil"
 	"log"
