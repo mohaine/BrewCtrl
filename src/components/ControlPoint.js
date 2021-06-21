@@ -60,9 +60,7 @@ export default class ControlPoint extends Component {
     let hasDuty = controlPoint.hasDuty
     let maxDuty = controlPoint.MaxDuty
 
-    let sensorAddress = controlPoint.tempSensorAddress
-
-    let automaticControl = !!sensorAddress
+    let automaticControl = controlPoint.automaticControl
 
     let targetTemp = ""
     if (automaticControl) {
