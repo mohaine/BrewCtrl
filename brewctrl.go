@@ -2,11 +2,9 @@ package main
 
 import (
 	"flag"
-	"log"
 	"github.com/mohaine/brewctrl/service"
+	"log"
 )
-
-
 
 func main() {
 	mock := flag.Bool("mock", false, "Use Mock GPIO/Sensors")
@@ -15,6 +13,5 @@ func main() {
 
 	log.Printf("mock: %v port: %v\n", *mock, *port)
 
-
-	service.StartServer(*mock,*port)
+	service.StartServer(*mock, *port)
 }
