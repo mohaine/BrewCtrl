@@ -113,7 +113,7 @@ export default class ControlPoint extends Component {
           </span>)}
           {!hasDuty && (<span> is
             <span></span><span> {duty > 0 && (<span className="clickable" onClick={() => this.updateDuty(0)}>On</span>)} </span>
-            <span></span><span> {duty == 0 && (<span className="clickable" onClick={() => this.updateDuty(100)}>Off</span>)} </span>
+            <span></span><span> {duty === 0 && (<span className="clickable" onClick={() => this.updateDuty(100)}>Off</span>)} </span>
           </span>)}
 
         </span>)}
