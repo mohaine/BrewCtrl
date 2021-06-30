@@ -27,7 +27,7 @@ https://www.raspberrypi.org/documentation/raspbian/
     
 
     go get github.com/gorilla/websocket
-    go run main.go --mock --port 2739
+    go run brewctrl.go --mock --port 2739
 
     load http://localhost:3000/ in your browser
 
