@@ -60,7 +60,6 @@ export default class ControlPoint extends Component {
       whatToControl = {}
     }
 
-    console.log(controlPoint)
     let duty = controlPoint.duty
     let hasDuty = controlPoint.hasDuty
     let maxDuty = controlPoint.MaxDuty

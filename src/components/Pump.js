@@ -33,9 +33,6 @@ export default class Pump extends Component {
 
     let onColor = automaticControl ? "#cfc" : "#0f0"
     let offColor = automaticControl ? "#fcc" : "#f00"
-    if (automaticControl) {
-      console.log(pump)
-    }
 
     return (<div>
       {this.state.editTargetTemp && (<QuickPickTemp close={() => { this.setState({ editTargetTemp: false }) }} apply={(value) => { this.updateTargetTemp(value) }} value={pump.targetTemp} />)}

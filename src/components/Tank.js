@@ -15,10 +15,11 @@ export default class Tank extends Component {
     }
   }
   updateTargetTemp(temp) {
-    let { step, tank, requestUpdateStep } = this.props
-    let heater = tank ? tank.heater : undefined;
-    requestUpdateStep(overlayControlPoint(step.rawStep, Object.assign({}, heater, { targetTemp: temp })));
+    let { step, requestUpdateStep } = this.props
+    let target = this.findTarget()
+    requestUpdateStep(overlayControlPoint(step.rawStep, Object.assign({}, target, { targetTemp: temp })));
   }
+
   updateElementDuty(duty) {
     let { step, tank, requestUpdateStep } = this.props
     let sensor = tank ? tank.sensor : undefined;
@@ -38,6 +39,26 @@ export default class Tank extends Component {
     requestUpdateStep(overlayControlPoint(step.rawStep, newControlPoint));
   }
 
+  findTarget(){
+    let { tank ,step} = this.props
+
+    let sensor = tank ? tank.sensor : undefined;
+    let heater = tank ? tank.heater : undefined;
+    let target = heater
+
+    // Something else might have this tank as the target, but only switch to it if no element
+    if (!heater && sensor) {
+      if (step && step.controlPoints) {
+        step.controlPoints.forEach(cp => {
+          if (cp.automaticControl && cp.tempSensorAddress === sensor.address){
+            target = cp
+          }
+        })
+      }   
+    }
+    return target
+  }
+
   render() {
     let { tank } = this.props
 
@@ -49,9 +70,10 @@ export default class Tank extends Component {
     if (heater && sensor) {
       extraItems.push({ value: "AUTO", text: "Auto" });
     }
+    let target = this.findTarget()
 
     return (<div>
-      {this.state.editTargetTemp && (<QuickPickTemp close={() => { this.setState({ editTargetTemp: false }) }} apply={(value) => { this.updateTargetTemp(value) }} value={heater.targetTemp} />)}
+      {this.state.editTargetTemp && (<QuickPickTemp close={() => { this.setState({ editTargetTemp: false }) }} apply={(value) => { this.updateTargetTemp(value) }} value={target.targetTemp} />)}
 
       { this.state.editElementDuty && (<QuickPickPercent close={() => { this.setState({ editElementDuty: false }) }} apply={(value) => { this.updateElementDuty(value) }}
         value={heater.automaticControl ? "AUTO" : heater.duty} extraItems={extraItems}
@@ -138,7 +160,7 @@ export default class Tank extends Component {
                   x="98.446396"
                   id="tempatureText">{formatTemp(sensor.temperatureC)}</tspan>
               </text>
-              {heater && heater.automaticControl && (<text onClick={() => this.setState({ editTargetTemp: true })}
+              {target && target.automaticControl && (<text onClick={() => this.setState({ editTargetTemp: true })}
                 id="targetTemp"
                 y="340.66696"
                 x="99.786003"
@@ -146,7 +168,7 @@ export default class Tank extends Component {
                 <tspan
                   y="340.66696"
                   x="99.786003"
-                  id="targetTempText">{"(" + formatTempWhole(heater.targetTemp) + ")"}</tspan>
+                  id="targetTempText">{"(" + formatTempWhole(target.targetTemp) + ")"}</tspan>
               </text>)}
             </g>
           )}
