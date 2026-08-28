@@ -7,7 +7,7 @@ import Brewery from '../containers/Brewery'
 import StepLists from '../containers/StepLists'
 import About from '../components/About'
 
-import { Switch, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 export default class App extends Component {
 
@@ -20,15 +20,13 @@ export default class App extends Component {
 
     return (<div><Header />
       <div className="container-fluid">
-        <Route path="/brewctrl">
-          <Switch>
-            <Route path="/brewctrl/about"><About /></Route>
-            <Route path="/brewctrl/configuration" ><Configuration /></Route>
-            <Route path="/brewctrl/brew"><Brewery /></Route>
-            <Route path="/brewctrl/steplists"><StepLists /></Route>
-            <Route><Default /></Route>
-          </Switch>
-        </Route>
+        <Routes>
+          <Route path="/brewctrl/about" element={<About />} />
+          <Route path="/brewctrl/configuration" element={<Configuration />} />
+          <Route path="/brewctrl/brew" element={<Brewery />} />
+          <Route path="/brewctrl/steplists" element={<StepLists />} />
+          <Route path="*" element={<Default />} />
+        </Routes>
 
       </div>
       <Footer /></div>)

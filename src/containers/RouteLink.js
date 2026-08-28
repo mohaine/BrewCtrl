@@ -1,19 +1,19 @@
 import { connect } from 'react-redux'
-
-import { viewRoute} from '../actions/'
+import { useNavigate } from 'react-router-dom'
 
 import Link from '../components/Link'
-
-const mapStateToProps = (state,ownProps) => {
-   return {  };
-}
 
 const mapDispatchToProps = (dispatch,ownProps) => {
   return {
     onClick: (route) => {
-      dispatch(viewRoute(ownProps.route));
+      ownProps.navigate('/brewctrl/' + ownProps.route)
     }
   }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(Link)
+const ConnectedLink = connect(null,mapDispatchToProps)(Link)
+
+export default function RouteLink(props) {
+  const navigate = useNavigate()
+  return <ConnectedLink {...props} navigate={navigate} />
+}

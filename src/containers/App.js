@@ -1,19 +1,20 @@
 import { connect } from 'react-redux'
-
-import { viewRoute} from '../actions/'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import App from '../components/App'
-
-const mapStateToProps = (state,ownProps) => {
-   return { location: state.router.location };
-}
 
 const mapDispatchToProps = (dispatch,ownProps) => {
   return {
     route: (route) => {
-      dispatch(viewRoute(route));
+      ownProps.navigate('/brewctrl/' + route)
     }
   }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(App)
+const ConnectedApp = connect(null,mapDispatchToProps)(App)
+
+export default function AppContainer() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  return <ConnectedApp location={location} navigate={navigate} />
+}
