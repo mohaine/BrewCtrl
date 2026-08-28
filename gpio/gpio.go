@@ -1,13 +1,14 @@
 package gpio
 
 import (
-	"io/ioutil"
-	"log"
 	"fmt"
+	"log"
+	"os"
 )
 
 const IO_OUT = false
 const IO_IN = true
+
 var SYS_PATH = "/sys/"
 
 func gpioRoot() string {
@@ -23,7 +24,7 @@ func IoMode(io int32, inout bool) {
 	// fmt.Printf("  Pin %v In/Out to %v\n", io, direction)
 	// Export pin
 	path := fmt.Sprintf("%v/export", gpioRoot())
-	ioutil.WriteFile(path, []byte(fmt.Sprintf("%v", io)), 0644)
+	os.WriteFile(path, []byte(fmt.Sprintf("%v", io)), 0644)
 	// These fail if called twice
 	// if err != nil {
 	// 	log.Panic("Failed export io %v In/Out to %v\n", io, direction)
@@ -31,13 +32,12 @@ func IoMode(io int32, inout bool) {
 
 	// Set Direction
 	path = fmt.Sprintf("%v/gpio%v/direction", gpioRoot(), io)
-	ioutil.WriteFile(path, []byte(direction), 0644)
+	os.WriteFile(path, []byte(direction), 0644)
 	// if err != nil {
 	// 	log.Panic("Failed to set direction on io %v In/Out to %v\n", io, direction)
 	// }
 }
 
-//
 func TurnIoTo(io int32, hilow bool) {
 	// if (INVERT_GPIO[io]) {
 	// 	hilow = !hilow;
@@ -50,7 +50,7 @@ func TurnIoTo(io int32, hilow bool) {
 		oneZero = "1"
 	}
 	path := fmt.Sprintf("%v/gpio%v/value", gpioRoot(), io)
-	err := ioutil.WriteFile(path, []byte(oneZero), 0644)
+	err := os.WriteFile(path, []byte(oneZero), 0644)
 	if err != nil {
 		onOff := "off"
 		if hilow {

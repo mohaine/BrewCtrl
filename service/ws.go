@@ -119,8 +119,6 @@ type Client struct {
 	send chan []byte
 }
 
-
-
 func (c *Client) writePump(getState func() State) {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -145,7 +143,7 @@ func (c *Client) writePump(getState func() State) {
 
 			// Add queued chat messages to the current websocket message.
 			n := len(c.send)
-			for i := 0; i < n; i++ {
+			for range n {
 				w.Write(newline)
 				w.Write(<-c.send)
 			}
@@ -177,5 +175,5 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, getState func() S
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
-	go client.writePump(getState)	
+	go client.writePump(getState)
 }

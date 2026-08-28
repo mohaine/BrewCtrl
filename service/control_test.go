@@ -7,62 +7,70 @@ import (
 
 func TestUpdateStepTimer_ON(t *testing.T) {
 	cfg := SimpleTestCfg()
-	state := StateDefault(cfg)
+	initIo := func(i int32) {
+	}
+	state := StateDefault(cfg, initIo)
 	state.Mode = MODE_ON
 	steps := state.Steps
 	stepId := steps[0].Id
 	steps[0].StepTime = 1
 	startTime = startTime - 50
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	expectStringToNotBe(t, state.Steps[0].Id, stepId)
 }
 func TestUpdateStepTimer_HEAT_OFF(t *testing.T) {
+	initIo := func(i int32) {
+	}
 	cfg := SimpleTestCfg()
-	state := StateDefault(cfg)
+	state := StateDefault(cfg, initIo)
 	state.Mode = MODE_HEAT_OFF
 	steps := state.Steps
 	stepId := steps[0].Id
 	steps[0].StepTime = 1
 	startTime = startTime - 50
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	expectStringToNotBe(t, state.Steps[0].Id, stepId)
 }
 func TestUpdateStepTimer_OFF(t *testing.T) {
+	initIo := func(i int32) {
+	}
 	cfg := SimpleTestCfg()
-	state := StateDefault(cfg)
+	state := StateDefault(cfg, initIo)
 	state.Mode = MODE_OFF
 	steps := state.Steps
 	stepId := steps[0].Id
 	steps[0].StepTime = 1
 	startTime = startTime - 50
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	expectStringToBe(t, state.Steps[0].Id, stepId)
 }
 func TestUpdateStepTimer_HOLD(t *testing.T) {
+	initIo := func(i int32) {
+	}
 	cfg := SimpleTestCfg()
-	state := StateDefault(cfg)
+	state := StateDefault(cfg, initIo)
 	state.Mode = MODE_HOLD
 	steps := state.Steps
 	stepId := steps[0].Id
 	steps[0].StepTime = 1
 	startTime = startTime - 50
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	startTime = startTime - 550
-	UpdateStepTimer(&state, &cfg)
+	UpdateStepTimer(&state, &cfg, initIo)
 	expectStringToBe(t, state.Steps[0].Id, stepId)
 }
 
@@ -111,12 +119,14 @@ func ComplexConfig2() (cfg Configuration) {
 }
 
 func TestNewCfg(t *testing.T) {
+	initIo := func(i int32) {
+	}
 	cfg := ComplexConfig1()
 	cfgNew := ComplexConfig2()
 
 	origVersion := cfg.Version
 
-	state := StateDefault(cfg)
+	state := StateDefault(cfg, initIo)
 	state.Mode = MODE_HOLD
 
 	expectStringToBe(t, origVersion, state.ConfigurationVersion)
@@ -127,7 +137,8 @@ func TestNewCfg(t *testing.T) {
 	expectInt32ToBe(t, 10, stepBefore.ControlPoints[2].Io)
 	expectInt32ToBe(t, 11, stepBefore.ControlPoints[3].Io)
 
-	updateForNewConfiguration(&cfgNew, &state, &cfg)
+	updateForNewConfiguration(&cfgNew, &state, &cfg, initIo, func(_ int32, _ bool) {
+	})
 	expectStringToNotBe(t, origVersion, state.ConfigurationVersion)
 
 	stepAfter := state.Steps[0]
