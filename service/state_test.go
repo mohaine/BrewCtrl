@@ -33,7 +33,7 @@ func expectStringToNotBe(t *testing.T, expected string, actual string) {
 }
 
 func InitMockPath() {
-	SYS_PATH = "../../../../../mock/sys/"
+	//SYS_PATH = "../../../../../mock/sys/"
 	// dir, err := filepath.Abs(filepath.Dir(SYS_PATH))
 	//  if err != nil {
 	//      log.Fatal(err)
@@ -50,7 +50,9 @@ func SimpleTestCfg() (cfg Configuration) {
 
 func TestDefaultState(t *testing.T) {
 	cfg := SimpleTestCfg()
-	state := StateDefault(cfg)
+	state := StateDefault(cfg, func(_ int32) {
+
+	})
 	expectStringToBe(t, state.Mode, MODE_OFF)
 	steps := state.Steps
 	expectIntToBe(t, len(steps), 1)
@@ -64,7 +66,9 @@ func TestDefaultState(t *testing.T) {
 
 func TestStateUpdateDuty(t *testing.T) {
 	cfg := SimpleTestCfg()
-	state := StateDefault(cfg)
+	state := StateDefault(cfg, func(_ int32) {
+
+	})
 	steps := state.Steps
 	controlPoints := steps[0].ControlPoints
 	pump := controlPoints[0]

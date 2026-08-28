@@ -1,5 +1,5 @@
 module github.com/mohaine/brewctrl
 
-go 1.22
+go 1.27
 
-require github.com/gorilla/websocket v1.4.2 // indirect
+require github.com/gorilla/websocket v1.4.2

@@ -26,7 +26,6 @@ func sendError(w http.ResponseWriter, msg string, code int) {
 
 func StartServer(mock bool, port uint) {
 
-
 	cfg, err := LoadCfg(CFG_FILE)
 	if err != nil {
 		log.Printf("Failed to load cfg file: %v\n", err)

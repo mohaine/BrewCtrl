@@ -84,7 +84,7 @@ func SetToStateDefault(cfg Configuration, state *State, initIo func(int32)) {
 
 func IsHeater(cfg *Configuration, io int32) bool {
 	tanks := cfg.BrewLayout.Tanks
-	for i := 0; i < len(tanks); i++ {
+	for i := range tanks {
 		tank := tanks[i]
 		heater := tank.Heater
 		if heater.Io > 0 && heater.Io == io {
@@ -101,7 +101,7 @@ func StepDefault(cfg Configuration, initIo func(int32)) (step ControlStep) {
 	step.Active = true
 
 	tanks := cfg.BrewLayout.Tanks
-	for i := 0; i < len(tanks); i++ {
+	for i := range tanks {
 		tank := tanks[i]
 		heater := tank.Heater
 		if heater.Io > 0 {
@@ -110,7 +110,7 @@ func StepDefault(cfg Configuration, initIo func(int32)) (step ControlStep) {
 		}
 	}
 	pumps := cfg.BrewLayout.Pumps
-	for i := 0; i < len(pumps); i++ {
+	for i := range pumps {
 		pump := pumps[i]
 		cp := createControlPoint(pump.Io, pump.HasDuty, pump.MinStateChangeSeconds, 0, 100, initIo)
 		step.ControlPoints = append(step.ControlPoints, cp)

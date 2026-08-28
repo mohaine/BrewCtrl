@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"github.com/mohaine/brewctrl/id"
 	"io"
-	"io/ioutil"
+
 	"log"
 	"os"
 )
@@ -35,8 +35,8 @@ type HeatElement struct {
 type Tank struct {
 	Id     string        `json:"id,omitempty"`
 	Name   string        `json:"name,omitempty"`
-	Sensor SensorAddress `json:"sensor,omitempty"`
-	Heater HeatElement   `json:"heater,omitempty"`
+	Sensor SensorAddress `json:"sensor"`
+	Heater HeatElement   `json:"heater"`
 }
 type Pump struct {
 	Id                    string `json:"id,omitempty"`
@@ -84,7 +84,7 @@ func IdEverything(cfg *Configuration) {
 	idMap := make(map[string]bool)
 
 	stepLists := cfg.StepLists
-	for i := 0; i < len(stepLists); i++ {
+	for i := range stepLists {
 		stepList := &stepLists[i]
 		if len(stepList.Id) == 0 || idMap[stepList.Id] {
 			stepList.Id = id.RandomId()
@@ -93,7 +93,7 @@ func IdEverything(cfg *Configuration) {
 	}
 
 	tanks := cfg.BrewLayout.Tanks
-	for i := 0; i < len(tanks); i++ {
+	for i := range tanks {
 		tank := &tanks[i]
 		if len(tank.Id) == 0 || idMap[tank.Id] {
 			tank.Id = id.RandomId()
@@ -106,7 +106,7 @@ func IdEverything(cfg *Configuration) {
 		idMap[tank.Heater.Id] = true
 	}
 	pumps := cfg.BrewLayout.Pumps
-	for i := 0; i < len(pumps); i++ {
+	for i := range pumps {
 		pump := &pumps[i]
 		if len(pump.Id) == 0 || idMap[pump.Id] {
 			pump.Id = id.RandomId()
@@ -117,7 +117,7 @@ func IdEverything(cfg *Configuration) {
 
 func SetMaxDutyIfNot(cfg *Configuration) {
 	tanks := cfg.BrewLayout.Tanks
-	for i := 0; i < len(tanks); i++ {
+	for i := range tanks {
 		tank := &tanks[i]
 		if tank.Heater.MaxDuty == 0 {
 			tank.Heater.MaxDuty = 100
@@ -127,7 +127,7 @@ func SetMaxDutyIfNot(cfg *Configuration) {
 
 func SetPumpsMinChangeTime(cfg *Configuration) {
 	pumps := cfg.BrewLayout.Pumps
-	for i := 0; i < len(pumps); i++ {
+	for i := range pumps {
 		pump := &pumps[i]
 		if !pump.HasDuty && pump.MinStateChangeSeconds <= 0 {
 			pump.MinStateChangeSeconds = 15
@@ -140,7 +140,7 @@ func SetPumpsMinChangeTime(cfg *Configuration) {
 func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
 	ioMap = make(map[int32]string)
 	tanks := cfg.BrewLayout.Tanks
-	for i := 0; i < len(tanks); i++ {
+	for i := range tanks {
 		tank := tanks[i]
 		heater := tank.Heater
 		if heater.Io > 0 {
@@ -148,7 +148,7 @@ func IoToOwnerIdMap(cfg *Configuration) (ioMap map[int32]string) {
 		}
 	}
 	pumps := cfg.BrewLayout.Pumps
-	for i := 0; i < len(pumps); i++ {
+	for i := range pumps {
 		pump := pumps[i]
 		ioMap[pump.Io] = pump.Id
 	}
@@ -162,7 +162,7 @@ func WriteConfiguration(cfg *Configuration) {
 	}
 	var out bytes.Buffer
 	json.Indent(&out, j, "", "  ")
-	err = ioutil.WriteFile(CFG_FILE, out.Bytes(), 0644)
+	err = os.WriteFile(CFG_FILE, out.Bytes(), 0644)
 	if err != nil {
 		log.Println("Failed to write to ", CFG_FILE, " error ", err)
 	}

@@ -1,20 +1,18 @@
 package onewire
 
-
 import (
+	"errors"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
-	"errors"
-	"os"
 )
 
 type TempReading struct {
 	TempMilliC int32
-	Id string
+	Id         string
 }
-
 
 func (tr *TempReading) TempC() float32 {
 	return float32(tr.TempMilliC) / 1000.0
@@ -22,8 +20,8 @@ func (tr *TempReading) TempC() float32 {
 
 func parseTemp(w1SlaveData string) (temp TempReading, err error) {
 	index := strings.LastIndex(w1SlaveData, " t=")
-	if index > -1 && index + 3 < len(w1SlaveData) {
-		tempString := strings.Trim(w1SlaveData[index+3 : ],"\n ")	  	
+	if index > -1 && index+3 < len(w1SlaveData) {
+		tempString := strings.Trim(w1SlaveData[index+3:], "\n ")
 		var temp64 int64
 		temp64, err = strconv.ParseInt(tempString, 10, 32)
 		if err == nil {
@@ -37,27 +35,25 @@ func parseTemp(w1SlaveData string) (temp TempReading, err error) {
 
 func readTempSensor(filename string) (temp TempReading, err error) {
 	var data []byte
-	data, err = ioutil.ReadFile(filename)
+	data, err = os.ReadFile(filename)
 	if err == nil {
 		temp, err = parseTemp(string(data))
 	}
 	return
 }
 
-
-func SensorLoop(interval time.Duration, searchDir string) (read func()([]TempReading), quit func()) {
+func SensorLoop(interval time.Duration, searchDir string) (read func() []TempReading, quit func()) {
 	quitC := make(chan int)
 	quit = func() { quitC <- 1 }
 	tick := time.Tick(interval)
 
 	currReadings := make([]TempReading, 0)
-	read = func () ([]TempReading) {
-		 now:= currReadings
-	   readings := make([]TempReading, len(now))
-		 copy(readings,now)
-		 return readings
-	 }
-
+	read = func() []TempReading {
+		now := currReadings
+		readings := make([]TempReading, len(now))
+		copy(readings, now)
+		return readings
+	}
 
 	loop := func() {
 		for {
